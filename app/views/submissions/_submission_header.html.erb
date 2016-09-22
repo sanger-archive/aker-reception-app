@@ -1,0 +1,27 @@
+<div class="row">
+  <div class="col-md-12">
+    <p style="padding: 15px; margin: 15px 0" class="bg-info">
+      Please read submission guidance before submitting your material.
+      <br /><br />
+      <%= link_to "Submission guidance (vx.x)", "#" %>
+    </p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <%= render "error_messages", target: material_submission %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <h2><%= title %></h2>
+  </div>
+</div>
+
+<div class="progress">
+  <div class="progress-bar progress-bar-striped progress-bar-success" role="progressbar" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100" style="width: <%= progress %>%">
+    <span class="sr-only"><%= progress %>% Complete (success)</span>
+  </div>
+</div>

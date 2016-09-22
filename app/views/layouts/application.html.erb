@@ -15,10 +15,12 @@
 
   <div class="container">
 
-
     <div class="row">
-      <div class="col-md-12">
-        <h1>Sanger Institute: Material Submission</h1>
+      <div class="col-md-8">
+        <h1>Sanger Institute <small>Material Submission</small></h1>
+      </div>
+      <div class="col-md-4 text-right">
+        <%= yield(:title_button) if content_for?(:title_button) %>
       </div>
     </div>
 

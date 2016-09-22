@@ -1,53 +1,17 @@
+<% content_for :title_button do %>
+  <%= link_to 'Create New Submission', new_material_submission_url, class: 'btn btn-success vcenter', style: 'margin-top: 28px' %>
+<% end %>
+
 <div class="row">
   <div class="col-md-12">
-    <%= link_to 'Create New Submission', new_material_submission_url, class: 'btn btn-success' %>
+    <h2>Incomplete Submissions</h2>
+    <%= render "material_submission_table", material_submissions: @pending_material_submissions %>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-12">
-    <h2>Pending Submissions</h2>
-
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Labware Type</th>
-          <th>Number</th>
-          <th>Supply Labware?</th>
-          <th>Date Created</th>
-          <th></th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <%= render @pending_material_submissions %>
-      </tbody>
-
-    </table>
-
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
-    <h2>Active Submissions</h2>
-
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Labware Type</th>
-          <th>Number</th>
-          <th>Supply Labware?</th>
-          <th>Date Created</th>
-          <th></th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <%= render @active_material_submissions %>
-      </tbody>
-
-    </table>
-
+    <h2>Completed Submissions</h2>
+    <%= render "material_submission_table", material_submissions: @active_material_submissions %>
   </div>
 </div>

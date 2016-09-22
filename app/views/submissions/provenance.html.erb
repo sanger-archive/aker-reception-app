@@ -1,5 +1,6 @@
-<%= render 'form', locals: { step: step } do %>
-  <%= bootstrap_form_for material_submission, url: wizard_path, method: :put do |f| %>
+<%= render partial: 'submission_header', locals: { title: "Step 2: Biomaterial Provenance" , progress: 50 } %>
+
+<%= bootstrap_form_for material_submission, url: wizard_path, method: :put do |f| %>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
 
@@ -76,13 +77,12 @@
             </tbody>
           </table>
 
-        </div> <!-- tabpanel -->
+        </div>
 
     <% end %>
 
-  </div> <!-- tab-content -->
+  </div>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
-<% end %>
 
 <% end %>

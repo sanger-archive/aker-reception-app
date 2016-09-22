@@ -9,10 +9,12 @@ class MaterialSubmission < ApplicationRecord
     if: :active_or_labware?
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :active_or_labware?
-
   validates :labware_type_id, presence: true, if: :active_or_labware?
+  validates :address, presence: true, if: :active?
 
-  before_save :set_labware, if: :labware_type_id_changed?
+  validate :each_labware_has_biomaterial, if: :active?
+
+  before_save :set_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
   accepts_nested_attributes_for :labwares
 
@@ -46,6 +48,12 @@ class MaterialSubmission < ApplicationRecord
 
   def set_labware
     self.labwares = LabwareType.create_labwares(number: no_of_labwares_required, labware_type_id: labware_type_id)
+  end
+
+  def each_labware_has_biomaterial
+    unless labwares.all? { |labware| labware.biomaterials.count > 0 }
+      errors.add(:labwares, "must each have at least one Biomaterial")
+    end
   end
 
 end
