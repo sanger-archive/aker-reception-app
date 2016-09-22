@@ -1,0 +1,19 @@
+<%= render 'form', locals: { step: step }  do %>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Dispatch request #<%= material_submission.id %></h2>
+
+      <p><%= pluralize(material_submission.no_of_labwares_required, 'barcode') %> will be printed and dispatched to you in the next 5 working days. A copy of the material manifest will be mailed to the address below:</p>
+
+      <%= bootstrap_form_for material_submission, url: wizard_path, method: :put  do |f| %>
+
+        <%= f.text_area :address, value: "Dr. Alan Kay\n\n80 Xerox Palo Alto Research Center\nA place\nUSA", control_class: 'form-control halvsies' %>
+
+        <%= render 'buttons', material_submission: material_submission, f: f %>
+
+      <% end %>
+
+    </div>
+  </div>
+<% end %>

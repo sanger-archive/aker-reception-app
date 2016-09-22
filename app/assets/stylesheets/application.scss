@@ -1,0 +1,29 @@
+@import "bootstrap-sprockets";
+@import "bootstrap";
+@import "font-awesome-sprockets";
+@import "font-awesome";
+@import "datatables";
+
+textarea.halvsies { height: 150px; width: 33% }
+
+.error {
+  @extend .alert-danger;
+}
+
+.warning {
+  @extend .alert-warning;
+}
+
+.notice {
+  @extend .alert-success;
+}
+
+.is-dragover {
+  opacity: 0.5;
+}
+
+.vcenter {
+  display: inline-block;
+  vertical-align: middle;
+  float: none;
+}
