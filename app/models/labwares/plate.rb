@@ -5,7 +5,7 @@ class Plate < Labware
 
   accepts_nested_attributes_for :wells
 
-  before_create :build_wells
+  before_create :build_default_wells
 
   def positions
     if (!x_dimension_is_alpha && !y_dimension_is_alpha)
@@ -27,8 +27,11 @@ class Plate < Labware
     y.product(x).map(&:join)
   end
 
-  def build_wells
-    wells.build(positions.map { |position| { position: position } })
+private
+
+  def build_default_wells
+    self.wells = wells.build(positions.map { |position| { position: position } })
+    true
   end
 
 end
