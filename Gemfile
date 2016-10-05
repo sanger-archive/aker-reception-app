@@ -31,7 +31,10 @@ gem 'jbuilder', '~> 2.5'
 gem 'wicked'
 gem 'bootstrap_form'
 gem 'uuid'
-gem 'pg'
+
+group :pg do
+  gem 'pg'
+end
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
