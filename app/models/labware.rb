@@ -3,6 +3,7 @@ class Labware < ApplicationRecord
 
   has_one :material_submission_labware, as: :labware
   has_one :material_submission, through: :material_submission_labware
+  has_many :wells
 
   belongs_to :labware_type
 

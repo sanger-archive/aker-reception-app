@@ -76,11 +76,11 @@ ActiveRecord::Schema.define(version: 20160921095507) do
   end
 
   create_table "wells", force: :cascade do |t|
-    t.integer  "plate_id"
+    t.integer  "labware_id"
     t.string   "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["plate_id"], name: "index_wells_on_plate_id"
+    t.index ["labware_id"], name: "index_wells_on_labware_id"
   end
 
 end

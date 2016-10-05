@@ -1,5 +1,5 @@
 class Well < ApplicationRecord
-  belongs_to :plate
+  belongs_to :labware
   has_one :biomaterial, as: :containable
 
   validates :position, presence: true, uniqueness: { scope: :labware_id }
