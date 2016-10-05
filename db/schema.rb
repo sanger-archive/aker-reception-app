@@ -75,20 +75,6 @@ ActiveRecord::Schema.define(version: 20160921095507) do
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id"
   end
 
-  create_table "plates", force: :cascade do |t|
-    t.integer  "labware_type_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-    t.index ["labware_type_id"], name: "index_plates_on_labware_type_id"
-  end
-
-  create_table "tubes", force: :cascade do |t|
-    t.integer  "labware_type_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-    t.index ["labware_type_id"], name: "index_tubes_on_labware_type_id"
-  end
-
   create_table "wells", force: :cascade do |t|
     t.integer  "plate_id"
     t.string   "position"

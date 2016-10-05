@@ -30,7 +30,7 @@ class Plate < Labware
 private
 
   def build_default_wells
-    self.wells = wells.build(positions.map { |position| { position: position } })
+    wells.build(positions.map { |position| { position: position } })
     true
   end
 
