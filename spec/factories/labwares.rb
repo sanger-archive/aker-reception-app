@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :labware do
-    labware_type nil
+    labware_type
     type ""
   end
 end

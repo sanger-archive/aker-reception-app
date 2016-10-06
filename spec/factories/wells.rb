@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :well do
-    plate
+    labware
     position "A:1"
   end
 end
