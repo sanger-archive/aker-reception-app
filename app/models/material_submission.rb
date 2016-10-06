@@ -2,7 +2,7 @@ class MaterialSubmission < ApplicationRecord
 
   belongs_to :labware_type, optional: true
 
-  has_many :material_submission_labwares
+  has_many :material_submission_labwares, dependent: :destroy
   has_many :labwares, through: :material_submission_labwares
 
   validates :no_of_labwares_required, numericality: { only_integer: true, greater_than_or_equal_to: 1 },
