@@ -11,19 +11,7 @@ class SubmissionsController < ApplicationController
     params[:material_submission][:status] = step.to_s
     params[:material_submission][:status] = 'active' if last_step?
 
-    updating_params = material_submission_params
-    case step
-    when :dispatch
-      if material_submission_params[:contact].empty?
-        flash[:error] = "You need to provide a contact"
-        redirect_to material_submission_build_path material_submission_id: material_submission.id
-        return
-      else
-        set_contact
-        updating_params = updating_params.merge({:contact => @contact})
-      end
-    end
-    if material_submission.update_attributes(updating_params) && last_step?
+    if material_submission.update_attributes(material_submission_params) && last_step?
       flash[:notice] = 'Your Submission has been created'
     end
 
@@ -50,7 +38,7 @@ class SubmissionsController < ApplicationController
 
   def material_submission_params
     params.require(:material_submission).permit(
-      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :contact, labwares_attributes: [
+      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, contact_attributes: [:email], labwares_attributes: [
         :id,
         wells_attributes: [
           :id,
@@ -59,14 +47,6 @@ class SubmissionsController < ApplicationController
       ]
     )
   end
-
-  def set_contact
-    @contact = Contact.find_by_email(material_submission_params[:contact])
-    if @contact.nil?
-      @contact = Contact.create(:email => material_submission_params[:contact])
-    end
-  end
-
 
 
 end
