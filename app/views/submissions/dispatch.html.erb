@@ -19,7 +19,7 @@
   <div class="col-md-6 col-xs-12">
     <h2>Contact</h2>
 
-    <p>The following contact will be noticed when the materials arrive at Sanger Institute:</p>
+    <p>The following contact will be notified when the materials arrive at Sanger Institute:</p>
 
     <%= f.fields_for(:contact_attributes) do |c| %>
       <%= c.select(:email, options_for_select(available_contacts_select_options), {}, {class: "form-control contact"}) %>
