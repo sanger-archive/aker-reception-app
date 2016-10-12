@@ -37,3 +37,10 @@ LabwareType.create(
   x_dimension_is_alpha: false,
   y_dimension_is_alpha: false
 )
+
+100.times do
+  Contact.create(
+    fullname: Forgery('name').full_name,
+    email: Forgery('internet').email_address
+  )
+end

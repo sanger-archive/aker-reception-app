@@ -1,6 +1,7 @@
 class Labware < ApplicationRecord
   include Barcodeable
 
+
   has_one :material_submission_labware, as: :labware
   has_one :material_submission, through: :material_submission_labware
   has_many :wells, dependent: :destroy
