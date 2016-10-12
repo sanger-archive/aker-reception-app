@@ -14,6 +14,7 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require bootstrap-sprockets
+//= require select2
 //= require_tree .
 
 var field_mapping = {
@@ -49,7 +50,12 @@ $(document).on('turbolinks:load', function() {
     })
     .on('drop', function(e) {
       fillInTableFromFile($(this), e.originalEvent.dataTransfer.files);
-    })
+    });
+
+  $('select.contact').select2({
+    tags: true,
+    tokenSeparators: [',', ' ']
+  });
 
   $('form.edit_material_submission input:file').on('change', function() {
 

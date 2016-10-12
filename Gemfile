@@ -31,6 +31,8 @@ gem 'jbuilder', '~> 2.5'
 gem 'wicked'
 gem 'bootstrap_form'
 gem 'uuid'
+gem 'select2-rails'
+gem 'forgery'
 
 gem 'pg'
 

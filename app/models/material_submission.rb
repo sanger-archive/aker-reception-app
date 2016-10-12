@@ -1,6 +1,7 @@
 class MaterialSubmission < ApplicationRecord
 
   belongs_to :labware_type, optional: true
+  belongs_to :contact, optional: true
 
   has_many :material_submission_labwares, dependent: :destroy
   has_many :labwares, through: :material_submission_labwares
@@ -11,6 +12,7 @@ class MaterialSubmission < ApplicationRecord
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :active_or_labware?
   validates :labware_type_id, presence: true, if: :active_or_labware?
   validates :address, presence: true, if: :active?
+  validates :contact, presence: true, if: :active?
 
   validate :each_labware_has_biomaterial, if: :active?
 
