@@ -1,0 +1,2 @@
+class MaterialReception < ApplicationRecord
+end
