@@ -2,7 +2,7 @@ module Barcodeable
   extend ActiveSupport::Concern
 
   included do
-    has_one :barcode, as: :barcodeable
+    has_one :barcode, as: :barcodeable, foreign_key: :barcodeable_id
 
     after_create :set_barcode
 

@@ -1,15 +1,32 @@
 <% content_for :title_button do %>
-  <%= link_to 'Receive new material', new_material_reception_url, class: 'btn btn-success vcenter', style: 'margin-top: 28px' %>
+  <%= link_to 'To Submission', material_submissions_path, class: 'btn btn-info vcenter', style: 'margin-top: 28px' %>
+  <!-- %= link_to 'Receive new material', new_material_reception_url, class: 'btn btn-success vcenter', style: 'margin-top: 28px' % -->
 <% end %>
 
 <% content_for :main_title do %>
   Material Reception
 <% end %>
 
-<div class="row">
-  <div class="col-md-12">
-    <h2>Received material</h2>
-    <%= render "material_receptions", material_receptions: @material_receptions %>
+  <div class="alert alert-danger invisible" role="alert">
+    <!-- h4 class='alert-title'>Error!</h4 -->
+    <p class='alert-msg'>&nbsp;</p>
   </div>
+
+<div data-psd-component-class='BarcodeReader' data-psd-component-parameters="<%= @material_receptions.map(&:presenter).to_json %>">
+<%= bootstrap_form_for(@material_reception, remote: true) do |f| %>
+  <div class='input-group row'>
+    <span class="input-group-addon glyphicon glyphicon-barcode" aria-hidden="true" style="top:0px;"></span>
+    <%= f.text_field :barcode_value, :placeholder => 'Scan a barcode', hide_label: true, autocomplete: 'off' %>
+  </div>
+
+
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Received material</h2>
+      <%= render "material_receptions", material_receptions: @material_receptions %>
+    </div>
+  </div>
+<% end %>
 </div>
 

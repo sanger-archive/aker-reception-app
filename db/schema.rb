@@ -63,9 +63,10 @@ ActiveRecord::Schema.define(version: 20161012135533) do
   end
 
   create_table "material_receptions", force: :cascade do |t|
-    t.string   "barcode"
+    t.integer  "labware_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["labware_id"], name: "index_material_receptions_on_labware_id"
   end
 
   create_table "material_submission_labwares", force: :cascade do |t|
