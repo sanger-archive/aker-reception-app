@@ -9,7 +9,7 @@ class SubmissionsController < ApplicationController
 
   def update
     params[:material_submission][:status] = step.to_s
-    params[:material_submission][:status] = 'active' if last_step?
+    params[:material_submission][:status] = MaterialSubmission.ACTIVE if last_step?
 
     if material_submission.update_attributes(material_submission_params) && last_step?
       flash[:notice] = 'Your Submission has been created'

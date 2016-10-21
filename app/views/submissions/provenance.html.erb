@@ -6,7 +6,7 @@
 
   <ul class="nav nav-tabs" role="tablist">
 
-    <% material_submission.labwares.each_with_index do |labware, i| %>
+    <% material_submission.labwares.includes(:barcode).each_with_index do |labware, i| %>
       <li class="<%= 'active' if i == 0 %>" role="presentation">
         <a data-toggle="tab" href="#<%= labware.barcode.value %>" aria-controls="<%= labware.barcode.value %>" role="tab">
           <%= labware.barcode.value %>
@@ -18,7 +18,7 @@
 
   <div class="tab-content">
 
-    <%= f.fields_for :labwares, material_submission.labwares do |labware_fields| %>
+    <%= f.fields_for :labwares, material_submission.labwares.includes(:biomaterials, :barcode) do |labware_fields| %>
 
         <div role="tabpanel" class="tab-pane <%= 'active' if labware_fields.index == 0 %>" id="<%= labware_fields.object.barcode.value %>">
 

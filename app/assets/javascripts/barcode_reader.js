@@ -1,14 +1,24 @@
 (function($, undefined) {
+  /**
+  * This component works with 3 elements:
+  * 1. An input to read a barcode with the following behaviour:
+  *     - On tabulator or carriage return will send the form (2)
+  * 2. A form that will obtain a data object about the barcode provided in the input:
+  *     - On success, it will trigger an event DataTableInitialization.addRow with some data inside an array
+  * 3. A table using DataTable js and DataTableInitialization class to manage the answer
+  **/
   function BarcodeReader(node, params) {
     this.node = $(node);
-    this.rows = params;
 
     this.form = $('form', this.node);
     this.table = $('table tbody', this.node);
+    this.containerTable = $('table', this.node);
     this.inputReader = $('input', this.node);
 
-    this.renderTable();
+    this.initTable(params);
     this.attachHandlers();
+
+    this.inputReader.focus();
   };
 
   var proto = BarcodeReader.prototype;
@@ -22,12 +32,12 @@
   };
 
   proto.addRow = function(rowInfo) {
-    this.table.append(['<tr><td>',rowInfo.labware.barcode,
-          '</td><td>', rowInfo.created_at, '</td></tr>'].join(''));
+    this.rows.push(rowInfo);
+    this.containerTable.trigger('DataTableInitialization.addRow', [[rowInfo.labware.barcode, rowInfo.created_at]]);
   };
 
-  proto.renderTable = function() {
-    this.table.html('');
+  proto.initTable = function(rows) {
+    this.rows = [];
     for (var i=0; i<this.rows.length; i++) {
       this.addRow(this.rows[i]);
     }
@@ -43,9 +53,12 @@
       this.alert(json.error);
     } else {
       $('.alert').toggleClass('invisible', true);
-      this.rows.push(json)
-      this.renderTable();
+      this.addRow(json);
     }
+  };
+
+  proto.displayeError = function(e, json) {
+    this.alert(json);
   };
 
   proto.attachHandlers = function() {
