@@ -51,6 +51,10 @@ class MaterialSubmission < ApplicationRecord
     super || 0
   end
 
+  def invalid_labwares
+    labwares.select(&:invalid?)
+  end
+
   private
 
   def set_labware
@@ -71,5 +75,6 @@ class MaterialSubmission < ApplicationRecord
       errors.add(:contact, "doest not have a valid email")
     end
   end
+
 
 end

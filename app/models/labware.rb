@@ -22,4 +22,17 @@ class Labware < ApplicationRecord
     material_submission_labware.update_attributes(:state => 'received unclaimed')
   end
 
+  def invalid_data
+    if invalid?
+      wells.map{|w| w if w.invalid?}.compact.map do |invalid_well|
+        {
+          :labware_id => self.id,
+          :well_id => invalid_well.id,
+          :errors => invalid_well.errors.messages
+        }
+      end.flatten.compact
+    end
+  end
+
+
 end

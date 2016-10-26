@@ -56,6 +56,7 @@ $(document).on('turbolinks:load', function() {
 
   $('select.contact').select2({
     tags: true,
+    minimumResultsForSearch: Infinity,
     tokenSeparators: [',', ' ']
   });
 

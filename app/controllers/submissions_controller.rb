@@ -11,11 +11,17 @@ class SubmissionsController < ApplicationController
     params[:material_submission][:status] = step.to_s
     params[:material_submission][:status] = MaterialSubmission.ACTIVE if last_step?
 
-    if material_submission.update_attributes(material_submission_params) && last_step?
+    @status_success = material_submission.update_attributes(material_submission_params)
+    if @status_success && last_step?
       flash[:notice] = 'Your Submission has been created'
     end
-
-    render_wizard material_submission
+    if params[:material_submission][:status] == 'provenance'
+      unless @status_success
+        @invalid_data = material_submission.invalid_labwares.map(&:invalid_data).flatten.compact
+      end
+    else
+      render_wizard material_submission
+    end
   end
 
   protected
