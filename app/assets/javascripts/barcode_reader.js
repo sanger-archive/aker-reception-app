@@ -57,10 +57,6 @@
     }
   };
 
-  proto.displayeError = function(e, json) {
-    this.alert(json);
-  };
-
   proto.attachHandlers = function() {
     $(this.inputReader).on('keydown', $.proxy(this.readInput, this));
     $(this.form).on('ajax:success', $.proxy(this.onReceivedBarcode, this));
