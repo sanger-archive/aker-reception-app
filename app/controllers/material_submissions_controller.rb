@@ -26,4 +26,12 @@ class MaterialSubmissionsController < ApplicationController
     end
   end
 
+  def show
+    @material_submission = MaterialSubmission.find(params[:id])
+  end
+
+  def edit
+    @material_submission = MaterialSubmission.find(params[:id])
+  end
+
 end

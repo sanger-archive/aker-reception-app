@@ -4,6 +4,8 @@ RSpec.describe MaterialReceptionsController, type: :controller do
   describe "When scanning a barcode" do
     setup do
       @labware = FactoryGirl.create(:labware)
+      @submission = FactoryGirl.create(:material_submission)
+      @submission.labwares << @labware
     end
 
     it "does not add the barcode to the list if the barcode does not exist" do

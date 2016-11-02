@@ -1,7 +1,13 @@
 class MaterialReception < ApplicationRecord
   belongs_to :labware
 
+  before_create :receive_labware
+
   validates :labware, uniqueness: { message: "cannot be received twice" }
+
+  def receive_labware
+    labware.received_unclaimed
+  end
 
   def barcode_value
     labware && labware.barcode && labware.barcode.value

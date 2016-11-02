@@ -6,7 +6,9 @@ class MaterialReceptionsController < ApplicationController
 
   def create
     @material_reception = MaterialReception.create(material_reception_params)
-    @material_reception.save
+    if @material_reception.save
+      ReceptionMailer.material_reception(@material_reception).deliver_later
+    end
     render json: @material_reception.presenter
   end
 

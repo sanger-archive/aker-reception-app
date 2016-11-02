@@ -1,5 +1,8 @@
 class MaterialSubmission < ApplicationRecord
 
+  def self.ACTIVE
+    'active'
+  end
 
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
@@ -22,11 +25,11 @@ class MaterialSubmission < ApplicationRecord
 
   accepts_nested_attributes_for :labwares
 
-  scope :active, -> { where(status: 'active') }
-  scope :pending, -> { where.not(status: 'active') }
+  scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
+  scope :pending, -> { where.not(status: MaterialSubmission.ACTIVE) }
 
   def active?
-    status == 'active'
+    status == MaterialSubmission.ACTIVE
   end
 
   def active_or_labware?
@@ -48,6 +51,10 @@ class MaterialSubmission < ApplicationRecord
     super || 0
   end
 
+  def invalid_labwares
+    labwares.select(&:invalid?)
+  end
+
   private
 
   def set_labware
@@ -64,6 +71,10 @@ class MaterialSubmission < ApplicationRecord
     if contact.email.empty?
       errors.add(:contact, "must have an email")
     end
+    unless contact.email =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+      errors.add(:contact, "doest not have a valid email")
+    end
   end
+
 
 end
