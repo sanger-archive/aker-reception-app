@@ -30,59 +30,20 @@ textarea.halvsies { height: 150px; width: 33% }
   float: none;
 }
 
-.spinner {
-  font-size: 20px;
+table thead th {cursor :s-resize;}
+table tbody tr {cursor :e-resize;}
+table tbody td {cursor :nw-resize;}
+
+table input.form-control {
+    background-color: transparent;
+    outline: none;
+    border: 0px;
+    border-color: inherit;
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 
-.glyphicon.fast-right-spinner {
-    -webkit-animation: glyphicon-spin-r 1s infinite linear;
-    animation: glyphicon-spin-r 1s infinite linear;
+table input.form-control:focus {
+    border: 1px solid #ccc
 }
 
-@-webkit-keyframes glyphicon-spin-r {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
-}
-
-@keyframes glyphicon-spin-r {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
-}
-
-@-webkit-keyframes glyphicon-spin-l {
-    0% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-}
-
-@keyframes glyphicon-spin-l {
-    0% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-}

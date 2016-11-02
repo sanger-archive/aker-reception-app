@@ -7,9 +7,9 @@
     this.containerIconClass = params.containerIconClass || "spinner";
     this.container = $('.'+this.containerIconClass, this.node);
 
-    this.iconClass = params.iconClass || "glyphicon";
+    this.iconClass = params.iconClass || "fa-refresh";
     this.icon = $('.'+this.iconClass, this.container);
-    this.loadingClass = params.loadingClass || "fast-right-spinner"
+    this.loadingClass = params.loadingClass || "fa-spin fa fa-refresh"
     this.hideNode = $(params.hideNodeSelector);
 
     $(this.container).hide();
