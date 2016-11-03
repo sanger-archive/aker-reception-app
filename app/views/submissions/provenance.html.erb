@@ -73,7 +73,9 @@
             </thead>
 
             <tbody>
-            <%= labware_fields.fields_for :wells, labware_fields.object.wells.includes(:biomaterial) do |well_fields| %>
+            <%= labware_fields.fields_for(:wells, labware_fields.object.wells.includes(:biomaterial).sort do |w1, w2|
+              w1.id <=> w2.id
+              end) do |well_fields| %>
 
               <tr>
                 <td><%= labware_fields.object.barcode.value %></td>
