@@ -16,6 +16,7 @@ class MaterialSubmission < ApplicationRecord
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :active_or_labware?
   validates :labware_type_id, presence: true, if: :active_or_labware?
+  validates :email, presence: true, if: :active?
   validates :address, presence: true, if: :active?
   validates :contact, presence: true, if: :active?
   validate :contact_has_a_correct_email?, if: :active?
