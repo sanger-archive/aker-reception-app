@@ -54,7 +54,7 @@ $(document).on('turbolinks:load', function() {
       fillInTableFromFile($(this), e.originalEvent.dataTransfer.files);
     });
 
-  $('select.contact').select2({
+  $('select#material_submission_contact_id').select2({
     tags: true,
     minimumResultsForSearch: Infinity,
     tokenSeparators: [',', ' ']

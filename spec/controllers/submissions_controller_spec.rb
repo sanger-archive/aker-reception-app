@@ -20,7 +20,7 @@ def step_params(material_submission, step_name)
         {
           :status => 'active',
           :address => 'Testing address',
-          :contact_attributes => { :email => 'correct@email.ac.uk'}
+          :contact_id => @contact.id
         }
       when :dispatch_contact_error
         step_name = :dispatch
@@ -79,6 +79,7 @@ RSpec.describe SubmissionsController, type: :controller do
     setup do
       @labware_type = FactoryGirl.create :labware_type
       @material_submission = FactoryGirl.create :material_submission
+      @contact = FactoryGirl.create :contact
     end
 
     it "does not update the submission state if any steps have not been performed" do

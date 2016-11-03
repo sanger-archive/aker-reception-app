@@ -44,7 +44,7 @@ class SubmissionsController < ApplicationController
 
   def material_submission_params
     params.require(:material_submission).permit(
-      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, contact_attributes: [:email], labwares_attributes: [
+      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :contact_id, labwares_attributes: [
         :id,
         wells_attributes: [
           :id,
