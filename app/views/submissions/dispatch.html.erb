@@ -21,10 +21,9 @@
 
     <p>The following contact will be notified when the materials arrive at Sanger Institute:</p>
 
-    <%= f.fields_for(:contact_attributes) do |c| %>
-      <% selection = material_submission.contact ? {:selected => material_submission.contact.email} : {} %>
-      <%= c.select(:email, options_for_select(available_contacts_select_options), selection, {class: "form-control contact"}) %>
-    <% end %>
+    <% selection = material_submission.contact ? {:selected => material_submission.contact.id} : {} %>
+
+    <%= f.collection_select :contact_id, Contact.all, :id, :fullname_and_email, { class: "form-control contact" } %>
 
   </div>
   <%= render 'buttons', material_submission: material_submission, f: f %>
