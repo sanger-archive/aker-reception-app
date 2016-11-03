@@ -1,6 +1,6 @@
 module SubmissionHelper
   def available_contacts_select_options
-    [['None', '']].concat(Contact.all.map{|c| ["#{c.fullname} <#{c.email}>", c.email]})
+    [['None', '']].concat(Contact.all.map{|c| ["#{c.fullname} <#{c.email}>", c.id]})
   end
 
   def available_labware_types_select_options

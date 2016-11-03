@@ -16,9 +16,9 @@ class MaterialSubmission < ApplicationRecord
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :active_or_labware?
   validates :labware_type_id, presence: true, if: :active_or_labware?
+  validates :email, presence: true, if: :active?
   validates :address, presence: true, if: :active?
   validates :contact, presence: true, if: :active?
-  validate :contact_has_a_correct_email?, if: :active?
   validate :each_labware_has_biomaterial, if: :active?
 
   before_save :set_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
@@ -64,15 +64,6 @@ class MaterialSubmission < ApplicationRecord
   def each_labware_has_biomaterial
     unless labwares.all? { |labware| labware.biomaterials.count > 0 }
       errors.add(:labwares, "must each have at least one Biomaterial")
-    end
-  end
-
-  def contact_has_a_correct_email?
-    if contact.email.empty?
-      errors.add(:contact, "must have an email")
-    end
-    unless contact.email =~ /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
-      errors.add(:contact, "doest not have a valid email")
     end
   end
 
