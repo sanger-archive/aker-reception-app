@@ -2,6 +2,24 @@
 
 <div data-psd-component-class="SingleTableManager"
   data-psd-component-parameters="<%= plate_attributes_for(material_submission.labwares.includes(:biomaterials, :barcode)).to_json %>">
+
+<div id="alert-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 <%= bootstrap_form_for material_submission, remote: true, url: wizard_path, method: :put, :html => {:'data-type' => 'json'} do |f| %>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
@@ -41,10 +59,7 @@
           </div>
 
 
-          <table data-behavior="datatable" class="table table-condensed table-striped"
-          <%# data-psd-component-class="TableCursorMovement" data-psd-component-parameters="{}" %>
-          >
-            <button class="btn btn-default save"><span class="glyphicon glyphicon-floppy-save"></span></button>
+          <table data-behavior="datatable" class="table table-condensed table-striped">
             <thead>
               <tr>
                 <th>Plate Barcode</th>

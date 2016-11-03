@@ -9,7 +9,7 @@
         <%= f.submit "Save & Exit", class: "btn btn-primary", style: "float: right" %>
       <% else %>
         <% if step == :provenance %>
-          <%= link_to "Next", wizard_path(:dispatch), {class: "btn btn-default", style: "float: right" } %>
+          <%= link_to "Next", wizard_path(:dispatch), {class: "btn btn-default save", style: "float: right" } %>
         <% else %>
           <%= f.submit "Next", class: "btn btn-default", style: "float: right" %>
         <% end %>
