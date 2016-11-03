@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Material Submission</title>
+    <title><%= yield(:main_title) %></title>
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
@@ -16,10 +16,10 @@
   <div class="container">
 
     <div class="row">
-      <div class="col-md-8">
-        <h1>Sanger Institute <small>Material Submission</small></h1>
+      <div class="col-md-8 col-xs-8">
+        <h1>Sanger Institute <small><%= yield(:main_title) %></small></h1>
       </div>
-      <div class="col-md-4 text-right">
+      <div class="col-md-4 col-xs-4 text-right">
         <%= yield(:title_button) if content_for?(:title_button) %>
       </div>
     </div>

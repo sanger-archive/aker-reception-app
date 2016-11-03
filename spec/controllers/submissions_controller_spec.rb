@@ -12,6 +12,7 @@ def step_params(material_submission, step_name)
         }
       when :provenance
         {
+
               :status => 'provenance',
               :labwares_attributes => plate_attributes_for(material_submission.labwares)
         }
@@ -19,7 +20,7 @@ def step_params(material_submission, step_name)
         {
           :status => 'active',
           :address => 'Testing address',
-          :contact_attributes => { :email => 'Contact test email'}
+          :contact_attributes => { :email => 'correct@email.ac.uk'}
         }
       when :dispatch_contact_error
         step_name = :dispatch
@@ -31,6 +32,7 @@ def step_params(material_submission, step_name)
       end
     }.merge(
       {
+        :format => (step_name == :provenance) ? 'json' : 'html',
         :material_submission_id => material_submission.id,
         :id => step_name
       }

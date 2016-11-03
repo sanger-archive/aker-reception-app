@@ -15,6 +15,8 @@
 //= require turbolinks
 //= require bootstrap-sprockets
 //= require select2
+//= require component_builder
+//= require barcode_reader
 //= require_tree .
 
 var field_mapping = {
@@ -54,6 +56,7 @@ $(document).on('turbolinks:load', function() {
 
   $('select.contact').select2({
     tags: true,
+    minimumResultsForSearch: Infinity,
     tokenSeparators: [',', ' ']
   });
 
