@@ -3,18 +3,21 @@ class SubmissionsController < ApplicationController
   include Wicked::Wizard
   steps :labware, :provenance, :dispatch
 
+  before_action :set_status, only: [:update]
+
   def show
     render_wizard
   end
 
   def update
-    params[:material_submission][:status] = step.to_s
-    params[:material_submission][:status] = MaterialSubmission.ACTIVE if last_step?
-
     @status_success = material_submission.update_attributes(material_submission_params)
+
     if @status_success && last_step?
       flash[:notice] = 'Your Submission has been created'
+      MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
+      MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
     end
+
     if params[:material_submission][:status] == 'provenance'
       unless @status_success
         @invalid_data = material_submission.invalid_labwares.map(&:invalid_data).flatten.compact
@@ -22,6 +25,7 @@ class SubmissionsController < ApplicationController
     else
       render_wizard material_submission
     end
+
   end
 
   protected
@@ -52,6 +56,10 @@ class SubmissionsController < ApplicationController
           biomaterial_attributes: [ :id, :supplier_name, :donor_name, :gender, :common_name, :phenotype ]]
       ]
     )
+  end
+
+  def set_status
+    params[:material_submission][:status] = last_step? ? MaterialSubmission.ACTIVE : step.to_s
   end
 
 
