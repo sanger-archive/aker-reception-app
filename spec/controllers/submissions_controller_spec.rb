@@ -20,6 +20,7 @@ def step_params(material_submission, step_name)
         {
           :status => 'active',
           :address => 'Testing address',
+          :email => 'test@email.com',
           :contact_id => @contact.id
         }
       when :dispatch_contact_error
