@@ -1,14 +1,25 @@
 (function($, undefined) {
+
   function SingleTableManager(node, params) {
     this.node = $(node);
     this.params = params;
 
+    this.params._cssNotEmptyTabClass = this.params._cssNotEmptyTabClass || 'bg-info';
+    this.params._cssEmptyTabClass = this.params._cssEmptyTabClass || 'bg-warning';
+    this.params._cssErrorTabClass = this.params._cssErrorTabClass || 'bg-danger';
+
+    this._tabsWithError = [];
     this.errorCells = {};
     this.tooltipInputs = [];
 
     this.form = $('form');
     $(this.form).data('remote', true);
-    this.currentTab = $('a[data-toggle="tab"]')[0];
+    this._tabs = $('a[data-toggle="tab"]');
+    this.currentTab = this._tabs[0];
+
+    this._tabs.each($.proxy(function(e, tab) {
+      this.updateTabContentPresenceStatus(tab);
+    }, this));
 
     this.attachHandlers();
   }
@@ -35,6 +46,28 @@
       var msg = this.errorCells[labwareId][wellId][fieldName]
       this.setErrorToInput(input, msg);
     }
+  };
+
+  proto.setErrorToTab = function(tab) {
+    this._tabsWithError.push(tab);
+    $(tab).addClass(this.params._cssErrorTabClass);
+    $(tab).removeClass(this.params._cssNotEmptyTabClass);
+  };
+
+  proto.unsetErrorToTab = function(tab) {
+    var index = this._tabsWithError.indexOf(tab);
+    if (index > -1) {
+      this._tabsWithError.splice(index, 1);
+    }
+
+    $(tab).removeClass(this.params._cssErrorTabClass);
+
+    this.updateTabContentPresenceStatus(tab);
+  };
+
+  proto.updateTabContentPresenceStatus = function(tab) {
+    $(tab).toggleClass(this.params._cssNotEmptyTabClass, !this.isTabEmpty(tab));
+    $(tab).toggleClass(this.params._cssEmptyTabClass, this.isTabEmpty(tab));
   };
 
   proto.setErrorToInput = function(input, msg) {
@@ -67,6 +100,20 @@
     return(name);
   };
 
+  proto.isTabEmpty = function(tab) {
+    return !this.isTabWithContent(tab);
+  }
+
+  proto.isTabWithContent = function(tab) {
+    var data = this.dataForTab(tab);
+    return $.map(data.wells_attributes, function(n){return n;}).some(function(well) {
+      var biomaterialAttributes = well.biomaterial_attributes;
+      return ['donor_name', 'gender', 'id', 'phenotype', 'supplier_name', 'uuid', 'common_name'].some(function(name) {
+        return ((biomaterialAttributes[name]!==null) && (biomaterialAttributes[name]!=''));
+      });
+    });
+  };
+
   proto.saveTab = function(e) {
     var currentTab = $(e.target);
     var data = this.dataForTab(currentTab);
@@ -76,16 +123,19 @@
     var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
     $(this.form).append(input);
 
-    $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
-      $.proxy(this.onReceive, this),
+    var promise = $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
+      $.proxy(this.onReceive, this, currentTab),
       $.proxy(this.onError, this));
     input.remove();
+    return promise;
   };
 
-  proto.onReceive = function(data, status) {
+  proto.onReceive = function(currentTab, data, status) {
     if (data.update_successful) {
       this.errorCells = {};
+      this.unsetErrorToTab(currentTab[0]);
     } else {
+      this.setErrorToTab(currentTab[0]);
       for (var i=0; i<data.messages.length; i++) {
         var message = data.messages[i];
         this.resetCellNameErrors(message.labware_id);
@@ -97,6 +147,7 @@
       }
     }
     this.updateValidations();
+    return data;
   };
 
   proto.updateValidations = function() {
@@ -212,6 +263,34 @@
     }
   };
 
+  proto.showModal = function(data) {
+    $('#alert-modal .modal-title').html(data.title);
+    $('#alert-modal .modal-body').html(data.body);
+    $('#alert-modal').modal();
+  };
+
+  proto.saveCurrentTabBeforeLeaving = function(button, e) {
+    e.stopPropagation();
+    e.preventDefault();
+    //this.saveTab({target: this.currentTab});
+    var promise = this.saveTab({target: this.currentTab});
+    promise.then($.proxy(function(data) {
+      if (data.update_successful && (this._tabsWithError.length == 0)) {
+        window.location.href = $(button).attr('href');
+      } else {
+        this.showModal({
+          title: 'Validation problems',
+          body: 'Please review and solve the validation problems before continuing'})
+      }
+    }, this), $.proxy(this.onError, this));
+  };
+
+  proto.onError = function(e) {
+    this.showModal({
+      title: 'Server error',
+      body: 'We could not save the current content due to an error'})
+  };
+
   proto.toDispatch = function(e) {
     this.dispatchUrl = window.location.href.replace('provenance', 'dispatch');
     window.location.href = this.dispatchUrl;
@@ -222,7 +301,10 @@
     $('a[data-toggle="tab"]').on('show.bs.tab', $.proxy(this.restoreTab, this));
     //$('table tbody tr td input').on('blur', $.proxy(this.saveCurrentTab, this));
     $('form').on('submit.rails', $.proxy(this.saveTab, this));
-    $('button.save').on('click', $.proxy(this.saveCurrentTab, this));
+
+    // If you have one
+    var button = $('.save');
+    button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));
 
     $('input[type=submit]').on('click', $.proxy(this.toDispatch, this));
   };
