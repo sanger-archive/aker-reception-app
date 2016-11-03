@@ -21,8 +21,6 @@
 
     <p>The following contact will be notified when the materials arrive at Sanger Institute:</p>
 
-    <% selection = material_submission.contact ? {:selected => material_submission.contact.id} : {} %>
-
     <%= f.collection_select :contact_id, Contact.all, :id, :fullname_and_email, { class: "form-control contact" } %>
 
   </div>
