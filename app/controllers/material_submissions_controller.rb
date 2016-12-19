@@ -1,5 +1,9 @@
 class MaterialSubmissionsController < ApplicationController
 
+  def schema
+    render :json => Schema.get
+  end
+
   def index
     @pending_material_submissions = MaterialSubmission.pending
     @active_material_submissions = MaterialSubmission.active

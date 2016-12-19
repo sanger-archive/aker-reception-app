@@ -20,6 +20,8 @@
 </div><!-- /.modal -->
 
 
+
+
 <%= bootstrap_form_for material_submission, remote: true, url: wizard_path, method: :put, :html => {:'data-type' => 'json'} do |f| %>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
@@ -59,7 +61,8 @@
           </div>
 
 
-          <table data-behavior="datatable" class="table table-condensed table-striped">
+          <table data-behavior="datatable" class="table table-condensed table-striped"
+            data-psd-component-class='DataTableSchemaValidation' data-psd-component-parameters='{}'>
             <thead>
               <tr>
                 <th>Plate Barcode</th>
@@ -73,8 +76,10 @@
             </thead>
 
             <tbody>
-            <%= labware_fields.fields_for :wells, labware_fields.object.wells.includes(:biomaterial) do |well_fields| %>
 
+
+            <%= labware_fields.fields_for :wells, labware_fields.object.wells.includes(:biomaterial) do |well_fields| %>
+              <!--  %= react_component 'SchemaForm', {} % -->
               <tr>
                 <td><%= labware_fields.object.barcode.value %></td>
                 <td>
@@ -86,11 +91,11 @@
                 <% biomaterial = well_fields.object.biomaterial.nil? ? well_fields.object.build_biomaterial : well_fields.object.biomaterial %>
 
                 <%= well_fields.fields_for :biomaterial, biomaterial do |bm_fields| %>
-                  <td><%= bm_fields.text_field :supplier_name, hide_label: true %></td>
-                  <td><%= bm_fields.text_field :donor_name, hide_label: true %></td>
-                  <td><%= bm_fields.text_field :gender, hide_label: true %></td>
-                  <td><%= bm_fields.text_field :common_name, hide_label: true %></td>
-                  <td><%= bm_fields.text_field :phenotype, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="supplier_name"><%= bm_fields.text_field :supplier_name, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="donor_name"><%= bm_fields.text_field :donor_name, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="gender"><%= bm_fields.text_field :gender, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="common_name"><%= bm_fields.text_field :common_name, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="phenotype"><%= bm_fields.text_field :phenotype, hide_label: true %></td>
                 <% end %>
 
               </tr>

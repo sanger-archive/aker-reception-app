@@ -54,4 +54,7 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :sendmail
   config.action_mailer.default_url_options = { host: 'example.com' }
+
+  config.materials_service_url = "http://localhost:5000"
+
 end

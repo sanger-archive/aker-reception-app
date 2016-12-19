@@ -114,20 +114,40 @@
     });
   };
 
+  proto.validateInput = function(input) {
+    var name = $(input).parent().data('psd-schema-validation-name');
+    if (!!name) {
+      debugger;
+      $(input).trigger('psd.schema.validation', {
+        node: input,
+        name: name
+      });      
+    }
+  };
+
+  proto.validateTab = function(tab) {
+    this.inputs().each($.proxy(function(pos, input) {
+      return this.validateInput(input);
+    }, this));
+  };
+
   proto.saveTab = function(e) {
     var currentTab = $(e.target);
     var data = this.dataForTab(currentTab);
 
     this.inputs().each($.proxy(this.saveInput, this, data));
 
-    var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
-    $(this.form).append(input);
+    if (this.validateTab(currentTab)) {
+      var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
+      $(this.form).append(input);
 
-    var promise = $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
-      $.proxy(this.onReceive, this, currentTab),
-      $.proxy(this.onError, this));
-    input.remove();
-    return promise;
+      var promise = $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
+        $.proxy(this.onReceive, this, currentTab),
+        $.proxy(this.onError, this));
+      input.remove();
+      return promise;      
+    }
+    return null;
   };
 
   proto.onReceive = function(currentTab, data, status) {
@@ -274,6 +294,9 @@
     e.preventDefault();
     //this.saveTab({target: this.currentTab});
     var promise = this.saveTab({target: this.currentTab});
+    if (promise === null) {
+      return;
+    }
     promise.then($.proxy(function(data) {
       if (data.update_successful && (this._tabsWithError.length == 0)) {
         window.location.href = $(button).attr('href');
