@@ -16,12 +16,16 @@
     }, this)});
   };
 
-  proto.validationError = function(node, attr, msg) {
-    var data = {
+  proto.dataForNode = function(node) {
+    return {
       errors: {},
       labware_id: $('input#material_submission_labwares_attributes_0_id', $(node).parents('div.tab-content')).first().val(),
       well_id: $('input', $(node).parents('tr')).first().val()
     };
+  };
+
+  proto.validationError = function(node, attr, msg) {
+    var data = this.dataForNode(node);
     if (!!attr) {
       data.errors[attr] = msg;
     }
@@ -32,35 +36,39 @@
     });
   };
 
+  proto.schemaChecks = {
+    failsDataValueRequired: function(schema, msg) {
+      return ((!!schema.required) && (!msg.value));
+    },
+    failsDataValueAllowed: function(schema, msg) {
+      return ((!!schema.allowed) && (!!msg.value) && ($.inArray(msg.value, schema.allowed)==-1));
+    }
+  };
+
+  proto.schemaCheck = function(schema, msg, condFunct, textFunct) {
+    if (condFunct(schema, msg)) {
+      this.validationError(msg.node, msg.name, textFunct(schema, msg));
+      return false;
+    }
+    return true;
+  };
+
   proto.validateSchemaField = function(e, msg) {
     var schema = this._loadedSchema.properties[msg.name];
     var valid = true;
-    if (!!schema) {
-      if (!!schema.required) {
-        if (!msg.value) {
-          this.validationError(msg.node, msg.name, 'Client side validation: The field '+msg.name+' is required');
-          valid=false;
-        }
-      }
-      if ((!!schema.allowed)) {
-        if ($.inArray(msg.value, schema.allowed)==-1) {
-          this.validationError(msg.node, msg.name, 'Client side validation: The field should have any of these values ['+schema.allowed.join(',')+']');
-          valid=false;
-        }
-      }
-    }
-    if (valid) {
-      var node = msg.node;
-      var data = {
-        errors: {},
-        labware_id: $('input#material_submission_labwares_attributes_0_id', $(node).parents('div.tab-content')).first().val(),
-        well_id: $('input', $(node).parents('tr')).first().val(),
-        update_successful: true
-      };
-      $(node).trigger('psd.schema.error', {
-        node: node,      
-        messages: [ data ]
-      });
+
+    if ((!schema) || (![
+        this.schemaCheck(schema, msg, this.schemaChecks.failsDataValueRequired, function(schema, msg) {
+          return 'The field '+msg.name+' is required'
+        }),
+        this.schemaCheck(schema, msg, this.schemaChecks.failsDataValueAllowed, function(schema, msg) {
+          return 'The field should have any of these values ['+schema.allowed.join(',')+']';
+        })].some(a => a))) {
+        var node = msg.node;
+        $(node).trigger('psd.schema.error', {
+          node: node,      
+          messages: [ $.extend(this.dataForNode(node), { updateSuccessful: true}) ]
+        });
     }
   };
 
