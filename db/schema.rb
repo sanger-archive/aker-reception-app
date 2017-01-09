@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161103114923) do
+ActiveRecord::Schema.define(version: 20170109161429) do
 
   create_table "barcodes", force: :cascade do |t|
     t.string   "barcode_type"
@@ -91,6 +91,11 @@ ActiveRecord::Schema.define(version: 20161103114923) do
     t.string   "email"
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id"
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id"
+  end
+
+  create_table "ownerships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "wells", force: :cascade do |t|
