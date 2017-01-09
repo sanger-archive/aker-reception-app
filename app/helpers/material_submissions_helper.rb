@@ -5,7 +5,7 @@ def wells_attributes_for(plate)
     memo[index.to_s] = {
       :id => well.id.to_s,
       :position => well.position,
-      :biomaterial_attributes => (well.biomaterial || Biomaterial.new)
+      :biomaterial_attributes => (Biomaterial.find(well.biomaterial_id) || Biomaterial.new)
     }
     memo
   end
