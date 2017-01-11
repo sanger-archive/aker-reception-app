@@ -1,10 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe Ownership, type: :model do
-
-  it "creating an ownership creates it in the ownership service" do
-  	owner = Ownership.new({})
-
-  	owner.save
-  end
+describe Ownership, type: :model do
+	include ActiveModel::Lint::Tests
+ 	
+  	it_should_behave_like "ActiveModel"	
 end
