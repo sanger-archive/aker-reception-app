@@ -57,4 +57,8 @@ Rails.application.configure do
 
   config.materials_service_url = "http://localhost:5000"
 
+
+  config.set_url = 'http://localhost:1500/ownerships'
+  config.set_url_default_proxy = 'http://localhost:1500'
+
 end

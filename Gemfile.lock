@@ -99,6 +99,8 @@ GEM
     factory_girl_rails (4.7.0)
       factory_girl (~> 4.7.0)
       railties (>= 3.0.0)
+    faraday (0.10.1)
+      multipart-post (>= 1.2, < 3)
     ffi (1.9.14)
     font-awesome-sass (4.6.2)
       sass (>= 3.2)
@@ -138,6 +140,7 @@ GEM
     minitest (5.9.0)
     multi_json (1.12.1)
     netrc (0.11.0)
+    multipart-post (2.0.0)
     nio4r (1.2.1)
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
@@ -283,6 +286,7 @@ DEPENDENCIES
   coffee-rails (~> 4.2)
   database_cleaner
   factory_girl_rails
+  faraday
   font-awesome-sass
   forgery
   jbuilder (~> 2.5)
@@ -313,4 +317,4 @@ DEPENDENCIES
   wicked
 
 BUNDLED WITH
-   1.13.6
+   1.13.7

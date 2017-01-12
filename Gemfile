@@ -41,6 +41,8 @@ gem 'uuid'
 gem 'select2-rails'
 gem 'forgery'
 
+gem 'faraday'
+
 gem 'pg'
 
 group :development, :test do
