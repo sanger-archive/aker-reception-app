@@ -54,4 +54,8 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :sendmail
   config.action_mailer.default_url_options = { host: 'example.com' }
+
+  config.set_url = 'http://localhost:1500/ownerships'
+  config.set_url_default_proxy = 'http://localhost:1500'
+
 end
