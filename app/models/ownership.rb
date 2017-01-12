@@ -9,14 +9,29 @@ class Ownership
   validates :model_type, presence: true
   validates :owner_id,   presence: true
 
-  # obj = {:model_id => SecureRandom.uuid, :model_type => 'bio', :owner_idd => 'hc6@sanger.ac.uk'}
-  def create_remote_ownership(obj)
-  	post(obj)
+  attr_accessor :model_id, :model_type, :owner_id
+
+  def initialize(attributes = {})
+    attributes.each do |name, value|
+      send("#{name}=", value) if respond_to?("#{name}=")
+    end
+  end
+
+  # params = {:model_id => SecureRandom.uuid, :model_type => 'bio', :owner_id => 'hc6@sanger.ac.uk'}
+  def self.create_remote_ownership(params)
+  	create OwnershipClient::post(params)
   end
 
   # obj = 'b7a32344-cd0b-4b46-b986-48c1888c99a1'
-  def get_remote_ownership(obj)
-  	get(obj)
+  def self.get_remote_ownership(uuid)
+  	create OwnershipClient::get(uuid)
+  end
+
+  private
+
+  def self.create(obj)
+    # filter form json, reject method
+    Ownership.new(model_id: obj["model_id"], model_type: obj["model_type"], owner_id: obj["owner_id"], x: obj["x"])
   end
 
 end
