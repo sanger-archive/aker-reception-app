@@ -1,18 +1,30 @@
 module BiomaterialClient
   def site
-	 RestClient::Resource.new(Rails.configuration.materials_service_url)
+	  RestClient::Resource.new(Rails.configuration.materials_service_url)
   end
 
-  def create(data)
-	self.site["materials"].post(data, :content_type => 'text/json')
+  def process_response(response)
+    if response
+      JSON.parse(response.body)
+    else
+      nil
+    end    
   end
 
-  def update(data)
-	self.site["materials"][data[:uuid]].put(data, :content_type => 'text/json')
+  def post(data)
+	  process_response(self.site["materials"].post(data, :content_type => 'text/json'))
   end
 
-  def find(uuid)
-  	return nil if uuid.nil?
-  	self.site["materials"][uuid].get(:content_type => 'text/json')
+  def put(data)
+	  process_response(self.site["materials"][data[:uuid]].put(data, :content_type => 'text/json'))
+  end
+
+  def get(uuid)
+    begin
+    	return nil if uuid.nil?
+    	return process_response(self.site["materials"][uuid].get(:content_type => 'text/json'))
+    rescue RestClient::ExceptionWithResponse => e
+      return nil
+    end
   end
 end

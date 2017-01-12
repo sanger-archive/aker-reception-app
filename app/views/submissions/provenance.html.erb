@@ -88,8 +88,8 @@
                   <%= well_fields.object.position %>
                 </td>
 
-                <% biomaterial = well_fields.object.biomaterial.nil? ? Biomaterial.new : well_fields.object.biomaterial %>
-                <% well_fields.object.biomaterial_id = biomaterial.uuid if well_fields.object.biomaterial.nil? %>                
+                <% biomaterial = well_fields.object.biomaterial_id.nil? ? Biomaterial.new : well_fields.object.biomaterial %>
+                <% well_fields.object.biomaterial_id = biomaterial.uuid if well_fields.object.biomaterial_id.nil? %>                
 
                 <%= well_fields.fields_for :biomaterial, biomaterial do |bm_fields| %>
                   <td data-psd-schema-validation-name="supplier_name"><%= bm_fields.text_field :supplier_name, hide_label: true %></td>

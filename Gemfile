@@ -18,6 +18,8 @@ gem 'react-rails'
 gem 'rest-client'
 
 gem 'json-schema'
+gem 'activeresource', github: 'rails/activeresource', branch: 'master'
+
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

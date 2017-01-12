@@ -1,11 +1,12 @@
 module MaterialSubmissionsHelper
 def wells_attributes_for(plate)
+  #debugger
   plate.wells.each_with_index.reduce({}) do |memo, list|
     well,index = list[0],list[1]
     memo[index.to_s] = {
       :id => well.id.to_s,
       :position => well.position,
-      :biomaterial_attributes => (Biomaterial.find(well.biomaterial_id) || Biomaterial.new)
+      :biomaterial_attributes => well.biomaterial_id.nil? ? Biomaterial.new : Biomaterial.find(well.biomaterial_id)
     }
     memo
   end
