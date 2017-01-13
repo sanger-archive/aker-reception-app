@@ -16,7 +16,8 @@ module BiomaterialClient
   end
 
   def put(data)
-	  process_response(self.site["materials"][data[:uuid]].put(data, :content_type => 'text/json'))
+    data_to_send = data.reject{|k,v| k.to_sym == :uuid}
+	  process_response(self.site["materials"][data[:uuid]].put(data_to_send, :content_type => 'text/json'))
   end
 
   def get(uuid)

@@ -7,7 +7,7 @@ class Schema
   end
 
   def self.get
-	 Schema.site["materials"]["schema"].get :content_type => 'text/json'  	
+	 JSON.parse(Schema.site["materials"]["schema"].get :content_type => 'text/json')
   end
 
 end

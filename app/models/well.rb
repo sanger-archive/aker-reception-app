@@ -6,8 +6,20 @@ class Well < ApplicationRecord
 
   validates :position, presence: true, uniqueness: { scope: :labware_id }
 
+  validate :biomaterial_json_schema_is_valid
+ 
+  def biomaterial_json_schema_is_valid
+    unless biomaterial.valid?
+      errors.add(:base, biomaterial.errors)
+      return false
+    end
+    true
+  end
+
+  attr_writer :biomaterial
+
   def biomaterial
-  	Biomaterial.get(biomaterial_id)
+  	@biomaterial ||= Biomaterial.find(biomaterial_id)
   end
 
   #attr_accessor :biomaterial_id
@@ -28,7 +40,7 @@ class Well < ApplicationRecord
       biomaterial = Biomaterial.new(attributes)
     end
     unless biomaterial.is_empty?
-      biomaterial.save(biomaterial_id)
+      biomaterial.save!(biomaterial_id)
       update_attributes(:biomaterial_id => biomaterial.uuid)
     end
   end

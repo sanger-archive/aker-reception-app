@@ -11,7 +11,7 @@
   proto.loadSchema = function() {
     return $.ajax({url: '/materials_schema', 
       success: $.proxy(function(json) {
-        this._loadedSchema = {type: 'Mytype', type: 'object', properties: json };
+        this._loadedSchema = json;
         return this._loadedSchema;
     }, this)});
   };
@@ -29,7 +29,6 @@
     if (!!attr) {
       data.errors[attr] = msg;
     }
-
     $(node).trigger('psd.schema.error', {
       node: node,      
       messages: [ data ]
@@ -41,7 +40,7 @@
       return ((!!schema.required) && (!msg.value));
     },
     failsDataValueAllowed: function(schema, msg) {
-      return ((!!schema.allowed) && (!!msg.value) && ($.inArray(msg.value, schema.allowed)==-1));
+      return ((!!schema.enum) && (!!msg.value) && ($.inArray(msg.value, schema.enum)==-1));
     }
   };
 
@@ -62,7 +61,7 @@
           return 'The field '+msg.name+' is required'
         }),
         this.schemaCheck(schema, msg, this.schemaChecks.failsDataValueAllowed, function(schema, msg) {
-          return 'The field should have any of these values ['+schema.allowed.join(',')+']';
+          return 'The field should have any of these values ['+schema.enum.join(',')+']';
         })].some(a => a))) {
         var node = msg.node;
         $(node).trigger('psd.schema.error', {
