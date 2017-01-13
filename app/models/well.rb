@@ -9,9 +9,11 @@ class Well < ApplicationRecord
   validate :biomaterial_json_schema_is_valid
  
   def biomaterial_json_schema_is_valid
-    unless biomaterial.valid?
-      errors.add(:base, biomaterial.errors)
-      return false
+    if biomaterial
+      unless biomaterial.valid?
+        errors.add(:base, biomaterial.errors)
+        return false
+      end
     end
     true
   end
@@ -21,6 +23,11 @@ class Well < ApplicationRecord
   def biomaterial
   	@biomaterial ||= Biomaterial.find(biomaterial_id)
   end
+
+  def biomaterials
+    [biomaterial].compact
+  end
+
 
   #attr_accessor :biomaterial_id
   #accepts_nested_attributes_for :biomaterial, reject_if: :all_attributes_blank?
