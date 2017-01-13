@@ -1,6 +1,7 @@
 class Ownership
   include OwnershipClient
   include ActiveModel::Model
+  include ActiveModel::Serializers::JSON
 
   # define_model_callbacks :create
   # before_create :create_remote_ownership
@@ -11,9 +12,9 @@ class Ownership
 
   attr_accessor :model_id, :model_type, :owner_id
 
-  def initialize(attributes = {})
-    attributes.each do |name, value|
-      send("#{name}=", value) if respond_to?("#{name}=")
+  def attributes=(hash)
+    hash.each do |key, value|
+      send("#{key}=", value) if respond_to?("#{key}=")
     end
   end
 
@@ -34,13 +35,19 @@ class Ownership
 
   private
 
-  def self.create(obj)
-    # filter form json, reject method
-    Ownership.new(model_id: obj["model_id"], model_type: obj["model_type"], owner_id: obj["owner_id"], x: obj["x"])
-  end
-
   def self.create_batch(obj)
     obj.map { |item| create(item) }
+  end
+
+  def self.create(obj)
+    filter(obj)
+  end
+
+# from_json creates an instance of Ownership and sets the attributes
+# attributes= method filters out none valid attributes
+  def self.filter(hash)
+    ownership = Ownership.new
+    ownership.from_json(hash.to_json)
   end
 
 end
