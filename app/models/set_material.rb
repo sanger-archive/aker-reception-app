@@ -5,7 +5,7 @@ class SetMaterial
 
 	validates :name, presence: true	
 
-	attr_accessor :id, :name
+	attr_accessor :uuid, :name
 
 	# params = {:data=>{:type=>"sets", :attributes=>{:name=>MaterialSubmission.first.id}}} 
 	def self.create_remote_set(params)
@@ -22,17 +22,9 @@ class SetMaterial
 	end
 
 	private 
-	
-	def self.filter(h, k = [])
-		new_hash = {}
-		h.each_pair do |key, val|
-			if val.is_a?(Hash)
-				new_hash.merge!(filter(val))
-			else
-				new_hash[key] = val
-			end
-		end
-		new_hash.select { |k, _| ['id', 'name'].include? k}
+
+	def self.filter(h)
+		{:uuid => h["data"]["id"], :name => h["data"]["attributes"]["name"]}
 	end
 
 end
