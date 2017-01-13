@@ -1,7 +1,6 @@
 class Ownership
   include OwnershipClient
   include ActiveModel::Model
-  include ActiveModel::Serializers::JSON
 
   # define_model_callbacks :create
   # before_create :create_remote_ownership
@@ -12,18 +11,12 @@ class Ownership
 
   attr_accessor :model_id, :model_type, :owner_id
 
-  def attributes=(hash)
-    hash.each do |key, value|
-      send("#{key}=", value) if respond_to?("#{key}=")
-    end
-  end
-
   # params = {:model_id => SecureRandom.uuid, :model_type => 'bio', :owner_id => 'hc6@sanger.ac.uk'}
   def self.create_remote_ownership(params)
   	create OwnershipClient::post(params)
   end
 
-  # params = [{model_id: SecureRandom.uuid, model_type: 'bio', owner_id: 'hc6@sanger.ac.uk'}]
+  # params = [{model_id: SecureRandom.uuid, model_type: 'bio', owner_id: 'hc6@sanger.ac.uk'},{model_id: SecureRandom.uuid, model_type: 'bio', owner_id: 'hc6@sanger.ac.uk'}]
   def self.create_remote_ownership_batch(params)
     create_batch OwnershipClient::post_batch(params)
   end
@@ -40,14 +33,11 @@ class Ownership
   end
 
   def self.create(obj)
-    filter(obj)
+    new filter(obj)
   end
 
-# from_json creates an instance of Ownership and sets the attributes
-# attributes= method filters out none valid attributes
-  def self.filter(hash)
-    ownership = Ownership.new
-    ownership.from_json(hash.to_json)
+  def self.filter(h)
+    {:model_id => h["model_id"], :model_type => h["model_type"], :owner_id => h["owner_id"]}
   end
 
 end
