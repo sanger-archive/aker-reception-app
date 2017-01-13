@@ -7,6 +7,10 @@ module OwnershipClient
     JSON.parse(get_connection.post('/ownerships', { :ownership => params }).body)
   end
 
+  def self.post_batch(params)
+    JSON.parse(get_connection.post('/ownerships/batch', { :ownership => params }).body)
+  end
+
   def self.get(uuid)
     JSON.parse(get_connection.get('/ownerships/'+uuid).body)
   end
