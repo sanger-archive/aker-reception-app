@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'webmock/rspec'
 
 def step_params(material_submission, step_name)
   {:params => {
@@ -81,6 +82,19 @@ RSpec.describe SubmissionsController, type: :controller do
       @labware_type = FactoryGirl.create :labware_type
       @material_submission = FactoryGirl.create :material_submission
       @contact = FactoryGirl.create :contact
+
+      stub_request(:get, "#{Rails.configuration.materials_service_url}/materials/schema").
+         with(:headers => {
+          'Content-Type'=>'text/json', 
+          }).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+      stub_request(:post, "#{Rails.configuration.materials_service_url}/materials").
+         with(:body => {"common_name"=>"Test", "donor_id"=>"Test", "gender"=>"Test", "phenotype"=>"Test", "supplier_name"=>"Test"},
+              :headers => { 'Content-Type'=>'application/x-www-form-urlencoded'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+
     end
 
     it "does not update the submission state if any steps have not been performed" do
@@ -92,6 +106,7 @@ RSpec.describe SubmissionsController, type: :controller do
     it "does not update the submission state if any required data of steps has not been provided" do
       put :update, step_params(@material_submission, :labware)
       @material_submission.reload
+
       put :update, step_params(@material_submission, :provenance)
       @material_submission.reload
       put :update, step_params(@material_submission, :dispatch_contact_error)

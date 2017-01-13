@@ -1,6 +1,5 @@
 class Plate < Labware
   belongs_to :labware_type
-  has_many :biomaterials, through: :wells
 
   accepts_nested_attributes_for :wells
 

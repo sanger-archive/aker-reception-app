@@ -83,6 +83,8 @@
   proto.cleanTooltips = function() {
     for (var i=0; i<this.tooltipInputs.length; i++) {
       $(this.tooltipInputs[i]).tooltip('hide');
+      $(this.tooltipInputs[i]).tooltip('disable');
+      $(this.tooltipInputs[i]).tooltip('destroy');
       setTimeout($.proxy(function() {
         $(this.tooltipInputs[i]).tooltip('destroy');
       }, this), 0);
@@ -114,20 +116,59 @@
     });
   };
 
+  proto.validateInput = function(input) {
+    var name = $(input).parents('td').data('psd-schema-validation-name');
+    if (!!name) {
+      $(input).trigger('psd.schema.validation', {
+        node: input,
+        name: name,
+        value: $(input).val()
+      });
+    }
+  };
+
+  proto.validateTab = function(tab) {
+    this.inputs().each($.proxy(function(pos, input) {
+      return this.validateInput(input);
+    }, this));
+  };
+
   proto.saveTab = function(e) {
     var currentTab = $(e.target);
     var data = this.dataForTab(currentTab);
 
     this.inputs().each($.proxy(this.saveInput, this, data));
+    //this.validateTab(currentTab);
+      var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
+      $(this.form).append(input);
 
-    var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
-    $(this.form).append(input);
+      var promise = $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
+        $.proxy(this.onReceive, this, currentTab),
+        $.proxy(this.onError, this));
+      input.remove();
+      return promise;      
+    return null;
+  };
 
-    var promise = $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
-      $.proxy(this.onReceive, this, currentTab),
-      $.proxy(this.onError, this));
-    input.remove();
-    return promise;
+  proto.onSchemaError = function(e, data) {
+    this._tabsWithError=[];
+    return this.onReceive(this.currentTab, data);
+    this.loadErrorsFromMsg(data);
+    this.updateValidations();
+  };
+
+  proto.loadErrorsFromMsg = function(data) {
+    for (var i=0; i<data.messages.length; i++) {
+      var message = data.messages[i];
+      this.resetCellNameErrors(message.labware_id);
+    }      
+
+    for (var i=0; i<data.messages.length; i++) {
+      var message = data.messages[i];
+      var wellId = message.well_id;
+      this.storeCellNameError(message.labware_id, wellId, message.errors);
+    }
+
   };
 
   proto.onReceive = function(currentTab, data, status) {
@@ -136,15 +177,7 @@
       this.unsetErrorToTab(currentTab[0]);
     } else {
       this.setErrorToTab(currentTab[0]);
-      for (var i=0; i<data.messages.length; i++) {
-        var message = data.messages[i];
-        this.resetCellNameErrors(message.labware_id);
-      }
-      for (var i=0; i<data.messages.length; i++) {
-        var message = data.messages[i];
-        var wellId = message.well_id;
-        this.storeCellNameError(message.labware_id, wellId, message.errors);
-      }
+      this.loadErrorsFromMsg(data);
     }
     this.updateValidations();
     return data;
@@ -274,13 +307,16 @@
     e.preventDefault();
     //this.saveTab({target: this.currentTab});
     var promise = this.saveTab({target: this.currentTab});
+    if (promise === null) {
+      return;
+    }
     promise.then($.proxy(function(data) {
       if (data.update_successful && (this._tabsWithError.length == 0)) {
         window.location.href = $(button).attr('href');
       } else {
         this.showModal({
           title: 'Validation problems',
-          body: 'Please review and solve the validation problems before continuing'})
+          body: 'Please review and solve the validation problems before continuing'});
       }
     }, this), $.proxy(this.onError, this));
   };
@@ -300,11 +336,16 @@
     $('a[data-toggle="tab"]').on('hide.bs.tab', $.proxy(this.saveTab, this));
     $('a[data-toggle="tab"]').on('show.bs.tab', $.proxy(this.restoreTab, this));
     //$('table tbody tr td input').on('blur', $.proxy(this.saveCurrentTab, this));
+    $('table tbody tr td input').on('blur', $.proxy(function(e) {
+      return this.validateInput(e.target);
+    }, this));
     $('form').on('submit.rails', $.proxy(this.saveTab, this));
 
     // If you have one
     var button = $('.save');
     button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));
+
+    $(this.node).on('psd.schema.error', $.proxy(this.onSchemaError, this));
 
     $('input[type=submit]').on('click', $.proxy(this.toDispatch, this));
   };

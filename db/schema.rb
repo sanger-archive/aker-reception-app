@@ -95,9 +95,10 @@ ActiveRecord::Schema.define(version: 20161103114923) do
 
   create_table "wells", force: :cascade do |t|
     t.integer  "labware_id"
+    t.string   "biomaterial_id"
     t.string   "position"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
     t.index ["labware_id"], name: "index_wells_on_labware_id"
   end
 

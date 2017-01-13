@@ -14,6 +14,10 @@ class Labware < ApplicationRecord
     joins(:barcode).where(:barcodes => {:value => barcode })
   }
 
+  def biomaterials
+    wells.map(&:biomaterial)
+  end
+
   def waiting_receipt
     material_submission_labware.update_attributes(:state => 'awaiting receipt')
   end
