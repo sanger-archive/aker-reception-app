@@ -56,7 +56,6 @@ ActiveRecord::Schema.define(version: 20161103114923) do
 
   create_table "labwares", force: :cascade do |t|
     t.integer  "labware_type_id"
-    t.string   "type"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
     t.index ["labware_type_id"], name: "index_labwares_on_labware_type_id"
