@@ -14,10 +14,10 @@ class SubmissionsController < ApplicationController
 
     if @status_success && last_step?
 
-      biomaterials = []
+      materials = []
       material_submission.labwares.each do |lw|
-        lw.wells.each do |w|
-          biomaterials.append(w.biomaterial)
+        lw.wells.each do |well|
+          materials.append(well.biomaterial)
         end
       end
 
@@ -26,8 +26,9 @@ class SubmissionsController < ApplicationController
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
 
       new_set_material = SetMaterial.create_remote_set(material_submission.id)
-      # SetMaterial.get_remote_set(new_set_material.uuid)
-      debugger
+      SetMaterial.add_materials_to_set(new_set_material.uuid, materials)
+      set_material = SetMaterial.get_remote_set_with_materials(new_set_material.uuid)
+      # debugger
     end
 
     if params[:material_submission][:status] == 'provenance'

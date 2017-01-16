@@ -14,16 +14,16 @@ module SetMaterialClient
     	JSON.parse(get_connection.get('/api/v1/sets/'+uuid).body)
 	end
 
-	def self.get_with_materials(uuid)
-		conn = get_connection
-		conn.headers = {'Accept' => 'application/vnd.api+json'} 
-    	JSON.parse(get_connection.get('/api/v1/sets/'+uuid+'/relationships/materials').body)
-	end
-
 	def self.add_materials(uuid, materials)
 		data = {:data=>{:type=>"sets", :attributes=>{:relationship=>materials}}} 
 		conn = get_connection
     	json = JSON.parse(get_connection.get('/api/v1/sets/#{uuid}/relationships/materials', data).body)
+	end
+
+	def self.get_with_materials(uuid)
+		conn = get_connection
+		conn.headers = {'Accept' => 'application/vnd.api+json'} 
+    	JSON.parse(get_connection.get('/api/v1/sets/'+uuid+'/relationships/materials').body)
 	end
 
 	private 
