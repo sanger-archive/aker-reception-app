@@ -8,6 +8,10 @@ class Labware < ApplicationRecord
   has_one :material_submission, through: :material_submission_labware
   has_many :wells, dependent: :destroy
 
+  accepts_nested_attributes_for :wells
+
+  before_create :build_default_wells
+  
   delegate :size, :x_dimension_is_alpha, :y_dimension_is_alpha, :x_dimension_size, :y_dimension_size, to: :labware_type
 
   scope :with_barcode, ->(barcode) {
@@ -36,6 +40,33 @@ class Labware < ApplicationRecord
         }
       end.flatten.compact
     end
+  end
+
+  def positions
+    if (!x_dimension_is_alpha && !y_dimension_is_alpha)
+      return (1..size).to_a
+    end
+
+    if x_dimension_is_alpha
+      x = ("A"..("A".ord + x_dimension_size - 1).chr).to_a
+    else
+      x = (1..x_dimension_size).to_a
+    end
+
+    if y_dimension_is_alpha
+      y = ("A"..("A".ord + y_dimension_size - 1).chr).to_a
+    else
+      y = (1..y_dimension_size).to_a
+    end
+
+    y.product(x).map(&:join)
+  end
+
+private
+
+  def build_default_wells
+    wells.build(positions.map { |position| { position: position } })
+    true
   end
 
 
