@@ -7,18 +7,20 @@ class SetMaterial
 
 	attr_accessor :uuid, :name
 
-	# params = {:data=>{:type=>"sets", :attributes=>{:name=>MaterialSubmission.first.id}}} 
-	def self.create_remote_set(params)
-	  	create SetMaterialClient::post(params)
+	def self.create_remote_set(submission_id)
+	  	create SetMaterialClient::post(submission_id)
 	end
 
-	# Status: 402 - there are no persisted Sets in aker-set-service
-	def self.get_remote_set(params)
-		get SetMaterialClient::get(params)
+	def self.get_remote_set(uuid)
+		SetMaterialClient::get(uuid)
 	end
 
 	def self.create(obj)
 	  	new filter(obj)
+	end
+
+	def self.add_materials_to_set(uuid, materials)
+		SetMaterialClient::add_materials(uuid, materials)
 	end
 
 	private 

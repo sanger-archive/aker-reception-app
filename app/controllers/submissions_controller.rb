@@ -13,9 +13,21 @@ class SubmissionsController < ApplicationController
     @status_success = material_submission.update_attributes(material_submission_params)
 
     if @status_success && last_step?
+
+      biomaterials = []
+      material_submission.labwares.each do |lw|
+        lw.wells.each do |w|
+          biomaterials.append(w.biomaterial)
+        end
+      end
+
       flash[:notice] = 'Your Submission has been created'
       MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
+
+      new_set_material = SetMaterial.create_remote_set(material_submission.id)
+      # SetMaterial.get_remote_set(new_set_material.uuid)
+      debugger
     end
 
     if params[:material_submission][:status] == 'provenance'
