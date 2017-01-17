@@ -65,8 +65,9 @@
         })].some(a => a))) {
         var node = msg.node;
         $(node).trigger('psd.schema.error', {
-          node: node,      
-          messages: [ $.extend(this.dataForNode(node), { updateSuccessful: true}) ]
+          node: node, 
+          update_successful: true,     
+          messages: [ $.extend(this.dataForNode(node), { update_successful: true}) ]
         });
     }
   };
