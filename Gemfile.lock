@@ -90,8 +90,6 @@ GEM
     database_cleaner (1.5.3)
     debug_inspector (0.0.2)
     diff-lcs (1.2.5)
-    domain_name (0.5.20161129)
-      unf (>= 0.0.5, < 1.0.0)
     erubis (2.7.0)
     execjs (2.7.0)
     factory_girl (4.7.0)
@@ -139,11 +137,9 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.9.0)
     multi_json (1.12.1)
-<<<<<<< HEAD
     multipart-post (2.0.0)
-=======
->>>>>>> a52_ownership_client_generation
     netrc (0.11.0)
+    multipart-post (2.0.0)
     nio4r (1.2.1)
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
@@ -197,10 +193,6 @@ GEM
       railties (>= 3.2)
       tilt
     ref (2.0.0)
-    rest-client (2.0.0)
-      http-cookie (>= 1.0.2, < 2.0)
-      mime-types (>= 1.16, < 4.0)
-      netrc (~> 0.8)
     rspec-core (3.5.3)
       rspec-support (~> 3.5.0)
     rspec-expectations (3.5.0)
@@ -255,9 +247,6 @@ GEM
       thread_safe (~> 0.1)
     uglifier (3.0.2)
       execjs (>= 0.3.0, < 3)
-    unf (0.1.4)
-      unf_ext
-    unf_ext (0.0.7.2)
     uuid (2.3.8)
       macaddr (~> 1.0)
     web-console (3.3.1)
@@ -302,10 +291,7 @@ DEPENDENCIES
   pry
   puma (~> 3.0)
   rails (~> 5.0.0, >= 5.0.0.1)
-<<<<<<< HEAD
   react-rails
-=======
->>>>>>> a52_ownership_client_generation
   rest-client
   rspec-rails (~> 3.4)
   sass-rails (~> 5.0)
@@ -323,8 +309,4 @@ DEPENDENCIES
   wicked
 
 BUNDLED WITH
-<<<<<<< HEAD
    1.13.7
-=======
-   1.13.6
->>>>>>> a52_ownership_client_generation

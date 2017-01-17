@@ -59,4 +59,6 @@ Rails.application.configure do
   config.set_url = 'http://localhost:1500/api/v1/sets'
   config.set_url_default_proxy = 'http://localhost:1500'
 
+  config.ownership_url = 'http://localhost:4000/ownerships'
+  config.ownership_url_default_proxy = 'http://localhost:4000'
 end

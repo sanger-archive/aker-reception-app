@@ -1,19 +1,26 @@
-require 'rest_client'
+require 'faraday'
 
 module OwnershipClient
-  def post(params)
-	RestClient.post(Rails.application.config.ownership_url, params, {content_type: :json, accept: :json})
+
+  def self.post(params)
+    JSON.parse(get_connection.post('/ownerships', { :ownership => params }).body)
   end
 
-  def put(params)
-	RestClient.post(Rails.application.config.ownership_url, params, {content_type: :json, accept: :json})
+  def self.post_batch(params)
+    JSON.parse(get_connection.post('/ownerships/batch', { :ownership => params }).body)
   end
 
-  def get(id)
-  	RestClient.get(Rails.application.config.ownership_url+'/'+id, {content_type: :json, accept: :json})
-  end 
+  def self.get(uuid)
+    JSON.parse(get_connection.get('/ownerships/'+uuid).body)
+  end
 
   def delete
   	raise 'Not implemented'
+  end
+
+  def self.get_connection
+    conn = Faraday.new(:url => Rails.application.config.ownership_url)
+    conn.proxy Rails.application.config.ownership_url_default_proxy
+    conn
   end
 end

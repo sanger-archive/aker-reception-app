@@ -28,6 +28,7 @@ class SubmissionsController < ApplicationController
       new_set_material = SetMaterial.create_remote_set(material_submission.id)
       SetMaterial.add_materials_to_set(new_set_material.uuid, materials)
       set_material = SetMaterial.get_remote_set_with_materials(new_set_material.uuid)
+      Ownership.create_remote_ownership_batch(ownership_batch_params)
     end
 
     if params[:material_submission][:status] == 'provenance'
@@ -74,5 +75,10 @@ class SubmissionsController < ApplicationController
     params[:material_submission][:status] = last_step? ? MaterialSubmission.ACTIVE : step.to_s
   end
 
+  def ownership_batch_params
+    owner = material_submission.email
+    bios = material_submission.labwares.flat_map &:biomaterials
+    bios.map { |bio| { model_id: bio.uuid, model_type: 'biomaterial', owner_id: owner }}
+  end
 
 end
