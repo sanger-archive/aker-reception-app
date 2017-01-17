@@ -1,7 +1,6 @@
 class SetMaterial
 	include SetMaterialClient
 	include ActiveModel::Model
-	include ActiveModel::Serializers::JSON
 
 	validates :name, presence: true	
 

@@ -13,7 +13,6 @@ class SubmissionsController < ApplicationController
     @status_success = material_submission.update_attributes(material_submission_params)
 
     if @status_success && last_step?
-
       materials = []
       material_submission.labwares.each do |lw|
         lw.wells.each do |well|
