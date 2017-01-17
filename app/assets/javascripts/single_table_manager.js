@@ -323,7 +323,7 @@
 
   proto.onError = function(e) {
     this.showModal({
-      title: 'Server error',
+      title: 'Validation Error',
       body: 'We could not save the current content due to an error'})
   };
 
