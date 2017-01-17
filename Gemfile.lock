@@ -139,7 +139,10 @@ GEM
     mini_portile2 (2.1.0)
     minitest (5.9.0)
     multi_json (1.12.1)
+<<<<<<< HEAD
     multipart-post (2.0.0)
+=======
+>>>>>>> a52_ownership_client_generation
     netrc (0.11.0)
     nio4r (1.2.1)
     nokogiri (1.6.8)
@@ -299,7 +302,10 @@ DEPENDENCIES
   pry
   puma (~> 3.0)
   rails (~> 5.0.0, >= 5.0.0.1)
+<<<<<<< HEAD
   react-rails
+=======
+>>>>>>> a52_ownership_client_generation
   rest-client
   rspec-rails (~> 3.4)
   sass-rails (~> 5.0)
@@ -317,4 +323,8 @@ DEPENDENCIES
   wicked
 
 BUNDLED WITH
+<<<<<<< HEAD
    1.13.7
+=======
+   1.13.6
+>>>>>>> a52_ownership_client_generation
