@@ -1,3 +1,5 @@
+require 'rest-client'
+
 module BiomaterialClient
   def site
 	  RestClient::Resource.new(Rails.configuration.materials_service_url)
