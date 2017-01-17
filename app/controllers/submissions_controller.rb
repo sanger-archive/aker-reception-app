@@ -28,7 +28,6 @@ class SubmissionsController < ApplicationController
       new_set_material = SetMaterial.create_remote_set(material_submission.id)
       SetMaterial.add_materials_to_set(new_set_material.uuid, materials)
       set_material = SetMaterial.get_remote_set_with_materials(new_set_material.uuid)
-      # debugger
     end
 
     if params[:material_submission][:status] == 'provenance'

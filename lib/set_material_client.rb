@@ -21,9 +21,9 @@ module SetMaterialClient
 	end
 
 	def self.add_materials(uuid, materials)
-		data = {:data=>{:type=>"sets", :attributes=>{:relationship=>materials}}} 
+		data = {:data => materials.compact.map{|m| {:id => m.uuid, :type => 'materials'}}}
 		conn = get_connection
-    	json = JSON.parse(get_connection.get('/api/v1/sets/#{uuid}/relationships/materials', data).body)
+    	json = JSON.parse(get_connection.post("/api/v1/sets/#{uuid}/relationships/materials", data.to_json).body)
 	end
 
 	private 
