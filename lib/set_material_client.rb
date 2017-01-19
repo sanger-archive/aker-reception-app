@@ -8,23 +8,16 @@ module SetMaterialClient
 		JSON.parse(conn.post('/api/v1/sets', data.to_json).body)
 	end
 
-	def self.get(uuid)
-		conn = get_connection
-		conn.headers = {'Accept' => 'application/vnd.api+json'} 
-    	JSON.parse(get_connection.get('/api/v1/sets/'+uuid).body)
-	end
-
-	def self.add_materials(uuid, materials)
+	def self.add_materials(set_uuid, materials)
 		data = {:data => materials.compact.map{|m| {:id => m.uuid, :type => 'materials'}}}
 		conn = get_connection
-    	json = JSON.parse(get_connection.post('/api/v1/sets/'+uuid+'/relationships/materials', data.to_json).body)
+		get_connection.post('/api/v1/sets/'+set_uuid+'/relationships/materials', data.to_json)
 	end
 
-# not returning materials
-	def self.get_with_materials(uuid)
+	def self.get_with_materials(set_uuid)
 		conn = get_connection
 		conn.headers = {'Accept' => 'application/vnd.api+json'} 
-    	JSON.parse(get_connection.get('/api/v1/sets/'+uuid+'/relationships/materials').body)
+	 	JSON.parse(get_connection.get('/api/v1/sets/'+set_uuid+'/relationships/materials').body)
 	end
 
 	private 

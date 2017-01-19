@@ -66,6 +66,7 @@ class Biomaterial
       attributes_with_id[:uuid] = biomaterial_id
       response = self.class.put(self.class.filter_attrs(attributes_with_id))
     else
+      self.class.filter_attrs(attributes)
       response = self.class.post(self.class.filter_attrs(attributes))
     end
     self.uuid = response["_id"]

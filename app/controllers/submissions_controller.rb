@@ -11,7 +11,6 @@ class SubmissionsController < ApplicationController
 
   def update
     @status_success = material_submission.update_attributes(material_submission_params)
-
     if @status_success && last_step?
       materials = []
       material_submission.labwares.each do |lw|
@@ -24,9 +23,9 @@ class SubmissionsController < ApplicationController
       MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
 
-      new_set_material = SetMaterial.create_remote_set(material_submission.id)
-      SetMaterial.add_materials_to_set(new_set_material.uuid, materials)
-      set_material = SetMaterial.get_remote_set_with_materials(new_set_material.uuid)
+      new_set = SetMaterial.create_remote_set(material_submission.id)
+      SetMaterial.add_materials_to_set(new_set.uuid, materials)
+      puts "new set uuid: #{new_set.uuid}"
     end
 
     if params[:material_submission][:status] == 'provenance'
