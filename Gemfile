@@ -46,6 +46,7 @@ gem 'pg'
 gem 'zipkin-tracer'
 
 gem 'set_service_client'
+gem 'material_service_client'
 
 
 group :development, :test do
