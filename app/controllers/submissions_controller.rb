@@ -19,13 +19,13 @@ class SubmissionsController < ApplicationController
         end
       end
 
-      flash[:notice] = 'Your Submission has been created'
-      MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
-      MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
-
       new_set = SetMaterial.create_remote_set(material_submission.id)
       SetMaterial.add_materials_to_set(new_set.uuid, materials)
       puts "new set uuid: #{new_set.uuid}"
+
+      flash[:notice] = 'Your Submission has been created'
+      MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
+      MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
     end
 
     if params[:material_submission][:status] == 'provenance'
