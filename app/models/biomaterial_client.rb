@@ -13,7 +13,7 @@ module BiomaterialClient
     data_to_send = data.reject{|k,v| k.to_sym == :uuid}
 
     conn = get_connection
-    JSON.parse(conn.post('/materials/'+uuid, data_to_send.to_json).body)
+    JSON.parse(conn.put('/materials/'+uuid, data_to_send.to_json).body)
   end
 
   def get(uuid)
