@@ -60,4 +60,10 @@ Rails.application.configure do
   config.set_url = 'http://localhost:3000/api/v1/sets'
   config.set_url_default_proxy = 'http://localhost:3000'
 
+  config.middleware.use ZipkinTracer::RackHandler, { service_name: "Set Service",
+                           service_port: 3000,
+                           sample_rate: 1,
+                           json_api_host: "http://localhost:9411",
+                           log_tracing: true }
+
 end

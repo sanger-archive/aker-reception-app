@@ -15,7 +15,6 @@ gem 'coffee-rails', '~> 4.2'
 gem 'therubyracer', platforms: :ruby
 gem 'pry'
 gem 'react-rails'
-gem 'rest-client'
 
 gem 'json-schema'
 gem 'activeresource', github: 'rails/activeresource', branch: 'master'
@@ -44,6 +43,8 @@ gem 'forgery'
 gem 'faraday'
 
 gem 'pg'
+gem 'zipkin-tracer'
+
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

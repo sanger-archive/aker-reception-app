@@ -11,7 +11,7 @@ module SetMaterialClient
 	def self.add_materials(set_uuid, materials)
 		data = {:data => materials.compact.map{|m| {:id => m.uuid, :type => 'materials'}}}
 		conn = get_connection
-		get_connection.post('/api/v1/sets/'+set_uuid+'/relationships/materials', data.to_json)
+		conn.post('/api/v1/sets/'+set_uuid+'/relationships/materials', data.to_json)
 	end
 
 	def self.get_with_materials(set_uuid)
@@ -23,10 +23,16 @@ module SetMaterialClient
 	private 
 
 	def self.get_connection
-		conn = Faraday.new(:url => Rails.application.config.set_url)
-	    conn.proxy Rails.application.config.set_url_default_proxy
-	    conn.headers = {'Content-Type' => 'application/vnd.api+json'} 
-	    conn
-	end
+    	conn = Faraday.new(:url => Rails.application.config.set_url) do |faraday|
+			# faraday.use ZipkinTracer::FaradayHandler, 'Set Service'
+			faraday.proxy Rails.application.config.set_url_default_proxy
+			faraday.request  :url_encoded
+			faraday.response :logger
+			faraday.adapter  Faraday.default_adapter 
+			faraday.proxy Rails.application.config.set_url_default_proxy
+		end
+		conn.headers = {'Content-Type' => 'application/vnd.api+json'} 
+		conn
+ 	end
 
 end

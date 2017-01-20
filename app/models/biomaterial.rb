@@ -1,5 +1,4 @@
 require 'pry'
-require 'rest-client'
 
 class Biomaterial
   include ActiveModel::Model
