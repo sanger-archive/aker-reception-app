@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 20161103114923) do
-=======
 ActiveRecord::Schema.define(version: 20170119170909) do
->>>>>>> d1192be... Added label templates for:
 
   create_table "barcodes", force: :cascade do |t|
     t.string   "barcode_type"
