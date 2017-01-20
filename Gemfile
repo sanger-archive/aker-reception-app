@@ -20,6 +20,9 @@ gem 'rest-client'
 gem 'json-schema'
 gem 'activeresource', github: 'rails/activeresource', branch: 'master'
 
+# Add simple support for print-my barcode)
+gem 'pmb-client', '0.1.0', :github => 'sanger/pmb-client'
+
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

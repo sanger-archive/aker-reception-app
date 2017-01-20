@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20161103114923) do
+=======
+ActiveRecord::Schema.define(version: 20170119170909) do
+>>>>>>> d1192be... Added label templates for:
 
   create_table "barcodes", force: :cascade do |t|
     t.string   "barcode_type"
@@ -41,6 +45,14 @@ ActiveRecord::Schema.define(version: 20161103114923) do
     t.string   "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "label_templates", force: :cascade do |t|
+    t.string   "name",          null: false
+    t.string   "template_type"
+    t.integer  "external_id",   null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
   create_table "labware_types", force: :cascade do |t|
