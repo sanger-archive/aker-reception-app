@@ -45,6 +45,8 @@ gem 'faraday'
 gem 'pg'
 gem 'zipkin-tracer'
 
+gem 'set_service_client'
+
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -74,4 +76,5 @@ group :test do
   gem 'poltergeist'
   gem 'factory_girl_rails'
   gem 'database_cleaner'
+
 end
