@@ -20,6 +20,14 @@ module MaterialServiceClient
 		JSON.parse(conn.get('/materials/'+uuid).body)
 	end
 
+	def self.valid?(uuids)
+		conn = get_connection
+		data = { materials: uuids }
+
+		response = conn.post('/materials/validate', data.to_json)
+		response.body == 'ok'
+	end
+
 	private
 
 	def self.get_connection
@@ -28,9 +36,9 @@ module MaterialServiceClient
 		  faraday.proxy Rails.application.config.material_url
 		  faraday.request  :url_encoded
 		  faraday.response :logger
-		  faraday.adapter  Faraday.default_adapter 
+		  faraday.adapter  Faraday.default_adapter
 		end
-		conn.headers = {'Content-Type' => 'application/json'} 
+		conn.headers = {'Content-Type' => 'application/json'}
 		conn
 	end
 end

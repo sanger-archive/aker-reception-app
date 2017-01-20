@@ -131,7 +131,7 @@ GEM
       systemu (~> 2.6.2)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
-    material_service_client (0.1.9)
+    material_service_client (0.1.11)
     method_source (0.8.2)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
