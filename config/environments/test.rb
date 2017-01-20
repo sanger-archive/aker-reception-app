@@ -40,4 +40,5 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
   config.materials_service_url = "http://localhost:5000"
+  config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
 end
