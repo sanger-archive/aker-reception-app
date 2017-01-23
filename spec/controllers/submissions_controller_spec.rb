@@ -83,15 +83,15 @@ RSpec.describe SubmissionsController, type: :controller do
       @material_submission = FactoryGirl.create :material_submission
       @contact = FactoryGirl.create :contact
 
-      stub_request(:get, "#{Rails.configuration.materials_service_url}/materials/schema").
+      stub_request(:get, "#{Rails.configuration.material_url}/materials/schema").
          with(:headers => {
           'Content-Type'=>'text/json', 
           }).
          to_return(:status => 200, :body => "{}", :headers => {})
 
-      stub_request(:post, "#{Rails.configuration.materials_service_url}/materials").
+      stub_request(:post, "#{Rails.configuration.material_url}/materials").
          with(:body => {"common_name"=>"Test", "donor_id"=>"Test", "gender"=>"Test", "phenotype"=>"Test", "supplier_name"=>"Test"},
-              :headers => { 'Content-Type'=>'application/x-www-form-urlencoded'}).
+              :headers => { 'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => "{}", :headers => {})
 
       @uuid = SecureRandom.uuid

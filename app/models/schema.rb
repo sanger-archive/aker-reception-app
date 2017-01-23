@@ -4,7 +4,7 @@ class Schema
 
 	def self.get
 		conn = get_connection
-		JSON.parse(get_connection.get('/materials/schema/').body)
+		JSON.parse(get_connection.get('/materials/schema').body)
 	end
 
 	def self.get_connection
