@@ -28,7 +28,6 @@ class Well < ApplicationRecord
     [biomaterial].compact
   end
 
-
   #attr_accessor :biomaterial_id
   #accepts_nested_attributes_for :biomaterial, reject_if: :all_attributes_blank?
 
