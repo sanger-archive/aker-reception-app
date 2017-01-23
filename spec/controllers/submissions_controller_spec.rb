@@ -83,18 +83,41 @@ RSpec.describe SubmissionsController, type: :controller do
       @material_submission = FactoryGirl.create :material_submission
       @contact = FactoryGirl.create :contact
 
-      stub_request(:get, "#{Rails.configuration.materials_service_url}/materials/schema").
+      stub_request(:get, "#{Rails.configuration.material_url}/materials/schema").
          with(:headers => {
           'Content-Type'=>'text/json', 
           }).
          to_return(:status => 200, :body => "{}", :headers => {})
 
-      stub_request(:post, "#{Rails.configuration.materials_service_url}/materials").
+      stub_request(:post, "#{Rails.configuration.material_url}/materials").
          with(:body => {"common_name"=>"Test", "donor_id"=>"Test", "gender"=>"Test", "phenotype"=>"Test", "supplier_name"=>"Test"},
-              :headers => { 'Content-Type'=>'application/x-www-form-urlencoded'}).
+              :headers => { 'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => "{}", :headers => {})
 
+      @uuid = SecureRandom.uuid
 
+      stub_request(:post, "#{Rails.configuration.set_url}").
+         with(:body => "{\"data\":{\"type\":\"sets\",\"attributes\":{\"name\":1}}}",
+              :headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{\"data\":{\"id\":\"#{@uuid}\",\"attributes\":{\"name\":\"testing-set-1\"}}}", :headers => {})
+
+      stub_request(:post, "#{Rails.configuration.ownership_url}/batch").
+         with(:headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
+         to_return(:status => 200, :body => "{}", :headers => {})         
+
+      stub_request(:post, "#{Rails.configuration.ownership_url}").
+         with(:body => {"ownership"=>{"model_id"=>"#{@uuid}", "model_type"=>"set", "owner_id"=>"test@email.com"}},
+              :headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+      stub_request(:post, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
+         with(:body => "{\"data\":[]}",
+              :headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})         
+
+       stub_request(:get, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
+         with(:headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
     end
 
     it "does not update the submission state if any steps have not been performed" do

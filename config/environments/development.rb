@@ -55,6 +55,17 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :sendmail
   config.action_mailer.default_url_options = { host: 'example.com' }
 
-  config.materials_service_url = "http://localhost:5000"
+  config.material_url = 'http://localhost:5000'
 
+  config.set_url = 'http://localhost:3000/api/v1/sets'
+  config.set_url_default_proxy = 'http://localhost:3000'
+
+  config.middleware.use ZipkinTracer::RackHandler, { service_name: "Set Service",
+                           service_port: 3000,
+                           sample_rate: 1,
+                           json_api_host: "http://localhost:9411",
+                           log_tracing: true }
+
+  config.ownership_url = 'http://localhost:4000/ownerships'
+  config.ownership_url_default_proxy = 'http://localhost:4000'
 end

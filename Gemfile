@@ -15,7 +15,6 @@ gem 'coffee-rails', '~> 4.2'
 gem 'therubyracer', platforms: :ruby
 gem 'pry'
 gem 'react-rails'
-gem 'rest-client'
 
 gem 'json-schema'
 gem 'activeresource', github: 'rails/activeresource', branch: 'master'
@@ -41,12 +40,22 @@ gem 'uuid'
 gem 'select2-rails'
 gem 'forgery'
 
+gem 'faraday'
+
 gem 'pg'
+gem 'zipkin-tracer'
+
+gem 'set_service_client'
+gem 'material_service_client'
+
+
+gem 'faraday'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
   gem 'sqlite3'
+
 end
 
 group :development do
@@ -71,4 +80,5 @@ group :test do
   gem 'poltergeist'
   gem 'factory_girl_rails'
   gem 'database_cleaner'
+
 end

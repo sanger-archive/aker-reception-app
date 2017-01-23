@@ -13,7 +13,7 @@ RSpec.describe Labware, type: :model do
     context 'when both dimensions are not alpha' do
 
       before do
-        labware_type = create(:labware_labware_type, x_dimension_size: 3, y_dimension_size: 3)
+        labware_type = create(:labware_type, x_dimension_size: 3, y_dimension_size: 3)
         @labware = create(:labware, labware_type: labware_type)
       end
 
@@ -26,7 +26,7 @@ RSpec.describe Labware, type: :model do
     context 'when x_dimension_is_alpha is true' do
 
       before do
-        labware_type = create(:labware_labware_type, x_dimension_size: 3, y_dimension_size: 3, x_dimension_is_alpha: true)
+        labware_type = create(:labware_type, x_dimension_size: 3, y_dimension_size: 3, x_dimension_is_alpha: true)
         @labware = create(:labware, labware_type: labware_type)
       end
 
@@ -40,7 +40,7 @@ RSpec.describe Labware, type: :model do
     context 'when y_dimension_is_alpha is true' do
 
       before do
-        labware_type = create(:labware_labware_type, x_dimension_size: 3, y_dimension_size: 3, y_dimension_is_alpha: true)
+        labware_type = create(:labware_type, x_dimension_size: 3, y_dimension_size: 3, y_dimension_is_alpha: true)
         @labware = create(:labware, labware_type: labware_type)
       end
 

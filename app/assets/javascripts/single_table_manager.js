@@ -139,13 +139,12 @@
 
     this.inputs().each($.proxy(this.saveInput, this, data));
     //this.validateTab(currentTab);
-      var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
-      $(this.form).append(input);
-
+      // var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
+      // $(this.form).append(input);
       var promise = $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
         $.proxy(this.onReceive, this, currentTab),
         $.proxy(this.onError, this));
-      input.remove();
+      // input.remove();
       return promise;      
     return null;
   };
@@ -323,7 +322,7 @@
 
   proto.onError = function(e) {
     this.showModal({
-      title: 'Server error',
+      title: 'Validation Error',
       body: 'We could not save the current content due to an error'})
   };
 
