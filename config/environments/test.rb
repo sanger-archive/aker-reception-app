@@ -45,5 +45,4 @@ Rails.application.configure do
   config.ownership_url = 'http://localhost:4000/ownerships'
   config.ownership_url_default_proxy = 'http://localhost:4000'
   
-
 end
