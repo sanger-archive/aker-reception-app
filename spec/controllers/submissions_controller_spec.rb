@@ -94,7 +94,30 @@ RSpec.describe SubmissionsController, type: :controller do
               :headers => { 'Content-Type'=>'application/x-www-form-urlencoded'}).
          to_return(:status => 200, :body => "{}", :headers => {})
 
+      @uuid = SecureRandom.uuid
 
+      stub_request(:post, "#{Rails.configuration.set_url}").
+         with(:body => "{\"data\":{\"type\":\"sets\",\"attributes\":{\"name\":1}}}",
+              :headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{\"data\":{\"id\":\"#{@uuid}\",\"attributes\":{\"name\":\"testing-set-1\"}}}", :headers => {})
+
+      stub_request(:post, "#{Rails.configuration.ownership_url}/batch").
+         with(:headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
+         to_return(:status => 200, :body => "{}", :headers => {})         
+
+      stub_request(:post, "#{Rails.configuration.ownership_url}").
+         with(:body => {"ownership"=>{"model_id"=>"#{@uuid}", "model_type"=>"set", "owner_id"=>"test@email.com"}},
+              :headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+      stub_request(:post, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
+         with(:body => "{\"data\":[]}",
+              :headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})         
+
+       stub_request(:get, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
+         with(:headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
     end
 
     it "does not update the submission state if any steps have not been performed" do

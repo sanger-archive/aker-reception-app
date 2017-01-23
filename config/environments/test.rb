@@ -39,8 +39,10 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
-  config.material_url = 'http://localhost:5000'
-
-  config.set_url = 'http://localhost:3000/api/v1/sets'
-  config.set_url_default_proxy = 'http://localhost:3000'
+  config.materials_service_url = "http://localhost:5000"
+  config.set_url = 'http://localhost:1500/api/v1/sets'
+  config.set_url_default_proxy = 'http://localhost:1500'
+  config.ownership_url = 'http://localhost:4000/ownerships'
+  config.ownership_url_default_proxy = 'http://localhost:4000'
+  
 end

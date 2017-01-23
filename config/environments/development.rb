@@ -66,4 +66,6 @@ Rails.application.configure do
                            json_api_host: "http://localhost:9411",
                            log_tracing: true }
 
+  config.ownership_url = 'http://localhost:4000/ownerships'
+  config.ownership_url_default_proxy = 'http://localhost:4000'
 end
