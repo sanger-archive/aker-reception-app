@@ -44,5 +44,7 @@ Rails.application.configure do
   config.set_url_default_proxy = 'http://localhost:1500'
   config.ownership_url = 'http://localhost:4000/ownerships'
   config.ownership_url_default_proxy = 'http://localhost:4000'
+  config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
+
   
 end
