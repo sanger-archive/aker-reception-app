@@ -12,10 +12,10 @@ class Printer < ApplicationRecord
 		print_printables(submissions.flat_map { |submission| submission_to_printables(submission) })
 	end
 	def print_printables(printables)
-		if @label_type=='Plate'
-			print_plates(@name, PLATE_TEMPLATE, printables)
+		if label_type=='Plate'
+			print_plates(name, Printer.PLATE_TEMPLATE, printables)
 		else
-			print_tubes(@name, TUBE_TEMPLATE, printables)
+			print_tubes(name, Printer.TUBE_TEMPLATE, printables)
 		end
 	end
 
