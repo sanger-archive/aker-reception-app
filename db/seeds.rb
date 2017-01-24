@@ -44,3 +44,12 @@ LabwareType.create(
     email: Forgery('internet').email_address
   )
 end
+
+Printer.create(
+  name: 'd304bc',
+  label_type: 'Plate',
+)
+Printer.create(
+  name: 'e367bc',
+  label_type: 'Tube',
+)

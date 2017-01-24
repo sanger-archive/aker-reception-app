@@ -15,6 +15,7 @@ class CompletedSubmissionsController < ApplicationController
 		end
 
 		# Do print somehow
+		Printer.find(name: "d304bc").print_submissions(completed_submissions)
 
 		completed_submissions.each do |ms|
 			ms.update_attributes!({ status: MaterialSubmission.AWAITING }) if ms.active?
@@ -26,11 +27,4 @@ private
     def print_error(message)
     	redirect_back fallback_location: completed_submissions_url, flash: { error: message }
     end
-	def badrequest(message)
-		error = {
-			status: 400,
-			message: message
-		}
-		render json: error, status: :bad_request
-	end
 end
