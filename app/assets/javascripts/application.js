@@ -21,6 +21,7 @@
 //= require react_ujs
 //= require components
 //= require_tree .
+//= require bootstrap-table
 
 var field_mapping = {
   position: 'position',
