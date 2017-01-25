@@ -1,6 +1,9 @@
 class Printer < ApplicationRecord
 	include Printables::Group
 
+	validates :name, presence: true, uniqueness: true
+	validates :label_type, presence: true
+
 	def self.PLATE_TEMPLATE
 		"aker_code128_96plate"
 	end
