@@ -51,9 +51,6 @@ gem 'zipkin-tracer'
 gem 'set_service_client'
 gem 'material_service_client'
 
-
-gem 'faraday'
-
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
