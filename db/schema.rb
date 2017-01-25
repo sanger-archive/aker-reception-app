@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161010131800) do
+ActiveRecord::Schema.define(version: 20170124091451) do
 
   create_table "barcodes", force: :cascade do |t|
     t.string   "barcode_type"
@@ -43,6 +43,14 @@ ActiveRecord::Schema.define(version: 20161010131800) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "label_templates", force: :cascade do |t|
+    t.string   "name",          null: false
+    t.string   "template_type"
+    t.integer  "external_id",   null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
   create_table "labware_types", force: :cascade do |t|
     t.integer  "x_dimension_size"
     t.integer  "y_dimension_size"
@@ -56,10 +64,16 @@ ActiveRecord::Schema.define(version: 20161010131800) do
 
   create_table "labwares", force: :cascade do |t|
     t.integer  "labware_type_id"
-    t.string   "type"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
     t.index ["labware_type_id"], name: "index_labwares_on_labware_type_id"
+  end
+
+  create_table "material_receptions", force: :cascade do |t|
+    t.integer  "labware_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["labware_id"], name: "index_material_receptions_on_labware_id"
   end
 
   create_table "material_submission_labwares", force: :cascade do |t|
@@ -67,6 +81,7 @@ ActiveRecord::Schema.define(version: 20161010131800) do
     t.integer  "labware_id"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.text     "state"
     t.index ["labware_id"], name: "index_material_submission_labwares_on_labware_id"
     t.index ["material_submission_id"], name: "index_material_submission_labwares_on_material_submission_id"
   end
@@ -80,15 +95,25 @@ ActiveRecord::Schema.define(version: 20161010131800) do
     t.datetime "updated_at",              null: false
     t.text     "address"
     t.integer  "contact_id"
+    t.string   "email"
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id"
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id"
   end
 
-  create_table "wells", force: :cascade do |t|
-    t.integer  "labware_id"
-    t.string   "position"
+  create_table "printers", force: :cascade do |t|
+    t.string   "name"
+    t.string   "label_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_printers_on_name", unique: true
+  end
+
+  create_table "wells", force: :cascade do |t|
+    t.integer  "labware_id"
+    t.string   "biomaterial_id"
+    t.string   "position"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
     t.index ["labware_id"], name: "index_wells_on_labware_id"
   end
 

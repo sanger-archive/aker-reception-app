@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'webmock/rspec'
 
 def step_params(material_submission, step_name)
   {:params => {
@@ -12,6 +13,7 @@ def step_params(material_submission, step_name)
         }
       when :provenance
         {
+
               :status => 'provenance',
               :labwares_attributes => plate_attributes_for(material_submission.labwares)
         }
@@ -19,7 +21,8 @@ def step_params(material_submission, step_name)
         {
           :status => 'active',
           :address => 'Testing address',
-          :contact_attributes => { :email => 'Contact test email'}
+          :email => 'test@email.com',
+          :contact_id => @contact.id
         }
       when :dispatch_contact_error
         step_name = :dispatch
@@ -31,6 +34,7 @@ def step_params(material_submission, step_name)
       end
     }.merge(
       {
+        :format => (step_name == :provenance) ? 'json' : 'html',
         :material_submission_id => material_submission.id,
         :id => step_name
       }
@@ -77,6 +81,43 @@ RSpec.describe SubmissionsController, type: :controller do
     setup do
       @labware_type = FactoryGirl.create :labware_type
       @material_submission = FactoryGirl.create :material_submission
+      @contact = FactoryGirl.create :contact
+
+      stub_request(:get, "#{Rails.configuration.material_url}/materials/schema").
+         with(:headers => {
+          'Content-Type'=>'text/json', 
+          }).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+      stub_request(:post, "#{Rails.configuration.material_url}/materials").
+         with(:body => {"common_name"=>"Test", "donor_id"=>"Test", "gender"=>"Test", "phenotype"=>"Test", "supplier_name"=>"Test"},
+              :headers => { 'Content-Type'=>'application/json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+      @uuid = SecureRandom.uuid
+
+      stub_request(:post, "#{Rails.configuration.set_url}").
+         with(:body => "{\"data\":{\"type\":\"sets\",\"attributes\":{\"name\":1}}}",
+              :headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{\"data\":{\"id\":\"#{@uuid}\",\"attributes\":{\"name\":\"testing-set-1\"}}}", :headers => {})
+
+      stub_request(:post, "#{Rails.configuration.ownership_url}/batch").
+         with(:headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
+         to_return(:status => 200, :body => "{}", :headers => {})         
+
+      stub_request(:post, "#{Rails.configuration.ownership_url}").
+         with(:body => {"ownership"=>{"model_id"=>"#{@uuid}", "model_type"=>"set", "owner_id"=>"test@email.com"}},
+              :headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+      stub_request(:post, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
+         with(:body => "{\"data\":[]}",
+              :headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})         
+
+       stub_request(:get, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
+         with(:headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
     end
 
     it "does not update the submission state if any steps have not been performed" do
@@ -88,6 +129,7 @@ RSpec.describe SubmissionsController, type: :controller do
     it "does not update the submission state if any required data of steps has not been provided" do
       put :update, step_params(@material_submission, :labware)
       @material_submission.reload
+
       put :update, step_params(@material_submission, :provenance)
       @material_submission.reload
       put :update, step_params(@material_submission, :dispatch_contact_error)
