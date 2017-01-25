@@ -31,7 +31,7 @@ class MaterialSubmission < ApplicationRecord
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
-  scope :pending, -> { where.not(status: MaterialSubmission.ACTIVE) }
+  scope :pending, -> { where.not(status: [MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING]) }
 
   def active?
     status == MaterialSubmission.ACTIVE
