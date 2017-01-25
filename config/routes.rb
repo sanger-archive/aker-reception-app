@@ -8,4 +8,7 @@ Rails.application.routes.draw do
   resources :material_submissions do
     resources :build, controller: 'submissions'
   end
+
+  resources :completed_submissions
+  post '/completed_submissions/print', to: 'completed_submissions#print'
 end

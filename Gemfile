@@ -51,9 +51,6 @@ gem 'zipkin-tracer'
 gem 'set_service_client'
 gem 'material_service_client'
 
-
-gem 'faraday'
-
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
@@ -75,7 +72,7 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'bootstrap-sass', '~> 3.3.6'
 gem 'font-awesome-sass'
-group :test do
+group :development, :test do
   gem 'webmock'
   gem 'rspec-rails', '~> 3.4'
   gem 'launchy'

@@ -4,6 +4,10 @@ class MaterialSubmission < ApplicationRecord
     'active'
   end
 
+  def self.AWAITING
+    'awaiting receipt'
+  end
+
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
@@ -26,6 +30,7 @@ class MaterialSubmission < ApplicationRecord
   accepts_nested_attributes_for :labwares
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
+  scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
   scope :pending, -> { where.not(status: MaterialSubmission.ACTIVE) }
 
   def active?
@@ -45,6 +50,11 @@ class MaterialSubmission < ApplicationRecord
   def active_or_dispatch?
     return false if status.nil?
     active? || status.include?('dispatch')
+  end
+
+  def active_or_awaiting?
+    return false if status.nil?
+    active? || status==MaterialSubmission.AWAITING
   end
 
   def no_of_labwares_required
