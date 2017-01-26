@@ -17,6 +17,7 @@ class CompletedSubmissionsController < ApplicationController
 
 		completed_submissions.each do |ms|
 			ms.update_attributes!({ status: MaterialSubmission.AWAITING }) if ms.active?
+			ms.labwares.each { |lw| lw.barcode.increment!(:print_count) }
 		end
 		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Print issued."}
 	end

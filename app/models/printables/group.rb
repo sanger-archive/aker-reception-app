@@ -27,7 +27,7 @@ module Printables::Group
       :bottom_right        => printable_object[:uricode],
       :top_far_right       => printable_object[:number],
       :bottom_far_right    => "of #{printable_object[:total_number]}",
-      :label_counter_right => "#{printable_object[:num_prints]} prints"
+      :label_counter_right => num_prints(printable_object[:num_prints]),
     }   
   end
 
@@ -39,8 +39,12 @@ module Printables::Group
       :bottom_line             => printable_object[:date],
       :round_label_top_line    => printable_object[:collaborator_email],
       :round_label_bottom_line => 
-      "(#{printable_object[:number]} of #{printable_object[:total_number]}) #{printable_object[:num_prints]} prints"
+      "(#{printable_object[:number]} of #{printable_object[:total_number]}) #{num_prints(printable_object[:num_prints])}"
     }
   end
 
+private
+  def num_prints(n)
+    n==1 ? '1 print' : "#{n} prints"
+  end
 end
