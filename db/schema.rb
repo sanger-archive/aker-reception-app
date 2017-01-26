@@ -10,15 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170124091451) do
+ActiveRecord::Schema.define(version: 20170126102536) do
 
   create_table "barcodes", force: :cascade do |t|
     t.string   "barcode_type"
     t.string   "value"
     t.string   "barcodeable_type"
     t.integer  "barcodeable_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "print_count",      default: 0, null: false
     t.index ["barcodeable_type", "barcodeable_id"], name: "index_barcodes_on_barcodeable_type_and_barcodeable_id"
   end
 
