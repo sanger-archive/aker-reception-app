@@ -2,7 +2,7 @@ module Printables::Group
 
   def print_tubes(printer_name, label_template_name, printables)
     PMB::PrintJob.new(printer_name: printer_name,
-      label_template_id: LabelTemplate.find_by_name(label_template_name).id,
+      label_template_id: LabelTemplate.find_by_name(label_template_name).external_id,
       labels: {body: printables.map do |printable|
         {:main_label => tube_layout(printable)}
       end
@@ -11,7 +11,7 @@ module Printables::Group
 
   def print_plates(printer_name, label_template_name, printables)
     PMB::PrintJob.new(printer_name: printer_name,
-      label_template_id: LabelTemplate.find_by_name(label_template_name).id,
+      label_template_id: LabelTemplate.find_by_name(label_template_name).external_id,
       labels: {body: printables.map do |printable|
         {:label => plate_layout(printable)}
       end
