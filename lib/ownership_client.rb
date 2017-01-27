@@ -19,7 +19,10 @@ module OwnershipClient
   end
 
   def self.get_connection
-    conn = Faraday.new(:url => Rails.application.config.ownership_url)
+    conn = Faraday.new(:url => Rails.application.config.ownership_url) do |faraday|
+      faraday.use ZipkinTracer::FaradayHandler, 'ownership service'
+    end
+
     conn.proxy Rails.application.config.ownership_url_default_proxy
     conn
   end

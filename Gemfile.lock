@@ -9,11 +9,27 @@ GIT
       activesupport (> 4.2, < 6)
 
 GIT
+  remote: git://github.com/sanger/material_service_client_gem.git
+  revision: c7d4100278e88cd5c69f91e61f09f794eff1a340
+  specs:
+    material_service_client (0.1.12)
+      faraday (~> 0.11.0)
+      zipkin-tracer (~> 0.20.1)
+
+GIT
   remote: git://github.com/sanger/pmb-client.git
   revision: 016f151a3bde84448ed64e528259c3511282dcdb
   specs:
     pmb-client (0.1.0)
       json_api_client (~> 1.1)
+
+GIT
+  remote: git://github.com/sanger/set_service_client_gem.git
+  revision: 266f549dcc5335d06a4d845e1e2424d47201b3ea
+  specs:
+    set_service_client (0.1.2)
+      faraday (~> 0.11.0)
+      zipkin-tracer (~> 0.20.1)
 
 GEM
   remote: https://rubygems.org/
@@ -146,7 +162,6 @@ GEM
       systemu (~> 2.6.2)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
-    material_service_client (0.1.11)
     method_source (0.8.2)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
@@ -234,7 +249,6 @@ GEM
       tilt (>= 1.1, < 3)
     select2-rails (4.0.3)
       thor (~> 0.14)
-    set_service_client (0.1.1)
     slop (3.6.0)
     spring (2.0.1)
       activesupport (>= 4.2)
@@ -310,7 +324,7 @@ DEPENDENCIES
   json-schema
   launchy
   listen (~> 3.0.5)
-  material_service_client
+  material_service_client (~> 0.1.12)!
   pg
   pmb-client (= 0.1.0)!
   poltergeist
@@ -321,7 +335,7 @@ DEPENDENCIES
   rspec-rails (~> 3.4)
   sass-rails (~> 5.0)
   select2-rails
-  set_service_client
+  set_service_client (~> 0.1.2)!
   spring
   spring-watcher-listen (~> 2.0.0)
   sqlite3
@@ -336,4 +350,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.13.7
+   1.14.2
