@@ -13,6 +13,15 @@ gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.2'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 gem 'therubyracer', platforms: :ruby
+gem 'pry'
+gem 'react-rails'
+
+gem 'json-schema'
+gem 'activeresource', github: 'rails/activeresource', branch: 'master'
+
+# Add simple support for print-my barcode)
+gem 'pmb-client', '0.1.0', :github => 'sanger/pmb-client'
+
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -34,12 +43,19 @@ gem 'uuid'
 gem 'select2-rails'
 gem 'forgery'
 
+gem 'faraday'
+
 gem 'pg'
+gem 'zipkin-tracer'
+
+gem 'set_service_client', '~> 0.1.2', github: 'sanger/set_service_client_gem'
+gem 'material_service_client', '~> 0.1.12', github: 'sanger/material_service_client_gem'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
   gem 'sqlite3'
+
 end
 
 group :development do
@@ -56,11 +72,13 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'bootstrap-sass', '~> 3.3.6'
 gem 'font-awesome-sass'
-group :test do
+group :development, :test do
+  gem 'webmock'
   gem 'rspec-rails', '~> 3.4'
   gem 'launchy'
   gem 'capybara'
   gem 'poltergeist'
   gem 'factory_girl_rails'
   gem 'database_cleaner'
+
 end

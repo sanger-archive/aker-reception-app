@@ -17,6 +17,9 @@
 //= require select2
 //= require component_builder
 //= require barcode_reader
+//= require react
+//= require react_ujs
+//= require components
 //= require_tree .
 
 var field_mapping = {
