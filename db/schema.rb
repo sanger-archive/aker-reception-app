@@ -10,15 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161103114923) do
+ActiveRecord::Schema.define(version: 20170126102536) do
 
   create_table "barcodes", force: :cascade do |t|
     t.string   "barcode_type"
     t.string   "value"
     t.string   "barcodeable_type"
     t.integer  "barcodeable_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "print_count",      default: 0, null: false
     t.index ["barcodeable_type", "barcodeable_id"], name: "index_barcodes_on_barcodeable_type_and_barcodeable_id"
   end
 
@@ -41,6 +42,14 @@ ActiveRecord::Schema.define(version: 20161103114923) do
     t.string   "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "label_templates", force: :cascade do |t|
+    t.string   "name",          null: false
+    t.string   "template_type"
+    t.integer  "external_id",   null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
   create_table "labware_types", force: :cascade do |t|
@@ -90,6 +99,14 @@ ActiveRecord::Schema.define(version: 20161103114923) do
     t.string   "email"
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id"
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id"
+  end
+
+  create_table "printers", force: :cascade do |t|
+    t.string   "name"
+    t.string   "label_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_printers_on_name", unique: true
   end
 
   create_table "wells", force: :cascade do |t|

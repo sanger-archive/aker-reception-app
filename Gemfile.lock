@@ -8,6 +8,13 @@ GIT
       activemodel-serializers-xml (~> 1.0)
       activesupport (> 4.2, < 6)
 
+GIT
+  remote: git://github.com/sanger/pmb-client.git
+  revision: 016f151a3bde84448ed64e528259c3511282dcdb
+  specs:
+    pmb-client (0.1.0)
+      json_api_client (~> 1.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -101,6 +108,8 @@ GEM
       railties (>= 3.0.0)
     faraday (0.11.0)
       multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.11.0.1)
+      faraday (>= 0.7.4, < 1.0)
     ffi (1.9.17)
     finagle-thrift (1.4.2)
       thrift (~> 0.9.3)
@@ -120,6 +129,12 @@ GEM
       thor (>= 0.14, < 2.0)
     json-schema (2.7.0)
       addressable (>= 2.4)
+    json_api_client (1.4.0)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      addressable (~> 2.2)
+      faraday (~> 0.9)
+      faraday_middleware (~> 0.9)
     launchy (2.4.3)
       addressable (~> 2.3)
     libv8 (3.16.14.17)
@@ -299,6 +314,7 @@ DEPENDENCIES
   listen (~> 3.0.5)
   material_service_client
   pg
+  pmb-client (= 0.1.0)!
   poltergeist
   pry
   puma (~> 3.0)

@@ -13,4 +13,8 @@ Rails.application.routes.draw do
   post '/find_submissions_by_user', to: 'claim_submissions#find_submissions_by_user'
 
   get '/get_all_collections', to: 'claim_submissions#get_all_collections'
+
+  resources :completed_submissions
+  post '/completed_submissions/print', to: 'completed_submissions#print'
+  post '/material_submissions/claim', to: 'submissions#claim'
 end
