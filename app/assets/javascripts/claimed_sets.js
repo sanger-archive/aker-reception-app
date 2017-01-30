@@ -10,10 +10,11 @@
 
     $('.table tbody tr', $(NODE)).each(function(pos, node) {
       var list = $('td', node);
-      var form = $("<form method='post' class='form' data-remote='true' action='"+data[pos].uuid+"''></form>")
+      var collectionId = data[pos].uuid;
+      var form = $("<form method='post' class='form' data-remote='true' action='/material_submissions/claim'></form>") //claim url
       var claimingButton = $('<button class="btn btn-default">Claim</button>');
       form.append(claimingButton);
-      claimingButton.on('click', $.proxy(claim, this, form));
+      claimingButton.on('click', $.proxy(claim, this, form, collectionId));
       $(list[list.length - 1]).html(form);
     });
     if (data.length > 0) {
@@ -21,11 +22,12 @@
     }
   }
 
-  function claim(form) {
+  function claim(form, collectionId) {
     var submissionIds = $($('table', $(SUBMISSIONS_NODE))).bootstrapTable('getAllSelections').map(function(node, pos) {
       return node.id;
     });
-    $(form).append($("<input name='claimedSubmissions' type='hidden' value='"+JSON.stringify(submissionIds)+"' />"));
+    $(form).append($("<input name='submission_ids' type='hidden' value='"+JSON.stringify(submissionIds)+"' />"));
+    $(form).append($("<input name='collection_id' type='hidden' value='"+collectionId+"' />"));
 
     $(form).on('ajax:success', function() { 
       window.reload();
@@ -33,17 +35,22 @@
   }
 
   function init() {
-    var serviceUrl = $(NODE).data('service-url');
-    $.get(serviceUrl, onClaimedSetsReception)
-
     if (HEADERS.length == 0) {
       $('[data-field]', $(NODE)).each(function(pos, element) {
         HEADERS.push({field: $(element).data('field'), title: $(element).text()})
       });      
     }
+    var serviceUrl = $(NODE).data('service-url');
+    $.get(serviceUrl, onClaimedSetsReception)
 
   }
-  $(document).on('turbolinks:load', init);
+
+  function turbolinksLoad(){
+    $('.table').bootstrapTable({data: [], columns: HEADERS});
+    init();
+  }
+
+  $(document).on('turbolinks:load', turbolinksLoad);
   $(document).ready(init);
   
 }(jQuery))
