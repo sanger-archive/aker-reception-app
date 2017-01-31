@@ -51,6 +51,10 @@ gem 'zipkin-tracer'
 gem 'set_service_client', '~> 0.1.2', github: 'sanger/set_service_client_gem'
 gem 'material_service_client', '~> 0.1.12', github: 'sanger/material_service_client_gem'
 
+
+gem 'faraday'
+gem 'bootstrap-table-rails'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri

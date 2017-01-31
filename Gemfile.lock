@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/rails/activeresource.git
-  revision: 55a2643398762fae10acf6bb8cb21ae354a8eba1
+  revision: 5bb25e946c206e77f6f9b82c6a5ea8df31b9efc1
   branch: master
   specs:
     activeresource (5.0.0)
@@ -79,7 +79,7 @@ GEM
     addressable (2.5.0)
       public_suffix (~> 2.0, >= 2.0.2)
     arel (7.1.4)
-    autoprefixer-rails (6.7.0)
+    autoprefixer-rails (6.7.1)
       execjs
     babel-source (5.8.35)
     babel-transpiler (0.7.0)
@@ -88,6 +88,7 @@ GEM
     bootstrap-sass (3.3.7)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
+    bootstrap-table-rails (1.11.0)
     bootstrap_form (2.5.3)
     builder (3.2.3)
     byebug (9.0.6)
@@ -183,7 +184,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     public_suffix (2.0.5)
-    puma (3.6.2)
+    puma (3.7.0)
     rack (2.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -212,7 +213,7 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rake (12.0.0)
     rb-fsevent (0.9.8)
-    rb-inotify (0.9.7)
+    rb-inotify (0.9.8)
       ffi (>= 0.5.0)
     react-rails (1.10.0)
       babel-transpiler (>= 0.7.0)
@@ -272,7 +273,7 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.5)
     thrift (0.9.3.0)
-    tilt (2.0.5)
+    tilt (2.0.6)
     turbolinks (5.0.1)
       turbolinks-source (~> 5)
     turbolinks-source (5.0.0)
@@ -310,6 +311,7 @@ PLATFORMS
 DEPENDENCIES
   activeresource!
   bootstrap-sass (~> 3.3.6)
+  bootstrap-table-rails
   bootstrap_form
   byebug
   capybara
@@ -350,4 +352,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.14.2
+   1.13.7

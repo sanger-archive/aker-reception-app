@@ -1,13 +1,21 @@
-<p>Hi,</p>
+<p>Hi</p>
 <p>We've just received the following material mailed to you:</p>
 
-<table class="table">
-  <thead>
-    <tr><td>Submission</td><td>Barcode</td><td>Type</td><td>Created at</td></tr>
-  </thead>
-  <tbody>
-    <tr><td><%= @material_submission.id %> </td><td> <%= @labware.barcode.value %> </td><td> <%= @labware.type %> </td><td> <%= @material_submission.created_at %> </td></tr>
-  </tbody>
+<table>
+  <tr>
+    <th>Submission </th>
+    <th>Barcode</th>
+    <th>Type</th>
+    <th>Created at</th>
+  </tr>
+  <tr>
+    <td><%= @material_submission.id %></td>
+    <td><%= @labware.barcode.value %></td>
+    <td><%= @labware.labware_type.name %></td>
+    <td><%= @material_submission.created_at %></td>
+  </tr>
+
 </table>
 
-</p>Regards</p>
+<p>Regards</p>
+<p>AKER</p>
