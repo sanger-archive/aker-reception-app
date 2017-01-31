@@ -9,8 +9,17 @@
     $('.table tbody tr', $(SUBMISSIONS_NODE)).each(function(pos, node) {
       $(node).attr('draggable', true);
       $(node).on('dragstart', function(event) {
-        event.originalEvent.dataTransfer.setData("text", event.target.id);
+        var submissionIds = $($('table', $(SUBMISSIONS_NODE))).bootstrapTable('getAllSelections').map(function(node, pos) {
+          return node.id;
+        });
+        if (submissionIds.length>0) {
+          event.originalEvent.dataTransfer.setData("text", event.target.id);
+          var img = document.createElement('img');
+          img.src = "/assets/move.png";
+          event.originalEvent.dataTransfer.setDragImage(img, 10, 10);
+        }
       });
+
       var td = $($("td", $(node))[0]);
       var tdId = td.text();
       $(td).html($(["<a>",tdId, "</a>"].join('')));
