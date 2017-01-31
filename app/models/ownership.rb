@@ -29,7 +29,7 @@ class Ownership
   private
 
   def self.create_batch(obj)
-    obj.map { |item| create(item) }
+    obj[:ownership].map { |item| create(item) }
   end
 
   def self.create(obj)

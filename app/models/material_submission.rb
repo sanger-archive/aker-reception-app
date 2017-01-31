@@ -8,6 +8,10 @@ class MaterialSubmission < ApplicationRecord
     'awaiting receipt'
   end
 
+  def self.CLAIMED
+    'claimed'
+  end
+
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
@@ -31,7 +35,7 @@ class MaterialSubmission < ApplicationRecord
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
-  scope :pending, -> { where.not(status: [MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING]) }
+  scope :pending, -> { where.not(status: [MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED]) }
 
   def active?
     status == MaterialSubmission.ACTIVE
