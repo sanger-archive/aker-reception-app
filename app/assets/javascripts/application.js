@@ -16,6 +16,7 @@
 //= require bootstrap-sprockets
 //= require select2
 //= require component_builder
+//= require single_table_manager
 //= require barcode_reader
 //= require react
 //= require react_ujs
