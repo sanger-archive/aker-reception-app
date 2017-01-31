@@ -48,8 +48,8 @@ gem 'faraday'
 gem 'pg'
 gem 'zipkin-tracer'
 
-gem 'set_service_client'
-gem 'material_service_client'
+gem 'set_service_client', '~> 0.1.2', github: 'sanger/set_service_client_gem'
+gem 'material_service_client', '~> 0.1.12', github: 'sanger/material_service_client_gem'
 
 
 gem 'faraday'

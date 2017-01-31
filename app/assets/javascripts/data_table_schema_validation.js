@@ -9,7 +9,7 @@
 	var proto = DataTableSchemaValidation.prototype;
 
   proto.loadSchema = function() {
-    return $.ajax({url: '/materials_schema', 
+    return $.ajax({url: '/materials_schema',
       success: $.proxy(function(json) {
         this._loadedSchema = json;
         return this._loadedSchema;
@@ -30,7 +30,7 @@
       data.errors[attr] = msg;
     }
     $(node).trigger('psd.schema.error', {
-      node: node,      
+      node: node,
       messages: [ data ]
     });
   };
@@ -62,11 +62,11 @@
         }),
         this.schemaCheck(schema, msg, this.schemaChecks.failsDataValueAllowed, function(schema, msg) {
           return 'The field should have any of these values ['+schema.enum.join(',')+']';
-        })].some(a => a))) {
+        })].some(function(a) { return a }))) {
         var node = msg.node;
         $(node).trigger('psd.schema.error', {
-          node: node, 
-          update_successful: true,     
+          node: node,
+          update_successful: true,
           messages: [ $.extend(this.dataForNode(node), { update_successful: true}) ]
         });
     }
