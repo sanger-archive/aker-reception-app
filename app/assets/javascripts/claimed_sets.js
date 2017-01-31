@@ -30,7 +30,7 @@
     $(form).append($("<input name='collection_id' type='hidden' value='"+collectionId+"' />"));
 
     $(form).on('ajax:success', function() { 
-      window.reload();
+      window.location.href = window.location.href;
     });
   }
 

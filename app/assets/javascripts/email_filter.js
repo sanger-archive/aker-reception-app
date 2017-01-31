@@ -24,6 +24,7 @@
 
   function init() {
     $('form', $(NODE)).on('ajax:success', onFindReception);
+    $('.claiming-display').on('emailFilter.reload', onReload);
     
     $('[data-field]', $(SUBMISSIONS_NODE)).each(function(pos, element) {
       if (HEADERS.length == 0) {
