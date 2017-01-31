@@ -39,8 +39,6 @@ class SubmissionsController < ApplicationController
       # Adding materials to set
       SetMaterial.add_materials_to_set(new_set_material.uuid, materials)
       set_material = SetMaterial.get_remote_set_with_materials(new_set_material.uuid)
-
-      
     end
 
     if params[:material_submission][:status] == 'provenance'
@@ -50,10 +48,20 @@ class SubmissionsController < ApplicationController
     else
       render_wizard material_submission
     end
-
   end
 
-  protected
+  def claim
+    cp = claim_params
+    sub_ids = cp[:submission_ids]
+    col_id = cp[:collection_id]
+    submissions = MaterialSubmission.where(id: sub_ids)
+    materials = submissions_biomaterials(submissions)
+    SetMaterial.add_materials_to_set(col_id, materials)
+    submissions.update_all(status: MaterialSubmission.CLAIMED)
+  end
+
+
+protected
 
   def material_submission
     @material_submission ||= MaterialSubmission.find(params[:material_submission_id])
@@ -69,7 +77,7 @@ class SubmissionsController < ApplicationController
 
   helper_method :material_submission, :last_step?, :first_step?
 
-  private
+private
 
   def material_submission_params
     params.require(:material_submission).permit(
@@ -81,6 +89,17 @@ class SubmissionsController < ApplicationController
           biomaterial_attributes: [ :id, :supplier_name, :donor_name, :gender, :common_name, :phenotype ]]
       ]
     )
+  end
+
+  def claim_params
+    {
+      submission_ids: params.require(:submission_ids),
+      collection_id: params.require(:collection_id),
+    }
+  end
+
+  def submissions_biomaterials(submissions)
+    submissions.flat_map(&:labwares).flat_map(&:biomaterials)
   end
 
   def set_status
