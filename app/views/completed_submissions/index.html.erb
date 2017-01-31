@@ -2,7 +2,7 @@
   Completed submissions
 <% end %>
 
-<%= form_tag("completed_submissions/print", method: "post") do %>
+<%= form_tag(controller: "completed_submissions", action: "print", method: "post") do %>
 
 	<div class="row">
 	  <div class="col-md-12">
