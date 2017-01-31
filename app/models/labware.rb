@@ -30,6 +30,10 @@ class Labware < ApplicationRecord
     material_submission_labware.update_attributes(:state => 'received unclaimed')
   end
 
+  def received_unclaimed?
+    material_submission_labware.state == 'received unclaimed'
+  end
+
   def invalid_data
     if invalid?
       wells.map{|w| w if w.invalid?}.compact.map do |invalid_well|

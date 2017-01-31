@@ -1,7 +1,7 @@
 require 'set_service_client'
 
 class SetMaterial
-	# include SetMaterialClient
+	include StudyClient
 	include ActiveModel::Model
 
 	validates :name, presence: true	
@@ -20,6 +20,15 @@ class SetMaterial
 		SetServiceClient.get_with_materials(set_uuid)
 	end
 
+	def self.get_set_names
+		uuids = get_set_uuids_from_study
+		obj = []
+		uuids.each do |uuid|
+			obj.push(filter SetServiceClient.get_set(uuid))
+		end
+		obj
+	end
+
 	private 
 
 	def self.create(obj)
@@ -28,6 +37,10 @@ class SetMaterial
 
 	def self.filter(h)
 		{:uuid => h["data"]["id"], :name => h["data"]["attributes"]["name"]}
+	end
+
+	def self.get_set_uuids_from_study
+		StudyClient::get_set_uuids
 	end
 
 end

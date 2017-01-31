@@ -27,4 +27,8 @@ class MaterialReception < ApplicationRecord
     }
   end
 
+  def complete_set?
+    labware.material_submission.labwares.all?(&:received_unclaimed?)
+  end
+
 end
