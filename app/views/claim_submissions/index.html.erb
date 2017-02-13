@@ -1,10 +1,9 @@
-<% content_for :title_button do %>
-  <%= link_to 'To Submission', material_submissions_path, class: 'btn btn-info vcenter', style: 'margin-top: 28px' %>
-<% end %>
 
 <% content_for :main_title do %>
   Claim Submissions
 <% end %>
+<%= render :partial => 'title_buttons' %>
+
 
 <div class="container">
 <div class="claiming-display row">

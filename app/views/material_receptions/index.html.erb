@@ -1,11 +1,10 @@
-<% content_for :title_button do %>
-  <%= link_to 'To Submission', material_submissions_path, class: 'btn btn-info vcenter', style: 'margin-top: 28px' %>
-  <!-- %= link_to 'Receive new material', new_material_reception_url, class: 'btn btn-success vcenter', style: 'margin-top: 28px' % -->
-<% end %>
 
 <% content_for :main_title do %>
   Material Reception
 <% end %>
+
+<%= render :partial => 'title_buttons' %>
+
 
   <div class="alert alert-danger invisible" role="alert">
     <!-- h4 class='alert-title'>Error!</h4 -->
