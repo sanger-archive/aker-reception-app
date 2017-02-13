@@ -27,7 +27,11 @@ class Labware < ApplicationRecord
   end
 
   def received_unclaimed
-    material_submission_labware.update_attributes(:state => 'received unclaimed')
+    material_submission_labware.update_attributes(:state => 'received unclaimed') if barcode_printed?
+  end
+
+  def barcode_printed?
+    barcode.print_count > 0
   end
 
   def received_unclaimed?
