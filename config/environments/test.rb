@@ -46,5 +46,6 @@ Rails.application.configure do
   config.ownership_url_default_proxy = 'http://localhost:4000'
   config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
 
+  config.printing_disabled = true
   
 end
