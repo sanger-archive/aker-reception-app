@@ -8,9 +8,9 @@ class MaterialReceptionsController < ApplicationController
     @material_reception = MaterialReception.create(material_reception_params)
     if @material_reception.save
       ReceptionMailer.material_reception(@material_reception).deliver_later
-    end
-    if @material_reception.complete_set?
-      ReceptionMailer.complete_set(@material_reception).deliver_later
+      if @material_reception.complete_set?
+        ReceptionMailer.complete_set(@material_reception).deliver_later
+      end
     end
     render json: @material_reception.presenter
   end

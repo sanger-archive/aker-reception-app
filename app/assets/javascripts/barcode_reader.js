@@ -57,6 +57,10 @@
     }
   };
 
+  proto.displayError = function(e) {
+    this.alert('There is a network connection problem with the server. Please, contact the administrator.');
+  };
+
   proto.attachHandlers = function() {
     $(this.inputReader).on('keydown', $.proxy(this.readInput, this));
     $(this.form).on('ajax:success', $.proxy(this.onReceivedBarcode, this));

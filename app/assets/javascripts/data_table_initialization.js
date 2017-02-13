@@ -2,12 +2,16 @@
 
   function DataTableInitialization(node, params) {
     this.node = $(node);
-    this.dataTable = $(node).DataTable(params);
+    this.initDataTable(params);
 
     this.attachHandlers();
   };
 
   var proto = DataTableInitialization.prototype;
+
+  proto.initDataTable = function(params) {
+    this.dataTable = $(this.node).DataTable(params);    
+  };
 
   proto.attachHandlers = function() {
     this.node.on('DataTableInitialization.addRow', $.proxy(this.onAddRow, this));
