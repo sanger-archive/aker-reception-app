@@ -1,12 +1,34 @@
 <%= render partial: 'submission_header', locals: { title: "Step 2: Biomaterial Provenance" , progress: 50 } %>
 
-<%= bootstrap_form_for material_submission, url: wizard_path, method: :put do |f| %>
+<div data-psd-component-class="SingleTableManager"
+  data-psd-component-parameters="<%= plate_attributes_for(material_submission.labwares.includes(:barcode)).to_json %>">
+
+<div id="alert-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+<%= bootstrap_form_for material_submission, remote: true, url: wizard_path, method: :put, :html => {:'data-type' => 'json'} do |f| %>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
 
   <ul class="nav nav-tabs" role="tablist">
 
-    <% material_submission.labwares.each_with_index do |labware, i| %>
+    <% material_submission.labwares.includes(:barcode).each_with_index do |labware, i| %>
       <li class="<%= 'active' if i == 0 %>" role="presentation">
         <a data-toggle="tab" href="#<%= labware.barcode.value %>" aria-controls="<%= labware.barcode.value %>" role="tab">
           <%= labware.barcode.value %>
@@ -16,9 +38,12 @@
 
   </ul>
 
+
+
   <div class="tab-content">
 
-    <%= f.fields_for :labwares, material_submission.labwares do |labware_fields| %>
+
+    <%= f.fields_for :labwares, [material_submission.labwares.includes(:barcode).first] do |labware_fields| %>
 
         <div role="tabpanel" class="tab-pane <%= 'active' if labware_fields.index == 0 %>" id="<%= labware_fields.object.barcode.value %>">
 
@@ -36,7 +61,8 @@
           </div>
 
 
-          <table data-behavior="datatable" class="table table-condensed table-striped">
+          <table data-behavior="datatable" class="table table-condensed table-striped"
+            data-psd-component-class='DataTableSchemaValidation' data-psd-component-parameters='{}'>
             <thead>
               <tr>
                 <th>Plate Barcode</th>
@@ -51,8 +77,9 @@
 
             <tbody>
 
-            <%= labware_fields.fields_for :wells, labware_fields.object.wells do |well_fields| %>
 
+            <%= labware_fields.fields_for :wells, labware_fields.object.wells do |well_fields| %>
+              <!--  %= react_component 'SchemaForm', {} % -->
               <tr>
                 <td><%= labware_fields.object.barcode.value %></td>
                 <td>
@@ -61,14 +88,15 @@
                   <%= well_fields.object.position %>
                 </td>
 
-                <% biomaterial = well_fields.object.biomaterial.nil? ? well_fields.object.build_biomaterial : well_fields.object.biomaterial %>
+                <% biomaterial = well_fields.object.biomaterial_id.nil? ? Biomaterial.new : well_fields.object.biomaterial %>
+                <% well_fields.object.biomaterial_id = biomaterial.uuid if well_fields.object.biomaterial_id.nil? %>                
 
                 <%= well_fields.fields_for :biomaterial, biomaterial do |bm_fields| %>
-                  <td><%= bm_fields.text_field :supplier_name, hide_label: true %></td>
-                  <td><%= bm_fields.text_field :donor_name, hide_label: true %></td>
-                  <td><%= bm_fields.text_field :gender, hide_label: true %></td>
-                  <td><%= bm_fields.text_field :common_name, hide_label: true %></td>
-                  <td><%= bm_fields.text_field :phenotype, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="supplier_name"><%= bm_fields.text_field :supplier_name, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="donor_name"><%= bm_fields.text_field :donor_name, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="gender"><%= bm_fields.text_field :gender, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="common_name"><%= bm_fields.text_field :common_name, hide_label: true %></td>
+                  <td data-psd-schema-validation-name="phenotype"><%= bm_fields.text_field :phenotype, hide_label: true %></td>
                 <% end %>
 
               </tr>
@@ -86,3 +114,4 @@
   <%= render 'buttons', material_submission: material_submission, f: f %>
 
 <% end %>
+</div>

@@ -15,7 +15,14 @@
 //= require turbolinks
 //= require bootstrap-sprockets
 //= require select2
+//= require component_builder
+//= require single_table_manager
+//= require barcode_reader
+//= require react
+//= require react_ujs
+//= require components
 //= require_tree .
+//= require bootstrap-table
 
 var field_mapping = {
   position: 'position',
@@ -52,8 +59,9 @@ $(document).on('turbolinks:load', function() {
       fillInTableFromFile($(this), e.originalEvent.dataTransfer.files);
     });
 
-  $('select.contact').select2({
+  $('select#material_submission_contact_id').select2({
     tags: true,
+    minimumResultsForSearch: Infinity,
     tokenSeparators: [',', ' ']
   });
 

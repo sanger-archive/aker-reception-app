@@ -1,5 +1,9 @@
 class MaterialSubmissionsController < ApplicationController
 
+  def schema
+    render :json => Schema.get
+  end
+
   def index
     @pending_material_submissions = MaterialSubmission.pending
     @active_material_submissions = MaterialSubmission.active
@@ -24,6 +28,14 @@ class MaterialSubmissionsController < ApplicationController
       flash[:error] = "Submission could not be cancelled"
       redirect_to material_submission_build_path material_submission_id: @material_submission.id
     end
+  end
+
+  def show
+    @material_submission = MaterialSubmission.find(params[:id])
+  end
+
+  def edit
+    @material_submission = MaterialSubmission.find(params[:id])
   end
 
 end

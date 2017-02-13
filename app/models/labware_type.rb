@@ -13,13 +13,7 @@ class LabwareType < ApplicationRecord
   def create_labwares(number = 1)
     labware_args = Array.new(number, { labware_type: self })
 
-    # TODO don't base this on size!
-    case size
-    when 1
-      return Tube.create(labware_args)
-    else
-      return Plate.create(labware_args)
-    end
+    Labware.create(labware_args)
   end
 
   def size

@@ -1,6 +1,17 @@
-<% content_for :title_button do %>
-  <%= link_to 'Create New Submission', new_material_submission_url, class: 'btn btn-success vcenter', style: 'margin-top: 28px' %>
+<% content_for :main_title do %>
+  Material Submission
 <% end %>
+<% content_for :title_button do %>
+  <%= link_to 'To Reception', material_receptions_path, class: 'btn btn-info vcenter', style: 'margin-top: 28px' %>
+  <%= link_to 'Claim Submissions', claim_submissions_path, class: 'btn btn-info vcenter', style: 'margin-top: 28px' %>
+
+<% end %>
+
+<div class="row">
+  <div class="col-md-12">
+    <%= link_to 'Create New Submission', new_material_submission_url, class: 'btn btn-success vcenter' %>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-md-12">

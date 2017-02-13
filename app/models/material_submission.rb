@@ -1,5 +1,16 @@
 class MaterialSubmission < ApplicationRecord
 
+  def self.ACTIVE
+    'active'
+  end
+
+  def self.AWAITING
+    'awaiting receipt'
+  end
+
+  def self.CLAIMED
+    'claimed'
+  end
 
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
@@ -13,20 +24,21 @@ class MaterialSubmission < ApplicationRecord
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :active_or_labware?
   validates :labware_type_id, presence: true, if: :active_or_labware?
+  validates :email, presence: true, if: :active?
   validates :address, presence: true, if: :active?
   validates :contact, presence: true, if: :active?
-  validate :contact_has_a_correct_email?, if: :active?
   validate :each_labware_has_biomaterial, if: :active?
 
   before_save :set_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
   accepts_nested_attributes_for :labwares
 
-  scope :active, -> { where(status: 'active') }
-  scope :pending, -> { where.not(status: 'active') }
+  scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
+  scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
+  scope :pending, -> { where.not(status: [MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED]) }
 
   def active?
-    status == 'active'
+    status == MaterialSubmission.ACTIVE
   end
 
   def active_or_labware?
@@ -44,8 +56,17 @@ class MaterialSubmission < ApplicationRecord
     active? || status.include?('dispatch')
   end
 
+  def active_or_awaiting?
+    return false if status.nil?
+    active? || status==MaterialSubmission.AWAITING
+  end
+
   def no_of_labwares_required
     super || 0
+  end
+
+  def invalid_labwares
+    labwares.select(&:invalid?)
   end
 
   private
@@ -60,10 +81,5 @@ class MaterialSubmission < ApplicationRecord
     end
   end
 
-  def contact_has_a_correct_email?
-    if contact.email.empty?
-      errors.add(:contact, "must have an email")
-    end
-  end
 
 end
