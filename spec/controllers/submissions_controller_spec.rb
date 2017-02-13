@@ -85,11 +85,16 @@ RSpec.describe SubmissionsController, type: :controller do
 
       stub_request(:get, "#{Rails.configuration.material_url}/materials/schema").
          with(:headers => {
-          'Content-Type'=>'text/json', 
+          'Content-Type'=>'text/json',
           }).
          to_return(:status => 200, :body => "{}", :headers => {})
 
       stub_request(:post, "#{Rails.configuration.material_url}/materials").
+         with(:body => {"common_name"=>"Test", "donor_id"=>"Test", "gender"=>"Test", "phenotype"=>"Test", "supplier_name"=>"Test"},
+              :headers => { 'Content-Type'=>'application/json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+      stub_request(:put, "#{Rails.configuration.material_url}/materials").
          with(:body => {"common_name"=>"Test", "donor_id"=>"Test", "gender"=>"Test", "phenotype"=>"Test", "supplier_name"=>"Test"},
               :headers => { 'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => "{}", :headers => {})
@@ -103,7 +108,7 @@ RSpec.describe SubmissionsController, type: :controller do
 
       stub_request(:post, "#{Rails.configuration.ownership_url}/batch").
          with(:headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
-         to_return(:status => 200, :body => "{}", :headers => {})         
+         to_return(:status => 200, :body => "{}", :headers => {})
 
       stub_request(:post, "#{Rails.configuration.ownership_url}").
          with(:body => {"ownership"=>{"model_id"=>"#{@uuid}", "model_type"=>"set", "owner_id"=>"test@email.com"}},
@@ -113,10 +118,14 @@ RSpec.describe SubmissionsController, type: :controller do
       stub_request(:post, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
          with(:body => "{\"data\":[]}",
               :headers => {'Content-Type'=>'application/vnd.api+json'}).
-         to_return(:status => 200, :body => "{}", :headers => {})         
+         to_return(:status => 200, :body => "{}", :headers => {})
 
        stub_request(:get, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
          with(:headers => {'Content-Type'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => "{}", :headers => {})
+
+        stub_request(:get, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
+         with(:headers => {'Accept'=>'application/vnd.api+json'}).
          to_return(:status => 200, :body => "{}", :headers => {})
     end
 
