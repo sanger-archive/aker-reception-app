@@ -2,14 +2,15 @@
   data-psd-component-class="DataTableInitialization"
   data-psd-component-parameters="<%= { :order => [[1, 'desc']]}.to_json %>">
   <thead>
-    <tr>
-      <th>Barcode</th>
-      <th>Received at</th>
-    </tr>
+    <th>Barcode</th>
+    <th>Received at</th>
   </thead>
 
   <tbody>
     <%= render material_receptions %>
+    <% if material_receptions.length == 0 %>
+      <tr><td></td><td></td></tr>
+    <% end %>
   </tbody>
 
 </table>

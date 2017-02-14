@@ -1,6 +1,7 @@
 module Printables::Group
 
   def print_tubes(printer_name, label_template_name, printables)
+    return true if Rails.configuration.printing_disabled == true
     PMB::PrintJob.new(printer_name: printer_name,
       label_template_id: LabelTemplate.find_by_name(label_template_name).external_id,
       labels: {body: printables.map do |printable|
@@ -10,6 +11,7 @@ module Printables::Group
   end
 
   def print_plates(printer_name, label_template_name, printables)
+    return true if Rails.configuration.printing_disabled == true
     PMB::PrintJob.new(printer_name: printer_name,
       label_template_id: LabelTemplate.find_by_name(label_template_name).external_id,
       labels: {body: printables.map do |printable|

@@ -19,16 +19,12 @@ class SubmissionsController < ApplicationController
         end
       end
 
-      new_set = SetMaterial.create_remote_set(material_submission.id)
-      SetMaterial.add_materials_to_set(new_set.uuid, materials)
-      puts "new set uuid: #{new_set.uuid}"
-
       flash[:notice] = 'Your Submission has been created'
       MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
 
       # Creation of set
-      new_set_material = SetMaterial.create_remote_set(material_submission.id)
+      new_set_material = SetMaterial.create_remote_set("Submission #{material_submission.id}")
 
       # Ownership of materials
       Ownership.create_remote_ownership_batch(ownership_batch_params)

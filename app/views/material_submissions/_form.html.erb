@@ -28,3 +28,16 @@
   <%= f.select :contact, available_contacts_select_options, {:selected => material_submission.contact_id}, {:disabled => readonly }%>
 </div>
 <% end %>
+
+<div class="labwares">
+  <table class="table">
+    <thead>
+      <th>Barcode</th>
+    </thead>
+    <tbody>
+      <% material_submission.labwares.each do |labware| %>
+        <tr><td><%= labware.barcode.value %></td></tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
