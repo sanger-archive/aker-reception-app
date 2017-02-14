@@ -102,7 +102,7 @@ RSpec.describe SubmissionsController, type: :controller do
       @uuid = SecureRandom.uuid
 
       stub_request(:post, "#{Rails.configuration.set_url}").
-         with(:body => "{\"data\":{\"type\":\"sets\",\"attributes\":{\"name\":1}}}",
+         with(:body => "{\"data\":{\"type\":\"sets\",\"attributes\":{\"name\":\"Submission 1\"}}}",
               :headers => {'Content-Type'=>'application/vnd.api+json'}).
          to_return(:status => 200, :body => "{\"data\":{\"id\":\"#{@uuid}\",\"attributes\":{\"name\":\"testing-set-1\"}}}", :headers => {})
 
