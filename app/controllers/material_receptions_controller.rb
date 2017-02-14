@@ -14,6 +14,9 @@ class MaterialReceptionsController < ApplicationController
         ReceptionMailer.complete_set(@material_reception).deliver_later
       end
     end
+    if @material_reception.complete_set?
+      ReceptionMailer.complete_set(@material_reception).deliver_later
+    end
     render json: @material_reception.presenter
   end
 
