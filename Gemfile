@@ -84,5 +84,8 @@ group :development, :test do
   gem 'poltergeist'
   gem 'factory_girl_rails'
   gem 'database_cleaner'
-
 end
+
+gem 'simplecov', :require => false, :group => :test
+gem 'simplecov-rcov', :group => :test
+gem 'rubycritic', :group => :test

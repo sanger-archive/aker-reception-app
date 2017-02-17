@@ -22,3 +22,6 @@
 
 # Ignore config file.
 config/environments/development.rb
+
+# Ignore coverage
+coverage
