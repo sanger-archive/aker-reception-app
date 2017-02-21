@@ -43,8 +43,6 @@ gem 'uuid'
 gem 'select2-rails'
 gem 'forgery'
 
-gem 'faraday'
-
 gem 'pg'
 gem 'zipkin-tracer'
 
@@ -85,6 +83,12 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'database_cleaner'
 end
+
+group :test do
+  gem 'cucumber-rails', :require => false
+  # database_cleaner is not required, but highly recommended
+end
+
 
 gem 'simplecov', :require => false, :group => :test
 gem 'simplecov-rcov', :group => :test

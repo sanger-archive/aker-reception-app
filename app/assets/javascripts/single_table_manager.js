@@ -157,17 +157,18 @@
   };
 
   proto.loadErrorsFromMsg = function(data) {
-    for (var i=0; i<data.messages.length; i++) {
-      var message = data.messages[i];
-      this.resetCellNameErrors(message.labware_id);
-    }      
+    if (data && data.messages) {
+      for (var i=0; i<data.messages.length; i++) {
+        var message = data.messages[i];
+        this.resetCellNameErrors(message.labware_id);
+      }      
 
-    for (var i=0; i<data.messages.length; i++) {
-      var message = data.messages[i];
-      var wellId = message.well_id;
-      this.storeCellNameError(message.labware_id, wellId, message.errors);
+      for (var i=0; i<data.messages.length; i++) {
+        var message = data.messages[i];
+        var wellId = message.well_id;
+        this.storeCellNameError(message.labware_id, wellId, message.errors);
+      }
     }
-
   };
 
   proto.onReceive = function(currentTab, data, status) {

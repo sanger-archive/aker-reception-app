@@ -46,6 +46,7 @@ class Biomaterial
   end
 
   def self.find(biomaterial_id)
+    return nil if biomaterial_id.nil?
     obj = MaterialServiceClient.get(biomaterial_id)
     return nil if obj.nil?
     obj['uuid'] = obj['_id']

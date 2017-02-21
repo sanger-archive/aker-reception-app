@@ -77,6 +77,22 @@ $(document).on('turbolinks:load', function() {
 
 })
 
+function displayError(msg) {
+  $('.alert').html(msg);
+  $('.alert').toggleClass('invisible', false);
+  $('.alert').toggleClass('hidden', false);
+}
+
+function csvErrorToText(list) {
+  var nodes = [];
+  for (var i=0; i<list.length; i++) {
+    var li = document.createElement('li')
+    $(li).html(["<b>", list[i].code, "</b>:", list[i].row ? "At row " + list[i].row : '', list[i].message].join(' '));
+    nodes.push(li);
+  }
+  return nodes;
+}
+
 function fillInTableFromFile(table, files) {
   if (files.length != 1) {
     return false
@@ -87,6 +103,9 @@ function fillInTableFromFile(table, files) {
       console.log(results)
 
       if (results.errors.length > 0) {
+
+        displayError(csvErrorToText(results.errors));
+
         return false;
       }
 
@@ -102,7 +121,10 @@ function fillInTableFromFile(table, files) {
         }
 
         // No wellValue, no data
-        if (!wellValue) return;
+        if (!wellValue) { 
+          displayError('This manifest does not have a position field for the wells')
+          return;
+        };
 
         var tableRow = $('td input[name*="position"]', table).filter(function(td) {
           return $(this).val() == wellValue
