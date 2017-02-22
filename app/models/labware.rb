@@ -1,3 +1,6 @@
+require 'material_service_client'
+
+
 class Labware
   include ActiveModel::Model
   include ActiveModel::Conversion
@@ -21,6 +24,27 @@ class Labware
     @wells ||= slots.map do |s|
       Well.new(s)
     end
+  end
+
+  def well_at_position(position)
+    wells.select{|w| w.position==position}
+  end
+
+  def self.find(uuid)
+    new(MaterialServiceClient::Container.get(uuid))
+  end
+
+  def update(attrs)
+    attrs["wells_attributes"].select {|well| well["biomaterial_attributes"].values.all?(:empty?)}.each do |well|
+      well = well_at_position(well["position"])
+      biomaterial_id =  well.biomaterial_id
+      unless biomaterial_id.nil?
+        well.biomaterial.destroy
+      end
+    end
+    
+    assign_attributes(MaterialServiceClient::Container.put(attrs))
+    self
   end
 
   def wells_attributes=

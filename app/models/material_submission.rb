@@ -77,7 +77,9 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def labwares_attributes=(params)
-    debugger
+    params.values.each do |labware_attrs|
+      Labware.find(labware_attrs["uuid"]).update(labware_attrs)
+    end
   end
 
   def labware

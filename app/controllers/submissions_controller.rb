@@ -79,6 +79,7 @@ private
     params.require(:material_submission).permit(
       :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :email, :contact_id, labwares_attributes: [
         :id,
+        :uuid,
         wells_attributes: [
           :id,
           :position,
