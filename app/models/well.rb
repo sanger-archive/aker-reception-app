@@ -1,10 +1,18 @@
-class Well < ApplicationRecord
-  belongs_to :labware
+class Well
+  include ActiveModel::Model
+  include ActiveModel::Conversion
+
+  #include ActiveModel::Validations
+  attr_accessor :address, :material
+
+  alias_attribute :position, :address
+  alias_attribute :id, :address
+  #belongs_to :labware
   #has_one :biomaterial, as: :containable, dependent: :nullify
 
-  default_scope { order(:id => :asc)}
+  #default_scope { order(:id => :asc)}
 
-  validates :position, presence: true, uniqueness: { scope: :labware_id }
+  #validates :position, presence: true, uniqueness: { scope: :labware_id }
 
   validate :biomaterial_json_schema_is_valid
  
@@ -19,6 +27,15 @@ class Well < ApplicationRecord
   end
 
   attr_writer :biomaterial
+
+
+  def biomaterial_id
+    material&.id
+  end
+
+  def biomaterial_id=(id)
+    
+  end
 
   def biomaterial
   	@biomaterial ||= Biomaterial.find(biomaterial_id)

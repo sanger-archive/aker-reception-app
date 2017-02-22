@@ -281,7 +281,7 @@
 
   proto.dataForTab = function(tab) {
     for (var key in this.params) {
-      if ($(tab).attr('href') == ('#'+this.params[key].barcode.value)) {
+      if ($(tab).attr('href') == ('#'+this.params[key].barcode)) {
         return this.params[key];
       }
     }

@@ -1,22 +1,50 @@
-class Labware < ApplicationRecord
-  include Barcodeable
+class Labware
+  include ActiveModel::Model
+  include ActiveModel::Conversion
 
-  belongs_to :labware_type
-  has_one :material_reception
+  attr_accessor :num_of_cols, :barcode, :_updated, :num_of_rows, :_id, :row_is_alpha, :col_is_alpha, :slots
+  attr_accessor :_links, :_created
 
-  has_one :material_submission_labware
-  has_one :material_submission, through: :material_submission_labware
-  has_many :wells, dependent: :destroy
+  alias_attribute :uuid, :_id
+  alias_attribute :id, :_id
+  #alias_attribute :wells, :slots
 
-  accepts_nested_attributes_for :wells
+  #include Barcodeable
 
-  before_create :build_default_wells
+  #belongs_to :labware_type
+
+  def wells
+    slots.map do |s|
+      Well.new(s)
+    end
+  end
+
+  #has_one :material_reception
+  def material_reception
+  end
+
+  def material_submission_labware
+  end
+
+  def material_submission
+    #, through: :material_submission_labware
+  end
+  #def wells
+    #, dependent: :destroy
+  #end
+
+  #accepts_nested_attributes_for :wells
+
+  #before_create :build_default_wells
   
   delegate :size, :x_dimension_is_alpha, :y_dimension_is_alpha, :x_dimension_size, :y_dimension_size, to: :labware_type
 
-  scope :with_barcode, ->(barcode) {
-    joins(:barcode).where(:barcodes => {:value => barcode })
-  }
+  def self.with_barcode(barcode)
+  end
+  #scope :with_barcode, ->(barcode) {
+  #  joins(:barcode).where(:barcodes => {:value => barcode })
+  #}
+
 
   def biomaterials
     wells.map(&:biomaterial)

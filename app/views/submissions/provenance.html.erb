@@ -1,7 +1,9 @@
 <%= render partial: 'submission_header', locals: { title: "Step 2: Biomaterial Provenance" , progress: 50 } %>
+  <!-- data-psd-component-class="SingleTableManager"
+  data-psd-component-parameters="<%= plate_attributes_for(material_submission.labwares).to_json %>" -->
 
-<div data-psd-component-class="SingleTableManager"
-  data-psd-component-parameters="<%= plate_attributes_for(material_submission.labwares.includes(:barcode)).to_json %>">
+<div
+>
 
 <div id="alert-modal" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -28,10 +30,10 @@
 
   <ul class="nav nav-tabs" role="tablist">
 
-    <% material_submission.labwares.includes(:barcode).each_with_index do |labware, i| %>
+    <% material_submission.labwares.each_with_index do |labware, i| %>
       <li class="<%= 'active' if i == 0 %>" role="presentation">
-        <a data-toggle="tab" href="#<%= labware.barcode.value %>" aria-controls="<%= labware.barcode.value %>" role="tab">
-          <%= labware.barcode.value %>
+        <a data-toggle="tab" href="#<%= labware.barcode %>" aria-controls="<%= labware.barcode %>" role="tab">
+          <%= labware.barcode %>
         </a>
       </li>
     <% end %>
@@ -42,71 +44,72 @@
 
   <div class="tab-content">
 
+    <% material_submission.labwares.each_with_index do |labware, index| %>
+      <%= f.fields_for :labwares, labware do |labware_fields| %>
+        <!-- % labware_fields.object = labware_fields.object.first % -->
+          <div role="tabpanel" class="tab-pane <%= 'active' if index == 0 %>" id="<%= labware_fields.object.barcode %>">
 
-    <%= f.fields_for :labwares, [material_submission.labwares.includes(:barcode).first] do |labware_fields| %>
-
-        <div role="tabpanel" class="tab-pane <%= 'active' if labware_fields.index == 0 %>" id="<%= labware_fields.object.barcode.value %>">
-
-          <div style="margin-top: 10px" class="well">
-            <div class="row">
-              <div class="venter col-md-8">
-                Please enter material provenance or drag & drop comma separated value file (CSV)
-              </div>
-              <div class="vcenter col-md-4">
-                <label style="float: right" class="btn btn-primary">
-                    Upload CSV <input type="file" style="display: none;">
-                </label>
+            <div style="margin-top: 10px" class="well">
+              <div class="row">
+                <div class="venter col-md-8">
+                  Please enter material provenance or drag & drop comma separated value file (CSV)
+                </div>
+                <div class="vcenter col-md-4">
+                  <label style="float: right" class="btn btn-primary">
+                      Upload CSV <input type="file" style="display: none;">
+                  </label>
+                </div>
               </div>
             </div>
+
+
+            <table data-behavior="datatable" class="table table-condensed table-striped"
+              data-psd-component-class='DataTableSchemaValidation' data-psd-component-parameters='{}'>
+              <thead>
+                <tr>
+                  <th>Plate Barcode</th>
+                  <th>Well Position</th>
+                  <th>Your Material Alpha-Numeric</th>
+                  <th>Your Donor Alpha-Numeric</th>
+                  <th>Declared Gender</th>
+                  <th>Common Name</th>
+                  <th>Phenotype</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+
+              <% labware_fields.object.wells.each do |well| %>
+                <%= labware_fields.fields_for :wells, well do |well_fields| %>
+                  <!--  %= react_component 'SchemaForm', {} % -->
+                  <tr>
+                    <td><%= labware_fields.object.barcode %></td>
+                    <td>
+                      <%= well_fields.hidden_field :position %>
+                      <%= well_fields.object.position %>
+                    </td>
+
+                    <% biomaterial = well_fields.object.biomaterial_id.nil? ? Biomaterial.new : well_fields.object.biomaterial %>
+                    <% well_fields.object.biomaterial_id = biomaterial.uuid if well_fields.object.biomaterial_id.nil? %>                
+
+                    <%= well_fields.fields_for :biomaterial, biomaterial do |bm_fields| %>
+                      <td data-psd-schema-validation-name="supplier_name"><%= bm_fields.text_field :supplier_name, hide_label: true %></td>
+                      <td data-psd-schema-validation-name="donor_name"><%= bm_fields.text_field :donor_name, hide_label: true %></td>
+                      <td data-psd-schema-validation-name="gender"><%= bm_fields.text_field :gender, hide_label: true %></td>
+                      <td data-psd-schema-validation-name="common_name"><%= bm_fields.text_field :common_name, hide_label: true %></td>
+                      <td data-psd-schema-validation-name="phenotype"><%= bm_fields.text_field :phenotype, hide_label: true %></td>
+                    <% end %>
+
+                  </tr>
+                <% end %>
+              <% end %>
+              </tbody>
+            </table>
+
           </div>
 
-
-          <table data-behavior="datatable" class="table table-condensed table-striped"
-            data-psd-component-class='DataTableSchemaValidation' data-psd-component-parameters='{}'>
-            <thead>
-              <tr>
-                <th>Plate Barcode</th>
-                <th>Well Position</th>
-                <th>Your Material Alpha-Numeric</th>
-                <th>Your Donor Alpha-Numeric</th>
-                <th>Declared Gender</th>
-                <th>Common Name</th>
-                <th>Phenotype</th>
-              </tr>
-            </thead>
-
-            <tbody>
-
-
-            <%= labware_fields.fields_for :wells, labware_fields.object.wells do |well_fields| %>
-              <!--  %= react_component 'SchemaForm', {} % -->
-              <tr>
-                <td><%= labware_fields.object.barcode.value %></td>
-                <td>
-                  <%= well_fields.hidden_field :id %>
-                  <%= well_fields.hidden_field :position %>
-                  <%= well_fields.object.position %>
-                </td>
-
-                <% biomaterial = well_fields.object.biomaterial_id.nil? ? Biomaterial.new : well_fields.object.biomaterial %>
-                <% well_fields.object.biomaterial_id = biomaterial.uuid if well_fields.object.biomaterial_id.nil? %>                
-
-                <%= well_fields.fields_for :biomaterial, biomaterial do |bm_fields| %>
-                  <td data-psd-schema-validation-name="supplier_name"><%= bm_fields.text_field :supplier_name, hide_label: true %></td>
-                  <td data-psd-schema-validation-name="donor_name"><%= bm_fields.text_field :donor_name, hide_label: true %></td>
-                  <td data-psd-schema-validation-name="gender"><%= bm_fields.text_field :gender, hide_label: true %></td>
-                  <td data-psd-schema-validation-name="common_name"><%= bm_fields.text_field :common_name, hide_label: true %></td>
-                  <td data-psd-schema-validation-name="phenotype"><%= bm_fields.text_field :phenotype, hide_label: true %></td>
-                <% end %>
-
-              </tr>
-            <% end %>
-
-            </tbody>
-          </table>
-
-        </div>
-
+      <% end %>
     <% end %>
 
   </div>

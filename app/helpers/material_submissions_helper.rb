@@ -4,8 +4,8 @@ def wells_attributes_for(plate)
   plate.wells.each_with_index.reduce({}) do |memo, list|
     well,index = list[0],list[1]
     memo[index.to_s] = {
-      :id => well.id.to_s,
-      :position => well.position,
+      #:id => well.id.to_s,
+      :position => well.address,
       :biomaterial_attributes => well.biomaterial_id.nil? ? Biomaterial.new : Biomaterial.find(well.biomaterial_id)
     }
     memo

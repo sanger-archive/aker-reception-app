@@ -46,7 +46,7 @@ class Biomaterial
   end
 
   def self.find(biomaterial_id)
-    obj = MaterialServiceClient.get(biomaterial_id)
+    obj = MaterialServiceClient::Material.get(biomaterial_id)
     return nil if obj.nil?
     obj['uuid'] = obj['_id']
     new(filter_attrs(obj))
@@ -61,10 +61,10 @@ class Biomaterial
     if biomaterial_id
       attributes_with_id = attributes
       attributes_with_id[:uuid] = biomaterial_id
-      response = MaterialServiceClient.put(self.class.filter_attrs(attributes_with_id))
+      response = MaterialServiceClient::Material.put(self.class.filter_attrs(attributes_with_id))
     else
       self.class.filter_attrs(attributes)
-      response = MaterialServiceClient.post(self.class.filter_attrs(attributes))
+      response = MaterialServiceClient::Material.post(self.class.filter_attrs(attributes))
     end
     self.uuid = response["_id"]
     valid?
