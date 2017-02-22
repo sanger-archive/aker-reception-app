@@ -3,7 +3,7 @@
   data-psd-component-parameters="<%= plate_attributes_for(material_submission.labwares).to_json %>" -->
 
 <div
-data-psd-component-class="SingleTableManager"
+  data-psd-component-class="SingleTableManager"
   data-psd-component-parameters="<%= plate_attributes_for(material_submission.labwares).to_json %>"
 >
 
@@ -45,12 +45,11 @@ data-psd-component-class="SingleTableManager"
 
 
   <div class="tab-content">
-    <!-- %= f.fields_for :material_submission, material_submission do |material_submission_fields| % -->
-    <% material_submission.material_submission_labwares.each_with_index do |material_submission_labware, index| %>
-      <!-- %= f.fields_for :material_submission_labwares, material_submission_labware do |material_submission_labware_fields| % -->
+    <!-- % material_submission.material_submission_labwares.each_with_index do |material_submission_labware, index| % -->
+      <% material_submission_labware = material_submission.material_submission_labwares.first %>
+      <% index = 0 %>
       <%= f.fields_for :labwares, material_submission_labware.labware do |labware_fields| %>
 
-        <!-- % labware_fields.object = labware_fields.object.first % -->
           <div role="tabpanel" class="tab-pane <%= 'active' if index == 0 %>" id="<%= labware_fields.object.barcode %>">
 
             <div style="margin-top: 10px" class="well">
@@ -115,8 +114,6 @@ data-psd-component-class="SingleTableManager"
           </div>
 
       <% end %>
-      <!-- % end % -->
-    <% end %>
     <!-- % end % -->
 
   </div>

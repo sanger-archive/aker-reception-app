@@ -28,6 +28,13 @@ class Well
 
   attr_writer :biomaterial
 
+  def attributes
+    [:address, :material].map do |k|
+      [k, send(k)]
+    end.to_h
+  end
+
+
 
   def biomaterial_id
     material&.id
@@ -64,7 +71,7 @@ class Well
     end
     unless biomaterial.is_empty?
       biomaterial.save!(biomaterial_id)
-      update_attributes(:biomaterial_id => biomaterial.uuid)
+      assign_attributes(:biomaterial_id => biomaterial.uuid)
     end
   end
 

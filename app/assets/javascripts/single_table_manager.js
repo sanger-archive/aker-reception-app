@@ -151,7 +151,7 @@
 
   proto.onSchemaError = function(e, data) {
     this._tabsWithError=[];
-    return this.onReceive(this.currentTab, data);
+    return this.onReceive($(this.currentTab), data);
     this.loadErrorsFromMsg(data);
     this.updateValidations();
   };
@@ -258,7 +258,7 @@
     var fieldName = this.fieldNameForName(name)
 
     if (fieldName) {
-      this.updateErrorState(input, data.id, data.wells_attributes[rowNum].id, fieldName);
+      this.updateErrorState(input, data.id, data.wells_attributes[rowNum].position, fieldName);
     }
   };
 

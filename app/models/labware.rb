@@ -6,6 +6,7 @@ class Labware
   include ActiveModel::Conversion
 
   attr_accessor :num_of_cols, :barcode, :_updated, :num_of_rows, :_id, :row_is_alpha, :col_is_alpha, :slots
+  attr_accessor :_status, :_issues
   attr_accessor :_links, :_created
 
   alias_attribute :uuid, :_id
@@ -20,6 +21,15 @@ class Labware
 
   #belongs_to :labware_type
 
+  def attributes
+    [:num_of_cols, :barcode, :_updated, :num_of_rows, :uuid, :row_is_alpha, :col_is_alpha, :slots,
+      :_status, :_issues,
+      :_links, :_created
+    ].map do |k|      
+      [k, send(k)]
+    end.to_h
+  end
+
   def wells
     @wells ||= slots.map do |s|
       Well.new(s)
@@ -27,27 +37,35 @@ class Labware
   end
 
   def well_at_position(position)
-    wells.select{|w| w.position==position}
+    wells.select{|w| w.position==position}.first
   end
 
   def self.find(uuid)
     new(MaterialServiceClient::Container.get(uuid))
   end
 
+  def form_attrs_to_service_attrs(attrs)
+  end
+
   def update(attrs)
-    attrs["wells_attributes"].select {|well| well["biomaterial_attributes"].values.all?(:empty?)}.each do |well|
+    attrs["wells_attributes"].values.select {|well| well["biomaterial_attributes"].values.all?{|b| b.empty?}}.each do |well|
       well = well_at_position(well["position"])
       biomaterial_id =  well.biomaterial_id
       unless biomaterial_id.nil?
         well.biomaterial.destroy
       end
     end
+
+    attrs["wells_attributes"].values.each do |attr_well|
+      well = wells.select{|w| w.address == attr_well["position"]}.first
+      well.biomaterial_attributes=attr_well["biomaterial_attributes"]
+    end
     
-    assign_attributes(MaterialServiceClient::Container.put(attrs))
-    self
+    assign_attributes(attrs)
+    self.save!
   end
 
-  def wells_attributes=
+  def wells_attributes=(params)
   end
 
   #has_one :material_reception
@@ -128,6 +146,22 @@ class Labware
 
     y.product(x).map(&:join)
   end
+
+  def attributes_to_send
+    attributes.map.reject{|k,v| ["_updated", "barcode", "_issues", "_links", "_created", "_status"].include?(k.to_s)}.to_h
+  end
+
+  def save
+    assign_attributes(MaterialServiceClient::Container.put(attributes_to_send))
+    debugger
+    valid?
+  end
+
+  def save!
+    raise ActiveRecord::RecordInvalid unless valid?
+    save
+  end
+
 
 private
 
