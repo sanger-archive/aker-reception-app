@@ -7,6 +7,10 @@ class Labware
 
   alias_attribute :uuid, :_id
   alias_attribute :id, :_id
+
+
+  attr_writer :wells 
+
   #alias_attribute :wells, :slots
 
   #include Barcodeable
@@ -14,9 +18,12 @@ class Labware
   #belongs_to :labware_type
 
   def wells
-    slots.map do |s|
+    @wells ||= slots.map do |s|
       Well.new(s)
     end
+  end
+
+  def wells_attributes=
   end
 
   #has_one :material_reception

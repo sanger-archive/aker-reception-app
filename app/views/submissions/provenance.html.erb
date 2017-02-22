@@ -43,9 +43,10 @@
 
 
   <div class="tab-content">
-
-    <% material_submission.labwares.each_with_index do |labware, index| %>
-      <%= f.fields_for :labwares, labware do |labware_fields| %>
+    <%= f.fields_for :material_submission, material_submission do |material_submission_fields| %>
+    <% material_submission.material_submission_labwares.each_with_index do |material_submission_labware, index| %>
+      <%= f.fields_for :material_submission_labwares, material_submission_labware do |material_submission_labware_fields| %>
+      <%= material_submission_labware_fields.fields_for :labware, material_submission_labware.labware do |labware_fields| %>
         <!-- % labware_fields.object = labware_fields.object.first % -->
           <div role="tabpanel" class="tab-pane <%= 'active' if index == 0 %>" id="<%= labware_fields.object.barcode %>">
 
@@ -110,6 +111,8 @@
           </div>
 
       <% end %>
+      <% end %>
+    <% end %>
     <% end %>
 
   </div>

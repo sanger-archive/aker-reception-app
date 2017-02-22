@@ -18,6 +18,10 @@ class MaterialSubmissionLabware < ApplicationRecord
     @labware ||= Labware.new(MaterialServiceClient::Container.get(labware_id))
   end
 
+  def barcode
+    labware.barcode
+  end
+
   def labware_attributes=(attrs)
     @labware.update_attributes(attrs)
   end

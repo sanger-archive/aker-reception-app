@@ -12,6 +12,8 @@ class MaterialSubmission < ApplicationRecord
     'claimed'
   end
 
+  attr_writer :labwares
+
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
@@ -32,7 +34,7 @@ class MaterialSubmission < ApplicationRecord
   before_save :set_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
   #accepts_nested_attributes_for :labwares
-  
+
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
@@ -71,7 +73,18 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def labwares
-    material_submission_labwares.map(&:labware)
+    @labwares ||= material_submission_labwares.map(&:labware)
+  end
+
+  def labwares_attributes=(params)
+    debugger
+  end
+
+  def labware
+  end
+
+  def material_submission_labwares_attributes=(params)
+    debugger
   end
 
   private
