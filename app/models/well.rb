@@ -7,12 +7,24 @@ class Well
 
   alias_attribute :position, :address
   alias_attribute :id, :address
+
+  attr_writer :labware
   #belongs_to :labware
   #has_one :biomaterial, as: :containable, dependent: :nullify
 
   #default_scope { order(:id => :asc)}
 
   #validates :position, presence: true, uniqueness: { scope: :labware_id }
+
+  validate :has_one_labware?
+
+  def has_one_labware?
+    if @labware.nil?
+      errors.add(:base, 'No labware linked with the well')
+      return false
+    end
+    true
+  end
 
   validate :biomaterial_json_schema_is_valid
  

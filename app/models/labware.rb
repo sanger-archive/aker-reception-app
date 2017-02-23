@@ -8,6 +8,7 @@ class Labware
   attr_accessor :num_of_cols, :barcode, :_updated, :num_of_rows, :_id, :row_is_alpha, :col_is_alpha, :slots
   attr_accessor :_status, :_issues
   attr_accessor :_links, :_created
+  attr_accessor :labware_type
 
   alias_attribute :uuid, :_id
   alias_attribute :id, :_id
@@ -27,7 +28,7 @@ class Labware
       :_links, :_created
     ].map do |k|
       if k==:slots
-        [k, wells.map(&:attributes)]
+        [k, wells ? wells.map(&:attributes) : []]
       else
         [k, send(k)]
       end
@@ -35,8 +36,9 @@ class Labware
   end
 
   def wells
+    return nil unless slots
     @wells ||= slots.map do |s|
-      Well.new(s)
+      Well.new(s.merge(:labware => self))
     end
   end
 
@@ -91,7 +93,11 @@ class Labware
 
   #before_create :build_default_wells
   
-  delegate :size, :x_dimension_is_alpha, :y_dimension_is_alpha, :x_dimension_size, :y_dimension_size, to: :labware_type
+  #delegate :size, :x_dimension_is_alpha, :y_dimension_is_alpha, :x_dimension_size, :y_dimension_size, to: :labware_type
+
+  def size
+    num_of_rows * num_of_rows
+  end
 
   def self.with_barcode(barcode)
   end

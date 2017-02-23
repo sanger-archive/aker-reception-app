@@ -99,6 +99,43 @@ RSpec.describe SubmissionsController, type: :controller do
               :headers => { 'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => "{}", :headers => {})
 
+
+      labware_json = {
+        "_updated"=>"Wed, 22 Feb 2017 23:30:11 GMT",
+        "num_of_cols"=>12,
+        "barcode"=>"AKER-110",
+        "num_of_rows"=>8,
+        "col_is_alpha"=>false,
+        "slots" => [],
+        "_links"=>{
+        "self"=>{
+        "href"=>"containers/382ce837-478c-49a3-86a8-7af34bb898cf",
+        "title"=>"Container"
+        },
+        "collection"=>{
+        "href"=>"containers",
+        "title"=>"containers"
+        },
+        "parent"=>{
+        "href"=>"/",
+        "title"=>"home"
+        }
+        },
+        "_created"=>"Wed, 22 Feb 2017 22:42:38 GMT",
+        "row_is_alpha"=>true,
+        "_id"=>"382ce837-478c-49a3-86a8-7af34bb898cf"
+        }.to_json
+
+      stub_request(:post, "#{Rails.configuration.material_url}/containers").
+         with(:body => "{\"num_of_cols\":12,\"num_of_rows\":8,\"col_is_alpha\":false,\"row_is_alpha\":false}", 
+          :headers => { 'Content-Type'=>'application/json'}).
+         to_return(:status => 200, :body => labware_json, :headers => {})
+
+      stub_request(:get, "#{Rails.configuration.material_url}/containers/382ce837-478c-49a3-86a8-7af34bb898cf").
+         with( :headers => { 'Content-Type'=>'application/json'}).
+         to_return(:status => 200, :body => labware_json, :headers => {})
+
+
       @uuid = SecureRandom.uuid
 
       stub_request(:post, "#{Rails.configuration.set_url}").

@@ -20,6 +20,10 @@ class LabwareType < ApplicationRecord
     MaterialSubmissionLabware.new_list(labwares_args)
   end
 
+  def create_labware
+    create_labwares(1).first
+  end
+
   def size
     num_of_cols * num_of_rows
   end
