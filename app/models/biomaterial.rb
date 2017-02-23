@@ -17,19 +17,13 @@ class Biomaterial
 
   #belongs_to :containable, polymorphic: true, optional: true
 
-  attr_accessor :uuid, :supplier_name, :donor_name, :gender, :common_name, :phenotype, :donor_id
+  attr_accessor :uuid, :supplier_name, :donor_name, :gender, :common_name, :phenotype
+
+  alias_attribute :donor_id, :donor_name
 
   def attributes
-    [:supplier_name, :donor_name, :gender, :common_name, :phenotype].map do |k|
-      if (k == :donor_name)
-        if (send(:donor_id).nil?)
-          [:donor_id, send(k)]
-        else
-          [:donor_id, send(:donor_id)]
-        end
-      else
-        [k, send(k)]
-      end
+    [:supplier_name, :donor_id, :gender, :common_name, :phenotype].map do |k|
+      [k, send(k)]
     end.to_h
   end
 

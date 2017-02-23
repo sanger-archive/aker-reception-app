@@ -26,8 +26,8 @@ private
 	def submission_to_printables(submission)
 		submission.labwares.map.with_index(1) do |lw,i|
 			{
-				barcode: lw.barcode.value,
-				sanger_human_barcode: lw.barcode.value,
+				barcode: lw.barcode,
+				sanger_human_barcode: lw.barcode,
 				date: Date.today.to_s,
 				collaborator_email: submission.email,
 				uricode: '', # Don't know what this is supposed to be

@@ -235,7 +235,7 @@
 
   proto.is_labware_id = function(input) {
     var name = $(input).attr('name');
-    return (name.search(/material_submission\[labwares_attributes\]\[0\]\[id\]/) >= 0);
+    return (name.search(/material_submission\[labwares_attributes\]\[0\]\[uuid\]/) >= 0);
   };
 
   proto.saveInput = function(data, pos, input) {

@@ -12,7 +12,7 @@ class MaterialReception < ApplicationRecord
   end
 
   def barcode_value
-    labware && labware.barcode && labware.barcode.value
+    labware && labware.barcode
   end
 
   def barcode_value=(barcode)

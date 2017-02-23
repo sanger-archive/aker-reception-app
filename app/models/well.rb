@@ -29,7 +29,9 @@ class Well
   attr_writer :biomaterial
 
   def attributes
-    [:address, :material].map do |k|
+    list_attrs = [:address]
+    list_attrs.push(:material) if material
+    list_attrs.map do |k|
       [k, send(k)]
     end.to_h
   end
@@ -37,7 +39,7 @@ class Well
 
 
   def biomaterial_id
-    material&.id
+    material
   end
 
   def biomaterial_id=(id)
@@ -61,19 +63,20 @@ class Well
     attrs
   end
 
-  def biomaterial_attributes=(attributes)
-    attributes = convert_attributes(attributes)
+  def biomaterial_attributes=(attrs)
+    attrs = convert_attributes(attrs)
     if biomaterial_id
       biomaterial = Biomaterial.find(biomaterial_id)
-      biomaterial.assign_attributes(attributes)
+      biomaterial.assign_attributes(attrs)
     else
-      biomaterial = Biomaterial.new(attributes)
+      biomaterial = Biomaterial.new(attrs)
     end
     unless biomaterial.is_empty?
       biomaterial.save!(biomaterial_id)
-      assign_attributes(:biomaterial_id => biomaterial.uuid)
+      assign_attributes(:material => biomaterial.uuid)
     end
   end
+
 
   def all_attributes_blank?(attributes)
     [:supplier_name, :donor_name, :gender, :common_name, :phenotype].all? do |attribute| 

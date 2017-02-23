@@ -10,7 +10,7 @@ class MaterialSubmissionLabware < ApplicationRecord
 
   def self.new_list(params_list)
     params_list.map do |params|
-      new({:labware_id =>MaterialServiceClient::Container.post(params)['_id'] })
+      create({:labware_id =>MaterialServiceClient::Container.post(params)['_id'] })
     end
   end
 

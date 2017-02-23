@@ -25,8 +25,12 @@ class Labware
     [:num_of_cols, :barcode, :_updated, :num_of_rows, :uuid, :row_is_alpha, :col_is_alpha, :slots,
       :_status, :_issues,
       :_links, :_created
-    ].map do |k|      
-      [k, send(k)]
+    ].map do |k|
+      if k==:slots
+        [k, wells.map(&:attributes)]
+      else
+        [k, send(k)]
+      end
     end.to_h
   end
 
@@ -52,6 +56,7 @@ class Labware
       well = well_at_position(well["position"])
       biomaterial_id =  well.biomaterial_id
       unless biomaterial_id.nil?
+        debugger        
         well.biomaterial.destroy
       end
     end
@@ -61,7 +66,7 @@ class Labware
       well.biomaterial_attributes=attr_well["biomaterial_attributes"]
     end
     
-    assign_attributes(attrs)
+    #assign_attributes(attrs)
     self.save!
   end
 
@@ -148,18 +153,17 @@ class Labware
   end
 
   def attributes_to_send
-    attributes.map.reject{|k,v| ["_updated", "barcode", "_issues", "_links", "_created", "_status"].include?(k.to_s)}.to_h
+    attributes.map.reject{|k,v| ["_updated", "_issues", "_links", "_created", "_status"].include?(k.to_s)}.to_h
   end
 
   def save
     assign_attributes(MaterialServiceClient::Container.put(attributes_to_send))
-    debugger
     valid?
   end
 
   def save!
+    save    
     raise ActiveRecord::RecordInvalid unless valid?
-    save
   end
 
 

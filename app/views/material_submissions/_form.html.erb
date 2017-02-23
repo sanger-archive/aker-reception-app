@@ -36,7 +36,7 @@
     </thead>
     <tbody>
       <% material_submission.labwares.each do |labware| %>
-        <tr><td><%= labware.barcode.value %></td></tr>
+        <tr><td><%= labware.barcode %></td></tr>
       <% end %>
     </tbody>
   </table>
