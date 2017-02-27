@@ -8,6 +8,7 @@ class Labware
   attr_accessor :num_of_cols, :barcode, :_updated, :num_of_rows, :_id, :row_is_alpha, :col_is_alpha, :slots
   attr_accessor :_status, :_issues
   attr_accessor :_links, :_created
+  attr_accessor :print_count
   attr_accessor :labware_type
 
   alias_attribute :uuid, :_id
@@ -23,7 +24,7 @@ class Labware
   #belongs_to :labware_type
 
   def attributes
-    [:num_of_cols, :barcode, :_updated, :num_of_rows, :uuid, :row_is_alpha, :col_is_alpha, :slots,
+    [:num_of_cols, :print_count, :barcode, :_updated, :num_of_rows, :uuid, :row_is_alpha, :col_is_alpha, :slots,
       :_status, :_issues,
       :_links, :_created
     ].map do |k|
@@ -58,7 +59,6 @@ class Labware
       well = well_at_position(well["position"])
       biomaterial_id =  well.biomaterial_id
       unless biomaterial_id.nil?
-        debugger        
         well.biomaterial.destroy
       end
     end
@@ -77,13 +77,15 @@ class Labware
 
   #has_one :material_reception
   def material_reception
-  end
-
-  def material_submission_labware
+    MaterialReception.where(:labware_id => uuid).first
   end
 
   def material_submission
-    #, through: :material_submission_labware
+    material_submission_labware.material_submission
+  end
+
+  def material_submission_labware
+    MaterialSubmissionLabware.where(:labware_id => uuid).first
   end
   #def wells
     #, dependent: :destroy
@@ -100,6 +102,8 @@ class Labware
   end
 
   def self.with_barcode(barcode)
+    instances = MaterialServiceClient::Container.with_criteria({:where=>{:barcode => barcode}})["_items"]
+    instances.map{|instance| new(instance)}
   end
   #scope :with_barcode, ->(barcode) {
   #  joins(:barcode).where(:barcodes => {:value => barcode })
@@ -118,8 +122,18 @@ class Labware
     material_submission_labware.update_attributes(:state => 'received unclaimed') if barcode_printed?
   end
 
+  def print_count
+    @print_count || 0
+  end
+
+
+  def increment_print_count!
+    @print_count=self.print_count+1
+    save!
+  end
+
   def barcode_printed?
-    barcode.print_count > 0
+    print_count && print_count > 0
   end
 
   def received_unclaimed?
@@ -168,7 +182,7 @@ class Labware
   end
 
   def save!
-    save    
+    save 
     raise ActiveRecord::RecordInvalid unless valid?
   end
 

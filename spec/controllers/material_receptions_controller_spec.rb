@@ -68,12 +68,23 @@ RSpec.describe MaterialReceptionsController, type: :controller do
 
 
       @labware_type = FactoryGirl.create(:labware_type, {:row_is_alpha => true})
-      @labware = @labware_type.create_labware
+      @material_submission_labware = @labware_type.create_labware
       @submission = FactoryGirl.create(:material_submission)
-      @submission.labwares << @labware
+      @submission.labwares << @material_submission_labware
+      @labware = @material_submission_labware.labware
+
+      stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{@labware.barcode}%22%7D").
+         with(:headers => {'Content-Type'=>'application/json'}).
+         to_return(:status => 200, :body => {"_items" => []}.to_json)
+
+
     end
 
     it "does not add the barcode to the list if the barcode does not exist" do
+      stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22NOT_EXISTS%22%7D").
+         with(:headers => {'Content-Type'=>'application/json'}).
+         to_return(:status => 200, :body => {"_items" => []}.to_json)
+
       count = MaterialReception.all.count
       post :create, { :material_reception => {:barcode_value => 'NOT_EXISTS'}}
       MaterialReception.all.reload
@@ -81,17 +92,17 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     end
 
     it "does not add the barcode to the list if the barcode has already been received" do
-      MaterialReception.create(:labware => @labware)
+      MaterialReception.create(:labware_id => @labware.uuid)
       count = MaterialReception.all.count
-      post :create, { :material_reception => {:barcode_value => @labware.barcode.value}}
+      post :create, { :material_reception => {:barcode_value => @labware.barcode}}
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count)
     end
 
     it "does not add the barcode to the list if the barcode has not been printed" do
-      @labware.barcode.update_attributes(print_count: 0)
+      @labware.update_attributes(print_count: 0)
       count = MaterialReception.all.count
-      post :create, { :material_reception => {:barcode_value => @labware.barcode.value}}
+      post :create, { :material_reception => {:barcode_value => @labware.barcode}}
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count)
     end
@@ -99,7 +110,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     it "adds the barcode to the list if the barcode exists and has not been received yet" do
       count = MaterialReception.all.count
       @labware.barcode.update_attributes(print_count: 1)
-      post :create, { :material_reception => {:barcode_value => @labware.barcode.value }}
+      post :create, { :material_reception => {:barcode_value => @labware.barcode }}
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count+1)
     end

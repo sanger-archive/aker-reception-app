@@ -86,7 +86,6 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def material_submission_labwares_attributes=(params)
-    debugger
   end
 
   private

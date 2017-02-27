@@ -4,8 +4,8 @@ RSpec.describe Labware, type: :model do
 
   describe '#size' do
     it "returns its size" do
-      labware_type = create(:labware_type, num_of_cols: 12, num_of_rows: 8)
-      expect(labware_type.create_labware.size).to eq(96)
+      @labware = FactoryGirl.create(:labware, num_of_cols: 12, num_of_rows: 8)
+      expect(@labware.size).to eq(96)
     end
   end
 
@@ -14,8 +14,7 @@ RSpec.describe Labware, type: :model do
     context 'when both dimensions are not alpha' do
 
       before do
-        labware_type = create(:labware_type, num_of_cols: 3, num_of_rows: 3)
-        @labware = labware_type.create_labware
+        @labware = FactoryGirl.create(:labware, num_of_cols: 3, num_of_rows: 3)
       end
 
       it 'returns an array of integers for each of its well names' do
@@ -27,8 +26,7 @@ RSpec.describe Labware, type: :model do
     context 'when x_dimension_is_alpha is true' do
 
       before do
-        labware_type = create(:labware_type, num_of_cols: 3, num_of_rows: 3, col_is_alpha: true)
-        @labware = labware_type.create_labware
+        @labware = FactoryGirl.create(:labware, num_of_cols: 3, num_of_rows: 3, col_is_alpha: true)
       end
 
       it 'returns an array with letters for the x dimension' do
@@ -41,8 +39,7 @@ RSpec.describe Labware, type: :model do
     context 'when y_dimension_is_alpha is true' do
 
       before do
-        labware_type = create(:labware_type, num_of_cols: 3, num_of_rows: 3, row_is_alpha: true)
-        @labware = labware_type.create_labware
+        @labware = FactoryGirl.create(:labware, num_of_cols: 3, num_of_rows: 3, row_is_alpha: true)
       end
 
       it 'returns an array with letters for the y dimension' do

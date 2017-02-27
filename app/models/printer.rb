@@ -33,7 +33,7 @@ private
 				uricode: '', # Don't know what this is supposed to be
 				number: i,
 				total_number: submission.labwares.length,
-				num_prints: lw.barcode.print_count+1,
+				num_prints: lw.print_count+1,
 			}
 		end
 	end
