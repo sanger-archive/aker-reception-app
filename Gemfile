@@ -49,7 +49,7 @@ gem 'pg'
 gem 'zipkin-tracer'
 
 gem 'set_service_client', '~> 0.1.3', github: 'sanger/set_service_client_gem'
-gem 'material_service_client', github: 'emrojo/material_service_client_gem', branch: 'with_criteria'
+gem 'material_service_client', github: 'sanger/material_service_client_gem'
 
 
 gem 'faraday'

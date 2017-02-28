@@ -1,12 +1,4 @@
 GIT
-  remote: git://github.com/jbeast/material_service_client_gem.git
-  revision: 9dfa0a4538edf9df6f98cbdda5e0e44564ee5c77
-  branch: containers
-  specs:
-    material_service_client (1.0.0)
-      faraday
-
-GIT
   remote: git://github.com/rails/activeresource.git
   revision: e28f907145c34bcad1d354fa9b25fbd4264e52e9
   branch: master
@@ -15,6 +7,13 @@ GIT
       activemodel (> 4.2, < 6)
       activemodel-serializers-xml (~> 1.0)
       activesupport (> 4.2, < 6)
+
+GIT
+  remote: git://github.com/sanger/material_service_client_gem.git
+  revision: f306c2275ab22783349a3c389265be6552e82ce6
+  specs:
+    material_service_client (1.0.0)
+      faraday (~> 0.11.0)
 
 GIT
   remote: git://github.com/sanger/pmb-client.git
