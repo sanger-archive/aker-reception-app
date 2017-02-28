@@ -34,6 +34,7 @@ class SubmissionsController < ApplicationController
 
       # Adding materials to set
       SetMaterial.add_materials_to_set(new_set_material.uuid, materials)
+      SetMaterial.lock_set(new_set_material.uuid)
       set_material = SetMaterial.get_remote_set_with_materials(new_set_material.uuid)
     end
 
