@@ -8,6 +8,7 @@ class Labware
   attr_accessor :num_of_cols, :barcode, :_updated, :num_of_rows, :_id, :row_is_alpha, :col_is_alpha, :slots
   attr_accessor :_status, :_issues
   attr_accessor :_links, :_created
+  attr_accessor :_error
   attr_accessor :print_count
   attr_accessor :labware_type
 
