@@ -37,7 +37,7 @@ class Labware
   end
 
   def wells
-    return nil unless slots
+    return nil unless slots || @wells
     @wells ||= slots.map do |s|
       Well.new(s.merge(:labware => self))
     end
@@ -95,10 +95,10 @@ class Labware
 
   #before_create :build_default_wells
   
-  #delegate :size, :x_dimension_is_alpha, :y_dimension_is_alpha, :x_dimension_size, :y_dimension_size, to: :labware_type
+  #delegate :size, :col_is_alpha, :row_is_alpha, :num_of_cols, :num_of_rows, to: :labware_type
 
   def size
-    num_of_rows * num_of_rows
+    num_of_rows * num_of_cols
   end
 
   def self.with_barcode(barcode)
@@ -153,20 +153,20 @@ class Labware
   end
 
   def positions
-    if (!x_dimension_is_alpha && !y_dimension_is_alpha)
+    if (!col_is_alpha && !row_is_alpha)
       return (1..size).to_a
     end
 
-    if x_dimension_is_alpha
-      x = ("A"..("A".ord + x_dimension_size - 1).chr).to_a
+    if col_is_alpha
+      x = ("A"..("A".ord + num_of_cols - 1).chr).to_a
     else
-      x = (1..x_dimension_size).to_a
+      x = (1..num_of_cols).to_a
     end
 
-    if y_dimension_is_alpha
-      y = ("A"..("A".ord + y_dimension_size - 1).chr).to_a
+    if row_is_alpha
+      y = ("A"..("A".ord + num_of_rows - 1).chr).to_a
     else
-      y = (1..y_dimension_size).to_a
+      y = (1..num_of_rows).to_a
     end
 
     y.product(x).map(&:join)

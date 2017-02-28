@@ -16,6 +16,17 @@ class Well
 
   #validates :position, presence: true, uniqueness: { scope: :labware_id }
 
+  validate :is_unique_by_position?
+
+  def is_unique_by_position?
+    if @labware
+      if @labware.wells.select{|w| w.address == address}.count > 1
+        errors.add(:base, 'duplicated address in labware')
+        return false
+      end
+    end
+  end
+
   validate :has_one_labware?
 
   def has_one_labware?
