@@ -11,7 +11,7 @@
   <% @labwares.each do |lw| %>
     <tr>
       <td><%= @material_submission.id %></td>
-      <td><%= lw.barcode.value %></td>
+      <td><%= lw.barcode %></td>
       <td><%= lw.labware_type.name %></td>
       <td><%= @material_submission.created_at %></td>
     </tr>

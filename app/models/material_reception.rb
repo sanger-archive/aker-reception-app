@@ -1,22 +1,28 @@
 class MaterialReception < ApplicationRecord
-  belongs_to :labware
+  #belongs_to :labware
 
   before_create :receive_labware
 
-  validates :labware, uniqueness: { message: "cannot be received twice" }
+  validates :labware_id, uniqueness: { message: "cannot be received twice" }
   validate :validate_barcode_printed, on: :create
 
   def receive_labware
-    return false unless labware.barcode_printed?
+    return false unless labware
+    return false unless labware && labware.barcode_printed?
     labware.received_unclaimed
   end
 
   def barcode_value
-    labware && labware.barcode && labware.barcode.value
+    labware && labware.barcode
+  end
+
+  def labware
+    return nil if labware_id.nil?
+    Labware.find(labware_id)
   end
 
   def barcode_value=(barcode)
-    self.labware = Labware.with_barcode(barcode).first
+    self.labware_id = Labware.with_barcode(barcode).first.uuid
   end
 
   def validate_barcode_printed
@@ -26,7 +32,7 @@ class MaterialReception < ApplicationRecord
   end
 
   def labware_already_received?
-    MaterialReception.where(:labware => labware).count > 0
+    MaterialReception.where(:labware_id => labware.uuid).count > 0
   end
 
 
