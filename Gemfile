@@ -48,7 +48,7 @@ gem 'faraday'
 gem 'pg'
 gem 'zipkin-tracer'
 
-gem 'set_service_client', '~> 0.1.3', github: 'sanger/set_service_client_gem'
+gem 'set_service_client', '~> 0.1.3', github: 'khelwood/set_service_client_gem', branch: 'clone_lock'
 gem 'material_service_client', github: 'emrojo/material_service_client_gem', branch: 'with_criteria'
 
 

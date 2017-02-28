@@ -1,10 +1,19 @@
 GIT
-  remote: git://github.com/jbeast/material_service_client_gem.git
-  revision: 9dfa0a4538edf9df6f98cbdda5e0e44564ee5c77
-  branch: containers
+  remote: git://github.com/emrojo/material_service_client_gem.git
+  revision: 67240634281aea62c982ac0b397833ea451fe2c8
+  branch: with_criteria
   specs:
     material_service_client (1.0.0)
-      faraday
+      faraday (~> 0.11.0)
+
+GIT
+  remote: git://github.com/khelwood/set_service_client_gem.git
+  revision: 5843323a9b854c5c5a8e07bb5be57165d32eec68
+  branch: clone_lock
+  specs:
+    set_service_client (0.1.3)
+      faraday (~> 0.11.0)
+      zipkin-tracer (~> 0.20.1)
 
 GIT
   remote: git://github.com/rails/activeresource.git
@@ -22,14 +31,6 @@ GIT
   specs:
     pmb-client (0.1.0)
       json_api_client (~> 1.1)
-
-GIT
-  remote: git://github.com/sanger/set_service_client_gem.git
-  revision: c78e8f9d9c73b711a138de44683b0520a113b504
-  specs:
-    set_service_client (0.1.3)
-      faraday (~> 0.11.0)
-      zipkin-tracer (~> 0.20.1)
 
 GEM
   remote: https://rubygems.org/
@@ -80,7 +81,7 @@ GEM
       public_suffix (~> 2.0, >= 2.0.2)
     arel (7.1.4)
     ast (2.3.0)
-    autoprefixer-rails (6.7.4)
+    autoprefixer-rails (6.7.6)
       execjs
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -117,7 +118,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.0.4)
+    concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -157,10 +158,10 @@ GEM
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     hashdiff (0.3.2)
-    i18n (0.8.0)
+    i18n (0.8.1)
     ice_nine (0.11.2)
-    jbuilder (2.6.1)
-      activesupport (>= 3.0.0, < 5.1)
+    jbuilder (2.6.3)
+      activesupport (>= 3.0.0, < 5.2)
       multi_json (~> 1.2)
     jquery-rails (4.2.2)
       rails-dom-testing (>= 1, < 3)
@@ -322,7 +323,7 @@ GEM
       libv8 (~> 3.16.14.15)
       ref
     thor (0.19.4)
-    thread_safe (0.3.5)
+    thread_safe (0.3.6)
     thrift (0.9.3.0)
     tilt (2.0.6)
     turbolinks (5.0.1)
@@ -330,7 +331,7 @@ GEM
     turbolinks-source (5.0.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (3.0.4)
+    uglifier (3.1.1)
       execjs (>= 0.3.0, < 3)
     uuid (2.3.8)
       macaddr (~> 1.0)

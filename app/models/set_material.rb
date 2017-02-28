@@ -4,7 +4,7 @@ class SetMaterial
 	include StudyClient
 	include ActiveModel::Model
 
-	validates :name, presence: true	
+	validates :name, presence: true
 
 	attr_accessor :uuid, :name
 
@@ -14,6 +14,10 @@ class SetMaterial
 
 	def self.add_materials_to_set(set_uuid, materials)
 		SetServiceClient.add_materials(set_uuid, materials)
+	end
+
+	def self.lock_set(set_uuid)
+		SetServiceClient.lock_set(set_uuid)
 	end
 
 	def self.get_remote_set_with_materials(set_uuid)
@@ -29,7 +33,7 @@ class SetMaterial
 		obj
 	end
 
-	private 
+	private
 
 	def self.create(obj)
 	  	new filter(obj)
