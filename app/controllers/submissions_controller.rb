@@ -34,6 +34,7 @@ class SubmissionsController < ApplicationController
 
       # Adding materials to set
       SetMaterial.add_materials_to_set(new_set_material.uuid, materials)
+      SetMaterial.lock_set(new_set_material.uuid)
       set_material = SetMaterial.get_remote_set_with_materials(new_set_material.uuid)
     end
 
@@ -80,6 +81,7 @@ private
     params.require(:material_submission).permit(
       :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :email, :contact_id, labwares_attributes: [
         :id,
+        :uuid,
         wells_attributes: [
           :id,
           :position,
@@ -90,7 +92,7 @@ private
 
   def claim_params
     {
-      submission_ids: params.require(:submission_ids),
+      submission_ids: JSON.parse(params.require(:submission_ids)),
       collection_id: params.require(:collection_id),
     }
   end

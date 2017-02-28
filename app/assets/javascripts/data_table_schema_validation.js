@@ -19,8 +19,8 @@
   proto.dataForNode = function(node) {
     return {
       errors: {},
-      labware_id: $('input#material_submission_labwares_attributes_0_id', $(node).parents('div.tab-content')).first().val(),
-      well_id: $('input', $(node).parents('tr')).first().val()
+      labware_id: $('input#material_submission_labwares_attributes_0_uuid', $(node).parents('div.tab-content')).first().val(),
+      well_id: $($('input', $(node).parents('tr'))[1]).val()
     };
   };
 

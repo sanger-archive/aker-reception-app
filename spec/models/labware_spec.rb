@@ -1,10 +1,12 @@
 require 'rails_helper'
+require 'webmock/rspec'
 
 RSpec.describe Labware, type: :model do
 
   describe '#size' do
     it "returns its size" do
-      expect(build(:labware).size).to eq(96)
+      @labware = Labware.new(num_of_cols: 12, num_of_rows: 8)
+      expect(@labware.size).to eq(96)
     end
   end
 
@@ -13,8 +15,7 @@ RSpec.describe Labware, type: :model do
     context 'when both dimensions are not alpha' do
 
       before do
-        labware_type = create(:labware_type, x_dimension_size: 3, y_dimension_size: 3)
-        @labware = create(:labware, labware_type: labware_type)
+        @labware = Labware.new(num_of_cols: 3, num_of_rows: 3)
       end
 
       it 'returns an array of integers for each of its well names' do
@@ -26,8 +27,7 @@ RSpec.describe Labware, type: :model do
     context 'when x_dimension_is_alpha is true' do
 
       before do
-        labware_type = create(:labware_type, x_dimension_size: 3, y_dimension_size: 3, x_dimension_is_alpha: true)
-        @labware = create(:labware, labware_type: labware_type)
+        @labware = Labware.new(num_of_cols: 3, num_of_rows: 3, col_is_alpha: true)
       end
 
       it 'returns an array with letters for the x dimension' do
@@ -40,8 +40,7 @@ RSpec.describe Labware, type: :model do
     context 'when y_dimension_is_alpha is true' do
 
       before do
-        labware_type = create(:labware_type, x_dimension_size: 3, y_dimension_size: 3, y_dimension_is_alpha: true)
-        @labware = create(:labware, labware_type: labware_type)
+        @labware = Labware.new(num_of_cols: 3, num_of_rows: 3, row_is_alpha: true)
       end
 
       it 'returns an array with letters for the y dimension' do

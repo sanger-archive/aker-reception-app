@@ -1,11 +1,14 @@
 class MaterialReceptionsController < ApplicationController
+
+  before_filter :set_labware, only: :create
+
   def index
     @material_receptions = MaterialReception.all
     @material_reception = MaterialReception.new
   end
 
   def create
-    @material_reception = MaterialReception.create(material_reception_params)
+    @material_reception = MaterialReception.create(:labware_id => @labware_id)
 
     if @material_reception.save
       ReceptionMailer.material_reception(@material_reception).deliver_later
@@ -21,4 +24,10 @@ class MaterialReceptionsController < ApplicationController
   def material_reception_params
     params.require(:material_reception).permit(:barcode_value)
   end
+
+  def set_labware
+    @labware = Labware.with_barcode(material_reception_params[:barcode_value]).first
+    @labware_id = @labware ? @labware.uuid : nil
+  end
+
 end

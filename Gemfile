@@ -49,7 +49,7 @@ gem 'pg'
 gem 'zipkin-tracer'
 
 gem 'set_service_client', '~> 0.1.3', github: 'sanger/set_service_client_gem'
-gem 'material_service_client', '~> 0.1.12', github: 'sanger/material_service_client_gem'
+gem 'material_service_client', github: 'sanger/material_service_client_gem'
 
 
 gem 'faraday'
@@ -84,5 +84,8 @@ group :development, :test do
   gem 'poltergeist'
   gem 'factory_girl_rails'
   gem 'database_cleaner'
-
 end
+
+gem 'simplecov', :require => false, :group => :test
+gem 'simplecov-rcov', :group => :test
+gem 'rubycritic', :group => :test

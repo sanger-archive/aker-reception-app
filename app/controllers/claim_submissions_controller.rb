@@ -6,7 +6,7 @@ class ClaimSubmissionsController < ApplicationController
 	def find_submissions_by_user
 		@email = params[:email]
 		@contact = Contact.find_by_email(@email)
-		@submissions = @contact.material_submissions unless @contact.nil?
+		@submissions = @contact.material_submissions.where.not(:status => MaterialSubmission.CLAIMED) unless @contact.nil?
 
 		if @contact.nil? || @submissions.empty?
 		  @json = {:error => 'No submissions found'}
