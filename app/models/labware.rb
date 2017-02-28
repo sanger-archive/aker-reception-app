@@ -18,11 +18,6 @@ class Labware
 
   attr_writer :wells 
 
-  #alias_attribute :wells, :slots
-
-  #include Barcodeable
-
-  #belongs_to :labware_type
 
   def attributes
     [:num_of_cols, :print_count, :barcode, :_updated, :num_of_rows, :uuid, :row_is_alpha, :col_is_alpha, :slots,
