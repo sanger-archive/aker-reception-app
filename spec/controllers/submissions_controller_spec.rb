@@ -207,6 +207,11 @@ RSpec.describe SubmissionsController, type: :controller do
 
     it "updates the submission state to active when all the required data of the steps has been provided" do
 
+      stub_request(:patch, "#{Rails.configuration.set_url}/#{@uuid}").
+         with(:body => "{\"data\":{\"type\":\"sets\",\"id\":\"#{@uuid}\",\"attributes\":{\"locked\":true}}}",
+              :headers => {'Accept'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => {}.to_json, :headers => {})
+
       put :update, step_params(@material_submission, :labware)
       @material_submission.reload
 
