@@ -34,3 +34,5 @@ And I am in "Delivery Details"
 
 Given I enter my details as collaborator
 And I select the contact "test@test"
+
+Then I know my shared submission identifier

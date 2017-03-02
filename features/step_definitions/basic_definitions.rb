@@ -53,9 +53,7 @@ end
 
 
 Then(/^I should not see any validation errors$/) do
-  save_and_open_page
   expect(page.has_content?('validation')).to eq(false)
-  save_and_open_page
 end
 
 When(/^I enter my details as collaborator$/) do
@@ -68,4 +66,9 @@ end
 
 Then(/^I should see "([^"]*)"$/) do |arg1|
   expect(page.has_content?(arg1)).to eq(true)
+end
+
+Then(/^I know my shared submission identifier$/) do
+  last_id = MaterialSubmission.last.id.to_s
+  expect(page.has_content?("Submission "+last_id)).to eq(true)
 end

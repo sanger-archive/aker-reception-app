@@ -27,8 +27,17 @@
     </div>
 
     <div class="col-md-6 col-xs-12">
-      <%= f.collection_select :contact_id, Contact.all, :id, :fullname_and_email, { class: "form-control contact" } %>
+      <div class="row">
+        <%= f.collection_select :contact_id, Contact.all, :id, :fullname_and_email, { class: "form-control contact" } %>
+      </div>
+      <div class="row">
+        Your number is:
+        <span>Submission <h1><%= material_submission.id %></h1></span>
+      </div>
+
     </div>
+
+
   </div>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
