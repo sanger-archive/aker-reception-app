@@ -3,10 +3,10 @@ Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
   LabwareType.create(
     name: 'ABgene AB_0800',
     description: '0.2ml full skirted clear/colourless 96 well plates (volume <100µl)',
-    x_dimension_size: 12,
-    y_dimension_size: 8,
-    x_dimension_is_alpha: false,
-    y_dimension_is_alpha: true
+    num_of_cols: 12,
+    num_of_rows: 8,
+    col_is_alpha: false,
+    row_is_alpha: true
   )  
 end
 

@@ -17,19 +17,13 @@ class Biomaterial
 
   #belongs_to :containable, polymorphic: true, optional: true
 
-  attr_accessor :uuid, :supplier_name, :donor_name, :gender, :common_name, :phenotype, :donor_id
+  attr_accessor :uuid, :supplier_name, :donor_name, :gender, :common_name, :phenotype
+
+  alias_attribute :donor_id, :donor_name
 
   def attributes
-    [:supplier_name, :donor_name, :gender, :common_name, :phenotype].map do |k|
-      if (k == :donor_name)
-        if (send(:donor_id).nil?)
-          [:donor_id, send(k)]
-        else
-          [:donor_id, send(:donor_id)]
-        end
-      else
-        [k, send(k)]
-      end
+    [:supplier_name, :donor_id, :gender, :common_name, :phenotype].map do |k|
+      [k, send(k)]
     end.to_h
   end
 
@@ -46,8 +40,7 @@ class Biomaterial
   end
 
   def self.find(biomaterial_id)
-    return nil if biomaterial_id.nil?
-    obj = MaterialServiceClient.get(biomaterial_id)
+    obj = MaterialServiceClient::Material.get(biomaterial_id)
     return nil if obj.nil?
     obj['uuid'] = obj['_id']
     new(filter_attrs(obj))
@@ -62,10 +55,10 @@ class Biomaterial
     if biomaterial_id
       attributes_with_id = attributes
       attributes_with_id[:uuid] = biomaterial_id
-      response = MaterialServiceClient.put(self.class.filter_attrs(attributes_with_id))
+      response = MaterialServiceClient::Material.put(self.class.filter_attrs(attributes_with_id))
     else
       self.class.filter_attrs(attributes)
-      response = MaterialServiceClient.post(self.class.filter_attrs(attributes))
+      response = MaterialServiceClient::Material.post(self.class.filter_attrs(attributes))
     end
     self.uuid = response["_id"]
     valid?

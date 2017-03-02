@@ -25,11 +25,6 @@ And I click on "Next"
 
 Then I am in "Biomaterial Provenance"
 
-Given I upload the file "test/data/wrong_manifest.csv"
-Then I should display the data of my file
-When I go to next screen
-Then I should see validation errors
-
 Given I upload the file "test/data/manifest.csv"
 Then I should display the data of my file
 When I go to next screen

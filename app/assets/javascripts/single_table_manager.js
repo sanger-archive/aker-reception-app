@@ -151,7 +151,7 @@
 
   proto.onSchemaError = function(e, data) {
     this._tabsWithError=[];
-    return this.onReceive(this.currentTab, data);
+    return this.onReceive($(this.currentTab), data);
     this.loadErrorsFromMsg(data);
     this.updateValidations();
   };
@@ -236,7 +236,7 @@
 
   proto.is_labware_id = function(input) {
     var name = $(input).attr('name');
-    return (name.search(/material_submission\[labwares_attributes\]\[0\]\[id\]/) >= 0);
+    return (name.search(/material_submission\[labwares_attributes\]\[0\]\[uuid\]/) >= 0);
   };
 
   proto.saveInput = function(data, pos, input) {
@@ -259,7 +259,7 @@
     var fieldName = this.fieldNameForName(name)
 
     if (fieldName) {
-      this.updateErrorState(input, data.id, data.wells_attributes[rowNum].id, fieldName);
+      this.updateErrorState(input, data.id, data.wells_attributes[rowNum].position, fieldName);
     }
   };
 
@@ -282,7 +282,7 @@
 
   proto.dataForTab = function(tab) {
     for (var key in this.params) {
-      if ($(tab).attr('href') == ('#'+this.params[key].barcode.value)) {
+      if ($(tab).attr('href') == ('#'+this.params[key].barcode)) {
         return this.params[key];
       }
     }
