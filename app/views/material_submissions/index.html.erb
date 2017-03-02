@@ -1,6 +1,12 @@
-<% content_for :title_button do %>
-  <%= link_to 'Create New Submission', new_material_submission_url, class: 'btn btn-success vcenter', style: 'margin-top: 28px' %>
+<% content_for :main_title do %>
+  Material Submission
 <% end %>
+<%= render :partial => 'title_buttons' %>
+<div class="row">
+  <div class="col-md-12">
+    <%= link_to 'Create New Submission', new_material_submission_url, class: 'btn btn-success vcenter' %>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-md-12">

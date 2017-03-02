@@ -13,6 +13,15 @@ gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.2'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 gem 'therubyracer', platforms: :ruby
+gem 'pry'
+gem 'react-rails'
+
+gem 'json-schema'
+gem 'activeresource', github: 'rails/activeresource', branch: 'master'
+
+# Add simple support for print-my barcode)
+gem 'pmb-client', '0.1.0', :github => 'sanger/pmb-client'
+
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -35,11 +44,20 @@ gem 'select2-rails'
 gem 'forgery'
 
 gem 'pg'
+gem 'zipkin-tracer'
+
+gem 'set_service_client', '~> 0.1.3', github: 'sanger/set_service_client_gem'
+gem 'material_service_client', github: 'sanger/material_service_client_gem'
+
+
+gem 'faraday'
+gem 'bootstrap-table-rails'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
   gem 'sqlite3'
+
 end
 
 group :development do
@@ -56,7 +74,8 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'bootstrap-sass', '~> 3.3.6'
 gem 'font-awesome-sass'
-group :test do
+group :development, :test do
+  gem 'webmock'
   gem 'rspec-rails', '~> 3.4'
   gem 'launchy'
   gem 'capybara'
@@ -64,3 +83,13 @@ group :test do
   gem 'factory_girl_rails'
   gem 'database_cleaner'
 end
+
+group :test do
+  gem 'cucumber-rails', :require => false
+  # database_cleaner is not required, but highly recommended
+end
+
+
+gem 'simplecov', :require => false, :group => :test
+gem 'simplecov-rcov', :group => :test
+gem 'rubycritic', :group => :test

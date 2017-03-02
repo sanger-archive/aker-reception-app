@@ -2,6 +2,7 @@ class CreateWells < ActiveRecord::Migration[5.0]
   def change
     create_table :wells do |t|
       t.references :labware, foreign_key: true
+      t.string :biomaterial_id
       t.string :position
 
       t.timestamps

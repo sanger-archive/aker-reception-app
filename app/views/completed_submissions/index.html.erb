@@ -1,0 +1,32 @@
+<% content_for :main_title do %>
+  Completed submissions
+<% end %>
+<%= render :partial => 'title_buttons' %>
+<%= form_tag(controller: "completed_submissions", action: "print", method: "post") do %>
+
+	<div class="row">
+	  <div class="col-md-12">
+	    <h2>Completed submissions</h2>
+	    <%= render "completed_submission_table", completed_submissions: @unprinted_submissions %>
+	  </div>
+	</div>
+
+	<div class="row">
+	  <div class="col-md-12">
+	    <h2>Previously printed submissions</h2>
+	    <%= render "completed_submission_table", completed_submissions: @printed_submissions %>
+	  </div>
+	</div>
+
+	<div class="row">
+	  <div class="col-md-12">
+	  <span style="float:right;">
+	    <b>Printer:&nbsp;</b>
+	    <%= collection_select(:printer, :name, @printers, :name, :name) %>
+	    <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 20px;') %>
+	    </span>
+      </div>
+    </div>
+
+	
+<% end %>

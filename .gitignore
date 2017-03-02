@@ -19,3 +19,9 @@
 
 # Ignore Byebug command history file.
 .byebug_history
+
+# Ignore config file.
+config/environments/development.rb
+
+# Ignore coverage
+coverage

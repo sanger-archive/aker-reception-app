@@ -1,0 +1,17 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Submission ID</th>
+      <th>Status</th>
+      <th>Number of labware</th>
+      <th><%= I18n.translate "activerecord.attributes.material_submission.email" %></th>
+      <th>Date Created</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <%= render partial: "completed_submission", collection: completed_submissions %>
+  </tbody>
+
+</table>
