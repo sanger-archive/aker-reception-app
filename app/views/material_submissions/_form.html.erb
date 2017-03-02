@@ -1,4 +1,9 @@
 <%= bootstrap_form_for(material_submission) do |f| %>
+
+<div class="field">
+  <%= f.text_field :id, readonly: true %>
+</div>
+
 <div class="field">
   <%= f.text_field :no_of_labwares_required, :readonly => readonly %>
 </div>

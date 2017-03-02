@@ -24,5 +24,6 @@ en:
   activerecord:
     attributes:
       material_submission:
+        id: 'Submission Identifier'
         email: 'Collaborator email'
         contact: 'Internal Contact'
