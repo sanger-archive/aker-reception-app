@@ -31,8 +31,8 @@
         <%= f.collection_select :contact_id, Contact.all, :id, :fullname_and_email, { class: "form-control contact" } %>
       </div>
       <div class="row">
-        Your number is:
-        <span>Submission <h1><%= material_submission.id %></h1></span>
+        <div><b>Your submission is</b></div>
+       <span><h1>Submission <%= material_submission.id %></h1></span>
       </div>
 
     </div>
