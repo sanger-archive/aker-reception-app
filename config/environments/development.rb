@@ -58,7 +58,7 @@ Rails.application.configure do
   config.material_url = 'http://localhost:5000'
   ENV['MATERIALS_URL'] = config.material_url
 
-  config.set_url = 'http://localhost:3000/api/v1/sets'
+  config.set_url = 'http://localhost:3000/api/v1/'
   config.set_url_default_proxy = 'http://localhost:3000'
 
   config.ownership_url = 'http://localhost:4000/ownerships'

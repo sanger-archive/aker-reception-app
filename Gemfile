@@ -48,11 +48,9 @@ gem 'faraday'
 gem 'pg'
 gem 'zipkin-tracer'
 
-gem 'set_service_client', '~> 0.1.3', github: 'sanger/set_service_client_gem'
+gem 'set_client', github: 'khelwood/set_client'
 gem 'material_service_client', github: 'sanger/material_service_client_gem'
 
-
-gem 'faraday'
 gem 'bootstrap-table-rails'
 
 group :development, :test do

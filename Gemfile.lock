@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/khelwood/set_client.git
+  revision: e822f0c279f5346082aa90c5279b2f90837af682
+  specs:
+    set_client (0.1.0)
+      json_api_client
+
+GIT
   remote: git://github.com/rails/activeresource.git
   revision: e28f907145c34bcad1d354fa9b25fbd4264e52e9
   branch: master
@@ -21,14 +28,6 @@ GIT
   specs:
     pmb-client (0.1.0)
       json_api_client (~> 1.1)
-
-GIT
-  remote: git://github.com/sanger/set_service_client_gem.git
-  revision: c78e8f9d9c73b711a138de44683b0520a113b504
-  specs:
-    set_service_client (0.1.3)
-      faraday (~> 0.11.0)
-      zipkin-tracer (~> 0.20.1)
 
 GEM
   remote: https://rubygems.org/
@@ -393,7 +392,7 @@ DEPENDENCIES
   rubycritic
   sass-rails (~> 5.0)
   select2-rails
-  set_service_client (~> 0.1.3)!
+  set_client!
   simplecov
   simplecov-rcov
   spring
@@ -410,4 +409,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.13.7
+   1.14.5
