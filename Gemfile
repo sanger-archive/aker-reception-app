@@ -49,6 +49,7 @@ gem 'pg'
 gem 'zipkin-tracer'
 
 gem 'set_client', github: 'khelwood/set_client'
+gem 'study_client', github: 'khelwood/study_client'
 gem 'material_service_client', github: 'sanger/material_service_client_gem'
 
 gem 'bootstrap-table-rails'

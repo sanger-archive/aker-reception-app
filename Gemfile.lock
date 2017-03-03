@@ -6,6 +6,13 @@ GIT
       json_api_client
 
 GIT
+  remote: git://github.com/khelwood/study_client.git
+  revision: 565d87e784620aba32f0fee1c400ee105518cfd3
+  specs:
+    study_client (0.1.0)
+      json_api_client
+
+GIT
   remote: git://github.com/rails/activeresource.git
   revision: e28f907145c34bcad1d354fa9b25fbd4264e52e9
   branch: master
@@ -398,6 +405,7 @@ DEPENDENCIES
   spring
   spring-watcher-listen (~> 2.0.0)
   sqlite3
+  study_client!
   therubyracer
   turbolinks (~> 5)
   tzinfo-data
