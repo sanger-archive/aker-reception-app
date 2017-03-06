@@ -91,7 +91,7 @@ private
 
   def claim_params
     {
-      submission_ids: JSON.parse(params.require(:submission_ids)),
+      submission_ids: params.require(:submission_ids),
       collection_id: params.require(:collection_id),
     }
   end
