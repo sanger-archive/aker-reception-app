@@ -5,15 +5,25 @@
 
   function onFindReception(e, data, status, xhr) {
     $('.table', $(SUBMISSIONS_NODE)).bootstrapTable('destroy');
-    $('.table', $(SUBMISSIONS_NODE)).bootstrapTable({data: data, columns: HEADERS});
+
+    $('.table', $(SUBMISSIONS_NODE)).bootstrapTable({data: data, uniqueId: 'id', columns: HEADERS});
+
     $('.table tbody tr', $(SUBMISSIONS_NODE)).each(function(pos, node) {
       $(node).attr('draggable', true);
       $(node).on('dragstart', function(event) {
+
         var submissionIds = $($('table', $(SUBMISSIONS_NODE))).bootstrapTable('getAllSelections').map(function(node, pos) {
           return node.id;
         });
-        if (submissionIds.length>0) {
-          event.originalEvent.dataTransfer.setData("text", event.target.id);
+
+        // If there aren't currently selected submissions, get the one being dragged
+        if (submissionIds.length == 0) {
+          submissionIds = [$(event.target).data('uniqueid')];
+        }
+
+        // Should always be greater than 0...
+        if (submissionIds.length > 0) {
+          event.originalEvent.dataTransfer.setData("text/plain", JSON.stringify(submissionIds));
           var img = document.createElement('img');
           img.src = "/assets/move.png";
           event.originalEvent.dataTransfer.setDragImage(img, 10, 10);
