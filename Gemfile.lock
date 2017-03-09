@@ -1,18 +1,4 @@
 GIT
-  remote: git://github.com/khelwood/set_client.git
-  revision: e822f0c279f5346082aa90c5279b2f90837af682
-  specs:
-    set_client (0.1.0)
-      json_api_client
-
-GIT
-  remote: git://github.com/khelwood/study_client.git
-  revision: 565d87e784620aba32f0fee1c400ee105518cfd3
-  specs:
-    study_client (0.1.0)
-      json_api_client
-
-GIT
   remote: git://github.com/rails/activeresource.git
   revision: e28f907145c34bcad1d354fa9b25fbd4264e52e9
   branch: master
@@ -21,6 +7,20 @@ GIT
       activemodel (> 4.2, < 6)
       activemodel-serializers-xml (~> 1.0)
       activesupport (> 4.2, < 6)
+
+GIT
+  remote: git://github.com/sanger/aker-set-client.git
+  revision: 93853e389b78ea99346edc2f4f42904aa58e18b2
+  specs:
+    aker-set-client (0.1.0)
+      json_api_client
+
+GIT
+  remote: git://github.com/sanger/aker-study-client.git
+  revision: a4a39e7dc8e78144ab26510ccfe8a7fec229da68
+  specs:
+    aker-study-client (0.1.0)
+      json_api_client
 
 GIT
   remote: git://github.com/sanger/material_service_client_gem.git
@@ -39,44 +39,44 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actioncable (5.0.1)
-      actionpack (= 5.0.1)
-      nio4r (~> 1.2)
+    actioncable (5.0.2)
+      actionpack (= 5.0.2)
+      nio4r (>= 1.2, < 3.0)
       websocket-driver (~> 0.6.1)
-    actionmailer (5.0.1)
-      actionpack (= 5.0.1)
-      actionview (= 5.0.1)
-      activejob (= 5.0.1)
+    actionmailer (5.0.2)
+      actionpack (= 5.0.2)
+      actionview (= 5.0.2)
+      activejob (= 5.0.2)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (5.0.1)
-      actionview (= 5.0.1)
-      activesupport (= 5.0.1)
+    actionpack (5.0.2)
+      actionview (= 5.0.2)
+      activesupport (= 5.0.2)
       rack (~> 2.0)
       rack-test (~> 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (5.0.1)
-      activesupport (= 5.0.1)
+    actionview (5.0.2)
+      activesupport (= 5.0.2)
       builder (~> 3.1)
       erubis (~> 2.7.0)
       rails-dom-testing (~> 2.0)
-      rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    activejob (5.0.1)
-      activesupport (= 5.0.1)
+      rails-html-sanitizer (~> 1.0, >= 1.0.3)
+    activejob (5.0.2)
+      activesupport (= 5.0.2)
       globalid (>= 0.3.6)
-    activemodel (5.0.1)
-      activesupport (= 5.0.1)
+    activemodel (5.0.2)
+      activesupport (= 5.0.2)
     activemodel-serializers-xml (1.0.1)
       activemodel (> 5.x)
       activerecord (> 5.x)
       activesupport (> 5.x)
       builder (~> 3.1)
-    activerecord (5.0.1)
-      activemodel (= 5.0.1)
-      activesupport (= 5.0.1)
+    activerecord (5.0.2)
+      activemodel (= 5.0.2)
+      activesupport (= 5.0.2)
       arel (~> 7.0)
-    activesupport (5.0.1)
+    activesupport (5.0.2)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
       minitest (~> 5.1)
@@ -85,7 +85,7 @@ GEM
       public_suffix (~> 2.0, >= 2.0.2)
     arel (7.1.4)
     ast (2.3.0)
-    autoprefixer-rails (6.7.4)
+    autoprefixer-rails (6.7.6)
       execjs
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -98,7 +98,7 @@ GEM
     bootstrap-sass (3.3.7)
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
-    bootstrap-table-rails (1.11.0)
+    bootstrap-table-rails (1.11.1.1)
     bootstrap_form (2.6.0)
     builder (3.2.3)
     byebug (9.0.6)
@@ -122,7 +122,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
-    concurrent-ruby (1.0.4)
+    concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -144,7 +144,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.11.0.1)
       faraday (>= 0.7.4, < 1.0)
-    ffi (1.9.17)
+    ffi (1.9.18)
     finagle-thrift (1.4.2)
       thrift (~> 0.9.3)
     flay (2.8.1)
@@ -162,10 +162,10 @@ GEM
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     hashdiff (0.3.2)
-    i18n (0.8.0)
+    i18n (0.8.1)
     ice_nine (0.11.2)
-    jbuilder (2.6.1)
-      activesupport (>= 3.0.0, < 5.1)
+    jbuilder (2.6.3)
+      activesupport (>= 3.0.0, < 5.2)
       multi_json (~> 1.2)
     jquery-rails (4.2.2)
       rails-dom-testing (>= 1, < 3)
@@ -174,7 +174,7 @@ GEM
     json (2.0.3)
     json-schema (2.8.0)
       addressable (>= 2.4)
-    json_api_client (1.4.0)
+    json_api_client (1.5.1)
       activemodel (>= 3.2.0)
       activesupport (>= 3.2.0)
       addressable (~> 2.2)
@@ -200,7 +200,7 @@ GEM
     minitest (5.10.1)
     multi_json (1.12.1)
     multipart-post (2.0.0)
-    nio4r (1.2.1)
+    nio4r (2.0.0)
     nokogiri (1.7.0.1)
       mini_portile2 (~> 2.1.0)
     parser (2.3.3.1)
@@ -220,26 +220,26 @@ GEM
     rack (2.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
-    rails (5.0.1)
-      actioncable (= 5.0.1)
-      actionmailer (= 5.0.1)
-      actionpack (= 5.0.1)
-      actionview (= 5.0.1)
-      activejob (= 5.0.1)
-      activemodel (= 5.0.1)
-      activerecord (= 5.0.1)
-      activesupport (= 5.0.1)
+    rails (5.0.2)
+      actioncable (= 5.0.2)
+      actionmailer (= 5.0.2)
+      actionpack (= 5.0.2)
+      actionview (= 5.0.2)
+      activejob (= 5.0.2)
+      activemodel (= 5.0.2)
+      activerecord (= 5.0.2)
+      activesupport (= 5.0.2)
       bundler (>= 1.3.0, < 2.0)
-      railties (= 5.0.1)
+      railties (= 5.0.2)
       sprockets-rails (>= 2.0.0)
     rails-dom-testing (2.0.2)
       activesupport (>= 4.2.0, < 6.0)
       nokogiri (~> 1.6)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
-    railties (5.0.1)
-      actionpack (= 5.0.1)
-      activesupport (= 5.0.1)
+    railties (5.0.2)
+      actionpack (= 5.0.2)
+      activesupport (= 5.0.2)
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
@@ -327,7 +327,7 @@ GEM
       libv8 (~> 3.16.14.15)
       ref
     thor (0.19.4)
-    thread_safe (0.3.5)
+    thread_safe (0.3.6)
     thrift (0.9.3.0)
     tilt (2.0.6)
     turbolinks (5.0.1)
@@ -335,7 +335,7 @@ GEM
     turbolinks-source (5.0.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (3.0.4)
+    uglifier (3.1.5)
       execjs (>= 0.3.0, < 3)
     uuid (2.3.8)
       macaddr (~> 1.0)
@@ -360,7 +360,7 @@ GEM
       railties (>= 3.0.7)
     xpath (2.0.0)
       nokogiri (~> 1.3)
-    zipkin-tracer (0.20.1)
+    zipkin-tracer (0.21.0)
       faraday (~> 0.8)
       finagle-thrift (~> 1.4.2)
       rack (>= 1.0)
@@ -371,6 +371,8 @@ PLATFORMS
 
 DEPENDENCIES
   activeresource!
+  aker-set-client!
+  aker-study-client!
   bootstrap-sass (~> 3.3.6)
   bootstrap-table-rails
   bootstrap_form
@@ -399,13 +401,11 @@ DEPENDENCIES
   rubycritic
   sass-rails (~> 5.0)
   select2-rails
-  set_client!
   simplecov
   simplecov-rcov
   spring
   spring-watcher-listen (~> 2.0.0)
   sqlite3
-  study_client!
   therubyracer
   turbolinks (~> 5)
   tzinfo-data
