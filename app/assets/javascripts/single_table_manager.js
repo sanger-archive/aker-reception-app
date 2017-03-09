@@ -127,6 +127,12 @@
     }
   };
 
+  proto.validateNotEmptyInputs = function(tab) {
+    this.notEmptyInputs().each($.proxy(function(pos, input) {
+      return this.validateInput(input);
+    }, this));
+  };
+
   proto.validateTab = function(tab) {
     this.inputs().each($.proxy(function(pos, input) {
       return this.validateInput(input);
@@ -170,9 +176,19 @@
 
   };
 
+  proto.cleanValidLabwares = function(uuids) {
+    if (typeof this.errorCells !== 'undefined') {
+      for (var i=0; i<uuids.length; i++) {
+        delete(this.errorCells[uuids[i]]);
+      }      
+    }
+  };
+
   proto.onReceive = function(currentTab, data, status) {
     if (data.update_successful) {
-      this.errorCells = {};
+      if (typeof data.labwares_uuids !== 'undefined') {
+        this.cleanValidLabwares(data.labwares_uuids);
+      }
       this.unsetErrorToTab(currentTab[0]);
     } else {
       this.setErrorToTab(currentTab[0]);
@@ -184,7 +200,9 @@
 
   proto.updateValidations = function() {
     this.cleanTooltips();
-    this.inputs().each($.proxy(this.updateErrorInput, this, this.dataForTab(this.currentTab)));
+    setTimeout($.proxy(function() {
+      this.inputs().each($.proxy(this.updateErrorInput, this, this.dataForTab(this.currentTab)));
+    }, this), 500);
   };
 
   proto.storeCellNameError = function(labwareId, wellId, errors) {
@@ -194,9 +212,20 @@
     if (typeof this.errorCells[labwareId][wellId]==='undefined') {
       this.errorCells[labwareId][wellId]={};
     }
-    for (var key in errors) {
-      var fieldName = key.replace(/.*\./, '');
-      this.errorCells[labwareId][wellId][fieldName]=errors[key];
+    if (typeof errors.schema !== 'undefined') {
+      /** Json schema error message from the server json-schema gem */
+      for (var i=0; i<errors.schema[0].length; i++) {
+        var obj = errors.schema[0][i].message;
+        var fieldName = obj.fragment.replace(/#\//, '')
+        var text = obj.message;
+        this.errorCells[labwareId][wellId][fieldName]=text;
+      }
+    } else {
+      /** Json Schema error message from the JS client */
+      for (var key in errors) {
+        var fieldName = key.replace(/.*\./, '');
+        this.errorCells[labwareId][wellId][fieldName]=errors[key];
+      }
     }
   };
 
@@ -207,6 +236,12 @@
   proto.inputs = function() {
     return $('form input').filter(function(pos, input) {
       return($(input).attr('name') && $(input).attr('name').search(/material_submission/)>=0);
+    });
+  };
+
+  proto.notEmptyInputs = function() {
+    return $('form input').filter(function(pos, input) {
+      return(($(input).val().length > 0) && $(input).attr('name') && $(input).attr('name').search(/material_submission/)>=0);
     });
   };
 
@@ -301,27 +336,43 @@
     $('#alert-modal').modal();
   };
 
+  proto.showAlert = function(data) {
+    $('.alert .alert-title').html(data.title);
+    $('.alert .alert-msg').html(data.body);
+    $('.alert').toggleClass('hidden', false);
+  };  
+
+  proto.isEmptyErrorCells = function() {
+    return (Object.keys(this.errorCells).length == 0);
+  };
+
   proto.saveCurrentTabBeforeLeaving = function(button, e) {
     e.stopPropagation();
     e.preventDefault();
+
     //this.saveTab({target: this.currentTab});
     var promise = this.saveTab({target: this.currentTab});
     if (promise === null) {
       return;
     }
     promise.then($.proxy(function(data) {
-      if (data.update_successful && (this._tabsWithError.length == 0)) {
+      if (data.update_successful && (this.isEmptyErrorCells())) {
         window.location.href = $(button).attr('href');
       } else {
-        this.showModal({
+        this.showAlert({
           title: 'Validation problems',
           body: 'Please review and solve the validation problems before continuing'});
+        this.setErrorToTab(this.currentTab);
+        if (!data.update_successful) {
+          this.loadErrorsFromMsg(errorMsgs);
+        }
+        this.updateValidations();
       }
     }, this), $.proxy(this.onError, this));
   };
 
   proto.onError = function(e) {
-    this.showModal({
+    this.showAlert({
       title: 'Validation Error',
       body: 'We could not save the current content due to an error'})
   };

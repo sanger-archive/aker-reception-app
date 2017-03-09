@@ -77,9 +77,24 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def labwares_attributes=(params)
-    params.values.each do |labware_attrs|
-      Labware.find(labware_attrs["uuid"]).update(labware_attrs)
+    add_to_labwares(params.values.map do |labware_attrs|
+      labware = Labware.find(labware_attrs["uuid"])
+      labware.update(labware_attrs)
+      labware
+    end)
+  end
+
+  def add_to_labwares(labwares)
+    @labwares = [] if @labwares.nil?
+    labwares.each do |l|
+      @labwares.delete_if{|l2| l2.uuid == l.uuid}
+      @labwares.push(l)
     end
+  end
+
+  def update(params)
+    update_attributes(params)
+    labwares.all?(&:valid?) if @labwares
   end
 
   def labware
