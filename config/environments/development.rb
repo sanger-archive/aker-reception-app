@@ -69,6 +69,6 @@ Rails.application.configure do
 
   config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
 
-  config.printing_disabled = false
+  config.printing_disabled = true
 
 end
