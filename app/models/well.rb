@@ -18,6 +18,15 @@ class Well
 
   validate :is_unique_by_position?
 
+  validate :biomaterial_is_valid?
+
+  def biomaterial_is_valid?
+    if @biomaterial && @biomaterial.invalid?
+      add_biomaterial_errors
+      return false
+    end
+  end
+
   def is_unique_by_position?
     if @labware
       if @labware.wells.select{|w| w.address == address}.count > 1
@@ -86,17 +95,24 @@ class Well
     attrs
   end
 
+  def add_biomaterial_errors
+    @biomaterial.errors.keys.each do |k|
+      errors.add(k, biomaterial.errors[k])
+    end
+  end
+
   def biomaterial_attributes=(attrs)
     attrs = convert_attributes(attrs)
     if biomaterial_id
-      biomaterial = Biomaterial.find(biomaterial_id)
-      biomaterial.assign_attributes(attrs)
+      @biomaterial = Biomaterial.find(biomaterial_id)
+      @biomaterial.assign_attributes(attrs)
     else
-      biomaterial = Biomaterial.new(attrs)
+      @biomaterial = Biomaterial.new(attrs)
     end
-    unless biomaterial.is_empty?
-      biomaterial.save!(biomaterial_id)
-      assign_attributes(:material => biomaterial.uuid)
+    unless @biomaterial.is_empty?
+      if @biomaterial.save(biomaterial_id)
+        assign_attributes(:material => @biomaterial.uuid)
+      end
     end
   end
 

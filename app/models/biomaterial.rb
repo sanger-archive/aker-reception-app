@@ -5,7 +5,7 @@ class Biomaterial
   include ActiveModel::Model
   include ActiveModel::Conversion
 
-  validate :validate_with_schema
+  validate :validate_with_schema, unless: :is_empty?
 
   def persisted?
     false
@@ -69,6 +69,10 @@ class Biomaterial
     save(biomaterial_id)
   end
 
+  def destroy
+    MaterialServiceClient::Material.delete(uuid)
+  end
+
 private
 
   def set_uuid
@@ -76,7 +80,7 @@ private
   end
 
   def validate_with_schema
-    error_msgs = JSON::Validator.fully_validate(Schema.get, attributes)
+    error_msgs = JSON::Validator.fully_validate(Schema.get, attributes, :errors_as_objects => true)
     if error_msgs.length > 0
       error_msgs.each do |msg|
         errors.add(:schema, :message => msg)
