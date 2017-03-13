@@ -41,12 +41,13 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
   config.material_url = "http://localhost:5000"
   ENV['MATERIALS_URL'] = config.material_url
-  config.set_url = 'http://localhost:1500/api/v1/sets'
+  config.set_url = 'http://localhost:1500/api/v1/'
   config.set_url_default_proxy = 'http://localhost:1500'
   config.ownership_url = 'http://localhost:4000/ownerships'
   config.ownership_url_default_proxy = 'http://localhost:4000'
   config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
+  config.study_url = 'http://localhost:3300/api/v1/'
 
   config.printing_disabled = true
-  
+
 end

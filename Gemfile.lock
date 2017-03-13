@@ -401,7 +401,6 @@ DEPENDENCIES
   cucumber-rails
   database_cleaner
   factory_girl_rails
-  faraday
   font-awesome-sass
   forgery
   jbuilder (~> 2.5)
