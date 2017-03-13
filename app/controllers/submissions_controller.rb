@@ -24,18 +24,18 @@ class SubmissionsController < ApplicationController
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
 
       # Creation of set
-      new_set_material = SetMaterial.create_remote_set("Submission #{material_submission.id}")
+      new_set = SetClient::Set.create(name: "Submission #{material_submission.id}")
 
       # Ownership of materials
       Ownership.create_remote_ownership_batch(ownership_batch_params)
 
       # Ownership of set
-      Ownership.create_remote_ownership(ownership_set_params(new_set_material.uuid))
+      Ownership.create_remote_ownership(ownership_set_params(new_set.uuid))
 
       # Adding materials to set
-      SetMaterial.add_materials_to_set(new_set_material.uuid, materials)
-      SetMaterial.lock_set(new_set_material.uuid)
-      set_material = SetMaterial.get_remote_set_with_materials(new_set_material.uuid)
+      new_set.set_materials(materials)
+      new_set.update_attributes(locked: true)
+      SetClient::Set.find_with_materials(new_set.uuid).first
     end
 
     if params[:material_submission][:status] == 'provenance'
@@ -53,7 +53,7 @@ class SubmissionsController < ApplicationController
     col_id = cp[:collection_id]
     submissions = MaterialSubmission.where(id: sub_ids)
     materials = submissions_biomaterials(submissions)
-    SetMaterial.add_materials_to_set(col_id, materials)
+    SetClient::Set.find(col_id).first.set_materials(materials)
     submissions.update_all(status: MaterialSubmission.CLAIMED)
   end
 
@@ -91,7 +91,7 @@ private
 
   def claim_params
     {
-      submission_ids: JSON.parse(params.require(:submission_ids)),
+      submission_ids: params.require(:submission_ids),
       collection_id: params.require(:collection_id),
     }
   end

@@ -17,7 +17,8 @@ class ClaimSubmissionsController < ApplicationController
 	end
 
 	def get_all_collections
-		render json: SetMaterial.get_set_names.to_json
+		collection_uuids = StudyClient::Collection.all.map { |n| n.set_id }
+		render json: SetClient::Set.get_set_names(collection_uuids).to_json
 	end
 
 end

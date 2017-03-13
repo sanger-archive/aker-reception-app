@@ -31,14 +31,14 @@
 
   proto.onDrop = function(tr, event) {
     event.preventDefault();
-    $('button', tr).click();
+    var submissionIds = JSON.parse(event.originalEvent.dataTransfer.getData("text"));
+    var collectionId  = $(tr).data('uniqueid');
+    Aker.claim(submissionIds, collectionId);
     $(tr).removeClass('success')
   };
 
   $(document).ready(function() {
     $(document).trigger('registerComponent.builder', {'DragAndDrop': DragAndDrop});
   });
-
-  //var obj = new DragAndDrop($('claimed-sets'), {cssDropable: 'tr'});
 
 }(jQuery))

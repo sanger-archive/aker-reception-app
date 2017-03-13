@@ -58,13 +58,14 @@ Rails.application.configure do
   config.material_url = 'http://localhost:5000'
   ENV['MATERIALS_URL'] = config.material_url
 
-  config.set_url = 'http://localhost:3000/api/v1/sets'
+  config.set_url = 'http://localhost:3000/api/v1/'
   config.set_url_default_proxy = 'http://localhost:3000'
+
+  config.study_url = 'http://localhost:3300/api/v1/'
+  config.study_url_default_proxy = 'http://localhost:3300'
 
   config.ownership_url = 'http://localhost:4000/ownerships'
   config.ownership_url_default_proxy = 'http://localhost:4000'
-
-  config.collections_url = 'http://localhost:6000'
 
   config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
 
