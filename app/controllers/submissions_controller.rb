@@ -51,7 +51,8 @@ class SubmissionsController < ApplicationController
 
   def claim
     cp = claim_params
-    sub_ids = cp[:submission_ids]
+    sub_ids = JSON.parse(cp[:submission_ids])
+    
     col_id = cp[:collection_id]
     submissions = MaterialSubmission.where(id: sub_ids)
     materials = submissions_biomaterials(submissions)
