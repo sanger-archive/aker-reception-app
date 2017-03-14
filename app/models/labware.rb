@@ -16,6 +16,17 @@ class Labware
   alias_attribute :id, :_id
 
 
+  validate :wells_are_valid?
+
+  def wells_are_valid?
+    wells.each do |w|
+      if w.invalid?
+        errors.add(w.address, w.errors)
+      end
+    end
+    return false unless errors.empty?
+  end
+
   attr_writer :wells 
 
 
@@ -56,6 +67,7 @@ class Labware
       biomaterial_id =  well.biomaterial_id
       unless biomaterial_id.nil?
         well.biomaterial.destroy
+        well.biomaterial = nil
       end
     end
 
@@ -65,7 +77,7 @@ class Labware
     end
     
     #assign_attributes(attrs)
-    self.save!
+    self.save
   end
 
   def wells_attributes=(params)

@@ -43,16 +43,13 @@ gem 'uuid'
 gem 'select2-rails'
 gem 'forgery'
 
-gem 'faraday'
-
 gem 'pg'
 gem 'zipkin-tracer'
 
-gem 'set_service_client', '~> 0.1.3', github: 'sanger/set_service_client_gem'
-gem 'material_service_client', github: 'sanger/material_service_client_gem'
+gem 'aker-set-client', github: 'sanger/aker-set-client'
+gem 'aker-study-client', github: 'sanger/aker-study-client'
+gem 'material_service_client', '~> 1.0.1', github: 'sanger/material_service_client_gem'
 
-
-gem 'faraday'
 gem 'bootstrap-table-rails'
 
 group :development, :test do
@@ -85,6 +82,12 @@ group :development, :test do
   gem 'factory_girl_rails'
   gem 'database_cleaner'
 end
+
+group :test do
+  gem 'cucumber-rails', :require => false
+  # database_cleaner is not required, but highly recommended
+end
+
 
 gem 'simplecov', :require => false, :group => :test
 gem 'simplecov-rcov', :group => :test

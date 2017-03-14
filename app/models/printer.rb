@@ -12,6 +12,7 @@ class Printer < ApplicationRecord
 	end
 
 	def print_submissions(submissions)
+		return true if Rails.configuration.printing_disabled
 		print_printables(submissions.flat_map { |submission| submission_to_printables(submission) })
 	end
 	def print_printables(printables)

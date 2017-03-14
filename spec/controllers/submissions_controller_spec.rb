@@ -80,7 +80,7 @@ RSpec.describe SubmissionsController, type: :controller do
   describe "Using the steps defined by wicked" do
     setup do
       @labware_type = FactoryGirl.create :labware_type, {
-        :num_of_cols => 1, 
+        :num_of_cols => 1,
         :num_of_rows => 1
       }
       @material_submission = FactoryGirl.create :material_submission
@@ -111,7 +111,7 @@ RSpec.describe SubmissionsController, type: :controller do
         "barcode"=>"AKER-110",
         "num_of_rows"=>1,
         "col_is_alpha"=>false,
-        "slots" => 2.times.map do 
+        "slots" => 2.times.map do
             {
               "address": "A:1",
               "material": "uuid_for_material"
@@ -137,7 +137,7 @@ RSpec.describe SubmissionsController, type: :controller do
         }.to_json
 
       stub_request(:post, "#{Rails.configuration.material_url}/containers").
-         with(:body => "{\"num_of_cols\":1,\"num_of_rows\":1,\"col_is_alpha\":false,\"row_is_alpha\":false}", 
+         with(:body => "{\"num_of_cols\":1,\"num_of_rows\":1,\"col_is_alpha\":false,\"row_is_alpha\":false}",
           :headers => { 'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => labware_json, :headers => {})
 
@@ -146,7 +146,7 @@ RSpec.describe SubmissionsController, type: :controller do
 
       stub_request(:get, "#{Rails.configuration.material_url}/materials/uuid_for_material").
          with(:headers => {'Content-Type'=>'application/json'}).
-         to_return(:status => 200, :body => @material_obj.to_json, :headers => {})         
+         to_return(:status => 200, :body => @material_obj.to_json, :headers => {})
 
       stub_request(:put, "http://localhost:5000/materials/uuid_for_material").
          with(:body => "{\"supplier_name\":\"Test\",\"donor_id\":\"Test\",\"gender\":\"Test\",\"common_name\":\"Test\",\"phenotype\":\"Test\"}",
@@ -158,10 +158,15 @@ RSpec.describe SubmissionsController, type: :controller do
 
       @uuid = SecureRandom.uuid
 
-      stub_request(:post, "#{Rails.configuration.set_url}").
+      request_headers = {'Content-Type'=>'application/vnd.api+json', 'Accept'=>'application/vnd.api+json'}
+      response_headers = {'Content-Type'=>'application/vnd.api+json'}
+
+      stub_request(:post, "#{Rails.configuration.set_url}sets").
          with(:body => "{\"data\":{\"type\":\"sets\",\"attributes\":{\"name\":\"Submission 1\"}}}",
-              :headers => {'Content-Type'=>'application/vnd.api+json'}).
-         to_return(:status => 200, :body => "{\"data\":{\"id\":\"#{@uuid}\",\"attributes\":{\"name\":\"testing-set-1\"}}}", :headers => {})
+              :headers => request_headers).
+      to_return(status: 200, :body => {data: { id: "#{@uuid}", attributes: {name: "testing-set-1"}}}.to_json, headers: response_headers )
+
+         # to_return(:status => 200, :body => "{\"data\":{\"id\":\"#{@uuid}\",\"attributes\":{\"name\":\"testing-set-1\"}}}", :headers => {})
 
 
       stub_request(:post, "#{Rails.configuration.ownership_url}/batch").
@@ -173,18 +178,27 @@ RSpec.describe SubmissionsController, type: :controller do
               :headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
          to_return(:status => 200, :body => "{}", :headers => {})
 
-      stub_request(:post, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
-         with(:body =>"{\"data\":[{\"id\":null,\"type\":\"materials\"},{\"id\":null,\"type\":\"materials\"}]}",
-              :headers => {'Content-Type'=>'application/vnd.api+json'}).
-         to_return(:status => 200, :body => "{}", :headers => {})
+      stub_request(:post, "#{Rails.configuration.set_url}sets/#{@uuid}/relationships/materials").
+         with(:body =>"{\"data\":[]}",
+              :headers => request_headers).
+         to_return(:status => 200, :body => "{}", :headers => response_headers)
 
-       stub_request(:get, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
-         with(:headers => {'Content-Type'=>'application/vnd.api+json'}).
-         to_return(:status => 200, :body => "{}", :headers => {})
+       stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}/relationships/materials").
+         with(:headers => request_headers).
+         to_return(:status => 200, :body => "{}", :headers => response_headers)
 
-        stub_request(:get, "#{Rails.configuration.set_url}/#{@uuid}/relationships/materials").
-         with(:headers => {'Accept'=>'application/vnd.api+json'}).
-         to_return(:status => 200, :body => "{}", :headers => {})
+        stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}/relationships/materials").
+         with(:headers => request_headers).
+         to_return(:status => 200, :body => "{}", :headers => response_headers)
+
+        stub_request(:patch, "#{Rails.configuration.set_url}sets/#{@uuid}").
+         with(:body => "{\"data\":{\"id\":\"#{@uuid}\",\"type\":\"sets\",\"attributes\":{\"locked\":true}}}",
+              :headers => request_headers).
+         to_return(:status => 200, :body => "", :headers => response_headers)
+
+        stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}?include=materials").
+         with(:headers => request_headers).
+         to_return(:status => 200, :body => "{}", :headers => response_headers)
     end
 
     it "does not update the submission state if any steps have not been performed" do
@@ -206,6 +220,11 @@ RSpec.describe SubmissionsController, type: :controller do
 
 
     it "updates the submission state to active when all the required data of the steps has been provided" do
+
+      stub_request(:patch, "#{Rails.configuration.set_url}sets/#{@uuid}").
+         with(:body => "{\"data\":{\"type\":\"sets\",\"id\":\"#{@uuid}\",\"attributes\":{\"locked\":true}}}",
+              :headers => {'Accept'=>'application/vnd.api+json'}).
+         to_return(:status => 200, :body => {}.to_json, :headers => {})
 
       put :update, step_params(@material_submission, :labware)
       @material_submission.reload
