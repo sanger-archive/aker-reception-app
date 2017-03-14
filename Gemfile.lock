@@ -24,10 +24,11 @@ GIT
 
 GIT
   remote: git://github.com/sanger/material_service_client_gem.git
-  revision: f306c2275ab22783349a3c389265be6552e82ce6
+  revision: 32ce7adaf011a769d21c2627b3a101581579f7e7
   specs:
-    material_service_client (1.0.0)
+    material_service_client (1.0.1)
       faraday (~> 0.11.0)
+      faraday_middleware
 
 GIT
   remote: git://github.com/sanger/pmb-client.git
@@ -85,7 +86,7 @@ GEM
       public_suffix (~> 2.0, >= 2.0.2)
     arel (7.1.4)
     ast (2.3.0)
-    autoprefixer-rails (6.7.6)
+    autoprefixer-rails (6.7.7)
       execjs
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -200,7 +201,7 @@ GEM
       faraday_middleware (~> 0.9)
     launchy (2.4.3)
       addressable (~> 2.3)
-    libv8 (3.16.14.17)
+    libv8 (3.16.14.19)
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -225,7 +226,7 @@ GEM
     parser (2.3.3.1)
       ast (~> 2.2)
     path_expander (1.0.1)
-    pg (0.19.0)
+    pg (0.20.0)
     poltergeist (1.13.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
@@ -235,7 +236,7 @@ GEM
       method_source (~> 0.8.1)
       slop (~> 3.4)
     public_suffix (2.0.5)
-    puma (3.7.1)
+    puma (3.8.1)
     rack (2.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -354,7 +355,7 @@ GEM
     turbolinks-source (5.0.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (3.1.5)
+    uglifier (3.1.7)
       execjs (>= 0.3.0, < 3)
     uuid (2.3.8)
       macaddr (~> 1.0)
@@ -408,7 +409,7 @@ DEPENDENCIES
   json-schema
   launchy
   listen (~> 3.0.5)
-  material_service_client!
+  material_service_client (~> 1.0.1)!
   pg
   pmb-client (= 0.1.0)!
   poltergeist
