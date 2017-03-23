@@ -54,7 +54,7 @@ class SubmissionsController < ApplicationController
     col_id = cp[:collection_id]
     submissions = MaterialSubmission.where(id: sub_ids)
     materials = submissions_biomaterials(submissions)
-    SetClient::Set.find(col_id).first.set_materials(materials)
+    SetClient::Set.find(col_id).first.set_materials(materials.map(&:uuid))
     submissions.update_all(status: MaterialSubmission.CLAIMED)
   end
 
