@@ -98,7 +98,7 @@ private
   end
 
   def submissions_biomaterials(submissions)
-    submissions.flat_map(&:labwares).flat_map(&:biomaterials)
+    submissions.flat_map(&:labwares).flat_map(&:biomaterials).compact
   end
 
   def set_status
