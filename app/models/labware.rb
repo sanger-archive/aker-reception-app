@@ -183,7 +183,6 @@ class Labware
   def attributes_to_send
     attrs = attributes
     attrs[:_id] = attrs[:uuid]
-    debugger
     attrs.map.reject{|k,v| [:uuid, :_updated, :_issues, :_links, :_created, :_status].include?(k)}.to_h
   end
 
