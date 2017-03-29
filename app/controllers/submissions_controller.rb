@@ -5,14 +5,13 @@ class SubmissionsController < ApplicationController
 
   before_action :set_status, only: [:update]
 
-  #before_action :status_success, only: [:update]
-
   def show
     render_wizard
   end
 
   def update
     @status_success = material_submission.update(material_submission_params)
+
     if @status_success && last_step?
       materials = []
       material_submission.labwares.each do |lw|
@@ -35,9 +34,9 @@ class SubmissionsController < ApplicationController
       Ownership.create_remote_ownership(ownership_set_params(new_set.uuid))
 
       # Adding materials to set
-      new_set.set_materials(materials)
+      # set_materials takes an array of uuids
+      new_set.set_materials(materials.map(&:uuid))
       new_set.update_attributes(locked: true)
-      SetClient::Set.find_with_materials(new_set.uuid).first
     end
 
     if params[:material_submission][:status] == 'provenance'
@@ -55,7 +54,7 @@ class SubmissionsController < ApplicationController
     col_id = cp[:collection_id]
     submissions = MaterialSubmission.where(id: sub_ids)
     materials = submissions_biomaterials(submissions)
-    SetClient::Set.find(col_id).first.set_materials(materials)
+    SetClient::Set.find(col_id).first.set_materials(materials.map(&:uuid))
     submissions.update_all(status: MaterialSubmission.CLAIMED)
   end
 
