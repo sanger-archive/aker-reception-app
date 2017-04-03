@@ -2,14 +2,16 @@ class ClaimSubmissionsController < ApplicationController
 	before_action :authenticate_user!
 
 	def index
-		@contact = Contact.all
+		@email = current_user.email
+		@contact = Contact.find_by_email(@email)
+		if @contact.nil?
+			@submissions = []
+		else
+			@submissions = @contact.material_submissions.where.not(:status => MaterialSubmission.CLAIMED)
+		end
 	end
 
 	def find_submissions_by_user
-		@email = params[:email]
-		@contact = Contact.find_by_email(@email)
-		@submissions = @contact.material_submissions.where.not(:status => MaterialSubmission.CLAIMED) unless @contact.nil?
-
 		if @contact.nil? || @submissions.empty?
 		  @json = {:error => 'No submissions found'}
 		else
