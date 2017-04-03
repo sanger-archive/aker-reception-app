@@ -2,6 +2,8 @@ class User < ApplicationRecord
   devise :ldap_authenticatable, :rememberable, :trackable
 
   def fetch_groups
+  	return ['pirates']
+
     name = self.email
     DeviseLdapAuthenticatable::Logger.send("Getting groups for #{name}")
     connection = Devise::LDAP::Adapter.ldap_connect(name)
