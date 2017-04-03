@@ -11,7 +11,7 @@ class MaterialSubmissionsController < ApplicationController
   end
 
   def new
-    material_submission = MaterialSubmission.create
+    material_submission = MaterialSubmission.create(user: current_user)
 
     redirect_to material_submission_build_path(
       id: Wicked::FIRST_STEP,

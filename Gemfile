@@ -54,6 +54,8 @@ gem 'bootstrap-table-rails'
 gem 'devise'
 gem 'net-ldap'
 gem 'devise_ldap_authenticatable'
+gem 'jwt'
+gem 'request_store'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
