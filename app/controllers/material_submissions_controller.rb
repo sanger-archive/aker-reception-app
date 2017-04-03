@@ -1,4 +1,5 @@
 class MaterialSubmissionsController < ApplicationController
+  before_action :authenticate_user!
 
   def schema
     render :json => Schema.get

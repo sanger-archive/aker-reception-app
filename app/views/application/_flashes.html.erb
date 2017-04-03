@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-md-12">
     <% flash.each do |key, value| %>
-        <div class="<%= key %> alert alert-dismissible" role="alert">
+        <div class="alert-<%= key %> alert alert-dismissible" role="alert">
           <button type="button" class="close" data-dismiss="alert">
             <span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
           <% if value.kind_of? Array %>

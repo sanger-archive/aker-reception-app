@@ -13,15 +13,15 @@
 
 textarea.halvsies { height: 150px; width: 33% }
 
-.error {
+.alert-error {
   @extend .alert-danger;
 }
 
-.warning {
+.alert-alert {
   @extend .alert-warning;
 }
 
-.notice {
+.alert-notice {
   @extend .alert-success;
 }
 

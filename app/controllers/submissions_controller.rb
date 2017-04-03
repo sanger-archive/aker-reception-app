@@ -4,6 +4,7 @@ class SubmissionsController < ApplicationController
   steps :labware, :provenance, :dispatch
 
   before_action :set_status, only: [:update]
+  before_action :authenticate_user!
 
   def show
     render_wizard
