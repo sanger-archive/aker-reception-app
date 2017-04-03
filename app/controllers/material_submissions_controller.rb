@@ -6,12 +6,17 @@ class MaterialSubmissionsController < ApplicationController
   end
 
   def index
-    @pending_material_submissions = MaterialSubmission.pending
-    @active_material_submissions = MaterialSubmission.active
+    if user_signed_in?
+      @pending_material_submissions = MaterialSubmission.pending.for_user(current_user)
+      @active_material_submissions = MaterialSubmission.active.for_user(current_user)
+    else
+      @pending_material_submissions = []
+      @active_material_submissions = []
+    end
   end
 
   def new
-    material_submission = MaterialSubmission.create(user: current_user)
+    material_submission = MaterialSubmission.create!(user: current_user)
 
     redirect_to material_submission_build_path(
       id: Wicked::FIRST_STEP,

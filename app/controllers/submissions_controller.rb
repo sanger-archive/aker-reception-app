@@ -80,7 +80,7 @@ private
 
   def material_submission_params
     params.require(:material_submission).permit(
-      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :email, :contact_id, labwares_attributes: [
+      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :contact_id, labwares_attributes: [
         :id,
         :uuid,
         wells_attributes: [
@@ -107,13 +107,13 @@ private
   end
 
   def ownership_batch_params
-    owner = material_submission.email
+    owner = material_submission.user.email
     bios = material_submission.labwares.flat_map &:biomaterials
     bios.compact.map { |bio| { model_id: bio.uuid, model_type: 'biomaterial', owner_id: owner }}
   end
 
   def ownership_set_params(set_uuid)
-    owner = material_submission.email
+    owner = material_submission.user.email
     {model_id: set_uuid, model_type: 'set', owner_id: owner}
   end
 
