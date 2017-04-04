@@ -9,16 +9,6 @@
 <div class="claiming-display row">
 
   <div class="col-md-4">
-    <div class="row rowspace">
-      <div class="email-input">
-        <%= bootstrap_form_tag(url: find_submissions_by_user_path, remote: true, html: {:class => ''}) do |f| %>
-          <div class="">
-          	<%= f.email_field :email, value: '', autocomplete: 'off' %>
-            <%= f.submit 'Login' %>
-          </div>
-        <% end %>
-      </div>
-    </div>
 
     <div class="row rowspace">
       <div class="submission-list">
@@ -32,14 +22,24 @@
             <th data-field="state" data-checkbox="true"></th>
           </tr>
           </thead>
+          <tbody>
+            <% @submissions.each do |sub| %>
+              <tr>
+                 <td><%= sub.id %></td>
+                 <td><%= sub.created_at %></td>
+                 <td><%= sub.no_of_labwares_required %></td>
+                 <td></td>
+              </tr>
+            <% end %>
+          </tbody>
         </table>
       </div>
     </div>
   </div>
   <div class="col-md-8">
     <div class="row rowspace">
-      <div class="claimed-sets" data-service-url="/get_all_collections" 
-      data-psd-component-class="DragAndDrop" 
+      <div class="claimed-sets" data-service-url="/get_all_collections"
+      data-psd-component-class="DragAndDrop"
       data-psd-component-parameters='{"cssDropable": "tbody tr"}'
       >
           <table data-toggle="table" class="table">
@@ -50,7 +50,7 @@
                   <th data-field="claim">Claim</th>
               </tr>
               </thead>
-            </table>    
+            </table>
       </div>
     </div>
   </div>

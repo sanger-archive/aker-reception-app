@@ -51,6 +51,11 @@ gem 'aker-study-client', github: 'sanger/aker-study-client'
 gem 'material_service_client', '~> 1.0.1', github: 'sanger/material_service_client_gem'
 
 gem 'bootstrap-table-rails'
+gem 'devise'
+gem 'net-ldap'
+gem 'devise_ldap_authenticatable'
+gem 'jwt'
+gem 'request_store'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

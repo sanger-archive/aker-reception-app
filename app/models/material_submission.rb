@@ -14,6 +14,7 @@ class MaterialSubmission < ApplicationRecord
 
   attr_writer :labwares
 
+  belongs_to :user
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
@@ -26,7 +27,6 @@ class MaterialSubmission < ApplicationRecord
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :active_or_labware?
   validates :labware_type_id, presence: true, if: :active_or_labware?
-  validates :email, presence: true, if: :active?
   validates :address, presence: true, if: :active?
   validates :contact, presence: true, if: :active?
   validate :each_labware_has_biomaterial, if: :active?
@@ -35,10 +35,10 @@ class MaterialSubmission < ApplicationRecord
 
   #accepts_nested_attributes_for :labwares
 
-
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
   scope :pending, -> { where.not(status: [MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED]) }
+  scope :for_user, ->(user) { where(user_id: user.id) }
 
   def active?
     status == MaterialSubmission.ACTIVE
@@ -72,6 +72,10 @@ class MaterialSubmission < ApplicationRecord
     labwares.select(&:invalid?)
   end
 
+  def email
+    user&.email
+  end
+
   def labwares
     @labwares ||= material_submission_labwares.map(&:labware)
   end
@@ -93,8 +97,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def update(params)
-    update_attributes(params)
-    labwares.all?(&:valid?) if @labwares
+    update_attributes(params) && labwares.all?(&:valid?)
   end
 
   def labware

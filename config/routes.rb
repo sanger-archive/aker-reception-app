@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
 
+
+  devise_for :users, controllers: { sessions: 'users/sessions' }
+
   root 'material_submissions#index'
 
   get '/materials_schema', to: 'material_submissions#schema'

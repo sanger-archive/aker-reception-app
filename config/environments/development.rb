@@ -71,4 +71,11 @@ Rails.application.configure do
 
   config.printing_disabled = true
 
+  config.jwt_secret_key = 'development'
+
+  config.jwt_exp_time = 2 * 60
+  config.jwt_nbf_time = 1 * 60
+
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
 end
