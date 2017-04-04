@@ -139,6 +139,7 @@ function fillInTableFromFile(table, files) {
         }
       })
     },
-    header: true
+    header: true,
+    skipEmptyLines: true
   })
 }
