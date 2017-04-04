@@ -13,17 +13,19 @@ class SubmissionsController < ApplicationController
   def update
     @status_success = material_submission.update(material_submission_params)
 
+    unless @status_success
+      flash[:error] = 'The material submission could not be updated.'
+      render_wizard
+      return
+    end
+
     if @status_success && last_step?
       materials = []
       material_submission.labwares.each do |lw|
         lw.wells.each do |well|
-          materials.append(well.biomaterial)
+          materials.append(well.biomaterial) unless well.biomaterial.nil?
         end
       end
-
-      flash[:notice] = 'Your Submission has been created'
-      MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
-      MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
 
       # Creation of set
       new_set = SetClient::Set.create(name: "Submission #{material_submission.id}")
@@ -38,6 +40,11 @@ class SubmissionsController < ApplicationController
       # set_materials takes an array of uuids
       new_set.set_materials(materials.map(&:uuid))
       new_set.update_attributes(locked: true)
+
+      MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
+      MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
+      material_submission.update_attributes!(status: MaterialSubmission.ACTIVE)
+      flash[:notice] = 'Your Submission has been created'
     end
 
     if params[:material_submission][:status] == 'provenance'
@@ -103,7 +110,7 @@ private
   end
 
   def set_status
-    params[:material_submission][:status] = last_step? ? MaterialSubmission.ACTIVE : step.to_s
+    params[:material_submission][:status] = step.to_s
   end
 
   def ownership_batch_params

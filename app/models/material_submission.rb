@@ -97,8 +97,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def update(params)
-    update_attributes(params)
-    labwares.all?(&:valid?) if @labwares
+    update_attributes(params) && labwares.all?(&:valid?)
   end
 
   def labware
