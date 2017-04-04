@@ -97,3 +97,11 @@ end
 gem 'simplecov', :require => false, :group => :test
 gem 'simplecov-rcov', :group => :test
 gem 'rubycritic', :group => :test
+
+gem "exception_notification"
+group :deployment do
+  gem "psd_logger",
+    :github => "sanger/psd_logger"
+  gem "gmetric", "~>0.1.3"
+  gem "exception_notification"
+end
