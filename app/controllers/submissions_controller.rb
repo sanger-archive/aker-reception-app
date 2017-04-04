@@ -35,7 +35,7 @@ class SubmissionsController < ApplicationController
 
       # Adding materials to set
       # set_materials takes an array of uuids
-      new_set.set_materials(materials.map(&:uuid))
+      new_set.set_materials(materials.compact.map(&:uuid))
       new_set.update_attributes(locked: true)
     end
 
@@ -98,7 +98,7 @@ private
   end
 
   def submissions_biomaterials(submissions)
-    submissions.flat_map(&:labwares).flat_map(&:biomaterials)
+    submissions.flat_map(&:labwares).flat_map(&:biomaterials).compact
   end
 
   def set_status

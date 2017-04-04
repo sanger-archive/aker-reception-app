@@ -181,7 +181,9 @@ class Labware
   end
 
   def attributes_to_send
-    attributes.map.reject{|k,v| ["_updated", "_issues", "_links", "_created", "_status"].include?(k.to_s)}.to_h
+    attrs = attributes
+    attrs[:_id] = attrs[:uuid]
+    attrs.map.reject{|k,v| [:_updated, :_issues, :_links, :_created, :_status].include?(k)}.to_h
   end
 
   def save
