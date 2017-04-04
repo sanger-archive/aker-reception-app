@@ -50,4 +50,10 @@ Rails.application.configure do
 
   config.printing_disabled = true
 
+
+  config.jwt_secret_key = 'test'
+
+  config.jwt_exp_time = 2 * 60
+  config.jwt_nbf_time = 1 * 60
+
 end

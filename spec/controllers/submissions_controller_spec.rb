@@ -6,16 +6,15 @@ def step_params(material_submission, step_name)
     :material_submission => case step_name
       when :labware
         {
-              :supply_labwares => true,
-              :no_of_labwares_required => 1,
-              :status => 'labware',
-              :labware_type_id => @labware_type.id
+          :supply_labwares => true,
+          :no_of_labwares_required => 1,
+          :status => 'labware',
+          :labware_type_id => @labware_type.id
         }
       when :provenance
         {
-
-              :status => 'provenance',
-              :labwares_attributes => plate_attributes_for(material_submission.labwares)
+          :status => 'provenance',
+          :labwares_attributes => plate_attributes_for(material_submission.labwares)
         }
       when :dispatch
         {
@@ -79,11 +78,16 @@ end
 RSpec.describe SubmissionsController, type: :controller do
   describe "Using the steps defined by wicked" do
     setup do
+      @request.env['devise.mapping'] = Devise.mappings[:user]
+
+      @user = FactoryGirl.create(:user)
+      sign_in(@user)
+
       @labware_type = FactoryGirl.create :labware_type, {
         :num_of_cols => 1,
         :num_of_rows => 1
       }
-      @material_submission = FactoryGirl.create :material_submission
+      @material_submission = FactoryGirl.create(:material_submission, user: @user)
       @contact = FactoryGirl.create :contact
 
       stub_request(:get, "#{Rails.configuration.material_url}/materials/schema").

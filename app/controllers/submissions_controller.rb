@@ -3,7 +3,7 @@ class SubmissionsController < ApplicationController
   include Wicked::Wizard
   steps :labware, :provenance, :dispatch
 
-  before_action :set_status, only: [:update]
+#  before_action :set_status, only: [:update]
   before_action :authenticate_user!
 
   def show
@@ -14,12 +14,16 @@ class SubmissionsController < ApplicationController
     @status_success = material_submission.update(material_submission_params)
 
     unless @status_success
+      if params[:material_submission][:status] == 'provenance'
+        @invalid_data = material_submission.invalid_labwares.map(&:invalid_data).flatten.compact
+        return
+      end
       flash[:error] = 'The material submission could not be updated.'
       render_wizard
       return
     end
 
-    if @status_success && last_step?
+    if last_step?
       materials = []
       material_submission.labwares.each do |lw|
         lw.wells.each do |well|
@@ -43,17 +47,11 @@ class SubmissionsController < ApplicationController
 
       MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
-      material_submission.update_attributes!(status: MaterialSubmission.ACTIVE)
       flash[:notice] = 'Your Submission has been created'
     end
 
-    if params[:material_submission][:status] == 'provenance'
-      unless @status_success
-        @invalid_data = material_submission.invalid_labwares.map(&:invalid_data).flatten.compact
-      end
-    else
-      render_wizard material_submission
-    end
+    set_status
+    render_wizard material_submission
   end
 
   def claim
@@ -65,7 +63,6 @@ class SubmissionsController < ApplicationController
     SetClient::Set.find(col_id).first.set_materials(materials.map(&:uuid))
     submissions.update_all(status: MaterialSubmission.CLAIMED)
   end
-
 
 protected
 
@@ -110,7 +107,7 @@ private
   end
 
   def set_status
-    params[:material_submission][:status] = step.to_s
+    params[:material_submission][:status] = (last_step? ? MaterialSubmission.ACTIVE : step.to_s)
   end
 
   def ownership_batch_params
