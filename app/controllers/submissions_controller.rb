@@ -42,7 +42,7 @@ class SubmissionsController < ApplicationController
 
       # Adding materials to set
       # set_materials takes an array of uuids
-      new_set.set_materials(materials.map(&:uuid))
+      new_set.set_materials(materials.compact.map(&:uuid))
       new_set.update_attributes(locked: true)
 
       MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
