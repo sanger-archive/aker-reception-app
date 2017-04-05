@@ -5,6 +5,8 @@ RSpec.describe MaterialReceptionsController, type: :controller do
   describe "When scanning a barcode" do
     setup do
 
+      @request.env['devise.mapping'] = Devise.mappings[:user]
+
       stub_request(:post, Rails.configuration.material_url+'/containers').
          with(:body => {"num_of_cols"=> 12,"num_of_rows"=>8,"col_is_alpha"=>false,"row_is_alpha"=>true}.to_json,
               :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 
@@ -67,9 +69,15 @@ RSpec.describe MaterialReceptionsController, type: :controller do
             }.to_json, :headers => {})
 
 
+      @user = FactoryGirl.create(:user)
+      sign_in(@user)
+
       @labware_type = FactoryGirl.create(:labware_type, {:row_is_alpha => true})
       @material_submission_labware = @labware_type.create_labware
-      @submission = FactoryGirl.create(:material_submission)
+
+      allow(request.env['warden']).to receive(:authenticate!).and_return(@user)
+
+      @submission = FactoryGirl.create(:material_submission, user: @user)
       @submission.labwares << @material_submission_labware
       @labware = @material_submission_labware.labware
 
@@ -119,7 +127,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
          to_return(:status => 200, :body => {"_items" => [@labware.attributes]}.to_json)
 
 
-      @material_submission = FactoryGirl.create :material_submission
+      @material_submission = FactoryGirl.create(:material_submission, user: @user)
       @material_submission_labware = FactoryGirl.create :material_submission_labware, {
         :labware_id => @labware.uuid, 
         :material_submission => @material_submission}
