@@ -3,7 +3,6 @@ class SubmissionsController < ApplicationController
   include Wicked::Wizard
   steps :labware, :provenance, :dispatch
 
-#  before_action :set_status, only: [:update]
   before_action :authenticate_user!
 
   def show
@@ -32,7 +31,7 @@ class SubmissionsController < ApplicationController
       end
 
       # Creation of set
-      new_set = SetClient::Set.create(name: "Submission #{material_submission.id}")
+      new_set = SetClient::Set.create(name: "Submission #{material_submission.id}", owner: material_submission.contact.email)
 
       # Ownership of materials
       Ownership.create_remote_ownership_batch(ownership_batch_params)
@@ -50,7 +49,7 @@ class SubmissionsController < ApplicationController
       flash[:notice] = 'Your Submission has been created'
     end
 
-    set_status
+    material_submission.update(status: get_status)
     render_wizard material_submission
   end
 
@@ -106,8 +105,8 @@ private
     submissions.flat_map(&:labwares).flat_map(&:biomaterials)
   end
 
-  def set_status
-    params[:material_submission][:status] = (last_step? ? MaterialSubmission.ACTIVE : step.to_s)
+  def get_status
+    return last_step? ? MaterialSubmission.ACTIVE : step.to_s
   end
 
   def ownership_batch_params
