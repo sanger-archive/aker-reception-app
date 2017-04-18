@@ -3,7 +3,6 @@ class SubmissionsController < ApplicationController
   include Wicked::Wizard
   steps :labware, :provenance, :dispatch
 
-  before_action :authenticate_user!
 
   def show
     render_wizard
@@ -32,12 +31,13 @@ class SubmissionsController < ApplicationController
 
       # Creation of set
       new_set = SetClient::Set.create(name: "Submission #{material_submission.id}", owner: material_submission.contact.email)
+      raise 'No id obtained from Set service' unless new_set.id
 
       # Ownership of materials
-      Ownership.create_remote_ownership_batch(ownership_batch_params)
+      #Ownership.create_remote_ownership_batch(ownership_batch_params)
 
       # Ownership of set
-      Ownership.create_remote_ownership(ownership_set_params(new_set.uuid))
+      #Ownership.create_remote_ownership(ownership_set_params(new_set.uuid))
 
       # Adding materials to set
       # set_materials takes an array of uuids
@@ -102,7 +102,7 @@ private
   end
 
   def submissions_biomaterials(submissions)
-    submissions.flat_map(&:labwares).flat_map(&:biomaterials)
+    submissions.flat_map(&:labwares).flat_map(&:biomaterials).compact
   end
 
   def get_status
