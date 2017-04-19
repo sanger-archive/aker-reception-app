@@ -9,6 +9,46 @@ GIT
       activesupport (> 4.2, < 6)
 
 GIT
+  remote: git://github.com/sanger/aker-authentication.git
+  revision: 8cce41c0bc71f03a1b20df05fef760afc777708e
+  specs:
+    aker_authentication_gem (0.1.0)
+      devise
+      devise_ldap_authenticatable
+      jwt
+      net-ldap
+      request_store
+
+GIT
+  remote: git://github.com/sanger/aker-credentials.git
+  revision: ab120405c8a55506ff400921ab6cbd4472c8c6bc
+  specs:
+    aker_credentials_gem (0.1.0)
+      jwt
+      request_store
+
+GIT
+  remote: git://github.com/sanger/aker-permission.git
+  revision: 5723071971a0b4319302ea8f8733cbcbde1a7fb6
+  specs:
+    aker_permission_gem (0.1.1)
+      cancancan
+
+GIT
+  remote: git://github.com/sanger/aker-set-client.git
+  revision: 93853e389b78ea99346edc2f4f42904aa58e18b2
+  specs:
+    aker-set-client (0.1.0)
+      json_api_client
+
+GIT
+  remote: git://github.com/sanger/aker-study-client.git
+  revision: a4a39e7dc8e78144ab26510ccfe8a7fec229da68
+  specs:
+    aker-study-client (0.1.0)
+      json_api_client
+
+GIT
   remote: git://github.com/sanger/material_service_client_gem.git
   revision: 32ce7adaf011a769d21c2627b3a101581579f7e7
   specs:
@@ -28,41 +68,6 @@ GIT
   revision: dd2d634114df75b1d8535715c169a7fc99521389
   specs:
     psd_logger (0.1.6)
-
-PATH
-  remote: /Users/emr/projects/aker-set-client
-  specs:
-    aker-set-client (0.1.0)
-      json_api_client
-
-PATH
-  remote: /Users/emr/projects/aker-study-client
-  specs:
-    aker-study-client (0.1.0)
-      json_api_client
-
-PATH
-  remote: /Users/emr/projects/aker_authentication_gem
-  specs:
-    aker_authentication_gem (0.1.0)
-      devise
-      devise_ldap_authenticatable
-      jwt
-      net-ldap
-      request_store
-
-PATH
-  remote: /Users/emr/projects/aker_credentials_gem
-  specs:
-    aker_credentials_gem (0.1.0)
-      jwt
-      request_store
-
-PATH
-  remote: /Users/emr/projects/aker_permission_gem
-  specs:
-    aker_permission_gem (0.1.1)
-      cancancan
 
 GEM
   remote: https://rubygems.org/
