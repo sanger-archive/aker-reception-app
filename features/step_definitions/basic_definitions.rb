@@ -14,6 +14,14 @@ Given(/^I have the internal contact "([^"]*)"$/) do |arg1|
   Contact.create(fullname: arg1, email: arg1)
 end
 
+Given(/^I am logged in$/) do
+  user = User.first || FactoryGirl.create(:user)
+  visit '/users/sign_in'
+  fill_in "user_email", with: user.email
+  fill_in "user_password", with: user.password
+  click_on "Log in"
+end
+
 Given(/^I visit the homepage$/) do
   visit('/')
 end
