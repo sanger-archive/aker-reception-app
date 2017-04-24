@@ -30,14 +30,7 @@ class SubmissionsController < ApplicationController
       end
 
       # Creation of set
-      new_set = SetClient::Set.create(name: "Submission #{material_submission.id}", owner: material_submission.contact.email)
-      raise 'No id obtained from Set service' unless new_set.id
-
-      # Ownership of materials
-      #Ownership.create_remote_ownership_batch(ownership_batch_params)
-
-      # Ownership of set
-      #Ownership.create_remote_ownership(ownership_set_params(new_set.uuid))
+      new_set = SetClient::Set.create(name: "Submission #{material_submission.id}", owner_id: material_submission.contact.email)
 
       # Adding materials to set
       # set_materials takes an array of uuids
