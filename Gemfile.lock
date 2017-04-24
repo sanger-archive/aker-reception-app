@@ -10,7 +10,7 @@ GIT
 
 GIT
   remote: git://github.com/sanger/aker-authentication.git
-  revision: 8cce41c0bc71f03a1b20df05fef760afc777708e
+  revision: 4958592e3c98609d624129898a8ff56b8ae962d6
   specs:
     aker_authentication_gem (0.1.0)
       devise
@@ -29,24 +29,22 @@ GIT
 
 GIT
   remote: git://github.com/sanger/aker-permission.git
-  revision: 5723071971a0b4319302ea8f8733cbcbde1a7fb6
+  revision: 184fbc371bddb467859e71ae3a0f06ba483eab9b
   specs:
     aker_permission_gem (0.1.1)
       cancancan
 
 GIT
   remote: git://github.com/sanger/aker-set-client.git
-  revision: 93853e389b78ea99346edc2f4f42904aa58e18b2
+  revision: 9b827bf50b31126243a89d993381be07714b74b2
   specs:
-    aker-set-client (0.1.0)
-      json_api_client
+    aker-set-client (0.2.0)
 
 GIT
   remote: git://github.com/sanger/aker-study-client.git
-  revision: a4a39e7dc8e78144ab26510ccfe8a7fec229da68
+  revision: b4f733080909664af57234762c45d87f52a5a87e
   specs:
-    aker-study-client (0.1.0)
-      json_api_client
+    aker-study-client (0.2.0)
 
 GIT
   remote: git://github.com/sanger/material_service_client_gem.git
@@ -118,7 +116,7 @@ GEM
       public_suffix (~> 2.0, >= 2.0.2)
     arel (7.1.4)
     ast (2.3.0)
-    autoprefixer-rails (6.7.7.1)
+    autoprefixer-rails (6.7.7.2)
       execjs
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -134,7 +132,7 @@ GEM
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
     bootstrap-table-rails (1.11.1.1)
-    bootstrap_form (2.6.0)
+    bootstrap_form (2.7.0)
     builder (3.2.3)
     byebug (9.0.6)
     cancancan (1.16.0)
@@ -211,7 +209,7 @@ GEM
     ffi (1.9.18)
     finagle-thrift (1.4.2)
       thrift (~> 0.9.3)
-    flay (2.8.1)
+    flay (2.9.0)
       erubis (~> 2.7.0)
       path_expander (~> 1.0)
       ruby_parser (~> 3.0)
@@ -224,8 +222,8 @@ GEM
       sass (>= 3.2)
     forgery (0.6.0)
     gherkin (4.1.1)
-    globalid (0.3.7)
-      activesupport (>= 4.1.0)
+    globalid (0.4.0)
+      activesupport (>= 4.2.0)
     gmetric (0.1.3)
     hashdiff (0.3.2)
     i18n (0.8.1)
@@ -237,7 +235,7 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    json (2.0.4)
+    json (2.1.0)
     json-schema (2.8.0)
       addressable (>= 2.4)
     json_api_client (1.5.1)
@@ -313,12 +311,13 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rainbow (2.2.1)
+    rainbow (2.2.2)
+      rake
     rake (12.0.0)
     rb-fsevent (0.9.8)
     rb-inotify (0.9.8)
       ffi (>= 0.5.0)
-    react-rails (1.11.0)
+    react-rails (2.1.0)
       babel-transpiler (>= 0.7.0)
       connection_pool
       execjs
@@ -349,7 +348,7 @@ GEM
       rspec-mocks (~> 3.5.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
-    ruby_parser (3.8.4)
+    ruby_parser (3.9.0)
       sexp_processor (~> 4.1)
     rubycritic (3.2.0)
       flay (~> 2.8)
@@ -370,7 +369,7 @@ GEM
       tilt (>= 1.1, < 3)
     select2-rails (4.0.3)
       thor (~> 0.14)
-    sexp_processor (4.8.0)
+    sexp_processor (4.9.0)
     simplecov (0.14.1)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
