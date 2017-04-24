@@ -47,6 +47,17 @@ GIT
     aker-study-client (0.2.0)
 
 GIT
+  remote: git://github.com/sanger/json_api_client.git
+  revision: 680022ffc054bc5d69efc5cea31f85806362bfa5
+  specs:
+    json_api_client (1.5.1)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      addressable (~> 2.2)
+      faraday (~> 0.9)
+      faraday_middleware (~> 0.9)
+
+GIT
   remote: git://github.com/sanger/material_service_client_gem.git
   revision: 32ce7adaf011a769d21c2627b3a101581579f7e7
   specs:
@@ -238,12 +249,6 @@ GEM
     json (2.1.0)
     json-schema (2.8.0)
       addressable (>= 2.4)
-    json_api_client (1.5.1)
-      activemodel (>= 3.2.0)
-      activesupport (>= 3.2.0)
-      addressable (~> 2.2)
-      faraday (~> 0.9)
-      faraday_middleware (~> 0.9)
     jwt (1.5.6)
     launchy (2.4.3)
       addressable (~> 2.3)
@@ -465,6 +470,7 @@ DEPENDENCIES
   jbuilder (~> 2.5)
   jquery-rails
   json-schema
+  json_api_client!
   launchy
   listen (~> 3.0.5)
   material_service_client (~> 1.0.1)!

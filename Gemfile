@@ -19,6 +19,7 @@ gem 'react-rails'
 gem 'json-schema'
 gem 'activeresource', github: 'rails/activeresource', branch: 'master'
 
+gem 'json_api_client', github: 'sanger/json_api_client'
 # Add simple support for print-my barcode)
 gem 'pmb-client', '0.1.0', :github => 'sanger/pmb-client'
 
