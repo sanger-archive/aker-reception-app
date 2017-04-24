@@ -1,5 +1,4 @@
 class CompletedSubmissionsController < ApplicationController
-	before_action :authenticate_user!
 
 	def index
 		@unprinted_submissions = MaterialSubmission.active

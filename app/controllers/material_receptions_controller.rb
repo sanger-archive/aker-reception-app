@@ -1,5 +1,4 @@
 class MaterialReceptionsController < ApplicationController
-  before_action :authenticate_user!
 
   before_filter :set_labware, only: :create
 
