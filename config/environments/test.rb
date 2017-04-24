@@ -53,6 +53,8 @@ Rails.application.configure do
 
   config.jwt_secret_key = 'test'
 
+  config.fake_ldap = true
+
   config.jwt_exp_time = 2 * 60
   config.jwt_nbf_time = 1 * 60
 

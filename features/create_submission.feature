@@ -10,6 +10,7 @@ Background:
 
 Given I have defined labware of type "ABgene AB_0800"
 And I have the internal contact "test@test"
+And I am logged in
 
 Scenario:
 
