@@ -7,7 +7,6 @@ class MaterialReception < ApplicationRecord
   validate :validate_barcode_printed, on: :create
 
   def receive_labware
-    return false unless labware
     return false unless labware && labware.barcode_printed?
     labware.received_unclaimed
   end

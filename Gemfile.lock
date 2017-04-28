@@ -1,4 +1,14 @@
 GIT
+  remote: git://github.com/harrietc52/aker-matcon-client.git
+  revision: 8b69897361b7d697b08e10e5dd91b0f3efa410bc
+  specs:
+    matcon_client (0.2.0)
+      activemodel
+      activesupport
+      faraday
+      faraday_middleware
+
+GIT
   remote: git://github.com/rails/activeresource.git
   revision: e28f907145c34bcad1d354fa9b25fbd4264e52e9
   branch: master
@@ -56,14 +66,6 @@ GIT
       addressable (~> 2.2)
       faraday (~> 0.9)
       faraday_middleware (~> 0.9)
-
-GIT
-  remote: git://github.com/sanger/material_service_client_gem.git
-  revision: 32ce7adaf011a769d21c2627b3a101581579f7e7
-  specs:
-    material_service_client (1.0.1)
-      faraday (~> 0.11.0)
-      faraday_middleware
 
 GIT
   remote: git://github.com/sanger/pmb-client.git
@@ -213,7 +215,7 @@ GEM
     factory_girl_rails (4.8.0)
       factory_girl (~> 4.8.0)
       railties (>= 3.0.0)
-    faraday (0.11.0)
+    faraday (0.12.1)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.11.0.1)
       faraday (>= 0.7.4, < 1.0)
@@ -473,7 +475,7 @@ DEPENDENCIES
   json_api_client!
   launchy
   listen (~> 3.0.5)
-  material_service_client (~> 1.0.1)!
+  matcon_client!
   pg
   pmb-client (= 0.1.0)!
   poltergeist

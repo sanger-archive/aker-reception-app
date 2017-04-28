@@ -12,15 +12,12 @@ class MaterialSubmission < ApplicationRecord
     'claimed'
   end
 
-  attr_writer :labwares
-
   belongs_to :user
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
 
-  has_many :material_submission_labwares, dependent: :destroy
-  has_many :labware_references, through: :material_submission_labwares
+  has_many :labwares
 
   validates :no_of_labwares_required, numericality: { only_integer: true, greater_than_or_equal_to: 1 },
     if: :active_or_labware?
@@ -31,7 +28,7 @@ class MaterialSubmission < ApplicationRecord
   validates :contact, presence: true, if: :active?
   validate :each_labware_has_biomaterial, if: :active?
 
-  before_save :set_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
+  before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
   #accepts_nested_attributes_for :labwares
 
@@ -76,40 +73,22 @@ class MaterialSubmission < ApplicationRecord
     user&.email
   end
 
-  def labwares
-    @labwares ||= material_submission_labwares.map(&:labware)
-  end
-
-  def labwares_attributes=(params)
-    add_to_labwares(params.values.map do |labware_attrs|
-      labware = Labware.find(labware_attrs["uuid"])
-      labware.update(labware_attrs)
-      labware
-    end)
-  end
-
-  def add_to_labwares(labwares)
-    @labwares = [] if @labwares.nil?
-    labwares.each do |l|
-      @labwares.delete_if{|l2| l2.uuid == l.uuid}
-      @labwares.push(l)
-    end
-  end
-
   def update(params)
     update_attributes(params) && labwares.all?(&:valid?)
   end
 
-  def labware
-  end
-
-  def material_submission_labwares_attributes=(params)
-  end
-
   private
 
-  def set_labware
-    material_submission_labwares << LabwareType.create_labwares(number: no_of_labwares_required, labware_type_id: labware_type_id)
+  # Deletes any labware linked to this submission, and creates
+  # new ones based on the requested labware fields
+  def create_labware
+    if labwares
+      labwares.each { |lw| lw.destroy! }
+    end
+    labwares = []
+    (1..no_of_labwares_required).each do |i|
+      labwares << Labware.create(material_submission: self, labware_index: i)
+    end
   end
 
   def each_labware_has_biomaterial

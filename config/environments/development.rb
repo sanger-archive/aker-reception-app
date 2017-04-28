@@ -56,7 +56,6 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'example.com' }
 
   config.material_url = 'http://localhost:5000'
-  ENV['MATERIALS_URL'] = config.material_url
 
   config.set_url = 'http://localhost:3000/api/v1/'
   config.set_url_default_proxy = 'http://localhost:3000'

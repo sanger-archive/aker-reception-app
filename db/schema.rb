@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170403145658) do
+ActiveRecord::Schema.define(version: 20170426144647) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "barcodes", force: :cascade do |t|
     t.string   "barcode_type"
@@ -20,21 +23,7 @@ ActiveRecord::Schema.define(version: 20170403145658) do
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
     t.integer  "print_count",      default: 0, null: false
-    t.index ["barcodeable_type", "barcodeable_id"], name: "index_barcodes_on_barcodeable_type_and_barcodeable_id"
-  end
-
-  create_table "biomaterials", force: :cascade do |t|
-    t.string   "uuid"
-    t.string   "supplier_name"
-    t.string   "donor_name"
-    t.string   "gender"
-    t.string   "common_name"
-    t.string   "phenotype"
-    t.string   "containable_type"
-    t.integer  "containable_id"
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
-    t.index ["containable_type", "containable_id"], name: "index_biomaterials_on_containable_type_and_containable_id"
+    t.index ["barcodeable_type", "barcodeable_id"], name: "index_barcodes_on_barcodeable_type_and_barcodeable_id", using: :btree
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -64,27 +53,24 @@ ActiveRecord::Schema.define(version: 20170403145658) do
   end
 
   create_table "labwares", force: :cascade do |t|
-    t.integer  "labware_type_id"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
-    t.index ["labware_type_id"], name: "index_labwares_on_labware_type_id"
+    t.integer  "material_submission_id",             null: false
+    t.integer  "labware_index",                      null: false
+    t.integer  "print_count",            default: 0, null: false
+    t.jsonb    "contents"
+    t.string   "barcode"
+    t.string   "container_id"
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.index ["barcode"], name: "index_labwares_on_barcode", unique: true, using: :btree
+    t.index ["container_id"], name: "index_labwares_on_container_id", unique: true, using: :btree
+    t.index ["material_submission_id", "labware_index"], name: "index_labwares_on_material_submission_id_and_labware_index", unique: true, using: :btree
   end
 
   create_table "material_receptions", force: :cascade do |t|
-    t.string   "labware_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["labware_id"], name: "index_material_receptions_on_labware_id"
-  end
-
-  create_table "material_submission_labwares", force: :cascade do |t|
-    t.integer  "material_submission_id"
-    t.string   "labware_id"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.text     "state"
-    t.index ["labware_id"], name: "index_material_submission_labwares_on_labware_id"
-    t.index ["material_submission_id"], name: "index_material_submission_labwares_on_material_submission_id"
+    t.integer  "labware_id", null: false
+    t.index ["labware_id"], name: "index_material_receptions_on_labware_id", unique: true, using: :btree
   end
 
   create_table "material_submissions", force: :cascade do |t|
@@ -97,8 +83,8 @@ ActiveRecord::Schema.define(version: 20170403145658) do
     t.text     "address"
     t.integer  "contact_id"
     t.integer  "user_id"
-    t.index ["contact_id"], name: "index_material_submissions_on_contact_id"
-    t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id"
+    t.index ["contact_id"], name: "index_material_submissions_on_contact_id", using: :btree
+    t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id", using: :btree
   end
 
   create_table "printers", force: :cascade do |t|
@@ -106,7 +92,7 @@ ActiveRecord::Schema.define(version: 20170403145658) do
     t.string   "label_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_printers_on_name", unique: true
+    t.index ["name"], name: "index_printers_on_name", unique: true, using: :btree
   end
 
   create_table "users", force: :cascade do |t|
@@ -119,16 +105,11 @@ ActiveRecord::Schema.define(version: 20170403145658) do
     t.string   "last_sign_in_ip"
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
   end
 
-  create_table "wells", force: :cascade do |t|
-    t.integer  "labware_id"
-    t.string   "biomaterial_id"
-    t.string   "position"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-    t.index ["labware_id"], name: "index_wells_on_labware_id"
-  end
-
+  add_foreign_key "labwares", "material_submissions"
+  add_foreign_key "material_receptions", "labwares"
+  add_foreign_key "material_submissions", "contacts"
+  add_foreign_key "material_submissions", "labware_types"
 end

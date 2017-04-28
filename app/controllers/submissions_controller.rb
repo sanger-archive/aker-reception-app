@@ -3,13 +3,39 @@ class SubmissionsController < ApplicationController
   include Wicked::Wizard
   steps :labware, :provenance, :dispatch
 
-
   def show
     render_wizard
   end
 
   def update
-    @status_success = material_submission.update(material_submission_params)
+    if params[:id]=="provenance"
+      #TODO: Validatation
+
+      success = true
+      labwares_data = params["material_submission"]["labware"].each do | labware_key, labware_data |
+        labware_index = labware_key.to_i
+        labware = material_submission.labwares.select { |lw| lw.labware_index==labware_index }.first
+        if labware.nil?
+          flash[:error] = 'Wrong labware index received'
+          render_wizard
+          return
+        end
+        filtered_data = {}
+        labware_data.each do |address, material_data|
+          material_data.each do | fieldName, value |
+            unless value.blank?
+              filtered_data[address] = {} if filtered_data[address].nil?
+              filtered_data[address][fieldName] = value.strip()
+            end
+          end
+        end
+        filtered_data = nil if filtered_data.empty?
+        success &= labware.update_attributes(contents: filtered_data)
+      end
+      @status_success = success
+    else
+      @status_success = material_submission.update(material_submission_params)
+    end
 
     unless @status_success
       if params[:material_submission][:status] == 'provenance'
@@ -70,20 +96,13 @@ protected
     step == steps.first
   end
 
-  helper_method :material_submission, :last_step?, :first_step?
+  helper_method :material_submission, :last_step?, :first_step?, :material_schema, :labware_at_index
 
 private
 
   def material_submission_params
     params.require(:material_submission).permit(
-      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :contact_id, labwares_attributes: [
-        :id,
-        :uuid,
-        wells_attributes: [
-          :id,
-          :position,
-          biomaterial_attributes: [ :id, :supplier_name, :donor_name, :gender, :common_name, :phenotype ]]
-      ]
+      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :contact_id, :labware
     )
   end
 
@@ -111,6 +130,14 @@ private
   def ownership_set_params(set_uuid)
     owner = material_submission.user.email
     {model_id: set_uuid, model_type: 'set', owner_id: owner}
+  end
+
+  def material_schema
+    MatconClient::Material.schema.body
+  end
+
+  def labware_at_index(index)
+    material_submission.labwares.select { |lw| lw.labware_index==index }.first
   end
 
 end

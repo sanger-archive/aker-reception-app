@@ -32,8 +32,11 @@
 
     this.cleanTooltips();
 
-    var barcode = $(e.target).attr('href').replace('#', '');
-    $('form td:first-child').html(barcode);
+    // var labware_name = $(e.target).attr('href').replace('#', '');
+    // $('form td:first-child').html(labware_name);
+
+    $('#lw_index').val(data.labware_index);
+
     this.inputs().each($.proxy(this.restoreInput, this, data));
 
     this.updateValidations();
@@ -94,31 +97,43 @@
     this.tooltipInputs=[];
   };
 
-  proto.cellNameFromErrorKey = function(wellId, key) {
-    var fieldName = key.replace(/.*\./, '');
-    var name = [
-      "material_submission[labwares_attributes][0][wells_attributes][",
-      wellId, "][biomaterial_attributes][", fieldName,"]"].join('');
-    return(name);
-  };
+  // proto.cellNameFromErrorKey = function(wellId, key) {
+  //   var fieldName = key.replace(/.*\./, '');
+  //   var name = [
+  //     "material_submission[labwares_attributes][0][wells_attributes][",
+  //     wellId, "][biomaterial_attributes][", fieldName,"]"].join('');
+  //   return(name);
+  // };
 
   proto.isTabEmpty = function(tab) {
     return !this.isTabWithContent(tab);
   }
 
   proto.isTabWithContent = function(tab) {
-    var data = this.dataForTab(tab);
-    return $.map(data.wells_attributes, function(n){return n;}).some(function(well) {
-      var biomaterialAttributes = well.biomaterial_attributes;
-      return ['donor_name', 'gender', 'id', 'phenotype', 'supplier_name', 'uuid', 'common_name'].some(function(name) {
-        return ((biomaterialAttributes[name]!==null) && (biomaterialAttributes[name]!=''));
-      });
-    });
+    var data = this.dataForTab(tab); // data is the labware for this tab
+
+    return (data["contents"]!=null);
+    // TODO -- does this need to examine data any more closely?
+
+
+
+    // if (data.content===null) {
+    //   return false;
+    // }
+
+    // return $.map(data.content)
+
+    // return $.map(data.wells_attributes, function(n){return n;}).some(function(well) {
+    //   var biomaterialAttributes = well.biomaterial_attributes;
+    //   return ['donor_name', 'gender', 'id', 'phenotype', 'supplier_name', 'uuid', 'common_name'].some(function(name) {
+    //     return ((biomaterialAttributes[name]!==null) && (biomaterialAttributes[name]!=''));
+    //   });
+    // });
   };
 
   proto.validateInput = function(input) {
     var name = $(input).parents('td').data('psd-schema-validation-name');
-    if (!!name) {
+    if (name) {
       $(input).trigger('psd.schema.validation', {
         node: input,
         name: name,
@@ -147,7 +162,15 @@
     //this.validateTab(currentTab);
       // var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
       // $(this.form).append(input);
-      var promise = $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
+
+      // var dc = JSON.stringify(data["contents"]);
+
+      // var promise = $.post($(this.form).attr('action'), dc).then(
+      //     $.proxy(this.onReceive, this, currentTab),
+      //     $.proxy(this.onError, this)
+      //   );
+
+      var promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
         $.proxy(this.onReceive, this, currentTab),
         $.proxy(this.onError, this));
       // input.remove();
@@ -236,18 +259,18 @@
 
   proto.inputs = function() {
     return $('form input').filter(function(pos, input) {
-      return($(input).attr('name') && $(input).attr('name').search(/material_submission/)>=0);
+      return($(input).attr('id') && $(input).attr('id').search(/labware/)>=0);
     });
   };
 
   proto.notEmptyInputs = function() {
     return $('form input').filter(function(pos, input) {
-      return(($(input).val().length > 0) && $(input).attr('name') && $(input).attr('name').search(/material_submission/)>=0);
+      return(($(input).val().length > 0) && $(input).attr('id') && $(input).attr('id').search(/labware/)>=0);
     });
   };
 
-  proto.rowNumForName = function(name) {
-    var matching = name.match(/\[wells_attributes\]\[(\d*)\]/);
+  proto.addressForId = function(id) {
+    var matching = id.match(/address\[([A-Z0-9:]*)\]/);
     if (matching) {
       return matching[1]
     } else {
@@ -255,8 +278,8 @@
     }
   };
 
-  proto.fieldNameForName = function(name) {
-    var matching = name.match(/\[biomaterial_attributes\]\[(\w*)\]/);
+  proto.fieldNameForId = function(id) {
+    var matching = id.match(/column\[(\w*)\]/);
     if (matching) {
       return matching[1];
     } else {
@@ -264,60 +287,90 @@
     }
   };
 
-  proto.is_well_attribute_id = function(input) {
-    var name = $(input).attr('name');
-    return (name.search(/material_submission\[labwares_attributes\]\[0\]\[wells_attributes\]\[\d*\]\[id\]/) >=0);
-  };
+  // proto.is_well_attribute_id = function(input) {
+  //   var name = $(input).attr('name');
+  //   return (name.search(/material_submission\[labwares_attributes\]\[0\]\[wells_attributes\]\[\d*\]\[id\]/) >=0);
+  // };
 
-  proto.is_labware_id = function(input) {
-    var name = $(input).attr('name');
-    return (name.search(/material_submission\[labwares_attributes\]\[0\]\[uuid\]/) >= 0);
-  };
+  // proto.is_labware_id = function(input) {
+  //   var name = $(input).attr('name');
+  //   return (name.search(/material_submission\[labwares_attributes\]\[0\]\[uuid\]/) >= 0);
+  // };
 
   proto.saveInput = function(data, pos, input) {
-    var name = $(input).attr('name');
-    var rowNum = this.rowNumForName(name);
-    var fieldName = this.fieldNameForName(name);
-
-    if (data===null) {
+    if (data==null) {
       return;
     }
 
-    if ((rowNum!==null) && (fieldName!==null)) {
-      data.wells_attributes[rowNum].biomaterial_attributes[fieldName] = $(input).val();
+    var id = $(input).attr('id');
+    var address = this.addressForId(id)
+    var fieldName = this.fieldNameForId(id);
+
+    if (address!=null && fieldName!=null) {
+
+      var v = $(input).val();
+      if (v!=null) {
+        v = $.trim(v);
+        if (v=='') {
+          v = null;
+        }
+      }
+      if (v!=null) {
+        if (data["contents"]==null) {
+          data["contents"] = {}
+        }
+        if (data["contents"][address]==null) {
+          data["contents"][address] = {}
+        }
+        data["contents"][address][fieldName] = v;
+      } else if (this.fieldData(data, address, fieldName)!=null) {
+        data["contents"][address][fieldName] = null;
+      }
     }
   };
 
   proto.updateErrorInput = function(data, pos, input) {
-    var name = $(input).attr('name');
-    var rowNum = this.rowNumForName(name)
-    var fieldName = this.fieldNameForName(name)
+    var id = $(input).attr('id');
+    var address = this.addressForId(id)
+    var fieldName = this.fieldNameForId(id)
 
     if (fieldName) {
-      this.updateErrorState(input, data.id, data.wells_attributes[rowNum].position, fieldName);
+      this.updateErrorState(input, data.id, address, fieldName);
     }
   };
+
+  proto.fieldData = function(data, address, fieldName) {
+    if (data!=null && data["contents"]!=null && address!=null && data["contents"][address]!=null && fieldName!=null) {
+      return data["contents"][address][fieldName];
+    }
+    return null;
+  }
 
   proto.restoreInput = function(data, pos, input) {
-    var name = $(input).attr('name');
-    var rowNum = this.rowNumForName(name)
-    var fieldName = this.fieldNameForName(name)
+    var id = $(input).attr('id');
+    var address = this.addressForId(id)
+    var fieldName = this.fieldNameForId(id)
 
-    if ((rowNum!==null) && (fieldName!==null)) {
-      $(input).val(data.wells_attributes[rowNum].biomaterial_attributes[fieldName]);
-    } else {
-      if (this.is_well_attribute_id(input)) {
-        $(input).val(data.wells_attributes[rowNum].id);
-      }
-      if (this.is_labware_id(input)) {
-        $(input).val(data.id);
-      }
+    if (address!=null && fieldName!=null) {
+      $(input).val(this.fieldData(data, address, fieldName));
     }
+
+    // if (address!==null && fieldName!==null && data.content!==null && data.content[address]!==null && data.content[address][fieldName]!==null) {
+    //   $(input).val(data.content[address][fieldName]);
+    // } else {
+    //   if (this.is_well_attribute_id(input)) {
+    //     $(input).val(data.wells_attributes[rowNum].id);
+    //   }
+    //   if (this.is_labware_id(input)) {
+    //     $(input).val(data.id);
+    //   }
+    // }
   };
 
+  // This returns the labware object linked to the tab
   proto.dataForTab = function(tab) {
     for (var key in this.params) {
-      if ($(tab).attr('href') == ('#'+this.params[key].barcode)) {
+      if ($(tab).attr('href') === ('#Labware'+this.params[key].labware_index)) {
         return this.params[key];
       }
     }

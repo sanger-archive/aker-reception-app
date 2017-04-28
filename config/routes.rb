@@ -2,7 +2,7 @@ Rails.application.routes.draw do
 
   root 'material_submissions#index'
 
-  get '/materials_schema', to: 'material_submissions#schema'
+  post '/submissions/labware_data', to: 'submissions#labware_data'
 
   resources :material_receptions
   resources :material_submissions do
