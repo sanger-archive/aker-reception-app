@@ -53,7 +53,7 @@
     <% schema = material_schema %>
     <% labwares.each_with_index do |labware, i| %>
 
-      <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware <%= labware.labware_index %>">
+      <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware<%= labware.labware_index %>">
 
          <div style="margin-top: 10px" class="well">
           <div class="row">
@@ -86,7 +86,7 @@
                 <% for col in schema['required'] %>
                   <td data-psd-schema-validataion-name="<%= col %>">
                     <div class="form-group">
-                      <input class="form-control" type="text" name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]" id="labware[<%= labware.labware_index %>]address[<%= address %>]column[<%= col %>]" value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />                      
+                      <input class="form-control" type="text" name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]" id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]" value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />                      
                     </div>
                   </td>
                 <% end %>

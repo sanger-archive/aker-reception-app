@@ -33,6 +33,11 @@ class SubmissionsController < ApplicationController
         success &= labware.update_attributes(contents: filtered_data)
       end
       @status_success = success
+      # Return here so we don't advance to the next step if we're just changing tabs
+      if params["material_submission"]["change_tab"]
+        render_wizard
+        return
+      end
     else
       @status_success = material_submission.update(material_submission_params)
     end

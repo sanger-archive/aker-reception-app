@@ -35,8 +35,6 @@
     // var labware_name = $(e.target).attr('href').replace('#', '');
     // $('form td:first-child').html(labware_name);
 
-    $('#lw_index').val(data.labware_index);
-
     this.inputs().each($.proxy(this.restoreInput, this, data));
 
     this.updateValidations();
@@ -160,22 +158,15 @@
 
     this.inputs().each($.proxy(this.saveInput, this, data));
     //this.validateTab(currentTab);
-      // var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
-      // $(this.form).append(input);
+    var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
+    $(this.form).append(input);
 
-      // var dc = JSON.stringify(data["contents"]);
+    var promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
+      $.proxy(this.onReceive, this, currentTab),
+      $.proxy(this.onError, this));
 
-      // var promise = $.post($(this.form).attr('action'), dc).then(
-      //     $.proxy(this.onReceive, this, currentTab),
-      //     $.proxy(this.onError, this)
-      //   );
-
-      var promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
-        $.proxy(this.onReceive, this, currentTab),
-        $.proxy(this.onError, this));
-      // input.remove();
-      return promise;      
-    return null;
+    input.remove();
+    return promise;
   };
 
   proto.onSchemaError = function(e, data) {
@@ -269,23 +260,17 @@
     });
   };
 
-  proto.addressForId = function(id) {
-    var matching = id.match(/address\[([A-Z0-9:]*)\]/);
+  proto.fieldsForId = function(id) {
+    var matching = id.match(/labware\[([0-9]*)\]address\[([A-Z0-9:]*)\]fieldName\[(\w*)\]/);
     if (matching) {
-      return matching[1]
-    } else {
-      return null;
+      return {
+        "labwareIndex": matching[1],
+        "address": matching[2],
+        "fieldName": matching[3]
+      };
     }
-  };
-
-  proto.fieldNameForId = function(id) {
-    var matching = id.match(/column\[(\w*)\]/);
-    if (matching) {
-      return matching[1];
-    } else {
-      return null;
-    }
-  };
+    return null;
+  }
 
   // proto.is_well_attribute_id = function(input) {
   //   var name = $(input).attr('name');
@@ -303,10 +288,9 @@
     }
 
     var id = $(input).attr('id');
-    var address = this.addressForId(id)
-    var fieldName = this.fieldNameForId(id);
+    var info = this.fieldsForId(id);
 
-    if (address!=null && fieldName!=null) {
+    if (info!=null && data.labware_index==info.labwareIndex) {
 
       var v = $(input).val();
       if (v!=null) {
@@ -319,23 +303,22 @@
         if (data["contents"]==null) {
           data["contents"] = {}
         }
-        if (data["contents"][address]==null) {
-          data["contents"][address] = {}
+        if (data["contents"][info.address]==null) {
+          data["contents"][info.address] = {}
         }
-        data["contents"][address][fieldName] = v;
-      } else if (this.fieldData(data, address, fieldName)!=null) {
-        data["contents"][address][fieldName] = null;
+        data["contents"][info.address][info.fieldName] = v;
+      } else if (this.fieldData(data, info.address, info.fieldName)!=null) {
+        data["contents"][info.address][info.fieldName] = null;
       }
     }
   };
 
   proto.updateErrorInput = function(data, pos, input) {
     var id = $(input).attr('id');
-    var address = this.addressForId(id)
-    var fieldName = this.fieldNameForId(id)
+    var info = this.fieldsForId(id);
 
-    if (fieldName) {
-      this.updateErrorState(input, data.id, address, fieldName);
+    if (info) {
+      this.updateErrorState(input, data.id, info.address, info.fieldName); // TODO is this right?
     }
   };
 
@@ -348,11 +331,10 @@
 
   proto.restoreInput = function(data, pos, input) {
     var id = $(input).attr('id');
-    var address = this.addressForId(id)
-    var fieldName = this.fieldNameForId(id)
+    var info = this.fieldsForId(id);
 
-    if (address!=null && fieldName!=null) {
-      $(input).val(this.fieldData(data, address, fieldName));
+    if (info!=null && data.labware_index==info.labwareIndex) {
+      $(input).val(this.fieldData(data, info.address, info.fieldName));
     }
 
     // if (address!==null && fieldName!==null && data.content!==null && data.content[address]!==null && data.content[address][fieldName]!==null) {
