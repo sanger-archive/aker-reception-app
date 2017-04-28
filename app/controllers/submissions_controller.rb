@@ -87,6 +87,10 @@ class SubmissionsController < ApplicationController
     submissions.update_all(status: MaterialSubmission.CLAIMED)
   end
 
+  def material_schema
+    MatconClient::Material.schema.body
+  end
+
 protected
 
   def material_submission
@@ -135,10 +139,6 @@ private
   def ownership_set_params(set_uuid)
     owner = material_submission.user.email
     {model_id: set_uuid, model_type: 'set', owner_id: owner}
-  end
-
-  def material_schema
-    MatconClient::Material.schema.body
   end
 
   def labware_at_index(index)

@@ -17,6 +17,7 @@
   };
 
   proto.dataForNode = function(node) {
+    // TODO change this to something that makes sense
     return {
       errors: {},
       labware_id: $('input#material_submission_labwares_attributes_0_uuid', $(node).parents('div.tab-content')).first().val(),
@@ -26,7 +27,7 @@
 
   proto.validationError = function(node, attr, msg) {
     var data = this.dataForNode(node);
-    if (!!attr) {
+    if (attr) {
       data.errors[attr] = msg;
     }
     $(node).trigger('psd.schema.error', {
@@ -37,39 +38,41 @@
 
   proto.schemaChecks = {
     failsDataValueRequired: function(schema, msg) {
-      return ((!!schema.required) && (!msg.value));
+      return (schema.required && !msg.value);
     },
     failsDataValueAllowed: function(schema, msg) {
-      return ((!!schema.enum) && (!!msg.value) && ($.inArray(msg.value, schema.enum)==-1));
+      return (schema.enum && msg.value && $.inArray(msg.value, schema.enum)==-1);
     }
   };
 
-  proto.schemaCheck = function(schema, msg, condFunct, textFunct) {
-    if (condFunct(schema, msg)) {
+  proto.failSchemaCheck = function(schema, msg, failFunct, textFunct) {
+    if (failFunct(schema, msg)) {
       this.validationError(msg.node, msg.name, textFunct(schema, msg));
-      return false;
+      return true;
     }
-    return true;
+    return false;
   };
 
   proto.validateSchemaField = function(e, msg) {
     var schema = this._loadedSchema.properties[msg.name];
-    var valid = true;
 
-    if ((!schema) || (![
-        this.schemaCheck(schema, msg, this.schemaChecks.failsDataValueRequired, function(schema, msg) {
-          return 'The field '+msg.name+' is required'
-        }),
-        this.schemaCheck(schema, msg, this.schemaChecks.failsDataValueAllowed, function(schema, msg) {
-          return 'The field should have any of these values ['+schema.enum.join(',')+']';
-        })].some(function(a) { return a }))) {
-        var node = msg.node;
-        $(node).trigger('psd.schema.error', {
-          node: node,
-          update_successful: true,
-          messages: [ $.extend(this.dataForNode(node), { update_successful: true}) ]
-        });
+    var successful = true;
+    if (schema) {
+      successful = !(
+            this.failSchemaCheck(schema, msg, this.schemaChecks.failsDataValueRequired, function(schema, msg) {
+              return 'The field '+msg.name+' is required'
+            }) ||
+            this.failSchemaCheck(schema, msg, this.schemaChecks.failsDataValueAllowed, function(schema, msg) {
+              return 'The field should have any of these values ['+schema.enum.join(',')+']';
+            }));
     }
+
+    var node = msg.node;
+    $(node).trigger('psd.schema.error', {
+      node: node,
+      update_successful: successful,
+      messages: [ $.extend(this.dataForNode(node), { update_successful: successful}) ]
+    });
   };
 
   proto.attachHandlers = function() {

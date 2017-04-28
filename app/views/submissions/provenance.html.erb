@@ -84,7 +84,7 @@
               <tr>
                 <td><%= address %></td>
                 <% for col in schema['required'] %>
-                  <td data-psd-schema-validataion-name="<%= col %>">
+                  <td data-psd-schema-validation-name="<%= col %>">
                     <div class="form-group">
                       <input class="form-control" type="text" name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]" id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]" value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />                      
                     </div>

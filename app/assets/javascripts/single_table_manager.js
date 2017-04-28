@@ -41,11 +41,10 @@
     //this.inputs().each($.proxy(this.updateErrorInput, this, data));
   };
 
-  proto.updateErrorState = function(input, labwareId, wellId, fieldName) {
-    if (this.errorCells[labwareId] && this.errorCells[labwareId][wellId] &&
-      this.errorCells[labwareId][wellId][fieldName]) {
-      var msg = this.errorCells[labwareId][wellId][fieldName]
-      this.setErrorToInput(input, msg);
+  proto.updateErrorState = function(input, labwareIndex, address, fieldName) {
+    if (this.errorCells[labwareIndex] && this.errorCells[labwareIndex][address]
+        && this.errorCells[labwareIndex][address][fieldName]) {
+      this.setErrorToInput(input, this.errorCells[labwareIndex][address][fieldName]);
     }
   };
 
@@ -95,14 +94,6 @@
     this.tooltipInputs=[];
   };
 
-  // proto.cellNameFromErrorKey = function(wellId, key) {
-  //   var fieldName = key.replace(/.*\./, '');
-  //   var name = [
-  //     "material_submission[labwares_attributes][0][wells_attributes][",
-  //     wellId, "][biomaterial_attributes][", fieldName,"]"].join('');
-  //   return(name);
-  // };
-
   proto.isTabEmpty = function(tab) {
     return !this.isTabWithContent(tab);
   }
@@ -111,7 +102,7 @@
     var data = this.dataForTab(tab); // data is the labware for this tab
 
     return (data["contents"]!=null);
-    // TODO -- does this need to examine data any more closely?
+    // TODO -- this needs to examine data more closely
 
 
 
@@ -172,6 +163,7 @@
   proto.onSchemaError = function(e, data) {
     this._tabsWithError=[];
     return this.onReceive($(this.currentTab), data);
+    // TODO Why are there two lines after the return?
     this.loadErrorsFromMsg(data);
     this.updateValidations();
   };
@@ -180,29 +172,29 @@
     if (data && data.messages) {
       for (var i=0; i<data.messages.length; i++) {
         var message = data.messages[i];
-        this.resetCellNameErrors(message.labware_id);
+        this.resetCellNameErrors(message.labwareIndex);
       }      
 
       for (var i=0; i<data.messages.length; i++) {
         var message = data.messages[i];
-        var wellId = message.well_id;
-        this.storeCellNameError(message.labware_id, wellId, message.errors);
+        var address = message.address;
+        this.storeCellNameError(message.labwareIndex, address, message.errors);
       }
     }
   };
 
-  proto.cleanValidLabwares = function(uuids) {
+  proto.cleanValidLabwares = function(labwareIndexes) {
     if (typeof this.errorCells !== 'undefined') {
-      for (var i=0; i<uuids.length; i++) {
-        delete(this.errorCells[uuids[i]]);
-      }      
+      for (var i=0; i<labwareIndexes.length; i++) {
+        delete(this.errorCells[labwareIndexes[i]]);
+      }
     }
   };
 
   proto.onReceive = function(currentTab, data, status) {
     if (data.update_successful) {
-      if (typeof data.labwares_uuids !== 'undefined') {
-        this.cleanValidLabwares(data.labwares_uuids);
+      if (typeof data.labwares_indexes !== 'undefined') {
+        this.cleanValidLabwares(data.labwares_indexes);
       }
       this.unsetErrorToTab(currentTab[0]);
     } else {
@@ -220,12 +212,12 @@
     }, this), 500);
   };
 
-  proto.storeCellNameError = function(labwareId, wellId, errors) {
-    if (typeof this.errorCells[labwareId]==='undefined') {
-      this.resetCellNameErrors(labwareId);
+  proto.storeCellNameError = function(labwareIndex, address, errors) {
+    if (typeof this.errorCells[labwareIndex]==='undefined') {
+      this.resetCellNameErrors(labwareIndex);
     }
-    if (typeof this.errorCells[labwareId][wellId]==='undefined') {
-      this.errorCells[labwareId][wellId]={};
+    if (typeof this.errorCells[labwareIndex][address]==='undefined') {
+      this.errorCells[labwareIndex][address]={};
     }
     if (typeof errors.schema !== 'undefined') {
       /** Json schema error message from the server json-schema gem */
@@ -233,19 +225,19 @@
         var obj = errors.schema[0][i].message;
         var fieldName = obj.fragment.replace(/#\//, '')
         var text = obj.message;
-        this.errorCells[labwareId][wellId][fieldName]=text;
+        this.errorCells[labwareIndex][address][fieldName]=text;
       }
     } else {
       /** Json Schema error message from the JS client */
       for (var key in errors) {
         var fieldName = key.replace(/.*\./, '');
-        this.errorCells[labwareId][wellId][fieldName]=errors[key];
+        this.errorCells[labwareIndex][address][fieldName]=errors[key];
       }
     }
   };
 
-  proto.resetCellNameErrors = function(labwareId) {
-    this.errorCells[labwareId]={};
+  proto.resetCellNameErrors = function(labwareIndex) {
+    this.errorCells[labwareIndex]={};
   };
 
   proto.inputs = function() {
@@ -271,16 +263,6 @@
     }
     return null;
   }
-
-  // proto.is_well_attribute_id = function(input) {
-  //   var name = $(input).attr('name');
-  //   return (name.search(/material_submission\[labwares_attributes\]\[0\]\[wells_attributes\]\[\d*\]\[id\]/) >=0);
-  // };
-
-  // proto.is_labware_id = function(input) {
-  //   var name = $(input).attr('name');
-  //   return (name.search(/material_submission\[labwares_attributes\]\[0\]\[uuid\]/) >= 0);
-  // };
 
   proto.saveInput = function(data, pos, input) {
     if (data==null) {
@@ -318,7 +300,7 @@
     var info = this.fieldsForId(id);
 
     if (info) {
-      this.updateErrorState(input, data.id, info.address, info.fieldName); // TODO is this right?
+      this.updateErrorState(input, info.labwareIndex, info.address, info.fieldName); // TODO is this right?
     }
   };
 
@@ -336,17 +318,6 @@
     if (info!=null && data.labware_index==info.labwareIndex) {
       $(input).val(this.fieldData(data, info.address, info.fieldName));
     }
-
-    // if (address!==null && fieldName!==null && data.content!==null && data.content[address]!==null && data.content[address][fieldName]!==null) {
-    //   $(input).val(data.content[address][fieldName]);
-    // } else {
-    //   if (this.is_well_attribute_id(input)) {
-    //     $(input).val(data.wells_attributes[rowNum].id);
-    //   }
-    //   if (this.is_labware_id(input)) {
-    //     $(input).val(data.id);
-    //   }
-    // }
   };
 
   // This returns the labware object linked to the tab
@@ -429,8 +400,7 @@
 
     // If you have one
     var button = $('.save');
-    button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));
-
+    button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));    
     $(this.node).on('psd.schema.error', $.proxy(this.onSchemaError, this));
 
     $('input[type=submit]').on('click', $.proxy(this.toDispatch, this));
