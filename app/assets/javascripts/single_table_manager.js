@@ -170,10 +170,11 @@
 
   proto.loadErrorsFromMsg = function(data) {
     if (data && data.messages) {
+
       for (var i=0; i<data.messages.length; i++) {
         var message = data.messages[i];
         this.resetCellNameErrors(message.labwareIndex);
-      }      
+      }
 
       for (var i=0; i<data.messages.length; i++) {
         var message = data.messages[i];
@@ -347,7 +348,7 @@
     $('.alert .alert-title').html(data.title);
     $('.alert .alert-msg').html(data.body);
     $('.alert').toggleClass('hidden', false);
-  };  
+  };
 
   proto.isEmptyErrorCells = function() {
     return (Object.keys(this.errorCells).length == 0);
@@ -400,7 +401,7 @@
 
     // If you have one
     var button = $('.save');
-    button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));    
+    button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));
     $(this.node).on('psd.schema.error', $.proxy(this.onSchemaError, this));
 
     $('input[type=submit]').on('click', $.proxy(this.toDispatch, this));

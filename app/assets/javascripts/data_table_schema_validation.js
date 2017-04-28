@@ -17,11 +17,10 @@
   };
 
   proto.dataForNode = function(node) {
-    // TODO change this to something that makes sense
     return {
       errors: {},
-      labware_id: $('input#material_submission_labwares_attributes_0_uuid', $(node).parents('div.tab-content')).first().val(),
-      well_id: $($('input', $(node).parents('tr'))[1]).val()
+      labwareIndex: $(node).parents('tr').data('labwareIndex'),
+      address: $(node).parents('tr').data('address')
     };
   };
 
@@ -70,8 +69,8 @@
     var node = msg.node;
     $(node).trigger('psd.schema.error', {
       node: node,
-      update_successful: successful,
-      messages: [ $.extend(this.dataForNode(node), { update_successful: successful}) ]
+      update_successful: true,
+      messages: [ $.extend(this.dataForNode(node), { update_successful: true}) ]
     });
   };
 

@@ -81,12 +81,12 @@
 
           <tbody>
             <% for address in labware.positions %>
-              <tr>
+              <tr data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
                 <td><%= address %></td>
                 <% for col in schema['required'] %>
                   <td data-psd-schema-validation-name="<%= col %>">
                     <div class="form-group">
-                      <input class="form-control" type="text" name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]" id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]" value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />                      
+                      <input class="form-control" type="text" name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]" id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]" value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
                     </div>
                   </td>
                 <% end %>
