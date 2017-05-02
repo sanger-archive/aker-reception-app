@@ -82,48 +82,46 @@ class SubmissionsController < ApplicationController
     render_wizard material_submission
   end
 
-  # receive biomaterial data and validate it
+  # receive biomaterial data, validate it and save it in the labware's json column
   def biomaterial_data
     schema = material_schema
     @invalid_data = []
 
     @update_successful = true
 
-    labwares_data = params["material_submission"]["labware"].each do | labware_key, labware_data |
-      labware_index = labware_key.to_i
-      labware = material_submission.labwares.select { |lw| lw.labware_index==labware_index }.first
-      if labware.nil?
-        @update_successful = false
-#        render json: { error: "Wrong labware index received" }
- #       flash[:error] = 'Wrong labware index received'
-  #      render_wizard
-        return
-      end
+    labware_params = params["material_submission"]["labware"]
+
+    default_field = schema['required'][0].to_sym
+
+    material_submission.labwares.each do |labware|
+      labware_index = labware.labware_index
+      labware_data = labware_params[labware_index.to_s]
       filtered_data = {}
-      labware_data.each do |address, material_data|
-        material_data.each do | fieldName, value |
-          unless value.blank?
-            filtered_data[address] = {} if filtered_data[address].nil?
-            filtered_data[address][fieldName] = value.strip()
+      if labware_data
+        labware_data.each do |address, material_data|
+          material_data.each do |fieldName, value|
+            unless value.blank?
+              filtered_data[address] = {} if filtered_data[address].nil?
+              filtered_data[address][fieldName] = value.strip()
+            end
           end
         end
       end
       filtered_data = nil if filtered_data.empty?
-
-      error_messages = ProvenanceService.new.validate(schema, labware_index, filtered_data)
-
+      if filtered_data.nil?
+        error_messages = [{
+          errors: { default_field => "At least one material must be specified for each item of labware." },
+          labwareIndex: labware_index,
+          address: labware.positions[0],
+          update_successful: false,
+        }]
+      else
+        error_messages = ProvenanceService.new.validate(schema, labware_index, filtered_data)
+      end
       @update_successful &= error_messages.empty?
       @update_successful &= labware.update_attributes(contents: filtered_data)
-
       @invalid_data += error_messages unless error_messages.empty?
     end
-    
-
-    # # Return here so we don't advance to the next step if we're just changing tabs
-    # if params["material_submission"]["change_tab"]
-    #   render_wizard
-    #   return
-    # end
   end
 
   def claim
