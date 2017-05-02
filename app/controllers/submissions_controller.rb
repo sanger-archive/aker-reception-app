@@ -39,11 +39,7 @@ class SubmissionsController < ApplicationController
         success &= error_messages.empty?
         success &= labware.update_attributes(contents: filtered_data)
 
-        @invalid_data[labware_index] = error_messages unless error_messages.empty?
-        if error_messages.any?
-          material_submission.errors.add(:contents, message: "There are definitely some errors.")
-        end
-        debugger
+        @invalid_data += error_messages unless error_messages.empty?
       end
       @status_success = success
       # Return here so we don't advance to the next step if we're just changing tabs
