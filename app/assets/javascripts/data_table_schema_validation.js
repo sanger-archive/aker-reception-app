@@ -78,9 +78,9 @@
   proto.validateSchemaField = function(e, msg) {
     var schema = this._loadedSchema.properties[msg.name];
 
-    var successful = true;
+    var failed = false;
     if (schema) {
-      successful = !(
+      failed = (
             this.failSchemaCheck(schema, msg, this.schemaChecks.failsDataValueRequired, function(schema, msg) {
               return 'The field '+msg.name+' is required'
             }) ||
@@ -89,13 +89,18 @@
             }));
     }
 
-    var node = msg.node;
-    // We have to specify update_successful true here or validation doesn't work. Shrug.
-    $(node).trigger('psd.schema.error', {
-      node: node,
-      update_successful: true,
-      messages: [ $.extend(this.dataForNode(node), { update_successful: true}) ]
-    });
+    // If the schema checks fail, they will update the errorCells.
+    // If they don't fail, we should update them in case they have out of date errors.
+
+    if (!failed) {
+      var node = msg.node;
+
+      $(node).trigger('psd.schema.error', {
+        node: node,
+        update_successful: false,
+        messages: [ $.extend(this.dataForNode(node), { update_successful: false }) ]
+      });
+    }
   };
 
   proto.attachHandlers = function() {
