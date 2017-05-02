@@ -110,7 +110,7 @@ class SubmissionsController < ApplicationController
       filtered_data = nil if filtered_data.empty?
       if filtered_data.nil?
         error_messages = [{
-          errors: { default_field => "At least one material must be specified for each item of labware." },
+          errors: { default_field => "At least one material must be specified for each item of labware" },
           labwareIndex: labware_index,
           address: labware.positions[0],
           update_successful: false,

@@ -8,7 +8,6 @@
     this.params._cssEmptyTabClass = this.params._cssEmptyTabClass || 'bg-warning';
     this.params._cssErrorTabClass = this.params._cssErrorTabClass || 'bg-danger';
 
-    this._tabsWithError = [];
     this.errorCells = {};
     this.tooltipInputs = [];
 
@@ -48,19 +47,39 @@
     }
   };
 
+  proto.tabLabwareIndex = function(tab) {
+    var id = tab.attr('id');
+    var matching = id.match(/labware_tab\[([0-9]+)\]/);
+    return matching ? matching[1] : null;
+  }
+
   proto.setErrorToTab = function(tab) {
-    this._tabsWithError.push(tab);
-    $(tab).addClass(this.params._cssErrorTabClass);
-    $(tab).removeClass(this.params._cssNotEmptyTabClass);
+    var labwareIndex = this.tabLabwareIndex($(tab));
+    if (this.anyErrorsForLabwareIndex(labwareIndex)) {
+      $(tab).addClass(this.params._cssErrorTabClass);
+      $(tab).removeClass(this.params._cssNotEmptyTabClass);
+    } else {
+      $(tab).removeClass(this.params._cssErrorTabClass);
+    }
   };
 
-  proto.unsetErrorToTab = function(tab) {
-    var index = this._tabsWithError.indexOf(tab);
-    if (index > -1) {
-      this._tabsWithError.splice(index, 1);
+  proto.anyErrorsForLabwareIndex = function(labwareIndex) {
+    if (labwareIndex && this.errorCells) {
+      var lwe = this.errorCells[labwareIndex];
+      if (lwe) {
+        for (var i in lwe) {
+          if (lwe[i] && !$.isEmptyObject(lwe[i])) {
+            return true;
+          }
+        }
+      }
     }
+    return false;
+  }
 
-    $(tab).removeClass(this.params._cssErrorTabClass);
+  proto.unsetErrorToTab = function(tab) {
+    this.setErrorToTab(tab);
+//    $(tab).removeClass(this.params._cssErrorTabClass);
 
     this.updateTabContentPresenceStatus(tab);
   };
@@ -165,7 +184,6 @@
   };
 
   proto.onSchemaError = function(e, data) {
-    this._tabsWithError=[];
     return this.onReceive($(this.currentTab), data);
   };
 
@@ -197,13 +215,13 @@
 
   proto.onReceive = function(currentTab, data, status) {
     if (data.update_successful) {
-      if (typeof data.labwares_indexes !== 'undefined') {
+      this.unsetErrorToTab(currentTab[0]);
+      if (data.labwares_indexes) {
         this.cleanValidLabwares(data.labwares_indexes);
       }
-      this.unsetErrorToTab(currentTab[0]);
     } else {
-      this.setErrorToTab(currentTab[0]);
       this.loadErrorsFromMsg(data);
+      this.setErrorToTab(currentTab[0]);
     }
     this.updateValidations();
     return data;
