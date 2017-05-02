@@ -143,43 +143,46 @@
     }, this));
   };
 
-  proto.saveTab = function(e) {
+  proto.saveTab = function(e, leaving) {
     var currentTab = $(e.target);
     var data = this.dataForTab(currentTab);
 
     this.inputs().each($.proxy(this.saveInput, this, data));
-    //this.validateTab(currentTab);
-    var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
-    $(this.form).append(input);
 
+    if (!leaving) {
+      var changeTabField = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
+      $(this.form).append(changeTabField);
+    }
     var promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
       $.proxy(this.onReceive, this, currentTab),
-      $.proxy(this.onError, this));
+      $.proxy(this.onError, this)
+    );
 
-    input.remove();
+    if (!leaving) {
+     changeTabField.remove();
+    }
     return promise;
   };
 
   proto.onSchemaError = function(e, data) {
     this._tabsWithError=[];
     return this.onReceive($(this.currentTab), data);
-    // TODO Why are there two lines after the return?
-    this.loadErrorsFromMsg(data);
-    this.updateValidations();
   };
 
   proto.loadErrorsFromMsg = function(data) {
     if (data && data.messages) {
 
-      for (var i=0; i<data.messages.length; i++) {
-        var message = data.messages[i];
-        this.resetCellNameErrors(message.labwareIndex);
-      }
+      for (var key in data) {
+        for (var i=0; i<data.messages.length; i++) {
+          var message = data.messages[i];
+          this.resetCellNameErrors(message.labwareIndex);
+        }
 
-      for (var i=0; i<data.messages.length; i++) {
-        var message = data.messages[i];
-        var address = message.address;
-        this.storeCellNameError(message.labwareIndex, address, message.errors);
+        for (var i=0; i<data.messages.length; i++) {
+          var message = data.messages[i];
+          var address = message.address;
+          this.storeCellNameError(message.labwareIndex, address, message.errors);
+        }
       }
     }
   };
@@ -332,7 +335,7 @@
   };
 
   proto.saveCurrentTab = function(e) {
-    this.saveTab({target: this.currentTab});
+    this.saveTab({target: this.currentTab}, false);
     if (e) {
       e.preventDefault();
     }
@@ -359,7 +362,7 @@
     e.preventDefault();
 
     //this.saveTab({target: this.currentTab});
-    var promise = this.saveTab({target: this.currentTab});
+    var promise = this.saveTab({target: this.currentTab}, true);
     if (promise === null) {
       return;
     }
@@ -372,7 +375,7 @@
           body: 'Please review and solve the validation problems before continuing'});
         this.setErrorToTab(this.currentTab);
         if (!data.update_successful) {
-          this.loadErrorsFromMsg(errorMsgs);
+          this.loadErrorsFromMsg(data);
         }
         this.updateValidations();
       }

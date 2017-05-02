@@ -28,10 +28,7 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-
-
-
-<%= bootstrap_form_for material_submission, remote: true, url: wizard_path, method: :put, :html => {:'data-type' => 'json'} do |f| %>
+<%= bootstrap_form_tag url: material_submission_biomaterial_data_path(material_submission.id), remote: true, method: :put, html: {:'data-type' => 'json'} do |f| %>
 
   <% labwares = material_submission.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
 

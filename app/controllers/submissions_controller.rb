@@ -9,9 +9,12 @@ class SubmissionsController < ApplicationController
 
   def update
     if params[:id]=="provenance"
-      #TODO: Validatation
+
+      schema = material_schema
+      @invalid_data = {}
 
       success = true
+
       labwares_data = params["material_submission"]["labware"].each do | labware_key, labware_data |
         labware_index = labware_key.to_i
         labware = material_submission.labwares.select { |lw| lw.labware_index==labware_index }.first
@@ -30,7 +33,17 @@ class SubmissionsController < ApplicationController
           end
         end
         filtered_data = nil if filtered_data.empty?
+
+        error_messages = ProvenanceService.new.validate(schema, labware_index, filtered_data)
+
+        success &= error_messages.empty?
         success &= labware.update_attributes(contents: filtered_data)
+
+        @invalid_data[labware_index] = error_messages unless error_messages.empty?
+        if error_messages.any?
+          material_submission.errors.add(:contents, message: "There are definitely some errors.")
+        end
+        debugger
       end
       @status_success = success
       # Return here so we don't advance to the next step if we're just changing tabs
@@ -43,10 +56,6 @@ class SubmissionsController < ApplicationController
     end
 
     unless @status_success
-      if params[:material_submission][:status] == 'provenance'
-        @invalid_data = material_submission.invalid_labwares.map(&:invalid_data).flatten.compact
-        return
-      end
       flash[:error] = 'The material submission could not be updated.'
       render_wizard
       return
@@ -75,6 +84,50 @@ class SubmissionsController < ApplicationController
 
     material_submission.update(status: get_status)
     render_wizard material_submission
+  end
+
+  # receive biomaterial data and validate it
+  def biomaterial_data
+    schema = material_schema
+    @invalid_data = []
+
+    @update_successful = true
+
+    labwares_data = params["material_submission"]["labware"].each do | labware_key, labware_data |
+      labware_index = labware_key.to_i
+      labware = material_submission.labwares.select { |lw| lw.labware_index==labware_index }.first
+      if labware.nil?
+        @update_successful = false
+#        render json: { error: "Wrong labware index received" }
+ #       flash[:error] = 'Wrong labware index received'
+  #      render_wizard
+        return
+      end
+      filtered_data = {}
+      labware_data.each do |address, material_data|
+        material_data.each do | fieldName, value |
+          unless value.blank?
+            filtered_data[address] = {} if filtered_data[address].nil?
+            filtered_data[address][fieldName] = value.strip()
+          end
+        end
+      end
+      filtered_data = nil if filtered_data.empty?
+
+      error_messages = ProvenanceService.new.validate(schema, labware_index, filtered_data)
+
+      @update_successful &= error_messages.empty?
+      @update_successful &= labware.update_attributes(contents: filtered_data)
+
+      @invalid_data += error_messages unless error_messages.empty?
+    end
+    
+
+    # # Return here so we don't advance to the next step if we're just changing tabs
+    # if params["material_submission"]["change_tab"]
+    #   render_wizard
+    #   return
+    # end
   end
 
   def claim
