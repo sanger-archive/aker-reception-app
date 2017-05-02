@@ -35,12 +35,35 @@
     });
   };
 
+  Array.prototype.indexOfCaseInsensitive = function(item) {
+    item = item.toUpperCase();
+    for (var index = 0; index < this.length; ++index) {
+      if (item===this[index].toUpperCase()) {
+        return index;
+      }
+    }
+    return -1;
+  }
+
   proto.schemaChecks = {
+    // Fails if the field is required and the msg value is missing or all whitespace.
+    // Returns true if it fails.
     failsDataValueRequired: function(schema, msg) {
-      return (schema.required && !msg.value);
+      return (schema.required && !(msg.value && msg.value.trim()));
     },
+    // Fails if the field has an enum, the msg value is specified and not all whitespace,
+    // but it is not in the enum (case insensitive).
+    // Returns true if it fails.
     failsDataValueAllowed: function(schema, msg) {
-      return (schema.enum && msg.value && $.inArray(msg.value, schema.enum)==-1);
+      if (!schema.enum || !msg.value) {
+        return false;
+      }
+      var v = msg.value.trim();
+      if (!v) {
+        return false;
+      }
+      // True (fail) if the value is given but unmatched
+      return (schema.enum.indexOfCaseInsensitive(v) < 0);
     }
   };
 
@@ -67,6 +90,7 @@
     }
 
     var node = msg.node;
+    // We have to specify update_successful true here or validation doesn't work. Shrug.
     $(node).trigger('psd.schema.error', {
       node: node,
       update_successful: true,
