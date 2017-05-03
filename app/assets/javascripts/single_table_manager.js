@@ -235,25 +235,25 @@
   };
 
   proto.storeCellNameError = function(labwareIndex, address, errors) {
-    if (typeof this.errorCells[labwareIndex]==='undefined') {
+    if (!this.errorCells[labwareIndex]) {
       this.resetCellNameErrors(labwareIndex);
     }
-    if (typeof this.errorCells[labwareIndex][address]==='undefined') {
+    if (!this.errorCells[labwareIndex][address]) {
       this.errorCells[labwareIndex][address]={};
     }
-    if (typeof errors.schema !== 'undefined') {
+    if (errors.schema) {
       /** Json schema error message from the server json-schema gem */
       for (var i=0; i<errors.schema[0].length; i++) {
         var obj = errors.schema[0][i].message;
         var fieldName = obj.fragment.replace(/#\//, '')
         var text = obj.message;
-        this.errorCells[labwareIndex][address][fieldName]=text;
+        this.errorCells[labwareIndex][address][fieldName] = text;
       }
     } else {
       /** Json Schema error message from the JS client */
       for (var key in errors) {
         var fieldName = key.replace(/.*\./, '');
-        this.errorCells[labwareIndex][address][fieldName]=errors[key];
+        this.errorCells[labwareIndex][address][fieldName] = errors[key];
       }
     }
   };
@@ -294,7 +294,7 @@
     var id = $(input).attr('id');
     var info = this.fieldsForId(id);
 
-    if (info!=null && data.labware_index==info.labwareIndex) {
+    if (info && data.labware_index==info.labwareIndex) {
 
       var v = $(input).val();
       if (v!=null) {
@@ -303,11 +303,11 @@
           v = null;
         }
       }
-      if (v!=null) {
-        if (data["contents"]==null) {
+      if (v) {
+        if (!data["contents"]) {
           data["contents"] = {}
         }
-        if (data["contents"][info.address]==null) {
+        if (!data["contents"][info.address]) {
           data["contents"][info.address] = {}
         }
         data["contents"][info.address][info.fieldName] = v;
@@ -322,12 +322,12 @@
     var info = this.fieldsForId(id);
 
     if (info) {
-      this.updateErrorState(input, info.labwareIndex, info.address, info.fieldName); // TODO is this right?
+      this.updateErrorState(input, info.labwareIndex, info.address, info.fieldName);
     }
   };
 
   proto.fieldData = function(data, address, fieldName) {
-    if (data!=null && data["contents"]!=null && address!=null && data["contents"][address]!=null && fieldName!=null) {
+    if (data && data["contents"] && address && data["contents"][address] && fieldName) {
       return data["contents"][address][fieldName];
     }
     return null;
@@ -337,7 +337,7 @@
     var id = $(input).attr('id');
     var info = this.fieldsForId(id);
 
-    if (info!=null && data.labware_index==info.labwareIndex) {
+    if (info && data.labware_index==info.labwareIndex) {
       $(input).val(this.fieldData(data, info.address, info.fieldName));
     }
   };

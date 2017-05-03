@@ -61,6 +61,10 @@ class MaterialSubmission < ApplicationRecord
     active? || status==MaterialSubmission.AWAITING
   end
 
+  def pending?
+    ![MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED].include? status
+  end
+
   def no_of_labwares_required
     super || 0
   end
