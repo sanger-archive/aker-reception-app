@@ -1,19 +1,10 @@
 require 'rails_helper'
 
-class Service
-  def up
-    is_successful?
-  end
-  def down
-    is_successful?
-  end
-end
-
 RSpec.describe :dispatch_service do
-  let(:successful_service) { double(Service, up: true, down: true) }
-  let(:fail_service) { double(Service, up: false, down: true) }
-  let(:faulty_rollable_back) { double(Service up: false, down: true) }
-  let(:faulty_not_rollable_back) { double(Service, up: false, down: false) }
+  let(:successful_service) { double("Service", up: true, down: true) }
+  let(:fail_service) { double("Service", up: false, down: true) }
+  let(:faulty_rollable_back) { double("Service", up: false, down: true) }
+  let(:faulty_not_rollable_back) { double("Service", up: false, down: false) }
   
   setup do
     @dispatch = DispatchService.new
