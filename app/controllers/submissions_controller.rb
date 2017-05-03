@@ -23,6 +23,9 @@ class SubmissionsController < ApplicationController
         render_wizard
         return
       end
+      if @status_success
+        @status_success = material_submission.update(material_submission_params)
+      end
     else
       @status_success = material_submission.update(material_submission_params)
     end
@@ -53,20 +56,23 @@ class SubmissionsController < ApplicationController
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
       flash[:notice] = 'Your Submission has been created'
     end
-
-    material_submission.update(status: get_status)
+    material_submission.update_attributes(status: get_status)
     render_wizard material_submission
   end
 
   # receive biomaterial data, validate it and save it in the labware's json column
   def biomaterial_data
+
     # Make sure we don't let anyone update the data after the wizard has completed
     raise "This submission cannot be updated." unless material_submission.pending?
 
     labware_params = params["material_submission"]["labware"]
     service = ProvenanceService.new(material_schema)
-
     @update_successful, @invalid_data = service.set_biomaterial_data(material_submission, labware_params)
+
+    if @update_successful && !params["material_submission"]["change_tab"]
+      @update_successful = material_submission.update_attributes(status: :dispatch)
+    end
   end
 
   def claim

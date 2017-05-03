@@ -111,6 +111,4 @@
     $(document).trigger('registerComponent.builder', {'DataTableSchemaValidation': DataTableSchemaValidation});
   });
 
-
-
 }(jQuery))
