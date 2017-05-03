@@ -26,5 +26,5 @@ class SetService
   def down
 
   end
-  
+
 end

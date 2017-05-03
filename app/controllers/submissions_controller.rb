@@ -1,3 +1,6 @@
+require 'dispatch_steps/create_materials_step'
+require 'dispatch_steps/create_sets_step'
+
 class SubmissionsController < ApplicationController
 
   include Wicked::Wizard
@@ -37,13 +40,27 @@ class SubmissionsController < ApplicationController
     end
 
     if last_step?
+      success = false
+      begin
+        success = DispatchService.new.process([
+          CreateMaterialsStep.new(material_submission),
+          CreateSetsStep.new(material_submission),
+  #        MailService.new(material_submission)
+        ])
 
-      status = DispatchService.new.process([
-        SetService.new(material_submission),
-        MailService.new(material_submission)
-      ])
-
-      flash[:notice] = 'Your Submission has been created'
+        if success
+          flash[:notice] = 'Your submission has been created'
+        else
+          flash[:error] = "The submission could not be created"
+        end
+      rescue => e
+        flash[:error] = "There has been a problem with the submission. Please contact support."
+        # TODO - banjax submission
+      end
+      unless success
+        render_wizard
+        return
+      end
     end
     material_submission.update_attributes(status: get_status)
     render_wizard material_submission

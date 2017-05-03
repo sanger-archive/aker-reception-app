@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170426144647) do
+ActiveRecord::Schema.define(version: 20170503153748) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(version: 20170426144647) do
     t.text     "address"
     t.integer  "contact_id"
     t.integer  "user_id"
+    t.uuid     "set_id"
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id", using: :btree
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id", using: :btree
   end

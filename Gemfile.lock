@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/harrietc52/aker-matcon-client.git
-  revision: 8b69897361b7d697b08e10e5dd91b0f3efa410bc
+  revision: 88e8245938661e165f6d181cf0963c13ac04a517
   specs:
     matcon_client (0.2.0)
       activemodel
@@ -505,4 +505,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.14.5
+   1.14.6
