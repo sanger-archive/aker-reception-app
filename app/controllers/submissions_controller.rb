@@ -43,7 +43,6 @@ class SubmissionsController < ApplicationController
         if error_messages.any?
           material_submission.errors.add(:contents, message: "There are definitely some errors.")
         end
-        debugger
       end
       @status_success = success
       # Return here so we don't advance to the next step if we're just changing tabs
@@ -62,23 +61,12 @@ class SubmissionsController < ApplicationController
     end
 
     if last_step?
-      materials = []
-      material_submission.labwares.each do |lw|
-        lw.wells.each do |well|
-          materials.append(well.biomaterial) unless well.biomaterial.nil?
-        end
-      end
 
-      # Creation of set
-      new_set = SetClient::Set.create(name: "Submission #{material_submission.id}", owner_id: material_submission.contact.email)
+      status = DispatchService.new.process([
+        SetService.new(material_submission),
+        MailService.new(material_submission)
+      ])
 
-      # Adding materials to set
-      # set_materials takes an array of uuids
-      new_set.set_materials(materials.compact.map(&:uuid))
-      new_set.update_attributes(locked: true)
-
-      MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
-      MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
       flash[:notice] = 'Your Submission has been created'
     end
 
