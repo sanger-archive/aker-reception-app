@@ -15,26 +15,4 @@ class DispatchService
     true
   end
 
-  # def process(material_submission)
-  #   SetClientService.new.up(material_submission)
-  #   EmailService(material_submissions)
-  # end
-
 end
-
-
-# class ServiceProcess
-
-# end
-
-
-# class SetClientService
-
-#   def up(material_submission)
-
-#   end
-
-#   def down
-#   end
-
-# end
