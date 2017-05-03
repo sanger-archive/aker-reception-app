@@ -27,7 +27,7 @@ class MaterialReceptionsController < ApplicationController
 
   def set_labware
     @labware = Labware.with_barcode(material_reception_params[:barcode_value]).first
-    @labware_id = @labware ? @labware.uuid : nil
+    @labware_id = @labware&.uuid
   end
 
 end

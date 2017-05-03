@@ -26,7 +26,7 @@ class MaterialSubmission < ApplicationRecord
   validates :labware_type_id, presence: true, if: :active_or_labware?
   validates :address, presence: true, if: :active?
   validates :contact, presence: true, if: :active?
-  validate :each_labware_has_biomaterial, if: :active?
+  validate :each_labware_has_contents, if: :active?
 
   before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
@@ -95,8 +95,8 @@ class MaterialSubmission < ApplicationRecord
     end
   end
 
-  def each_labware_has_biomaterial
-    unless labwares.all? { |labware| labware.biomaterials.count > 0 }
+  def each_labware_has_contents
+    unless labwares.all? { |labware| labware.contents.present? }
       errors.add(:labwares, "must each have at least one Biomaterial")
     end
   end

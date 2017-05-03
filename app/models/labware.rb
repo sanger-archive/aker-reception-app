@@ -4,8 +4,14 @@ class Labware < ApplicationRecord
 
   alias_attribute :uuid, :container_id
 
+  scope :with_barcode, ->(barcode) { where(barcode: barcode) }
+
   def labware_type
     material_submission.labware_type
+  end
+
+  def increment_print_count!
+    update_attributes(print_count: print_count+1)
   end
 
   def num_of_rows
@@ -55,4 +61,5 @@ class Labware < ApplicationRecord
 
     y.product(x).map { |a,b| a+':'+b }
   end
+
 end
