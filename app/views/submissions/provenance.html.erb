@@ -38,7 +38,7 @@
 
     <% labwares.each_with_index do |labware, i| %>
       <li class="<%= 'active' if i == 0 %>" role="presentation">
-        <a data-toggle="tab" href="#Labware<%= labware.labware_index %>" aria-controls="Labware<%= labware.labware_index %>" role="tab">
+        <a data-toggle="tab" id="labware_tab[<%= labware.labware_index %>]" href="#Labware<%= labware.labware_index %>" aria-controls="Labware<%= labware.labware_index %>" role="tab">
           Labware <%= labware.labware_index %>
         </a>
       </li>

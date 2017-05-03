@@ -1,7 +1,7 @@
 <!-- # % if target.errors.any? % -->
   <div class="alert alert-danger <%= target.errors.empty? ? 'hidden': '' %>" role="alert">
     <% if target.errors.empty? %>
-        <strong>Unknown errors prevented this record from being saved.</strong>
+        <strong>Errors prevented this record from being saved.</strong>
     <% else %>
         <strong><%= pluralize(target.errors.count, "error") %> prevented this record from being saved:</strong>
         <ul>

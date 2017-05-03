@@ -12,21 +12,23 @@ class MaterialReception < ApplicationRecord
   end
 
   def barcode_value
-    labware && labware.barcode
+    labware&.barcode
   end
 
   def labware
-    return nil if labware_id.nil?
-    Labware.find(labware_id)
+    labware_id && Labware.find(labware_id)
   end
 
   def barcode_value=(barcode)
-    self.labware_id = Labware.with_barcode(barcode).first.uuid
+    self.labware_id = Labware.with_barcode(barcode).first.uuid # TODO - id or uuid?
   end
 
   def validate_barcode_printed
-    unless labware && labware.barcode_printed?
-      errors.add(:labware, "needs a printed barcode")
+    debugger
+    unless labware
+      errors.add(:labware, "could not be found")
+    else
+      errors.add(:labware, "needs to have been printed") unless labware.barcode_printed?
     end
   end
 
