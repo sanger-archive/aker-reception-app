@@ -43,7 +43,7 @@ class MaterialReception < ApplicationRecord
   end
 
   def all_received?
-    labware.material_submission.labwares.all?(&:recieved)
+    labware.material_submission.labwares.all?(&:received?)
   end
 
 end
