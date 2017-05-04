@@ -1,3 +1,7 @@
+# This service tries to execute a sequence of steps.
+# If any of the steps fails, that step and all previous steps should be rolled back.
+# If all steps succeed, process should return true.
+# If any steps fail, and roll back is successful, process should return false.
 class DispatchService
 
   def process(steps)

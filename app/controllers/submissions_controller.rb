@@ -52,27 +52,34 @@ class SubmissionsController < ApplicationController
           # CreateSetsStep should be last, because it is the least cleanupable
         ])
 
-        if success
-          flash[:notice] = 'Your submission has been created'
-        else
-          flash[:error] = "The submission could not be created"
-          cleanup = true
-        end
+        cleanup = !success
       rescue => e
         puts "*"*70
         puts "Error from dispatch service:"
         puts e
         puts e.backtrace
-        flash[:error] = "There has been a problem with the submission. Please contact support."
       ensure
         if !success && !cleanup
           @material_submission.broken!
         end
       end
+
+      if success
+        flash[:notice] = 'Your submission has been created'
+      elsif cleanup
+        flash[:error] = "The submission could not be created"
+      else
+        flash[:error] = "There has been a problem with the submission. Please contact support."
+      end
+
       unless success
         render_wizard
         return
       end
+
+      MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
+      MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
+
     end
     material_submission.update_attributes(status: get_status)
     render_wizard material_submission
