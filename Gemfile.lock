@@ -28,6 +28,16 @@ GIT
       request_store
 
 GIT
+  remote: git://github.com/sanger/aker-matcon-client.git
+  revision: 8d1199b0225257458467f7c6a2f0d1355c9d6655
+  specs:
+    matcon_client (0.2.0)
+      activemodel
+      activesupport
+      faraday
+      faraday_middleware
+
+GIT
   remote: git://github.com/sanger/aker-permission.git
   revision: 184fbc371bddb467859e71ae3a0f06ba483eab9b
   specs:
@@ -69,15 +79,6 @@ GIT
   revision: dd2d634114df75b1d8535715c169a7fc99521389
   specs:
     psd_logger (0.1.6)
-
-PATH
-  remote: /Users/hc6/gems/aker-matcon-client
-  specs:
-    matcon_client (0.2.0)
-      activemodel
-      activesupport
-      faraday
-      faraday_middleware
 
 GEM
   remote: https://rubygems.org/

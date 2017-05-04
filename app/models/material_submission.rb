@@ -12,6 +12,10 @@ class MaterialSubmission < ApplicationRecord
     'claimed'
   end
 
+  def self.BROKEN
+    'broken'
+  end
+
   belongs_to :user
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
@@ -62,7 +66,15 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def pending?
-    ![MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED].include? status
+    ![MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED, MaterialSubmission.BROKEN].include? status
+  end
+
+  def broken?
+    return status==MaterialSubmission.BROKEN
+  end
+
+  def broken!
+    update_attributes(status: MaterialSubmission.BROKEN)
   end
 
   def no_of_labwares_required

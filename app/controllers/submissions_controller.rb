@@ -1,6 +1,7 @@
 require 'dispatch_steps/create_materials_step'
 require 'dispatch_steps/create_sets_step'
 require 'dispatch_steps/create_containers_step'
+require 'dispatch_steps/fail_step'
 
 class SubmissionsController < ApplicationController
 
@@ -42,6 +43,7 @@ class SubmissionsController < ApplicationController
 
     if last_step?
       success = false
+      cleanup = false
       begin
         success = DispatchService.new.process([
           CreateMaterialsStep.new(material_submission),
@@ -54,6 +56,7 @@ class SubmissionsController < ApplicationController
           flash[:notice] = 'Your submission has been created'
         else
           flash[:error] = "The submission could not be created"
+          cleanup = true
         end
       rescue => e
         puts "*"*70
@@ -61,7 +64,10 @@ class SubmissionsController < ApplicationController
         puts e
         puts e.backtrace
         flash[:error] = "There has been a problem with the submission. Please contact support."
-        # TODO - banjax submission
+      ensure
+        if !success && !cleanup
+          @material_submission.broken!
+        end
       end
       unless success
         render_wizard
