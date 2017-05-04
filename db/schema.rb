@@ -15,17 +15,6 @@ ActiveRecord::Schema.define(version: 20170503153748) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "barcodes", force: :cascade do |t|
-    t.string   "barcode_type"
-    t.string   "value"
-    t.string   "barcodeable_type"
-    t.integer  "barcodeable_id"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-    t.integer  "print_count",      default: 0, null: false
-    t.index ["barcodeable_type", "barcodeable_id"], name: "index_barcodes_on_barcodeable_type_and_barcodeable_id", using: :btree
-  end
-
   create_table "contacts", force: :cascade do |t|
     t.string   "fullname"
     t.string   "email"

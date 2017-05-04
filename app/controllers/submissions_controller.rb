@@ -93,16 +93,6 @@ class SubmissionsController < ApplicationController
     end
   end
 
-  def claim
-    cp = claim_params
-    sub_ids = cp[:submission_ids]
-    col_id = cp[:collection_id]
-    submissions = MaterialSubmission.where(id: sub_ids)
-    materials = submissions_biomaterials(submissions)
-    SetClient::Set.find(col_id).first.set_materials(materials.map(&:uuid))
-    submissions.update_all(status: MaterialSubmission.CLAIMED)
-  end
-
   def material_schema
     MatconClient::Material.schema.body
   end
@@ -129,17 +119,6 @@ private
     params.require(:material_submission).permit(
       :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :contact_id, :labware
     )
-  end
-
-  def claim_params
-    {
-      submission_ids: params.require(:submission_ids),
-      collection_id: params.require(:collection_id),
-    }
-  end
-
-  def submissions_biomaterials(submissions)
-    submissions.flat_map(&:labwares).flat_map(&:biomaterials).compact
   end
 
   def get_status

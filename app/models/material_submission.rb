@@ -77,6 +77,14 @@ class MaterialSubmission < ApplicationRecord
     update_attributes(status: MaterialSubmission.BROKEN)
   end
 
+  def claimed?
+    return status==MaterialSubmission.CLAIMED
+  end
+
+  def ready_for_claim?
+    status==MaterialSubmission.AWAITING && labwares.all(&:received?)
+  end
+
   def no_of_labwares_required
     super || 0
   end

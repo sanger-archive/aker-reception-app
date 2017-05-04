@@ -2,8 +2,6 @@ class Labware < ApplicationRecord
   belongs_to :material_submission
   has_one :material_reception
 
-  alias_attribute :uuid, :container_id
-
   scope :with_barcode, ->(barcode) { where(barcode: barcode) }
 
   def labware_type

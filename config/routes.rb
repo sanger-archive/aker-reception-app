@@ -16,6 +16,6 @@ Rails.application.routes.draw do
 
   resources :completed_submissions
   post '/completed_submissions/print', to: 'completed_submissions#print'
-  post '/material_submissions/claim', to: 'submissions#claim'
+  post '/claim_submissions/claim', to: 'claim_submissions#claim'
 
 end
