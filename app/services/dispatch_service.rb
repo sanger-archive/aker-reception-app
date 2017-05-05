@@ -15,9 +15,9 @@ class DispatchService
         current_step = nil
       end
     rescue => e
-      puts "*"*70
-      puts e
-      puts e.backtrace
+      Rails.logger.error "A step failed in the dispatch service:"
+      Rails.logger.error e
+      e.backtrace.each { |x| Rails.logger.error x}
       raise
     ensure
       unless current_step.nil?

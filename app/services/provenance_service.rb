@@ -36,24 +36,6 @@ class ProvenanceService
     error_messages
   end
 
-  # Adds a validation error to the given error_messages.
-  def add_error(error_messages, labware_index, address, field, msg)
-    i = error_messages.index { |x| x[:labwareIndex]==labware_index && x[:address]==address }
-    if i.nil?
-      error_message = {
-        errors: {},
-        labwareIndex: labware_index,
-        address: address,
-        update_successful: true,
-      }
-      error_messages.push(error_message)
-    else
-      error_message = error_messages[i]
-    end
-
-    error_message[:errors][field.to_sym] = msg
-  end
-
   # Process request to set the json data for labware in a given submission.
   # Returns a success boolean and an array of errors.
   # The data will be saved even if the validation failed, because it might be in-progress.
@@ -82,6 +64,7 @@ class ProvenanceService
           end
         end
       end
+
       filtered_data = nil if filtered_data.empty?
 
       if filtered_data.nil? && !general_error_field.nil?
@@ -110,6 +93,24 @@ private
     sp = @schema['properties']
     return sp.keys.first.to_sym if sp && !sp.empty?
     nil
+  end
+
+  # Adds a validation error to the given error_messages.
+  def add_error(error_messages, labware_index, address, field, msg)
+    i = error_messages.index { |x| x[:labwareIndex]==labware_index && x[:address]==address }
+    if i.nil?
+      error_message = {
+        errors: {},
+        labwareIndex: labware_index,
+        address: address,
+        update_successful: true,
+      }
+      error_messages.push(error_message)
+    else
+      error_message = error_messages[i]
+    end
+
+    error_message[:errors][field.to_sym] = msg
   end
 
 end
