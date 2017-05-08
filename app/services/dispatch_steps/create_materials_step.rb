@@ -9,7 +9,8 @@ class CreateMaterialsStep
   def up
     @material_submission.labwares.each do | labware |
       changed = false
-      labware.contents.each do | address, bio_data |
+      contents = labware.contents
+      contents.each do | address, bio_data |
         unless bio_data['id']
           m = MatconClient::Material.create(bio_data)
           bio_data['id'] = m.id
@@ -17,7 +18,7 @@ class CreateMaterialsStep
         end
       end
       if changed
-        labware.update_attributes(contents: labware.contents)
+        labware.update_attributes(contents: contents)
       end
     end
   end
@@ -26,7 +27,8 @@ class CreateMaterialsStep
   def down
     @material_submission.labwares.each do | labware |
       changed = false
-      labware.contents.each do | address, bio_data |
+      contents = labware.contents
+      contents.each do | address, bio_data |
         if bio_data['id']
           MatconClient::Material.destroy(bio_data['id'])
           bio_data.delete('id')
@@ -34,7 +36,7 @@ class CreateMaterialsStep
         end
       end
       if changed
-        labware.update_attributes(contents: labware.contents)
+        labware.update_attributes(contents: contents)
       end
     end
   end
