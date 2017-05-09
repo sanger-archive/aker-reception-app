@@ -42,6 +42,12 @@ class SubmissionsController < ApplicationController
     end
 
     if last_step?
+      if material_submission.status!='dispatch'
+        flash[:error] = "Submission not ready: please check previous steps"
+        render_wizard
+        return
+      end
+
       success = false
       cleanup = false
       begin
@@ -97,6 +103,13 @@ class SubmissionsController < ApplicationController
 
     if @update_successful && !params["material_submission"]["change_tab"]
       @update_successful = material_submission.update_attributes(status: :dispatch)
+    end
+
+    if !@update_successful && material_submission.status=='dispatch'
+      # If the given provenance is incomplete or wrong, make sure
+      # they're not in the last step (because they could have gone
+      # back and incorrected the material data).
+      material_submission.update_attributes(status: :provenance)
     end
   end
 

@@ -1,5 +1,7 @@
 FactoryGirl.define do
   factory :labware do
+    labware_index 1
+    material_submission
   end
 
   factory :labware_with_barcode_and_material_submission, class: :labware do

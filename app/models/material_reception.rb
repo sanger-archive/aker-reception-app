@@ -42,6 +42,7 @@ class MaterialReception < ApplicationRecord
     end
   end
 
+  # Returns true if there are receptions for every labware in the submission
   def all_received?
     labware.material_submission.labwares.all?(&:received?)
   end

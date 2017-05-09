@@ -40,4 +40,8 @@ RSpec.describe LabwareType, type: :model do
     expect(build(:labware_type, name: nil)).to_not be_valid
   end
 
+  it "should have correct size" do
+    expect(build(:labware_type, num_of_rows: 2, num_of_cols: 3).size).to eq 6
+  end
+
 end

@@ -11,12 +11,8 @@ class CreateSetsStep
 
       # Adding materials to set
       # set_materials takes an array of uuids
-      uuids=[]
-      @material_submission.labwares.each do | labware |
-        labware.contents.each do | address, bio_data |
-          uuids.push(bio_data['id'])
-        end
-      end
+      uuids = @material_submission.labwares.flat_map { |lw| lw.contents.values }.flat_map { |c| c['id'] }
+
       set.set_materials(uuids)
       set.update_attributes(locked: true)
     end
