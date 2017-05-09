@@ -1,7 +1,7 @@
 class MaterialSubmissionsController < ApplicationController
 
   def schema
-    render :json => Schema.get
+    render :json => MatconClient::Material.schema.body
   end
 
   def index

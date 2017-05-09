@@ -8,7 +8,6 @@
     this.params._cssEmptyTabClass = this.params._cssEmptyTabClass || 'bg-warning';
     this.params._cssErrorTabClass = this.params._cssErrorTabClass || 'bg-danger';
 
-    this._tabsWithError = [];
     this.errorCells = {};
     this.tooltipInputs = [];
 
@@ -32,35 +31,55 @@
 
     this.cleanTooltips();
 
-    var barcode = $(e.target).attr('href').replace('#', '');
-    $('form td:first-child').html(barcode);
+    // var labware_name = $(e.target).attr('href').replace('#', '');
+    // $('form td:first-child').html(labware_name);
+
     this.inputs().each($.proxy(this.restoreInput, this, data));
 
     this.updateValidations();
     //this.inputs().each($.proxy(this.updateErrorInput, this, data));
   };
 
-  proto.updateErrorState = function(input, labwareId, wellId, fieldName) {
-    if (this.errorCells[labwareId] && this.errorCells[labwareId][wellId] &&
-      this.errorCells[labwareId][wellId][fieldName]) {
-      var msg = this.errorCells[labwareId][wellId][fieldName]
-      this.setErrorToInput(input, msg);
+  proto.updateErrorState = function(input, labwareIndex, address, fieldName) {
+    if (this.errorCells[labwareIndex] && this.errorCells[labwareIndex][address]
+        && this.errorCells[labwareIndex][address][fieldName]) {
+      this.setErrorToInput(input, this.errorCells[labwareIndex][address][fieldName]);
     }
   };
+
+  proto.tabLabwareIndex = function(tab) {
+    var id = tab.attr('id');
+    var matching = id.match(/labware_tab\[([0-9]+)\]/);
+    return matching ? matching[1] : null;
+  }
 
   proto.setErrorToTab = function(tab) {
-    this._tabsWithError.push(tab);
-    $(tab).addClass(this.params._cssErrorTabClass);
-    $(tab).removeClass(this.params._cssNotEmptyTabClass);
+    var labwareIndex = this.tabLabwareIndex($(tab));
+    if (this.anyErrorsForLabwareIndex(labwareIndex)) {
+      $(tab).addClass(this.params._cssErrorTabClass);
+      $(tab).removeClass(this.params._cssNotEmptyTabClass);
+    } else {
+      $(tab).removeClass(this.params._cssErrorTabClass);
+    }
   };
 
-  proto.unsetErrorToTab = function(tab) {
-    var index = this._tabsWithError.indexOf(tab);
-    if (index > -1) {
-      this._tabsWithError.splice(index, 1);
+  proto.anyErrorsForLabwareIndex = function(labwareIndex) {
+    if (labwareIndex && this.errorCells) {
+      var lwe = this.errorCells[labwareIndex];
+      if (lwe) {
+        for (var i in lwe) {
+          if (lwe[i] && !$.isEmptyObject(lwe[i])) {
+            return true;
+          }
+        }
+      }
     }
+    return false;
+  }
 
-    $(tab).removeClass(this.params._cssErrorTabClass);
+  proto.unsetErrorToTab = function(tab) {
+    this.setErrorToTab(tab);
+//    $(tab).removeClass(this.params._cssErrorTabClass);
 
     this.updateTabContentPresenceStatus(tab);
   };
@@ -94,31 +113,35 @@
     this.tooltipInputs=[];
   };
 
-  proto.cellNameFromErrorKey = function(wellId, key) {
-    var fieldName = key.replace(/.*\./, '');
-    var name = [
-      "material_submission[labwares_attributes][0][wells_attributes][",
-      wellId, "][biomaterial_attributes][", fieldName,"]"].join('');
-    return(name);
-  };
-
   proto.isTabEmpty = function(tab) {
     return !this.isTabWithContent(tab);
   }
 
   proto.isTabWithContent = function(tab) {
-    var data = this.dataForTab(tab);
-    return $.map(data.wells_attributes, function(n){return n;}).some(function(well) {
-      var biomaterialAttributes = well.biomaterial_attributes;
-      return ['donor_name', 'gender', 'id', 'phenotype', 'supplier_name', 'uuid', 'common_name'].some(function(name) {
-        return ((biomaterialAttributes[name]!==null) && (biomaterialAttributes[name]!=''));
-      });
-    });
+    var data = this.dataForTab(tab); // data is the labware for this tab
+
+    return (data["contents"]!=null);
+    // TODO -- this needs to examine data more closely
+
+
+
+    // if (data.content===null) {
+    //   return false;
+    // }
+
+    // return $.map(data.content)
+
+    // return $.map(data.wells_attributes, function(n){return n;}).some(function(well) {
+    //   var biomaterialAttributes = well.biomaterial_attributes;
+    //   return ['donor_name', 'gender', 'id', 'phenotype', 'supplier_name', 'uuid', 'common_name'].some(function(name) {
+    //     return ((biomaterialAttributes[name]!==null) && (biomaterialAttributes[name]!=''));
+    //   });
+    // });
   };
 
   proto.validateInput = function(input) {
     var name = $(input).parents('td').data('psd-schema-validation-name');
-    if (!!name) {
+    if (name) {
       $(input).trigger('psd.schema.validation', {
         node: input,
         name: name,
@@ -139,61 +162,66 @@
     }, this));
   };
 
-  proto.saveTab = function(e) {
+  proto.saveTab = function(e, leaving) {
     var currentTab = $(e.target);
     var data = this.dataForTab(currentTab);
 
     this.inputs().each($.proxy(this.saveInput, this, data));
-    //this.validateTab(currentTab);
-      // var input = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
-      // $(this.form).append(input);
-      var promise = $.post($(this.form).attr('action'),  $(this.form).serialize()).then(
-        $.proxy(this.onReceive, this, currentTab),
-        $.proxy(this.onError, this));
-      // input.remove();
-      return promise;      
-    return null;
+
+    if (!leaving) {
+      var changeTabField = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
+      $(this.form).append(changeTabField);
+    }
+    var promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
+      $.proxy(this.onReceive, this, currentTab),
+      $.proxy(this.onError, this)
+    );
+
+    if (!leaving) {
+     changeTabField.remove();
+    }
+    return promise;
   };
 
   proto.onSchemaError = function(e, data) {
-    this._tabsWithError=[];
     return this.onReceive($(this.currentTab), data);
-    this.loadErrorsFromMsg(data);
-    this.updateValidations();
   };
 
   proto.loadErrorsFromMsg = function(data) {
     if (data && data.messages) {
-      for (var i=0; i<data.messages.length; i++) {
-        var message = data.messages[i];
-        this.resetCellNameErrors(message.labware_id);
-      }      
 
-      for (var i=0; i<data.messages.length; i++) {
-        var message = data.messages[i];
-        var wellId = message.well_id;
-        this.storeCellNameError(message.labware_id, wellId, message.errors);
+      for (var key in data) {
+        for (var i=0; i<data.messages.length; i++) {
+          var message = data.messages[i];
+          this.resetCellNameErrors(message.labwareIndex);
+        }
+
+        for (var i=0; i<data.messages.length; i++) {
+          var message = data.messages[i];
+          var address = message.address;
+          this.storeCellNameError(message.labwareIndex, address, message.errors);
+        }
       }
     }
   };
 
-  proto.cleanValidLabwares = function(uuids) {
+  proto.cleanValidLabwares = function(labwareIndexes) {
     if (typeof this.errorCells !== 'undefined') {
-      for (var i=0; i<uuids.length; i++) {
-        delete(this.errorCells[uuids[i]]);
-      }      
+      for (var i=0; i<labwareIndexes.length; i++) {
+        delete(this.errorCells[labwareIndexes[i]]);
+      }
     }
   };
 
   proto.onReceive = function(currentTab, data, status) {
     if (data.update_successful) {
-      if (typeof data.labwares_uuids !== 'undefined') {
-        this.cleanValidLabwares(data.labwares_uuids);
-      }
       this.unsetErrorToTab(currentTab[0]);
+      if (data.labwares_indexes) {
+        this.cleanValidLabwares(data.labwares_indexes);
+      }
     } else {
-      this.setErrorToTab(currentTab[0]);
       this.loadErrorsFromMsg(data);
+      this.setErrorToTab(currentTab[0]);
     }
     this.updateValidations();
     return data;
@@ -206,118 +234,118 @@
     }, this), 500);
   };
 
-  proto.storeCellNameError = function(labwareId, wellId, errors) {
-    if (typeof this.errorCells[labwareId]==='undefined') {
-      this.resetCellNameErrors(labwareId);
+  proto.storeCellNameError = function(labwareIndex, address, errors) {
+    if (!this.errorCells[labwareIndex]) {
+      this.resetCellNameErrors(labwareIndex);
     }
-    if (typeof this.errorCells[labwareId][wellId]==='undefined') {
-      this.errorCells[labwareId][wellId]={};
+    if (!this.errorCells[labwareIndex][address]) {
+      this.errorCells[labwareIndex][address]={};
     }
-    if (typeof errors.schema !== 'undefined') {
+    if (errors.schema) {
       /** Json schema error message from the server json-schema gem */
       for (var i=0; i<errors.schema[0].length; i++) {
         var obj = errors.schema[0][i].message;
         var fieldName = obj.fragment.replace(/#\//, '')
         var text = obj.message;
-        this.errorCells[labwareId][wellId][fieldName]=text;
+        this.errorCells[labwareIndex][address][fieldName] = text;
       }
     } else {
       /** Json Schema error message from the JS client */
       for (var key in errors) {
         var fieldName = key.replace(/.*\./, '');
-        this.errorCells[labwareId][wellId][fieldName]=errors[key];
+        this.errorCells[labwareIndex][address][fieldName] = errors[key];
       }
     }
   };
 
-  proto.resetCellNameErrors = function(labwareId) {
-    this.errorCells[labwareId]={};
+  proto.resetCellNameErrors = function(labwareIndex) {
+    this.errorCells[labwareIndex]={};
   };
 
   proto.inputs = function() {
     return $('form input').filter(function(pos, input) {
-      return($(input).attr('name') && $(input).attr('name').search(/material_submission/)>=0);
+      return($(input).attr('id') && $(input).attr('id').search(/labware/)>=0);
     });
   };
 
   proto.notEmptyInputs = function() {
     return $('form input').filter(function(pos, input) {
-      return(($(input).val().length > 0) && $(input).attr('name') && $(input).attr('name').search(/material_submission/)>=0);
+      return(($(input).val().length > 0) && $(input).attr('id') && $(input).attr('id').search(/labware/)>=0);
     });
   };
 
-  proto.rowNumForName = function(name) {
-    var matching = name.match(/\[wells_attributes\]\[(\d*)\]/);
+  proto.fieldsForId = function(id) {
+    var matching = id.match(/labware\[([0-9]*)\]address\[([A-Z0-9:]*)\]fieldName\[(\w*)\]/);
     if (matching) {
-      return matching[1]
-    } else {
-      return null;
+      return {
+        "labwareIndex": matching[1],
+        "address": matching[2],
+        "fieldName": matching[3]
+      };
     }
-  };
-
-  proto.fieldNameForName = function(name) {
-    var matching = name.match(/\[biomaterial_attributes\]\[(\w*)\]/);
-    if (matching) {
-      return matching[1];
-    } else {
-      return null;
-    }
-  };
-
-  proto.is_well_attribute_id = function(input) {
-    var name = $(input).attr('name');
-    return (name.search(/material_submission\[labwares_attributes\]\[0\]\[wells_attributes\]\[\d*\]\[id\]/) >=0);
-  };
-
-  proto.is_labware_id = function(input) {
-    var name = $(input).attr('name');
-    return (name.search(/material_submission\[labwares_attributes\]\[0\]\[uuid\]/) >= 0);
-  };
+    return null;
+  }
 
   proto.saveInput = function(data, pos, input) {
-    var name = $(input).attr('name');
-    var rowNum = this.rowNumForName(name);
-    var fieldName = this.fieldNameForName(name);
-
-    if (data===null) {
+    if (data==null) {
       return;
     }
 
-    if ((rowNum!==null) && (fieldName!==null)) {
-      data.wells_attributes[rowNum].biomaterial_attributes[fieldName] = $(input).val();
+    var id = $(input).attr('id');
+    var info = this.fieldsForId(id);
+
+    if (info && data.labware_index==info.labwareIndex) {
+
+      var v = $(input).val();
+      if (v!=null) {
+        v = $.trim(v);
+        if (v=='') {
+          v = null;
+        }
+      }
+      if (v) {
+        if (!data["contents"]) {
+          data["contents"] = {}
+        }
+        if (!data["contents"][info.address]) {
+          data["contents"][info.address] = {}
+        }
+        data["contents"][info.address][info.fieldName] = v;
+      } else if (this.fieldData(data, info.address, info.fieldName)!=null) {
+        data["contents"][info.address][info.fieldName] = null;
+      }
     }
   };
 
   proto.updateErrorInput = function(data, pos, input) {
-    var name = $(input).attr('name');
-    var rowNum = this.rowNumForName(name)
-    var fieldName = this.fieldNameForName(name)
+    var id = $(input).attr('id');
+    var info = this.fieldsForId(id);
 
-    if (fieldName) {
-      this.updateErrorState(input, data.id, data.wells_attributes[rowNum].position, fieldName);
+    if (info) {
+      this.updateErrorState(input, info.labwareIndex, info.address, info.fieldName);
     }
   };
+
+  proto.fieldData = function(data, address, fieldName) {
+    if (data && data["contents"] && address && data["contents"][address] && fieldName) {
+      return data["contents"][address][fieldName];
+    }
+    return null;
+  }
 
   proto.restoreInput = function(data, pos, input) {
-    var name = $(input).attr('name');
-    var rowNum = this.rowNumForName(name)
-    var fieldName = this.fieldNameForName(name)
+    var id = $(input).attr('id');
+    var info = this.fieldsForId(id);
 
-    if ((rowNum!==null) && (fieldName!==null)) {
-      $(input).val(data.wells_attributes[rowNum].biomaterial_attributes[fieldName]);
-    } else {
-      if (this.is_well_attribute_id(input)) {
-        $(input).val(data.wells_attributes[rowNum].id);
-      }
-      if (this.is_labware_id(input)) {
-        $(input).val(data.id);
-      }
+    if (info && data.labware_index==info.labwareIndex) {
+      $(input).val(this.fieldData(data, info.address, info.fieldName));
     }
   };
 
+  // This returns the labware object linked to the tab
   proto.dataForTab = function(tab) {
     for (var key in this.params) {
-      if ($(tab).attr('href') == ('#'+this.params[key].barcode)) {
+      if ($(tab).attr('href') === ('#Labware'+this.params[key].labware_index)) {
         return this.params[key];
       }
     }
@@ -325,7 +353,7 @@
   };
 
   proto.saveCurrentTab = function(e) {
-    this.saveTab({target: this.currentTab});
+    this.saveTab({target: this.currentTab}, false);
     if (e) {
       e.preventDefault();
     }
@@ -341,7 +369,7 @@
     $('.alert .alert-title').html(data.title);
     $('.alert .alert-msg').html(data.body);
     $('.alert').toggleClass('hidden', false);
-  };  
+  };
 
   proto.isEmptyErrorCells = function() {
     return (Object.keys(this.errorCells).length == 0);
@@ -352,7 +380,7 @@
     e.preventDefault();
 
     //this.saveTab({target: this.currentTab});
-    var promise = this.saveTab({target: this.currentTab});
+    var promise = this.saveTab({target: this.currentTab}, true);
     if (promise === null) {
       return;
     }
@@ -365,7 +393,7 @@
           body: 'Please review and solve the validation problems before continuing'});
         this.setErrorToTab(this.currentTab);
         if (!data.update_successful) {
-          this.loadErrorsFromMsg(errorMsgs);
+          this.loadErrorsFromMsg(data);
         }
         this.updateValidations();
       }
@@ -395,7 +423,6 @@
     // If you have one
     var button = $('.save');
     button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));
-
     $(this.node).on('psd.schema.error', $.proxy(this.onSchemaError, this));
 
     $('input[type=submit]').on('click', $.proxy(this.toDispatch, this));

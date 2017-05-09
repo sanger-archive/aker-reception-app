@@ -38,12 +38,31 @@ LabwareType.create(
   row_is_alpha: false
 )
 
-100.times do
-  Contact.create(
-    fullname: Forgery('name').full_name,
-    email: Forgery('internet').email_address
+Contact.create(
+  fullname: Forgery('name').full_name,
+  email: Forgery('internet').email_address
   )
-end
+
+Contact.create(
+  fullname: "Dave",
+  email: "dr6@sanger.ac.uk"
+  )
+Contact.create(
+  fullname: "Harriet",
+  email: "hc6@sanger.ac.uk"
+  )
+Contact.create(
+  fullname: "Rich",
+  email: "rl15@sanger.ac.uk"
+  )
+Contact.create(
+  fullname: "Eduardo",
+  email: "emr@sanger.ac.uk"
+  )
+Contact.create(
+  fullname: "Chris",
+  email: "cs24@sanger.ac.uk"
+  )
 
 Printer.create(
   name: 'd304bc',

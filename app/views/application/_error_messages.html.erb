@@ -1,10 +1,14 @@
 <!-- # % if target.errors.any? % -->
-  <div class="alert alert-danger <%= target.errors.any? ? '': 'hidden' %>" role="alert">
-    <strong><%= pluralize(target.errors.count, "error") %> prohibited this record from being saved:</strong>
-    <ul>
-      <% target.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-    </ul>
+  <div class="alert alert-danger <%= target.errors.empty? ? 'hidden': '' %>" role="alert">
+    <% if target.errors.empty? %>
+        <strong>Errors prevented this record from being saved.</strong>
+    <% else %>
+        <strong><%= pluralize(target.errors.count, "error") %> prevented this record from being saved:</strong>
+        <ul>
+          <% target.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+    <% end %>
   </div>
 <!-- % end % -->

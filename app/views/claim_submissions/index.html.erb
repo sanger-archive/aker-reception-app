@@ -1,63 +1,56 @@
-
 <% content_for :main_title do %>
   Claim Submissions
 <% end %>
 <%= render :partial => 'title_buttons' %>
 
-
 <div class="container">
-<div class="claiming-display row">
+  <div class="claiming-display row">
 
-  <div class="col-md-4">
+    <div class="col-md-4">
 
-    <div class="row rowspace">
-      <div class="submission-list">
-        <table class="table" data-toggle="table">
-          <thead>
-          <tr>
-            <th data-field="id"> Id </th>
-            <th data-field="created_at">Created at </th>
-            <!-- th data-field="status">Status</th -->
-            <th data-field="no_of_labwares_required"># items</th>
-            <th data-field="state" data-checkbox="true"></th>
-          </tr>
-          </thead>
-          <tbody>
-            <% @submissions.each do |sub| %>
+      <div class="row rowspace">
+        <div class="submission-list">
+          <table class="table" data-toggle="table">
+            <thead>
               <tr>
-                 <td><%= sub.id %></td>
-                 <td><%= sub.created_at %></td>
-                 <td><%= sub.no_of_labwares_required %></td>
-                 <td></td>
+                <th data-field="id"> Id </th>
+                <th data-field="created_at">Created at </th>
+                <!-- th data-field="status">Status</th -->
+                <th data-field="no_of_labwares_required"># items</th>
+                <th data-field="state" data-checkbox="true"></th>
               </tr>
-            <% end %>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <% @submissions.each do |sub| %>
+                <tr>
+                  <td><%= sub.id %></td>
+                  <td><%= sub.created_at %></td>
+                  <td><%= sub.no_of_labwares_required %></td>
+                  <td></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="col-md-8">
-    <div class="row rowspace">
-      <div class="claimed-sets" data-service-url="/get_all_collections"
-      data-psd-component-class="DragAndDrop"
-      data-psd-component-parameters='{"cssDropable": "tbody tr"}'
-      >
+    <div class="col-md-8">
+      <div class="row rowspace">
+        <div class="claimed-sets" data-service-url="/get_all_collections"
+          data-psd-component-class="DragAndDrop"
+          data-psd-component-parameters='{"cssDropable": "tbody tr"}'
+        >
           <table data-toggle="table" class="table">
-              <thead>
+            <thead>
               <tr>
-                  <th data-field="name">Collection Name </th>
-                  <th data-field="uuid">UUID</th>
-                  <th data-field="claim">Claim</th>
+                <th data-field="name">Collection Name </th>
+                <th data-field="uuid">UUID</th>
+                <th data-field="claim">Claim</th>
               </tr>
-              </thead>
-            </table>
+            </thead>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<script type="text/javascript">
-
-</script>
-  </div>
-
 </div>
