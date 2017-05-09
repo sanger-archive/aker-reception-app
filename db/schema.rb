@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 20170503153748) do
     t.integer  "material_submission_id",             null: false
     t.integer  "labware_index",                      null: false
     t.integer  "print_count",            default: 0, null: false
-    t.jsonb    "contents"
+    t.json     "contents"
     t.string   "barcode"
     t.string   "container_id"
     t.datetime "created_at",                         null: false

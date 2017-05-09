@@ -5,7 +5,7 @@ class NewCreateLabware < ActiveRecord::Migration[5.0]
       t.integer :labware_index, null: false
       t.integer :print_count, null: false, default: 0
 
-      t.jsonb :contents, null: true
+      t.json :contents, null: true
       t.string :barcode, null: true
       t.string :container_id, null: true
 
