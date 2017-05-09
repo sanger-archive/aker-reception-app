@@ -54,7 +54,6 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
         @submission.labwares << @labware
 
         post :claim, {:params => { :submission_ids => [@submission.id], :collection_id =>  @set_uuid } }
-
         @submission.reload
         expect(@submission.status).to eq('claimed')
       end

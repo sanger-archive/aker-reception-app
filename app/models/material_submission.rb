@@ -82,7 +82,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def ready_for_claim?
-    status==MaterialSubmission.AWAITING && labwares.all(&:received?)
+    status==MaterialSubmission.AWAITING && labwares.all?(&:received?)
   end
 
   def no_of_labwares_required
