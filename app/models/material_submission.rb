@@ -12,15 +12,16 @@ class MaterialSubmission < ApplicationRecord
     'claimed'
   end
 
-  attr_writer :labwares
+  def self.BROKEN
+    'broken'
+  end
 
   belongs_to :user
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
 
-  has_many :material_submission_labwares, dependent: :destroy
-  has_many :labware_references, through: :material_submission_labwares
+  has_many :labwares
 
   validates :no_of_labwares_required, numericality: { only_integer: true, greater_than_or_equal_to: 1 },
     if: :active_or_labware?
@@ -29,9 +30,9 @@ class MaterialSubmission < ApplicationRecord
   validates :labware_type_id, presence: true, if: :active_or_labware?
   validates :address, presence: true, if: :active?
   validates :contact, presence: true, if: :active?
-  validate :each_labware_has_biomaterial, if: :active?
+  validate :each_labware_has_contents, if: :active?
 
-  before_save :set_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
+  before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
   #accepts_nested_attributes_for :labwares
 
@@ -64,6 +65,26 @@ class MaterialSubmission < ApplicationRecord
     active? || status==MaterialSubmission.AWAITING
   end
 
+  def pending?
+    ![MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED, MaterialSubmission.BROKEN].include? status
+  end
+
+  def broken?
+    return status==MaterialSubmission.BROKEN
+  end
+
+  def broken!
+    update_attributes(status: MaterialSubmission.BROKEN)
+  end
+
+  def claimed?
+    return status==MaterialSubmission.CLAIMED
+  end
+
+  def ready_for_claim?
+    status==MaterialSubmission.AWAITING && labwares.all?(&:received?)
+  end
+
   def no_of_labwares_required
     super || 0
   end
@@ -76,44 +97,26 @@ class MaterialSubmission < ApplicationRecord
     user&.email
   end
 
-  def labwares
-    @labwares ||= material_submission_labwares.map(&:labware)
-  end
-
-  def labwares_attributes=(params)
-    add_to_labwares(params.values.map do |labware_attrs|
-      labware = Labware.find(labware_attrs["uuid"])
-      labware.update(labware_attrs)
-      labware
-    end)
-  end
-
-  def add_to_labwares(labwares)
-    @labwares = [] if @labwares.nil?
-    labwares.each do |l|
-      @labwares.delete_if{|l2| l2.uuid == l.uuid}
-      @labwares.push(l)
-    end
-  end
-
   def update(params)
     update_attributes(params) && labwares.all?(&:valid?)
   end
 
-  def labware
-  end
-
-  def material_submission_labwares_attributes=(params)
-  end
-
   private
 
-  def set_labware
-    material_submission_labwares << LabwareType.create_labwares(number: no_of_labwares_required, labware_type_id: labware_type_id)
+  # Deletes any labware linked to this submission, and creates
+  # new ones based on the requested labware fields
+  def create_labware
+    if labwares
+      labwares.each { |lw| lw.destroy! }
+    end
+    labwares = []
+    (1..no_of_labwares_required).each do |i|
+      labwares << Labware.create(material_submission: self, labware_index: i)
+    end
   end
 
-  def each_labware_has_biomaterial
-    unless labwares.all? { |labware| labware.biomaterials.count > 0 }
+  def each_labware_has_contents
+    unless labwares.all? { |labware| labware.contents.present? }
       errors.add(:labwares, "must each have at least one Biomaterial")
     end
   end

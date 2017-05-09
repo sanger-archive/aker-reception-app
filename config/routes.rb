@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   root 'material_submissions#index'
 
   get '/materials_schema', to: 'material_submissions#schema'
@@ -7,6 +6,7 @@ Rails.application.routes.draw do
   resources :material_receptions
   resources :material_submissions do
     resources :build, controller: 'submissions'
+    put :biomaterial_data, controller: 'submissions'
   end
   resources :claim_submissions
 
@@ -16,5 +16,6 @@ Rails.application.routes.draw do
 
   resources :completed_submissions
   post '/completed_submissions/print', to: 'completed_submissions#print'
-  post '/material_submissions/claim', to: 'submissions#claim'
+  post '/claim_submissions/claim', to: 'claim_submissions#claim'
+
 end

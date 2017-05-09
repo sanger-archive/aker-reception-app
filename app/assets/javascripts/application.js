@@ -121,21 +121,15 @@ function fillInTableFromFile(table, files) {
         }
 
         // No wellValue, no data
-        if (!wellValue) { 
+        if (!wellValue) {
           displayError('This manifest does not have a position field for the wells')
           return;
         };
 
-        var tableRow = $('td input[name*="position"]', table).filter(function(td) {
-          return $(this).val() == wellValue
-        }).closest('tr');
+        var tableRow = $('tr[data-address="'+wellValue+'"]', table);
 
         for (var key in row) {
-          for (var fieldName in field_mapping) {
-            if (key.toLowerCase().indexOf(fieldName) != -1) {
-              tableRow.find('input[name*="' + field_mapping[fieldName] + '"]').val(row[key])
-            }
-          }
+          tableRow.find('input[name*="'+key+'"]').val(row[key]);
         }
       })
     },

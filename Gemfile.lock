@@ -28,6 +28,16 @@ GIT
       request_store
 
 GIT
+  remote: git://github.com/sanger/aker-matcon-client.git
+  revision: 8d1199b0225257458467f7c6a2f0d1355c9d6655
+  specs:
+    matcon_client (0.2.0)
+      activemodel
+      activesupport
+      faraday
+      faraday_middleware
+
+GIT
   remote: git://github.com/sanger/aker-permission.git
   revision: 184fbc371bddb467859e71ae3a0f06ba483eab9b
   specs:
@@ -56,14 +66,6 @@ GIT
       addressable (~> 2.2)
       faraday (~> 0.9)
       faraday_middleware (~> 0.9)
-
-GIT
-  remote: git://github.com/sanger/material_service_client_gem.git
-  revision: 32ce7adaf011a769d21c2627b3a101581579f7e7
-  specs:
-    material_service_client (1.0.1)
-      faraday (~> 0.11.0)
-      faraday_middleware
 
 GIT
   remote: git://github.com/sanger/pmb-client.git
@@ -147,7 +149,7 @@ GEM
     builder (3.2.3)
     byebug (9.0.6)
     cancancan (1.16.0)
-    capybara (2.13.0)
+    capybara (2.14.0)
       addressable
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -213,7 +215,7 @@ GEM
     factory_girl_rails (4.8.0)
       factory_girl (~> 4.8.0)
       railties (>= 3.0.0)
-    faraday (0.11.0)
+    faraday (0.12.1)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.11.0.1)
       faraday (>= 0.7.4, < 1.0)
@@ -236,7 +238,7 @@ GEM
     globalid (0.4.0)
       activesupport (>= 4.2.0)
     gmetric (0.1.3)
-    hashdiff (0.3.2)
+    hashdiff (0.3.4)
     i18n (0.8.1)
     ice_nine (0.11.2)
     jbuilder (2.6.3)
@@ -260,7 +262,7 @@ GEM
       nokogiri (>= 1.5.9)
     macaddr (1.7.1)
       systemu (~> 2.6.2)
-    mail (2.6.4)
+    mail (2.6.5)
       mime-types (>= 1.16, < 4)
     method_source (0.8.2)
     mime-types (3.1)
@@ -280,7 +282,7 @@ GEM
       ast (~> 2.2)
     path_expander (1.0.1)
     pg (0.20.0)
-    poltergeist (1.14.0)
+    poltergeist (1.15.0)
       capybara (~> 2.1)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
@@ -328,19 +330,21 @@ GEM
       execjs
       railties (>= 3.2)
       tilt
-    reek (4.6.1)
+    reek (4.6.2)
       codeclimate-engine-rb (~> 0.4.0)
-      parser (>= 2.3.1.2, < 2.5)
+      parser (>= 2.4.0.0, < 2.5)
       rainbow (~> 2.0)
     ref (2.0.0)
     request_store (1.3.2)
-    responders (2.3.0)
-      railties (>= 4.2.0, < 5.1)
+    responders (2.4.0)
+      actionpack (>= 4.2.0, < 5.3)
+      railties (>= 4.2.0, < 5.3)
     rspec-core (3.5.4)
       rspec-support (~> 3.5.0)
     rspec-expectations (3.5.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
+    rspec-json_expectations (2.1.0)
     rspec-mocks (3.5.0)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
@@ -408,7 +412,7 @@ GEM
     tilt (2.0.7)
     turbolinks (5.0.1)
       turbolinks-source (~> 5)
-    turbolinks-source (5.0.0)
+    turbolinks-source (5.0.1)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
     uglifier (3.2.0)
@@ -438,7 +442,7 @@ GEM
       railties (>= 3.0.7)
     xpath (2.0.0)
       nokogiri (~> 1.3)
-    zipkin-tracer (0.21.2)
+    zipkin-tracer (0.22.0)
       faraday (~> 0.8)
       finagle-thrift (~> 1.4.2)
       rack (>= 1.0)
@@ -473,7 +477,7 @@ DEPENDENCIES
   json_api_client!
   launchy
   listen (~> 3.0.5)
-  material_service_client (~> 1.0.1)!
+  matcon_client!
   pg
   pmb-client (= 0.1.0)!
   poltergeist
@@ -482,6 +486,7 @@ DEPENDENCIES
   puma (~> 3.0)
   rails (~> 5.0.0, >= 5.0.0.1)
   react-rails
+  rspec-json_expectations
   rspec-rails (~> 3.4)
   rubycritic
   sass-rails (~> 5.0)
@@ -502,4 +507,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.14.5
+   1.14.6

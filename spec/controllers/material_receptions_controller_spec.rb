@@ -9,7 +9,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
 
       stub_request(:post, Rails.configuration.material_url+'/containers').
          with(:body => {"num_of_cols"=> 12,"num_of_rows"=>8,"col_is_alpha"=>false,"row_is_alpha"=>true}.to_json,
-              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
                 'Content-Type'=>'application/json',
                 }).
          to_return(:status => 200, :body => {
@@ -40,7 +40,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
 
       stub_request(:get, Rails.configuration.material_url+'/containers/382ce837-478c-49a3-86a8-7af34bb898cf').
          with(
-              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 
+              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
                 'Content-Type'=>'application/json',
                 }).
          to_return(:status => 200, :body => {
@@ -73,18 +73,18 @@ RSpec.describe MaterialReceptionsController, type: :controller do
       sign_in(@user)
 
       @labware_type = FactoryGirl.create(:labware_type, {:row_is_alpha => true})
-      @material_submission_labware = @labware_type.create_labware
+
+      @submission = FactoryGirl.create(:material_submission, user: @user)
+
+      @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1")
 
       allow(request.env['warden']).to receive(:authenticate!).and_return(@user)
 
-      @submission = FactoryGirl.create(:material_submission, user: @user)
-      @submission.labwares << @material_submission_labware
-      @labware = @material_submission_labware.labware
+      @submission.labwares << @labware
 
       stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{@labware.barcode}%22%7D").
          with(:headers => {'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => {"_items" => []}.to_json)
-
 
     end
 
@@ -100,7 +100,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     end
 
     it "does not add the barcode to the list if the barcode has already been received" do
-      MaterialReception.create(:labware_id => @labware.uuid)
+      MaterialReception.create(:labware_id => @labware.id)
       count = MaterialReception.all.count
       post :create, { :material_reception => {:barcode_value => @labware.barcode}}
       MaterialReception.all.reload
@@ -116,25 +116,20 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     end
 
     it "adds the barcode to the list if the barcode exists and has not been received yet" do
-      @labware.assign_attributes(print_count: 1)
-      @labware.barcode = 'AKER-500'
-      @labware.uuid = 'testing-uuid'
-      stub_request(:get, Rails.configuration.material_url+"/containers/#{@labware.uuid}").
+      @labware.update_attributes(print_count: 1, barcode: 'AKER_500', container_id: 'testing-uuid')
+      @material_submission = FactoryGirl.create(:material_submission, user: @user)
+      @labware.update_attributes(material_submission_id: @material_submission.id)
+
+      stub_request(:get, Rails.configuration.material_url+"/containers/#{@labware.container_id}").
          with(:headers => {'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => @labware.attributes.to_json, :headers => {})
       stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{@labware.barcode}%22%7D").
          with(:headers => {'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => {"_items" => [@labware.attributes]}.to_json)
 
-
-      @material_submission = FactoryGirl.create(:material_submission, user: @user)
-      @material_submission_labware = FactoryGirl.create :material_submission_labware, {
-        :labware_id => @labware.uuid, 
-        :material_submission => @material_submission}
-        
       count = MaterialReception.all.count
-      @labware.assign_attributes(print_count: 1)
       post :create, { :material_reception => {:barcode_value => @labware.barcode }}
+      expect(response).to have_http_status(:ok)
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count+1)
     end

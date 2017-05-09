@@ -1,3 +1,5 @@
+require 'rails/commands/server'
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -56,7 +58,6 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'example.com' }
 
   config.material_url = 'http://localhost:5000'
-  ENV['MATERIALS_URL'] = config.material_url
 
   config.set_url = 'http://localhost:3000/api/v1/'
   config.set_url_default_proxy = 'http://localhost:3000'
@@ -78,6 +79,6 @@ Rails.application.configure do
 
   config.fake_ldap = true
 
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+  config.action_mailer.default_url_options = { host: 'localhost', port: Rails::Server.new.options[:Port] }
 
 end

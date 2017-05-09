@@ -26,4 +26,7 @@ config/environments/development.rb
 # Ignore coverage
 coverage
 
+# public assets folder
+/public/assets/**
+
 .DS_Store

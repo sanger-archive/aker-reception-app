@@ -14,7 +14,7 @@ def step_params(material_submission, step_name)
       when :provenance
         {
           :status => 'provenance',
-          :labwares_attributes => plate_attributes_for(material_submission.labwares)
+          :labware => labware_attributes_for(material_submission.labwares)
         }
       when :dispatch
         {
@@ -41,39 +41,21 @@ def step_params(material_submission, step_name)
   }
 end
 
-
-def wells_attributes_for(plate)
-  plate.wells.each_with_index.reduce({}) do |memo, list|
-    well,index = list[0],list[1]
-    memo[index.to_s] = {
-      :uuid => well.id.to_s,
-      :position => well.position,
-      :biomaterial_attributes => {
-        #{}"0" => {
-          :supplier_name => 'Test',
-          :donor_name => 'Test',
-          :gender => 'Test',
-          :common_name => 'Test',
-          :phenotype => 'Test'
-        #}
+def labware_attributes_for(labwares)
+  data = {}
+  labwares.each do |labware|
+    data[labware.labware_index] = {
+      "1" => {
+        "gender" => "male",
+        "donor_id" => "d",
+        "phenotype" => "p",
+        "supplier_name" => "s",
+        "common_name" => "mouse",
       }
     }
-    memo
   end
+  data
 end
-
-def plate_attributes_for(labwares)
-  labwares.each_with_index.reduce({}) do |mlabware, list|
-    plate, plate_idx = list[0],list[1]
-    mlabware[plate_idx.to_s] = {
-      :uuid => plate.id.to_s,
-      :wells_attributes => wells_attributes_for(plate)
-    }
-    mlabware
-  end
-
-end
-
 
 RSpec.describe SubmissionsController, type: :controller do
   describe "Using the steps defined by wicked" do
@@ -203,6 +185,67 @@ RSpec.describe SubmissionsController, type: :controller do
         stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}?include=materials").
          with(:headers => request_headers).
          to_return(:status => 200, :body => "{}", :headers => response_headers)
+
+         schema = %Q(
+          {
+             "required":[
+                "gender",
+                "donor_id",
+                "phenotype",
+                "supplier_name",
+                "common_name"
+             ],
+             "type":"object",
+             "properties":{
+                "gender":{
+                   "required":true,
+                   "type":"string",
+                   "enum":[
+                      "male",
+                      "female",
+                      "unknown"
+                   ]
+                },
+                "date_of_receipt":{
+                   "type":"string",
+                   "format":"date"
+                },
+                "material_type":{
+                   "enum":[
+                      "blood",
+                      "dna"
+                   ],
+                   "type":"string"
+                },
+                "donor_id":{
+                   "required":true,
+                   "type":"string"
+                },
+                "phenotype":{
+                   "required":true,
+                   "type":"string"
+                },
+                "supplier_name":{
+                   "required":true,
+                   "type":"string"
+                },
+                "common_name":{
+                   "required":true,
+                   "type":"string",
+                   "enum":[
+                      "Homo Sapiens",
+                      "Mouse"
+                   ]
+                }
+             }
+            }
+          )
+
+         stub_request(:get, "http://localhost:5000/materials/json_schema").
+         with(headers: {'Accept'=>'application/json', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Content-Type'=>'application/json', 'User-Agent'=>'Faraday v0.12.1'}).
+         to_return(status: 200, body: schema, headers: {})
+
     end
 
     it "does not update the submission state if any steps have not been performed" do
@@ -215,7 +258,7 @@ RSpec.describe SubmissionsController, type: :controller do
       put :update, step_params(@material_submission, :labware)
       @material_submission.reload
 
-      put :update, step_params(@material_submission, :provenance)
+      put :biomaterial_data, step_params(@material_submission, :provenance)
       @material_submission.reload
       put :update, step_params(@material_submission, :dispatch_contact_error)
       @material_submission.reload
@@ -233,7 +276,7 @@ RSpec.describe SubmissionsController, type: :controller do
       put :update, step_params(@material_submission, :labware)
       @material_submission.reload
 
-      put :update, step_params(@material_submission, :provenance)
+      put :biomaterial_data, step_params(@material_submission, :provenance)
       @material_submission.reload
       put :update, step_params(@material_submission, :dispatch)
       @material_submission.reload
