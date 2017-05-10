@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe MaterialSubmissionsController, type: :controller do
 
-  describe "#destory" do
+  describe "#destroy" do
 
     setup do
       @request.env['devise.mapping'] = Devise.mappings[:user]
