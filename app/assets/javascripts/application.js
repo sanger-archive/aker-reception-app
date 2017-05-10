@@ -65,8 +65,7 @@ $(document).on('turbolinks:load', function() {
     tokenSeparators: [',', ' ']
   });
 
-  $('form.edit_material_submission input:file').on('change', function() {
-
+  $('input:file.upload-button').on('change', function() {
     var sample_table = $(this).closest('.well').siblings().find('table.dataTable');
 
     fillInTableFromFile(sample_table, $(this)[0].files)
