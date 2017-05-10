@@ -21,7 +21,7 @@ class MaterialSubmission < ApplicationRecord
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
 
-  has_many :labwares
+  has_many :labwares, dependent: :destroy
 
   validates :no_of_labwares_required, numericality: { only_integer: true, greater_than_or_equal_to: 1 },
     if: :active_or_labware?

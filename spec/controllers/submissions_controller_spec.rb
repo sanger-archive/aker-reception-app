@@ -120,7 +120,12 @@ RSpec.describe SubmissionsController, type: :controller do
         "_created"=>"Wed, 22 Feb 2017 22:42:38 GMT",
         "row_is_alpha"=>true,
         "_id"=>"382ce837-478c-49a3-86a8-7af34bb898cf"
-        }.to_json
+      }.to_json
+
+      @uuid = SecureRandom.uuid
+
+      request_headers = {'Content-Type'=>'application/vnd.api+json', 'Accept'=>'application/vnd.api+json'}
+      response_headers = {'Content-Type'=>'application/vnd.api+json'}
 
       stub_request(:post, "#{Rails.configuration.material_url}/containers").
          with(:body => "{\"num_of_cols\":1,\"num_of_rows\":1,\"col_is_alpha\":false,\"row_is_alpha\":false}",
@@ -139,21 +144,10 @@ RSpec.describe SubmissionsController, type: :controller do
           :headers => { 'Content-Type'=>'application/json'}).
          to_return(:status => 200, :body => @material_obj.to_json, :headers => {})
 
-
-
-
-      @uuid = SecureRandom.uuid
-
-      request_headers = {'Content-Type'=>'application/vnd.api+json', 'Accept'=>'application/vnd.api+json'}
-      response_headers = {'Content-Type'=>'application/vnd.api+json'}
-
       stub_request(:post, "#{Rails.configuration.set_url}sets").
          with(:body => "{\"data\":{\"type\":\"sets\",\"attributes\":{\"name\":\"Submission 1\"}}}",
               :headers => request_headers).
       to_return(status: 200, :body => {data: { id: "#{@uuid}", attributes: {name: "testing-set-1"}}}.to_json, headers: response_headers )
-
-         # to_return(:status => 200, :body => "{\"data\":{\"id\":\"#{@uuid}\",\"attributes\":{\"name\":\"testing-set-1\"}}}", :headers => {})
-
 
       stub_request(:post, "#{Rails.configuration.ownership_url}/batch").
          with(:headers => {'Content-Type'=>'application/x-www-form-urlencoded'}).
@@ -169,82 +163,82 @@ RSpec.describe SubmissionsController, type: :controller do
               :headers => request_headers).
          to_return(:status => 200, :body => "{}", :headers => response_headers)
 
-       stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}/relationships/materials").
+      stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}/relationships/materials").
          with(:headers => request_headers).
          to_return(:status => 200, :body => "{}", :headers => response_headers)
 
-        stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}/relationships/materials").
+      stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}/relationships/materials").
          with(:headers => request_headers).
          to_return(:status => 200, :body => "{}", :headers => response_headers)
 
-        stub_request(:patch, "#{Rails.configuration.set_url}sets/#{@uuid}").
+      stub_request(:patch, "#{Rails.configuration.set_url}sets/#{@uuid}").
          with(:body => "{\"data\":{\"id\":\"#{@uuid}\",\"type\":\"sets\",\"attributes\":{\"locked\":true}}}",
               :headers => request_headers).
          to_return(:status => 200, :body => "", :headers => response_headers)
 
-        stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}?include=materials").
+      stub_request(:get, "#{Rails.configuration.set_url}sets/#{@uuid}?include=materials").
          with(:headers => request_headers).
          to_return(:status => 200, :body => "{}", :headers => response_headers)
 
-         schema = %Q(
-          {
-             "required":[
-                "gender",
-                "donor_id",
-                "phenotype",
-                "supplier_name",
-                "common_name"
-             ],
-             "type":"object",
-             "properties":{
-                "gender":{
-                   "required":true,
-                   "type":"string",
-                   "enum":[
-                      "male",
-                      "female",
-                      "unknown"
-                   ]
-                },
-                "date_of_receipt":{
-                   "type":"string",
-                   "format":"date"
-                },
-                "material_type":{
-                   "enum":[
-                      "blood",
-                      "dna"
-                   ],
-                   "type":"string"
-                },
-                "donor_id":{
-                   "required":true,
-                   "type":"string"
-                },
-                "phenotype":{
-                   "required":true,
-                   "type":"string"
-                },
-                "supplier_name":{
-                   "required":true,
-                   "type":"string"
-                },
-                "common_name":{
-                   "required":true,
-                   "type":"string",
-                   "enum":[
-                      "Homo Sapiens",
-                      "Mouse"
-                   ]
-                }
-             }
+     schema = %Q(
+      {
+         "required":[
+            "gender",
+            "donor_id",
+            "phenotype",
+            "supplier_name",
+            "common_name"
+         ],
+         "type":"object",
+         "properties":{
+            "gender":{
+               "required":true,
+               "type":"string",
+               "enum":[
+                  "male",
+                  "female",
+                  "unknown"
+               ]
+            },
+            "date_of_receipt":{
+               "type":"string",
+               "format":"date"
+            },
+            "material_type":{
+               "enum":[
+                  "blood",
+                  "dna"
+               ],
+               "type":"string"
+            },
+            "donor_id":{
+               "required":true,
+               "type":"string"
+            },
+            "phenotype":{
+               "required":true,
+               "type":"string"
+            },
+            "supplier_name":{
+               "required":true,
+               "type":"string"
+            },
+            "common_name":{
+               "required":true,
+               "type":"string",
+               "enum":[
+                  "Homo Sapiens",
+                  "Mouse"
+               ]
             }
-          )
+         }
+        }
+      )
 
-         stub_request(:get, "http://localhost:5000/materials/json_schema").
-         with(headers: {'Accept'=>'application/json', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Content-Type'=>'application/json', 'User-Agent'=>'Faraday v0.12.1'}).
-         to_return(status: 200, body: schema, headers: {})
+     stub_request(:get, "http://localhost:5000/materials/json_schema").
+       with(headers: {'Accept'=>'application/json', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type'=>'application/json', 'User-Agent'=>'Faraday v0.12.1'}).
+       to_return(status: 200, body: schema, headers: {})
 
     end
 
@@ -265,7 +259,6 @@ RSpec.describe SubmissionsController, type: :controller do
       expect(@material_submission.status).not_to eq('active')
     end
 
-
     it "updates the submission state to active when all the required data of the steps has been provided" do
 
       stub_request(:patch, "#{Rails.configuration.set_url}sets/#{@uuid}").
@@ -282,5 +275,7 @@ RSpec.describe SubmissionsController, type: :controller do
       @material_submission.reload
       expect(@material_submission.status).to eq('active')
     end
+
   end
+
 end
