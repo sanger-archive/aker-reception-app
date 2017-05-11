@@ -66,7 +66,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def pending?
-    ![MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED, MaterialSubmission.BROKEN].include? status
+    status.nil? || ['labware', 'provenance', 'dispatch'].include?(status)
   end
 
   def broken?

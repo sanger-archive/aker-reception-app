@@ -26,7 +26,7 @@ class MaterialSubmissionsController < ApplicationController
   def destroy
     @material_submission = MaterialSubmission.find(params[:id])
 
-    if @material_submission.destroy
+    if @material_submission.pending? && @material_submission.destroy
       flash[:notice] = "Submission Cancelled"
       redirect_to material_submissions_path
     else
