@@ -18,6 +18,7 @@ class SubmissionsController < ApplicationController
       render_wizard
       return
     end
+
     if params[:id]=="provenance"
       labware_params = params["material_submission"]["labware"]
       service = ProvenanceService.new(material_schema)
@@ -32,7 +33,7 @@ class SubmissionsController < ApplicationController
         @status_success = material_submission.update(material_submission_params)
       end
     else
-      @status_success = material_submission.update(material_submission_params)
+      @status_success = material_submission.update(material_submission_params.merge(status: step.to_s))
     end
 
     unless @status_success
@@ -87,13 +88,14 @@ class SubmissionsController < ApplicationController
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
 
     end
-    material_submission.update_attributes(status: get_status)
+
+    material_submission.update_attributes(status: get_next_status) if material_submission.valid?
     render_wizard material_submission
+    @material_submission = nil
   end
 
   # receive biomaterial data, validate it and save it in the labware's json column
   def biomaterial_data
-
     # Make sure we don't let anyone update the data after the wizard has completed
     raise "This submission cannot be updated." unless material_submission.pending?
 
@@ -141,8 +143,8 @@ private
     )
   end
 
-  def get_status
-    return last_step? ? MaterialSubmission.ACTIVE : step.to_s
+  def get_next_status
+    return last_step? ? MaterialSubmission.ACTIVE : next_step.to_s
   end
 
   def ownership_batch_params

@@ -1,7 +1,7 @@
 <tr>
-  <td><%= material_submission.labware_type.name %></td>
+  <td><%= material_submission.labware_type&.name || '(Not selected)' %></td>
   <td><%= material_submission.no_of_labwares_required %></td>
-  <td><%= material_submission.supply_labwares %></td>
+  <td><%= material_submission.supply_labwares.nil? ? '(Not selected)' : material_submission.supply_labwares %></td>
   <td><%= material_submission.updated_at %></td>
   <td>
     <% if material_submission.active? %>
@@ -10,7 +10,7 @@
 
     <% else %>
 
-      <%= link_to 'Continue', material_submission_build_path(id: material_submission.status, material_submission_id: material_submission.id), class: 'btn btn-primary' %>
+      <%= link_to 'Continue', material_submission_build_path(id: material_submission.status || 'labware', material_submission_id: material_submission.id), class: 'btn btn-primary' %>
 
       <%= link_to 'Cancel', material_submission,
             method: :delete,
