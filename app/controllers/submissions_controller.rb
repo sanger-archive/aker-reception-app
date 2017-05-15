@@ -146,17 +146,6 @@ private
     return last_step? ? MaterialSubmission.ACTIVE : next_step.to_s
   end
 
-  def ownership_batch_params
-    owner = material_submission.user.email
-    bios = material_submission.labwares.flat_map &:biomaterials
-    bios.compact.map { |bio| { model_id: bio.uuid, model_type: 'biomaterial', owner_id: owner }}
-  end
-
-  def ownership_set_params(set_uuid)
-    owner = material_submission.user.email
-    {model_id: set_uuid, model_type: 'set', owner_id: owner}
-  end
-
   def labware_at_index(index)
     material_submission.labwares.select { |lw| lw.labware_index==index }.first
   end
