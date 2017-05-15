@@ -109,12 +109,10 @@ class MaterialSubmission < ApplicationRecord
   # Deletes any labware linked to this submission, and creates
   # new ones based on the requested labware fields
   def create_labware
-    if labwares
-      labwares.each { |lw| lw.destroy! }
-    end
-    labwares = []
+    labwares.clear unless labwares.empty?
+
     (1..no_of_labwares_required).each do |i|
-      labwares << Labware.create(material_submission: self, labware_index: i)
+      self.labwares.create(labware_index: i)
     end
   end
 

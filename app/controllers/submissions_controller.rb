@@ -91,7 +91,6 @@ class SubmissionsController < ApplicationController
 
     material_submission.update_attributes(status: get_next_status) if material_submission.valid?
     render_wizard material_submission
-    @material_submission = nil
   end
 
   # receive biomaterial data, validate it and save it in the labware's json column
