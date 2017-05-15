@@ -65,6 +65,7 @@ class ProvenanceService
         end
       end
 
+
       filtered_data = nil if filtered_data.empty?
 
       if filtered_data.nil? && !general_error_field.nil?

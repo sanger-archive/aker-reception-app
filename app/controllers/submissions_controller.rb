@@ -91,7 +91,6 @@ class SubmissionsController < ApplicationController
 
     material_submission.update_attributes(status: get_next_status) if material_submission.valid?
     render_wizard material_submission
-    @material_submission = nil
   end
 
   # receive biomaterial data, validate it and save it in the labware's json column
@@ -145,17 +144,6 @@ private
 
   def get_next_status
     return last_step? ? MaterialSubmission.ACTIVE : next_step.to_s
-  end
-
-  def ownership_batch_params
-    owner = material_submission.user.email
-    bios = material_submission.labwares.flat_map &:biomaterials
-    bios.compact.map { |bio| { model_id: bio.uuid, model_type: 'biomaterial', owner_id: owner }}
-  end
-
-  def ownership_set_params(set_uuid)
-    owner = material_submission.user.email
-    {model_id: set_uuid, model_type: 'set', owner_id: owner}
   end
 
   def labware_at_index(index)
