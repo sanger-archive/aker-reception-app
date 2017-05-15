@@ -318,7 +318,7 @@ RSpec.describe MaterialSubmission, type: :model do
       @submission.no_of_labwares_required = 2
       @submission.save!
       @submission.reload
-      @old_labware = @submission.labwares
+      @old_labware = @submission.labwares.pluck(:id)
     end
 
     context "when no_of_labwares_required is altered" do
@@ -329,8 +329,8 @@ RSpec.describe MaterialSubmission, type: :model do
       end
 
       it "destroys the old labware" do
-        @old_labware.each do |lw|
-          expect(Labware.where(id: lw.id)).to be_empty
+        @old_labware.each do |lwid|
+          expect(Labware.where(id: lwid)).to be_empty
         end
       end
 
@@ -351,8 +351,8 @@ RSpec.describe MaterialSubmission, type: :model do
       end
 
       it "destroys the old labware" do
-        @old_labware.each do |lw|
-          expect(Labware.where(id: lw.id)).to be_empty
+        @old_labware.each do |lwid|
+          expect(Labware.where(id: lwid)).to be_empty
         end
       end
 

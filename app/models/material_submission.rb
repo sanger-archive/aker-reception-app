@@ -24,21 +24,20 @@ class MaterialSubmission < ApplicationRecord
   has_many :labwares, dependent: :destroy
 
   validates :no_of_labwares_required, numericality: { only_integer: true, greater_than_or_equal_to: 1 },
-    if: :active_or_labware?
+    if: :labware_or_later?
 
-  validates :supply_labwares, inclusion: { in: [true, false] }, if: :active_or_labware?
-  validates :labware_type_id, presence: true, if: :active_or_labware?
+  validates :supply_labwares, inclusion: { in: [true, false] }, if: :labware_or_later?
+  validates :labware_type_id, presence: true, if: :labware_or_later?
   validates :address, presence: true, if: :active?
   validates :contact, presence: true, if: :active?
   validate :each_labware_has_contents, if: :active?
 
   before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
-  #accepts_nested_attributes_for :labwares
-
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
-  scope :pending, -> { where.not(status: [MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED]) }
+  # broken submissions are not listed
+  scope :pending, -> { where(status: [nil, 'labware', 'provenance', 'dispatch']) }
   scope :for_user, ->(user) { where(user_id: user.id) }
 
   def active?
@@ -48,6 +47,10 @@ class MaterialSubmission < ApplicationRecord
   def active_or_labware?
     return false if status.nil?
     active? || status.include?('labware')
+  end
+
+  def labware_or_later?
+    return ['labware', 'provenance', 'dispatch'].include?(status)
   end
 
   def active_or_provenance?
@@ -106,12 +109,10 @@ class MaterialSubmission < ApplicationRecord
   # Deletes any labware linked to this submission, and creates
   # new ones based on the requested labware fields
   def create_labware
-    if labwares
-      labwares.each { |lw| lw.destroy! }
-    end
-    labwares = []
+    labwares.clear unless labwares.empty?
+
     (1..no_of_labwares_required).each do |i|
-      labwares << Labware.create(material_submission: self, labware_index: i)
+      self.labwares.create(labware_index: i)
     end
   end
 
