@@ -1,0 +1,44 @@
+<table class="table">
+  <% keys = list_contents_keys(labwares) %>
+  <% if keys.empty? %>
+    <thead><tr><th>barcode</th></tr></thead>
+    <tbody>
+      <% labwares.each do |labware| %>
+        <tr><td><%= labware.barcode %></td></tr>
+      <% end %>
+    </tbody>
+  <% else %>
+    <thead>
+      <tr>
+        <th>barcode</th>
+        <th>address</th>
+        <% keys.each do |key| %>
+          <th><%= key %> </th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% labwares.each do |labware| %>
+        <% if labware.contents.nil? %>
+          <tr><td><%= labware.barcode %></td></tr>
+        <% else %>
+          <% labware.contents.each do |address, bio_data| %>
+            <tr>
+              <td><%= labware.barcode %></td>
+              <td><%= address %></td>
+              <% keys.each do |key| %>
+                <td>
+                  <% v = bio_data[key] %>
+                  <% if v %>
+                    <%= v %>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+      <% end %>
+    </tbody>
+  <% end %>
+</table>
