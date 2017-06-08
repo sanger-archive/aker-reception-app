@@ -21,7 +21,7 @@ class ProvenanceService
             add_error(error_messages, labware_index, address, property_name, "The required field #{property_name} is not given.")
           end
         else
-          enum_items = property_data['enum']
+          enum_items = property_data['allowed']
           if enum_items
             i = enum_items.index { |x| x.casecmp(field_data)==0 }
             if i.nil?
