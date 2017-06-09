@@ -6,9 +6,12 @@ require 'dispatch_steps/fail_step'
 class SubmissionsController < ApplicationController
 
   include Wicked::Wizard
-  steps :labware, :provenance, :dispatch
+  steps :labware, :provenance, :ethics, :dispatch
 
   def show
+    if step==:ethics && !any_human_material?
+      skip_step
+    end
     render_wizard
   end
 
@@ -17,6 +20,10 @@ class SubmissionsController < ApplicationController
       flash[:error] = "This submission cannot be updated."
       render_wizard
       return
+    end
+
+    if params[:id]=="ethics"
+      return ethics_update
     end
 
     if params[:id]=="provenance"
@@ -37,16 +44,15 @@ class SubmissionsController < ApplicationController
     end
 
     unless @status_success
-      flash[:error] = 'The material submission could not be updated.'
-      render_wizard
-      return
+      return error_render 'The material submission could not be updated.'
     end
 
     if last_step?
       if material_submission.status!='dispatch'
-        flash[:error] = "Submission not ready: please check previous steps"
-        render_wizard
-        return
+        return error_render "Submission not ready: please check previous steps"
+      end
+      unless material_submission.ethical?
+        return error_render "Please go back and check the ethics step before proceeding."
       end
 
       success = false
@@ -103,19 +109,63 @@ class SubmissionsController < ApplicationController
     @update_successful, @invalid_data = service.set_biomaterial_data(material_submission, labware_params)
 
     if @update_successful && !params["material_submission"]["change_tab"]
-      @update_successful = material_submission.update_attributes(status: :dispatch)
+      @update_successful = material_submission.update_attributes(status: (any_human_material? ? 'ethics' : 'dispatch'))
     end
 
-    if !@update_successful && material_submission.status=='dispatch'
+    if !@update_successful && (material_submission.status=='dispatch' || material_submission.status=='ethics')
       # If the given provenance is incomplete or wrong, make sure
-      # they're not in the last step (because they could have gone
+      # they're not in a later step (because they could have gone
       # back and incorrected the material data).
       material_submission.update_attributes(status: :provenance)
     end
   end
 
+  def ethics_update
+    return error_render "This submission is not listed as including human material." unless any_human_material?
+    ep = ethics_params
+    confirmed_not_req = (ep[:confirm_hmdmc_not_required].to_i==1)
+    hmdmc_1 = ep[:hmdmc_1]
+    hmdmc_2 = ep[:hmdmc_2]
+    if confirmed_not_req && (hmdmc_1.present? || hmdmc_2.present?)
+      return error_render '"Not required" and HMDMC number both specified. Please choose one or the other.'
+    end
+    if hmdmc_1.present? != hmdmc_2.present?
+      return error_render 'Both parts of the HMDMC number must be specified.'
+    end
+    if !confirmed_not_req && !hmdmc_1.present?
+      return error_render 'Either "Not required" or an HMDMC number must be specified.'
+    end
+
+    by_user = current_user.email
+
+    if confirmed_not_req
+      material_submission.set_hmdmc_not_required(by_user)
+    else
+      hmdmc = hmdmc_1+'/'+hmdmc_2
+      unless hmdmc.match(/^[0-9]{2}\/[0-9]{3}$/)
+        return error_render 'HMDMC number must be of the format ##/###'
+      end
+      material_submission.set_hmdmc(hmdmc, by_user)
+    end
+
+    material_submission.labwares.each { |lw| lw.save! }
+    material_submission.update_attributes(status: 'dispatch')
+    render_wizard material_submission
+  end
+
+  def error_render(error)
+    flash[:error] = error
+    render_wizard
+  end
+
   def material_schema
     MatconClient::Material.schema.body
+  end
+
+  def previous_step(step=nil)
+    pstep = super(step)
+    return :provenance if pstep==:ethics && !any_human_material?
+    return pstep
   end
 
 protected
@@ -142,8 +192,17 @@ private
     )
   end
 
+  def ethics_params
+    params.permit(:confirm_hmdmc_not_required, :hmdmc_1, :hmdmc_2)
+  end
+
   def get_next_status
+    return 'dispatch' if step==:provenance && !any_human_material?
     return last_step? ? MaterialSubmission.ACTIVE : next_step.to_s
+  end
+
+  def any_human_material?
+    material_submission&.any_human_material?
   end
 
   def labware_at_index(index)

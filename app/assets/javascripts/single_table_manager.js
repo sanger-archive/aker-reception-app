@@ -406,9 +406,9 @@
       body: 'We could not save the current content due to an error'})
   };
 
-  proto.toDispatch = function(e) {
-    this.dispatchUrl = window.location.href.replace('provenance', 'dispatch');
-    window.location.href = this.dispatchUrl;
+  proto.toNextStep = function(e) {
+    this.nextStepUrl = window.location.href.replace('provenance', 'ethics');
+    window.location.href = this.nextStepUrl;
   };
 
   proto.attachHandlers = function() {
@@ -425,7 +425,7 @@
     button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));
     $(this.node).on('psd.schema.error', $.proxy(this.onSchemaError, this));
 
-    $('input[type=submit]').on('click', $.proxy(this.toDispatch, this));
+    $('input[type=submit]').on('click', $.proxy(this.toNextStep, this));
   };
 
   $(document).ready(function() {
