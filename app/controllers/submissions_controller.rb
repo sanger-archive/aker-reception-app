@@ -121,36 +121,12 @@ class SubmissionsController < ApplicationController
   end
 
   def ethics_update
-    return error_render "This submission is not listed as including human material." unless any_human_material?
-    ep = ethics_params
-    confirmed_not_req = (ep[:confirm_hmdmc_not_required].to_i==1)
-    hmdmc_1 = ep[:hmdmc_1]
-    hmdmc_2 = ep[:hmdmc_2]
-    if confirmed_not_req && (hmdmc_1.present? || hmdmc_2.present?)
-      return error_render '"Not required" and HMDMC number both specified. Please choose one or the other.'
-    end
-    if hmdmc_1.present? != hmdmc_2.present?
-      return error_render 'Both parts of the HMDMC number must be specified.'
-    end
-    if !confirmed_not_req && !hmdmc_1.present?
-      return error_render 'Either "Not required" or an HMDMC number must be specified.'
-    end
-
-    by_user = current_user.email
-
-    if confirmed_not_req
-      material_submission.set_hmdmc_not_required(by_user)
+    service = EthicsService.new(material_submission, flash)
+    if service.update(ethics_params, current_user.email)
+      render_wizard material_submission
     else
-      hmdmc = hmdmc_1+'/'+hmdmc_2
-      unless hmdmc.match(/^[0-9]{2}\/[0-9]{3}$/)
-        return error_render 'HMDMC number must be of the format ##/###'
-      end
-      material_submission.set_hmdmc(hmdmc, by_user)
+      render_wizard
     end
-
-    material_submission.labwares.each { |lw| lw.save! }
-    material_submission.update_attributes(status: 'dispatch')
-    render_wizard material_submission
   end
 
   def error_render(error)
