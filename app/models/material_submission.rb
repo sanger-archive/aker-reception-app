@@ -127,6 +127,19 @@ class MaterialSubmission < ApplicationRecord
     labwares.each { |lw| lw.clear_hmdmc }
   end
 
+  def first_hmdmc
+    return nil if labwares.nil?
+    labwares.each do |lw|
+      h = lw.first_hmdmc
+      return h if h
+    end
+    nil
+  end
+
+  def confirmed_no_hmdmc?
+    labwares && labwares.any? { |lw| lw.confirmed_no_hmdmc? }
+  end
+
   private
 
   # Deletes any labware linked to this submission, and creates

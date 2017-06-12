@@ -99,6 +99,19 @@ class Labware < ApplicationRecord
     end
   end
 
+  def first_hmdmc
+    return nil if contents.nil?
+    contents.each do |k,v|
+      h = material_is_human?(v) && v['hmdmc']
+      return h if h
+    end
+    nil
+  end
+
+  def confirmed_no_hmdmc?
+    contents && contents.any? { |k,v| material_is_human?(v) && v['hmdmc_not_required_confirmed_by'].present? }
+  end
+
 private
 
   def _set_hmdmc(hmdmc, confirmed_not_required, username)
