@@ -60,25 +60,12 @@ class Labware < ApplicationRecord
     y.product(x).map { |a,b| a+':'+b }
   end
 
-  def material_is_human?(material)
-    species = material['common_name']
-    species.present? && species.strip.downcase=='homo sapiens'
-  end
-
   def any_human_material?
     contents && contents.any? { |address, data| material_is_human?(data) }
   end
 
-  def check_ethics(data)
-    return true unless material_is_human?(data)
-    if data['hmdmc_not_required_confirmed_by']
-      return !data['hmdmc_set_by'] && !data['hmdmc']
-    else
-      return data['hmdmc_set_by'] && data['hmdmc']
-    end
-  end
-
   def ethical?
+    return true unless contents
     contents.all? { |address, data| check_ethics(data) }
   end
 
@@ -93,9 +80,9 @@ class Labware < ApplicationRecord
   def clear_hmdmc
     return if contents.nil?
     contents.each do |address, data|
-      data['hmdmc'] = nil
-      data['hmdmc_set_by'] = nil
-      data['hmdmc_not_required_confirmed_by'] = nil
+      data.delete('hmdmc')
+      data.delete('hmdmc_set_by')
+      data.delete('hmdmc_not_required_confirmed_by')
     end
   end
 
@@ -133,4 +120,17 @@ private
     end
   end
 
+  def material_is_human?(material)
+    species = material['common_name']
+    species.present? && species.strip.downcase=='homo sapiens'
+  end
+
+  def check_ethics(data)
+    return true unless material_is_human?(data)
+    if data['hmdmc_not_required_confirmed_by']
+      return !data['hmdmc_set_by'] && !data['hmdmc']
+    else
+      return data['hmdmc_set_by'] && data['hmdmc']
+    end
+  end
 end
