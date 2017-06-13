@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'webmock/rspec'
 
 RSpec.describe :ethics_service do
   let(:submission) do
@@ -23,6 +24,10 @@ RSpec.describe :ethics_service do
 
   describe '#update' do
 
+    def stub_ehmdmc(hmdmc, status_code)
+      stub_request(:get, "http://localhost:3501/validate?hmdmc=#{hmdmc.sub('/','_')}").to_return(status: status_code)
+    end
+
     def run(params)
       @result = service.update(params, user)
     end
@@ -36,6 +41,11 @@ RSpec.describe :ethics_service do
     def expect_success
       expect(@result).to be_truthy
       expect(flash[:error]).to be_nil
+    end
+
+    before do
+      stub_ehmdmc('12/345', 200)
+      stub_ehmdmc('12/999', 404)
     end
 
     context 'when the submission has no human material' do
@@ -64,7 +74,7 @@ RSpec.describe :ethics_service do
 
     context 'when the hmdmc and "not required" are both specified' do
       before do
-        run(confirm_hmdmc_not_required: '1', hmdmc_1: '17', hmdmc_2: '123')
+        run(confirm_hmdmc_not_required: '1', hmdmc_1: '12', hmdmc_2: '345')
       end
 
       it 'produces an error' do
@@ -255,6 +265,32 @@ RSpec.describe :ethics_service do
 
       it 'updates the submission status' do
         expect(submission).to have_received(:update_attributes!).with(status: 'dispatch')
+      end
+    end
+
+    context 'when invalid HMDMC is supplied' do
+      before do
+        run(hmdmc_1: '12', hmdmc_2: '999')
+      end
+
+      it 'produces an error' do
+        expect_error(/ehmdmc/i)
+      end
+
+      it 'does not set the HMDMC not required' do
+        expect(submission).not_to have_received(:set_hmdmc_not_required)
+      end
+
+      it 'does not set the HMDMC' do
+        expect(submission).not_to have_received(:set_hmdmc)
+      end
+
+      it 'does not save the labware' do
+        submission.labwares.each { |lw| expect(lw).not_to have_received(:save!) }
+      end
+
+      it 'does not update the submission status' do
+        expect(submission).not_to have_received(:update_attributes!)
       end
     end
   end
