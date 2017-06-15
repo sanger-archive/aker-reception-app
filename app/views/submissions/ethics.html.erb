@@ -1,0 +1,24 @@
+<%= render partial: 'submission_header', locals: { title: "Step 2b: Ethics" , progress: 75 } %>
+<%= bootstrap_form_tag url: wizard_path, method: :put  do |f| %>
+  <p>If you are using human material in research, you must choose one of the following options:</p>
+
+  <ol>
+    <li><p>Enter the HMDMC number (yy/nnn)</p>
+      <div>
+      <% hmdmc = material_submission.first_hmdmc || '/' %>
+      <% hmdmc_1, hmdmc_2 = hmdmc.split('/', 2) %>
+      <input name="hmdmc_1" id="hmdmc_1" type="text" pattern="[0-9]{2}" size="2" title="2 digit number" value="<%= hmdmc_1 || '' %>"/>
+       /
+      <input name="hmdmc_2" id="hmdmc_2" type="text" pattern="[0-9]{3}" size="3" title="3 digit number" value="<%= hmdmc_2 || '' %>"/>
+      </div>
+    </li>
+    <br/>
+    <li><p>Commercial cell line: no HMDMC required</p>
+      <%= f.check_box :confirm_hmdmc_not_required, label: 'I confirm that no HMDMC is required',
+          checked: material_submission.confirmed_no_hmdmc? %>
+    </li>
+  </ol>
+
+  <%= render 'buttons', material_submission: material_submission, f: f %>
+
+<% end %>

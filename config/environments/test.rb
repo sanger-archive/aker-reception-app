@@ -48,8 +48,9 @@ Rails.application.configure do
   config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
   config.study_url = 'http://localhost:3300/api/v1/'
 
-  config.printing_disabled = true
+  config.ehmdmc_url = 'http://localhost:3501/validate'
 
+  config.printing_disabled = true
 
   config.jwt_secret_key = 'test'
 
