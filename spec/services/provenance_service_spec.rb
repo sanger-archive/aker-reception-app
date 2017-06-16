@@ -14,7 +14,7 @@ RSpec.describe :provenance_service do
         },
         'REQUIRED_ENUM' => {
           'required' => true,
-          'enum' => ['ALPHA', 'BETA', 'GAMMA'],
+          'allowed' => ['ALPHA', 'BETA', 'GAMMA'],
         }
       },
     }

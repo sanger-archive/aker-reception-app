@@ -16,6 +16,20 @@ RSpec.describe Labware, type: :model do
     Labware.new(lw_args)
   end
 
+  def make_contents(human, options={})
+    c = { 'common_name' => (human ? 'Homo Sapiens' : 'Mouse') }
+    if options.has_key? :hmdmc
+      c['hmdmc'] = options[:hmdmc]
+    end
+    if options.has_key? :hmdmc_user
+      c['hmdmc_set_by'] = options[:hmdmc_user]
+    end
+    if options.has_key? :not_required
+      c['hmdmc_not_required_confirmed_by'] = options[:not_required]
+    end
+    return c
+  end
+
   describe '#size' do
     it "returns its size" do
       labware = make_labware(6, 4)
@@ -171,5 +185,226 @@ RSpec.describe Labware, type: :model do
       expect(r).to be_empty
     end
 
+  end
+
+  describe "#any_human_material?" do
+    context "when the labware has no contents" do
+      before do
+        @lw = make_labware(1,2)
+      end
+      it "should not be any human material" do
+        expect(@lw).not_to be_any_human_material
+      end
+    end
+    context "when the labware contents are not human" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(false) }})
+      end
+      it "should not be any human material" do
+        expect(@lw).not_to be_any_human_material
+      end
+    end
+    context "when the labware has some human material" do
+      before do
+        @lw = make_labware(1, 2, false, false, { contents: {"1" => make_contents(false), "2" => make_contents(true) }})
+      end
+      it "should be any human material" do
+        expect(@lw).to be_any_human_material
+      end
+    end
+  end
+
+  describe "#ethical?" do
+    context "when the labware has no contents" do
+      before do
+        @lw = make_labware(1,2)
+      end
+      it "should be ethical" do
+        expect(@lw).to be_ethical
+      end
+    end
+    context "when the labware has no human material" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(false) }})
+      end
+      it "should be ethical" do
+        expect(@lw).to be_ethical
+      end
+    end
+    context "when the labware has human material with no HMDMC info" do
+      before do
+        @lw = make_labware(1, 2, false, false, { contents: {"1" => make_contents(true) }})
+      end
+      it "should not be ethical" do
+        expect(@lw).not_to be_ethical
+      end
+    end
+    context "when the material has an HMDMC number but no HMDMC user" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, hmdmc: '12/345') }})
+      end
+      it "should not be ethical" do
+        expect(@lw).not_to be_ethical
+      end
+    end
+    context "when the material has an HMDMC user but no HMDMC number" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, hmdmc_user: 'dirk') }})
+      end
+      it "should not be ethical" do
+        expect(@lw).not_to be_ethical
+      end
+    end
+    context "when the material has an HMDMC number and user" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, hmdmc: '12/345', hmdmc_user: 'dirk') }})
+      end
+      it "should be ethical" do
+        expect(@lw).to be_ethical
+      end
+    end
+    context "when the material is confirmed not to need an HMDMC" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, not_required: 'dirk') }})
+      end
+      it "should be ethical" do
+        expect(@lw).to be_ethical
+      end
+    end
+    context "when there is conflicting HMDMC information" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, not_required: 'dirk', hmdmc: '12/345', hmdmc_user: 'dirk') }})
+      end
+      it "should not be ethical" do
+        expect(@lw).not_to be_ethical
+      end
+    end
+    context "when some material has HMDMC and some is not human" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, hmdmc: '12/345', hmdmc_user: 'dirk'), "2" => make_contents(false) }})
+      end
+      it "should be ethical" do
+        expect(@lw).to be_ethical
+      end
+    end
+    context "when some material has HMDMC and some is missing HMDMC" do
+      before do
+        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, hmdmc: '12/345', hmdmc_user: 'dirk'), "2" => make_contents(true) }})
+      end
+      it "should not be ethical" do
+        expect(@lw).not_to be_ethical
+      end
+    end
+  end
+
+  describe "#set_hmdmc" do
+    before do
+      @lw = make_labware(1, 2, false, false, { contents: { "1" => make_contents(true, not_required: 'jeff'), "2" => make_contents(false, hmdmc: "99/999")}})
+
+      @lw.set_hmdmc('12/345', 'dirk')
+    end
+    it "should correct set the fields on the human material" do
+      expect(@lw.contents['1']).to eq({
+          'common_name' => 'Homo Sapiens',
+          'hmdmc' => '12/345',
+          'hmdmc_set_by' => 'dirk',
+        })
+    end
+    it "should correct set the fields on the nonhuman material" do
+      expect(@lw.contents['2']).to eq({
+          'common_name' => 'Mouse',
+        })
+    end
+  end
+
+  describe "#set_hmdmc_not_required" do
+    before do
+      @lw = make_labware(1, 2, false, false, { contents: { "1" => make_contents(true, hmdmc_user: 'jeff'), "2" => make_contents(false, hmdmc: "99/999")}})
+
+      @lw.set_hmdmc_not_required('dirk')
+    end
+    it "should correct set the fields on the human material" do
+      expect(@lw.contents['1']).to eq({
+          'common_name' => 'Homo Sapiens',
+          'hmdmc_not_required_confirmed_by' => 'dirk',
+        })
+    end
+    it "should correct set the fields on the nonhuman material" do
+      expect(@lw.contents['2']).to eq({
+          'common_name' => 'Mouse',
+        })
+    end
+  end
+
+  describe "#clear_hmdmc" do
+    before do
+      @lw = make_labware(1, 2, false, false, { contents: { "1" => make_contents(true, hmdmc_user: 'jeff'), "2" => make_contents(false, hmdmc: "99/999")}})
+
+      @lw.clear_hmdmc
+    end
+    it "should correct set the fields on the human material" do
+      expect(@lw.contents['1']).to eq({
+          'common_name' => 'Homo Sapiens',
+        })
+    end
+    it "should correct set the fields on the nonhuman material" do
+      expect(@lw.contents['2']).to eq({
+          'common_name' => 'Mouse',
+        })
+    end
+  end
+
+  describe "#first_hmdmc" do
+    context "when the labware has no contents" do
+      before do
+        @lw = make_labware(1, 2, false, false, { contents: nil })
+      end
+      it "should return nil" do
+        expect(@lw.first_hmdmc).to be_nil
+      end
+    end
+    context "when the labware has human contents but no HMDMC" do
+      before do
+        @lw = make_labware(1, 2, false, false, { contents: {"1" => make_contents(true) } })
+      end
+      it "should return nil" do
+        expect(@lw.first_hmdmc).to be_nil
+      end
+    end
+    context "when the labware has human contents with an HMDMC" do
+      before do
+        @lw = make_labware(1, 2, false, false, { contents: {"1" => make_contents(true, hmdmc: '12/345') } })
+      end
+      it "should return the HMDMC" do
+        expect(@lw.first_hmdmc).to eq('12/345')
+      end
+    end
+  end
+
+  describe "#confirmed_no_hmdmc?" do
+    context "when the labware has no contents" do
+      before do
+        @lw = make_labware(1, 2, false, false, { contents: nil })
+      end
+      it "should return false" do
+        expect(@lw.confirmed_no_hmdmc?).to be_falsey
+      end
+    end
+    context "when the labware has human contents but not confirmed no HMDMC" do
+      before do
+        @lw = make_labware(1, 2, false, false, { contents: {"1" => make_contents(true) } })
+      end
+      it "should return false" do
+        expect(@lw.confirmed_no_hmdmc?).to be_falsey
+      end
+    end
+    context "when the labware has human contents and confirmed no HMDMC" do
+      before do
+        @lw = make_labware(1, 2, false, false, { contents: {"1" => make_contents(true, not_required: 'dirk') } })
+      end
+      it "should return true" do
+        expect(@lw.confirmed_no_hmdmc?).to be_truthy
+      end
+    end
   end
 end

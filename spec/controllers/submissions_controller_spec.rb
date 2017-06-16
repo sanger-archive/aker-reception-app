@@ -2,46 +2,56 @@ require 'rails_helper'
 require 'webmock/rspec'
 
 def step_params(material_submission, step_name)
-  {:params => {
-    :material_submission => case step_name
-      when :labware
+  p = {
+      material_submission: case step_name
+        when :labware
+          {
+            supply_labwares: true,
+            no_of_labwares_required: 1,
+            status: 'labware',
+            labware_type_id: @labware_type.id
+          }
+        when :provenance
+          {
+            status: 'provenance',
+            labware: labware_attributes_for(material_submission.labwares, 'Mouse')
+          }
+        when :provenance_human
+          step_name = :provenance
+          {
+            status: 'provenance',
+            labware: labware_attributes_for(material_submission.labwares, 'Homo Sapiens')
+          }
+        when :ethics
+          {
+            status: 'ethics',
+          }
+        when :dispatch
+          {
+            status: 'dispatch',
+            address: 'Testing address',
+            email: 'test@email.com',
+            contact_id: @contact.id
+          }
+        when :dispatch_contact_error
+          step_name = :dispatch
+          {
+            status: 'dispatch',
+            contact_attributes: {email: ''},
+            address: 'Testing address',
+          }
+        end
+      }.merge(
         {
-          :supply_labwares => true,
-          :no_of_labwares_required => 1,
-          :status => 'labware',
-          :labware_type_id => @labware_type.id
+          format: (step_name == :provenance) ? 'json' : 'html',
+          material_submission_id: material_submission.id,
+          id: step_name
         }
-      when :provenance
-        {
-          :status => 'provenance',
-          :labware => labware_attributes_for(material_submission.labwares)
-        }
-      when :dispatch
-        {
-          :status => 'dispatch',
-          :address => 'Testing address',
-          :email => 'test@email.com',
-          :contact_id => @contact.id
-        }
-      when :dispatch_contact_error
-        step_name = :dispatch
-        {
-          :status => 'dispatch',
-          :contact_attributes => {:email => ''},
-          :address => 'Testing address',
-        }
-      end
-    }.merge(
-      {
-        :format => (step_name == :provenance) ? 'json' : 'html',
-        :material_submission_id => material_submission.id,
-        :id => step_name
-      }
-    )
-  }
+      )
+  return { params: p }
 end
 
-def labware_attributes_for(labwares)
+def labware_attributes_for(labwares, species)
   data = {}
   labwares.each do |labware|
     data[labware.labware_index] = {
@@ -50,7 +60,7 @@ def labware_attributes_for(labwares)
         "donor_id" => "d",
         "phenotype" => "p",
         "supplier_name" => "s",
-        "common_name" => "mouse",
+        "common_name" => species,
       }
     }
   end
@@ -66,8 +76,8 @@ RSpec.describe SubmissionsController, type: :controller do
       sign_in(@user)
 
       @labware_type = FactoryGirl.create :labware_type, {
-        :num_of_cols => 1,
-        :num_of_rows => 1
+        num_of_cols: 1,
+        num_of_rows: 1
       }
       @material_submission = FactoryGirl.create(:material_submission, user: @user)
       @contact = FactoryGirl.create :contact
@@ -252,6 +262,39 @@ RSpec.describe SubmissionsController, type: :controller do
       @material_submission.reload
 
       expect(@material_submission.status).to eq('provenance')
+    end
+
+    it "moves on to the ethics step if the labware contains human material" do
+      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+      put :update, step_params(@material_submission, :labware)
+      @material_submission.reload
+      put :biomaterial_data, step_params(@material_submission, :provenance_human)
+      @material_submission.reload
+      expect(@material_submission.status).to eq('ethics')
+    end
+
+    it "skips the ethics step if the labware does not contain human material" do
+      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+      put :update, step_params(@material_submission, :labware)
+      @material_submission.reload
+      put :biomaterial_data, step_params(@material_submission, :provenance)
+      @material_submission.reload
+      expect(@material_submission.status).to eq('dispatch')
+    end
+
+    it "runs ethics in the ethics service" do
+      ethics_params = {
+        hmdmc_1: '12',
+        hmdmc_2: '345',
+        confirm_hmdmc_not_required: '0',
+      }
+      params = step_params(@material_submission, :ethics)
+      params[:params].merge!(ethics_params)
+      ac_par = ActionController::Parameters.new(ethics_params)
+      ac_par.permit!
+      expect_any_instance_of(EthicsService).to receive(:update).with(ac_par, "user@sanger.ac.uk")
+      put :update, params
+      @material_submission.reload
     end
 
   end

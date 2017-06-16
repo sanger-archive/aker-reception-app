@@ -37,7 +37,7 @@ class MaterialSubmission < ApplicationRecord
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
   # broken submissions are not listed
-  scope :pending, -> { where(status: [nil, 'labware', 'provenance', 'dispatch']) }
+  scope :pending, -> { where(status: [nil, 'labware', 'provenance', 'ethics', 'dispatch']) }
   scope :for_user, ->(user) { where(user_id: user.id) }
 
   def active?
@@ -50,7 +50,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def labware_or_later?
-    return ['labware', 'provenance', 'dispatch'].include?(status)
+    return ['labware', 'provenance', 'ethics', 'dispatch'].include?(status)
   end
 
   def active_or_provenance?
@@ -69,7 +69,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def pending?
-    status.nil? || ['labware', 'provenance', 'dispatch'].include?(status)
+    status.nil? || ['labware', 'provenance', 'ethics', 'dispatch'].include?(status)
   end
 
   def broken?
@@ -102,6 +102,42 @@ class MaterialSubmission < ApplicationRecord
 
   def update(params)
     update_attributes(params) && labwares.all?(&:valid?)
+  end
+
+  def any_human_material?
+    labwares && labwares.any? { |lw| lw.any_human_material? }
+  end
+
+  def ethical?
+    labwares && labwares.all? { |lw| lw.ethical? }
+  end
+
+  def set_hmdmc(hmdmc, username)
+    return if labwares.nil?
+    labwares.each { |lw| lw.set_hmdmc(hmdmc, username) }
+  end
+
+  def set_hmdmc_not_required(username)
+    return if labwares.nil?
+    labwares.each { |lw| lw.set_hmdmc_not_required(username) }
+  end
+
+  def clear_hmdmc
+    return if labwares.nil?
+    labwares.each { |lw| lw.clear_hmdmc }
+  end
+
+  def first_hmdmc
+    return nil if labwares.nil?
+    labwares.each do |lw|
+      h = lw.first_hmdmc
+      return h if h
+    end
+    nil
+  end
+
+  def confirmed_no_hmdmc?
+    labwares && labwares.any? { |lw| lw.confirmed_no_hmdmc? }
   end
 
   private
