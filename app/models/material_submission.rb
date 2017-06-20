@@ -44,34 +44,15 @@ class MaterialSubmission < ApplicationRecord
     status == MaterialSubmission.ACTIVE
   end
 
-  def active_or_labware?
-    return false if status.nil?
-    active? || status.include?('labware')
-  end
-
   def labware_or_later?
     return ['labware', 'provenance', 'ethics', 'dispatch'].include?(status)
-  end
-
-  def active_or_provenance?
-    return false if status.nil?
-    active? || status.include?('provenance')
-  end
-
-  def active_or_dispatch?
-    return false if status.nil?
-    active? || status.include?('dispatch')
-  end
-
-  def active_or_awaiting?
-    return false if status.nil?
-    active? || status==MaterialSubmission.AWAITING
   end
 
   def pending?
     status.nil? || ['labware', 'provenance', 'ethics', 'dispatch'].include?(status)
   end
 
+# not currently being used by may be useful
   def broken?
     return status==MaterialSubmission.BROKEN
   end
@@ -80,6 +61,7 @@ class MaterialSubmission < ApplicationRecord
     update_attributes(status: MaterialSubmission.BROKEN)
   end
 
+# not currently being used by may be useful
   def claimed?
     return status==MaterialSubmission.CLAIMED
   end
@@ -90,10 +72,6 @@ class MaterialSubmission < ApplicationRecord
 
   def no_of_labwares_required
     super || 0
-  end
-
-  def invalid_labwares
-    labwares.select(&:invalid?)
   end
 
   def email
