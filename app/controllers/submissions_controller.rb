@@ -158,11 +158,7 @@ protected
     step == steps.first
   end
 
-  helper_method :material_submission, :last_step?, :first_step?, :material_schema, :labware_at_index, :supply_labware_type
-
-  def supply_labware_type
-    material_submission.supply_labware_type
-  end
+  helper_method :material_submission, :last_step?, :first_step?, :material_schema, :labware_at_index
 
 private
 
