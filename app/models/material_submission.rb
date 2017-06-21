@@ -90,6 +90,14 @@ class MaterialSubmission < ApplicationRecord
     super || 0
   end
 
+  def labwares_unclaimed
+    labwares.reject(&:claimed?)
+  end
+
+  def labwares_ready_for_claim
+    labwares.select(&:ready_for_claim?)
+  end
+
   def invalid_labwares
     labwares.select(&:invalid?)
   end
