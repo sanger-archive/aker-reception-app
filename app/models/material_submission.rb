@@ -8,10 +8,6 @@ class MaterialSubmission < ApplicationRecord
     'awaiting receipt'
   end
 
-  def self.CLAIMED
-    'claimed'
-  end
-
   def self.BROKEN
     'broken'
   end
@@ -80,12 +76,14 @@ class MaterialSubmission < ApplicationRecord
     update_attributes(status: MaterialSubmission.BROKEN)
   end
 
-  def claimed?
-    return status==MaterialSubmission.CLAIMED
+  def ready_for_claim?
+    status==MaterialSubmission.AWAITING && labwares.any?(&:ready_for_claim?)
   end
 
-  def ready_for_claim?
-    status==MaterialSubmission.AWAITING && labwares.all?(&:received?)
+  def claim_claimable_labwares
+    labwares_to_claim = labwares.select(&:ready_for_claim?)
+    now = DateTime.now
+    labwares_to_claim.each { |lw| lw.update_attributes(claimed: now) }
   end
 
   def no_of_labwares_required

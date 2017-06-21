@@ -36,6 +36,14 @@ class Labware < ApplicationRecord
     print_count > 0
   end
 
+  def claimed?
+    claimed.present?
+  end
+
+  def ready_for_claim?
+    received? && !claimed?
+  end
+
   def received?
     material_reception.present?
   end

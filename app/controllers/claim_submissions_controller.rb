@@ -6,7 +6,7 @@ class ClaimSubmissionsController < ApplicationController
     if @contact.nil?
       @submissions = []
     else
-      @submissions = @contact.material_submissions.where.not(:status => MaterialSubmission.CLAIMED)
+      @submissions = @contact.material_submissions.where(:status => MaterialSubmission.AWAITING).select(&:ready_for_claim?)
     end
   end
 
@@ -27,7 +27,7 @@ class ClaimSubmissionsController < ApplicationController
     end
     material_ids = submissions_material_ids(submissions)
     SetClient::Set.find(col_id).first.set_materials(material_ids)
-    submissions.update_all(status: MaterialSubmission.CLAIMED)
+    submissions.each(&:claim_claimable_labwares)
   end
 
   private
@@ -40,7 +40,7 @@ class ClaimSubmissionsController < ApplicationController
   end
 
   def submissions_material_ids(submissions)
-    submissions.flat_map(&:labwares).flat_map { |lw| lw.contents.values }.flat_map { |bio_data| bio_data['id'] }
+    submissions.flat_map(&:labwares).select(&:ready_for_claim?).flat_map { |lw| lw.contents.values }.flat_map { |bio_data| bio_data['id'] }
   end
 
 end
