@@ -52,7 +52,7 @@ class MaterialSubmission < ApplicationRecord
     status.nil? || ['labware', 'provenance', 'ethics', 'dispatch'].include?(status)
   end
 
-# not currently being used by may be useful
+# only currently being used for tests
   def broken?
     return status==MaterialSubmission.BROKEN
   end
@@ -61,7 +61,7 @@ class MaterialSubmission < ApplicationRecord
     update_attributes(status: MaterialSubmission.BROKEN)
   end
 
-# not currently being used by may be useful
+# not currently being used but may be useful
   def claimed?
     return status==MaterialSubmission.CLAIMED
   end
