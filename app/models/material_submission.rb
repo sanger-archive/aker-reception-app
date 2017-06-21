@@ -81,9 +81,8 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def claim_claimable_labwares
-    labwares_to_claim = labwares.select(&:ready_for_claim?)
     now = DateTime.now
-    labwares_to_claim.each { |lw| lw.update_attributes(claimed: now) }
+    labwares_ready_for_claim.each { |lw| lw.update_attributes(claimed: now) }
   end
 
   def no_of_labwares_required
