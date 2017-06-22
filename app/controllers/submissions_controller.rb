@@ -138,12 +138,6 @@ class SubmissionsController < ApplicationController
     MatconClient::Material.schema.body
   end
 
-  def previous_step(step=nil)
-    pstep = super(step)
-    return :provenance if pstep==:ethics && !any_human_material?
-    return pstep
-  end
-
 protected
 
   def material_submission
@@ -158,7 +152,7 @@ protected
     step == steps.first
   end
 
-  helper_method :material_submission, :last_step?, :first_step?, :material_schema, :labware_at_index
+  helper_method :material_submission, :last_step?, :first_step?, :material_schema
 
 private
 
@@ -179,10 +173,6 @@ private
 
   def any_human_material?
     material_submission&.any_human_material?
-  end
-
-  def labware_at_index(index)
-    material_submission.labwares.select { |lw| lw.labware_index==index }.first
   end
 
 end
