@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170503153748) do
+ActiveRecord::Schema.define(version: 20170621134513) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(version: 20170503153748) do
     t.string   "container_id"
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
+    t.datetime "claimed"
     t.index ["barcode"], name: "index_labwares_on_barcode", unique: true, using: :btree
     t.index ["container_id"], name: "index_labwares_on_container_id", unique: true, using: :btree
     t.index ["material_submission_id", "labware_index"], name: "index_labwares_on_material_submission_id_and_labware_index", unique: true, using: :btree

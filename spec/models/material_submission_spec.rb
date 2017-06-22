@@ -145,13 +145,13 @@ RSpec.describe MaterialSubmission, type: :model do
     end
   end
 
-  describe "#active_or_awaiting?" do
+  describe "#active_or_printed?" do
     context "when the submission status is active" do
       before do
         @submission = build(:material_submission, status: MaterialSubmission.ACTIVE)
       end
       it "should return true" do
-        expect(@submission.active_or_awaiting?).to eq(true)
+        expect(@submission.active_or_printed?).to eq(true)
       end
     end
 
@@ -160,16 +160,16 @@ RSpec.describe MaterialSubmission, type: :model do
         @submission = build(:material_submission, status: nil)
       end
       it "should return false" do
-        expect(@submission.active_or_awaiting?).to eq(false)
+        expect(@submission.active_or_printed?).to eq(false)
       end
     end
 
-    context "when the submission status is awaiting" do
+    context "when the submission status is printed" do
       before do
-        @submission = build(:material_submission, status: MaterialSubmission.AWAITING)
+        @submission = build(:material_submission, status: MaterialSubmission.PRINTED)
       end
       it "should return true" do
-        expect(@submission.active_or_awaiting?).to eq(true)
+        expect(@submission.active_or_printed?).to eq(true)
       end
     end
 
@@ -178,53 +178,16 @@ RSpec.describe MaterialSubmission, type: :model do
         @submission = build(:material_submission, status: 'broken')
       end
       it "should return false" do
-        expect(@submission.active_or_awaiting?).to eq(false)
+        expect(@submission.active_or_printed?).to eq(false)
       end
     end
   end
 
-  describe "#claimed?" do
-    context "when the submission status is active" do
-      before do
-        @submission = build(:material_submission, status: MaterialSubmission.ACTIVE)
-      end
-      it "should return false" do
-        expect(@submission.claimed?).to eq(false)
-      end
-    end
-
-    context "when the submission status is nil" do
-      before do
-        @submission = build(:material_submission, status: nil)
-      end
-      it "should return false" do
-        expect(@submission.claimed?).to eq(false)
-      end
-    end
-
-    context "when the submission status is claimed" do
-      before do
-        @submission = build(:material_submission, status: MaterialSubmission.CLAIMED)
-      end
-      it "should return true" do
-        expect(@submission.claimed?).to eq(true)
-      end
-    end
-
-    context "when the submission status is something else" do
-      before do
-        @submission = build(:material_submission, status: 'broken')
-      end
-      it "should return false" do
-        expect(@submission.claimed?).to eq(false)
-      end
-    end
-  end
 
   describe "#pending?" do
     context "when the submission status is non-pending" do
       before do
-        statuses = [MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.CLAIMED, MaterialSubmission.BROKEN]
+        statuses = [MaterialSubmission.ACTIVE, MaterialSubmission.PRINTED, MaterialSubmission.BROKEN]
         @submissions = statuses.map { |s| build(:material_submission, status: s )}
       end
       it "should return false" do
@@ -272,37 +235,51 @@ RSpec.describe MaterialSubmission, type: :model do
         lw.update_attributes(barcode: "AKER-#{lw.id}", print_count: 1)
       end
     end
-    context "when status is not 'awaiting'" do
+    context "when status is not 'printed'" do
       before do
         @submission.labwares.each do |lw|
           create(:material_reception, labware_id: lw.id)
         end
       end
-      it "returns false" do
-        expect(@submission.ready_for_claim?).to eq(false)
-      end
+      it { expect(@submission.ready_for_claim?).to eq(false) }
     end
 
-    context "when not all labware are received" do
+    context "when some labware are received" do
       before do
-        @submission.update_attributes(status: MaterialSubmission.AWAITING)
+        @submission.update_attributes(status: MaterialSubmission.PRINTED)
         create(:material_reception, labware_id: @submission.labwares.first.id)
       end
-      it "returns false" do
-        expect(@submission.ready_for_claim?).to eq(false)
-      end
+      it { expect(@submission.ready_for_claim?).to eq(true) }
     end
 
-    context "when status is 'awaiting' and all labware are received" do
+    context "when some labware claimed and some not received" do
       before do
-        @submission.labwares.each do |lw|
-          create(:material_reception, labware_id: lw.id)
-        end
-        @submission.update_attributes(status: MaterialSubmission.AWAITING)
+        @submission.update_attributes(status: MaterialSubmission.PRINTED)
+        create(:material_reception, labware_id: @submission.labwares.first.id)
+        @submission.labwares.first.update_attributes(claimed: DateTime.now)
       end
-      it "returns true" do
-        expect(@submission.ready_for_claim?).to eq(true)
+      it { expect(@submission.ready_for_claim?).to eq(false) }
+    end
+
+    context "when some labware claimed and some received" do
+      before do
+        @submission.update_attributes(status: MaterialSubmission.PRINTED)
+        create(:material_reception, labware_id: @submission.labwares.first.id)
+        @submission.labwares.first.update_attributes(claimed: DateTime.now)
+        create(:material_reception, labware_id: @submission.labwares.second.id)
       end
+      it { expect(@submission.ready_for_claim?).to eq(true) }
+    end
+
+    context "when all labware claimed" do
+      before do
+        @submission.update_attributes(status: MaterialSubmission.PRINTED)
+        create(:material_reception, labware_id: @submission.labwares.first.id)
+        @submission.labwares.first.update_attributes(claimed: DateTime.now)
+        create(:material_reception, labware_id: @submission.labwares.second.id)
+        @submission.labwares.second.update_attributes(claimed: DateTime.now)
+      end
+      it { expect(@submission.ready_for_claim?).to eq(false) }
     end
   end
 
@@ -363,6 +340,84 @@ RSpec.describe MaterialSubmission, type: :model do
           expect(Labware.find(lw.id)).to eq(lw)
         end
       end
+    end
+  end
+
+  describe '#claim_claimable_labwares' do
+    before do
+      @submission = create(:material_submission,
+        labware_type: create(:labware_type),
+        supply_labwares: true,
+        contact: create(:contact),
+        address: 'Space',
+      )
+      @submission.no_of_labwares_required = 4
+      @submission.save!
+      @submission.reload
+
+      lws = @submission.labwares
+      lws.each { |lw| lw.update_attributes(print_count: 1) }
+      lws[0...3].each { |lw| create(:material_reception, labware_id: lw.id)}
+      @old_claim_time = 1.day.ago
+      lws[2].update_attributes(claimed: @old_claim_time)
+
+      @submission.claim_claimable_labwares
+      @submission.reload
+    end
+
+    it "claims the claimable labware" do
+      @submission.labwares[0...2].each { |lw| expect(lw).to be_claimed }
+    end
+
+    it "does not claim already claimed labware" do
+      expect(@submission.labwares[2].claimed).to eq(@old_claim_time)
+    end
+
+    it "does not claim labware that has not been received" do
+      expect(@submission.labwares[3]).not_to be_claimed
+    end
+  end
+
+  describe '#labwares_unclaimed' do
+    it "returns the unclaimed labwares" do
+      @submission = create(:material_submission,
+        labware_type: create(:labware_type),
+        supply_labwares: true,
+        contact: create(:contact),
+        address: 'Space',
+      )
+      @submission.no_of_labwares_required = 3
+      @submission.save!
+      @submission.reload
+
+      lws = @submission.labwares
+      lws.each { |lw| lw.update_attributes(print_count: 1) }
+      create(:material_reception, labware_id: lws[2].id)
+      lws[2].update_attributes(claimed: DateTime.now)
+
+      expect(@submission.labwares_unclaimed).to eq(@submission.labwares[0...2])
+    end
+  end
+
+  describe '#labwares_ready_for_claim' do
+    it "should return the claimable labwares" do
+      @submission = create(:material_submission,
+        labware_type: create(:labware_type),
+        supply_labwares: true,
+        contact: create(:contact),
+        address: 'Space',
+      )
+      @submission.no_of_labwares_required = 4
+      @submission.save!
+      @submission.reload
+
+      lws = @submission.labwares
+      lws.each { |lw| lw.update_attributes(print_count: 1) }
+      lws[0...3].each { |lw| create(:material_reception, labware_id: lw.id)}
+      lws[2].update_attributes(claimed: DateTime.now)
+      @submission.reload
+
+      expect(@submission.labwares_ready_for_claim).to eq(@submission.labwares[0...2])
     end
   end
 
@@ -551,6 +606,27 @@ RSpec.describe MaterialSubmission, type: :model do
       end
       it "is not confirmed_no_hmdmc" do
         expect(@submission).not_to be_confirmed_no_hmdmc
+      end
+    end
+  end
+
+  describe "#supply_labware_type" do
+    context "when the material submission does not need labware supplied" do
+      before do
+        labware_type = create(:labware_type)
+        @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: false)
+      end
+      it "expect supply labware type to show 'Label only" do
+        expect(@material_submission.supply_labware_type).to eq 'Label only'
+      end
+    end
+    context "when the material submission does need labware supplied" do
+      before do
+        labware_type = create(:plate_labware_type)
+        @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: true)
+      end
+      it "expect supply labware type to show 'Label only" do
+        expect(@material_submission.supply_labware_type).to eq 'Plate'
       end
     end
   end

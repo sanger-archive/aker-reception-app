@@ -15,8 +15,7 @@
               <tr>
                 <th data-field="id"> Id </th>
                 <th data-field="created_at">Created at </th>
-                <!-- th data-field="status">Status</th -->
-                <th data-field="no_of_labwares_required"># items</th>
+                <th data-field="no_of_labwares_required"># ready</th>
                 <th data-field="state" data-checkbox="true"></th>
               </tr>
             </thead>
@@ -25,7 +24,7 @@
                 <tr>
                   <td><%= sub.id %></td>
                   <td><%= sub.created_at %></td>
-                  <td><%= sub.no_of_labwares_required %></td>
+                  <td><%= sub.labwares_ready_for_claim.size %> / <%= sub.labwares_unclaimed.size %></td>
                   <td></td>
                 </tr>
               <% end %>
