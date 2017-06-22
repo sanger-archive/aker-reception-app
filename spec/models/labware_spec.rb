@@ -103,7 +103,7 @@ RSpec.describe Labware, type: :model do
     context "when labware has a reception" do
       before do
         @labware = create(:labware, print_count: 1)
-        reception = create(:material_reception, labware_id: @labware.id)
+        create(:material_reception, labware_id: @labware.id)
       end
 
       it "should return true" do
@@ -119,6 +119,46 @@ RSpec.describe Labware, type: :model do
       it "should return false" do
         expect(@labware.received?).to eq false
       end
+    end
+  end
+
+  describe '#claimed?' do
+    before do
+      @labware = create(:labware, print_count: 1)
+      create(:material_reception, labware_id: @labware.id)
+    end
+    context "when labware has been claimed" do
+      before do
+        @labware.update_attributes(claimed: DateTime.now)
+      end
+      it { expect(@labware).to be_claimed }
+    end
+    context "when labware has not been claimed" do
+      it { expect(@labware).not_to be_claimed }
+    end
+  end
+
+  describe '#ready_for_claim?' do
+    before do
+      @labware = create(:labware, print_count: 1)
+    end
+    context 'when labware has been received and not claimed' do
+      before do
+        create(:material_reception, labware_id: @labware.id)
+      end
+      it { expect(@labware).to be_ready_for_claim }
+    end
+
+    context 'when labware has not been received' do
+      it { expect(@labware).not_to be_ready_for_claim }
+    end
+
+    context 'when labware has been received and claimed' do
+      before do
+        create(:material_reception, labware_id: @labware.id)
+        @labware.update_attributes(claimed: DateTime.now)
+      end
+      it { expect(@labware).not_to be_ready_for_claim }
     end
   end
 
