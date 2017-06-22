@@ -6,7 +6,7 @@ class ClaimSubmissionsController < ApplicationController
     if @contact.nil?
       @submissions = []
     else
-      @submissions = @contact.material_submissions.where(:status => MaterialSubmission.AWAITING).select(&:ready_for_claim?)
+      @submissions = @contact.material_submissions.where(:status => MaterialSubmission.PRINTED).select(&:ready_for_claim?)
     end
   end
 

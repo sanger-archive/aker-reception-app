@@ -145,13 +145,13 @@ RSpec.describe MaterialSubmission, type: :model do
     end
   end
 
-  describe "#active_or_awaiting?" do
+  describe "#active_or_printed?" do
     context "when the submission status is active" do
       before do
         @submission = build(:material_submission, status: MaterialSubmission.ACTIVE)
       end
       it "should return true" do
-        expect(@submission.active_or_awaiting?).to eq(true)
+        expect(@submission.active_or_printed?).to eq(true)
       end
     end
 
@@ -160,16 +160,16 @@ RSpec.describe MaterialSubmission, type: :model do
         @submission = build(:material_submission, status: nil)
       end
       it "should return false" do
-        expect(@submission.active_or_awaiting?).to eq(false)
+        expect(@submission.active_or_printed?).to eq(false)
       end
     end
 
-    context "when the submission status is awaiting" do
+    context "when the submission status is printed" do
       before do
-        @submission = build(:material_submission, status: MaterialSubmission.AWAITING)
+        @submission = build(:material_submission, status: MaterialSubmission.PRINTED)
       end
       it "should return true" do
-        expect(@submission.active_or_awaiting?).to eq(true)
+        expect(@submission.active_or_printed?).to eq(true)
       end
     end
 
@@ -178,7 +178,7 @@ RSpec.describe MaterialSubmission, type: :model do
         @submission = build(:material_submission, status: 'broken')
       end
       it "should return false" do
-        expect(@submission.active_or_awaiting?).to eq(false)
+        expect(@submission.active_or_printed?).to eq(false)
       end
     end
   end
@@ -187,7 +187,7 @@ RSpec.describe MaterialSubmission, type: :model do
   describe "#pending?" do
     context "when the submission status is non-pending" do
       before do
-        statuses = [MaterialSubmission.ACTIVE, MaterialSubmission.AWAITING, MaterialSubmission.BROKEN]
+        statuses = [MaterialSubmission.ACTIVE, MaterialSubmission.PRINTED, MaterialSubmission.BROKEN]
         @submissions = statuses.map { |s| build(:material_submission, status: s )}
       end
       it "should return false" do
@@ -235,7 +235,7 @@ RSpec.describe MaterialSubmission, type: :model do
         lw.update_attributes(barcode: "AKER-#{lw.id}", print_count: 1)
       end
     end
-    context "when status is not 'awaiting'" do
+    context "when status is not 'printed'" do
       before do
         @submission.labwares.each do |lw|
           create(:material_reception, labware_id: lw.id)
@@ -246,7 +246,7 @@ RSpec.describe MaterialSubmission, type: :model do
 
     context "when some labware are received" do
       before do
-        @submission.update_attributes(status: MaterialSubmission.AWAITING)
+        @submission.update_attributes(status: MaterialSubmission.PRINTED)
         create(:material_reception, labware_id: @submission.labwares.first.id)
       end
       it { expect(@submission.ready_for_claim?).to eq(true) }
@@ -254,7 +254,7 @@ RSpec.describe MaterialSubmission, type: :model do
 
     context "when some labware claimed and some not received" do
       before do
-        @submission.update_attributes(status: MaterialSubmission.AWAITING)
+        @submission.update_attributes(status: MaterialSubmission.PRINTED)
         create(:material_reception, labware_id: @submission.labwares.first.id)
         @submission.labwares.first.update_attributes(claimed: DateTime.now)
       end
@@ -263,7 +263,7 @@ RSpec.describe MaterialSubmission, type: :model do
 
     context "when some labware claimed and some received" do
       before do
-        @submission.update_attributes(status: MaterialSubmission.AWAITING)
+        @submission.update_attributes(status: MaterialSubmission.PRINTED)
         create(:material_reception, labware_id: @submission.labwares.first.id)
         @submission.labwares.first.update_attributes(claimed: DateTime.now)
         create(:material_reception, labware_id: @submission.labwares.second.id)
@@ -273,7 +273,7 @@ RSpec.describe MaterialSubmission, type: :model do
 
     context "when all labware claimed" do
       before do
-        @submission.update_attributes(status: MaterialSubmission.AWAITING)
+        @submission.update_attributes(status: MaterialSubmission.PRINTED)
         create(:material_reception, labware_id: @submission.labwares.first.id)
         @submission.labwares.first.update_attributes(claimed: DateTime.now)
         create(:material_reception, labware_id: @submission.labwares.second.id)

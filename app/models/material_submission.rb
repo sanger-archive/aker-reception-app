@@ -4,8 +4,8 @@ class MaterialSubmission < ApplicationRecord
     'active'
   end
 
-  def self.AWAITING
-    'awaiting receipt'
+  def self.PRINTED
+    'printed'
   end
 
   def self.BROKEN
@@ -31,7 +31,7 @@ class MaterialSubmission < ApplicationRecord
   before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
-  scope :awaiting, -> { where(status: MaterialSubmission.AWAITING) }
+  scope :printed, -> { where(status: MaterialSubmission.PRINTED) }
   # broken submissions are not listed
   scope :pending, -> { where(status: [nil, 'labware', 'provenance', 'ethics', 'dispatch']) }
   scope :for_user, ->(user) { where(user_id: user.id) }
@@ -59,9 +59,9 @@ class MaterialSubmission < ApplicationRecord
     active? || status.include?('dispatch')
   end
 
-  def active_or_awaiting?
+  def active_or_printed?
     return false if status.nil?
-    active? || status==MaterialSubmission.AWAITING
+    active? || status==MaterialSubmission.PRINTED
   end
 
   def pending?
@@ -77,7 +77,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def ready_for_claim?
-    status==MaterialSubmission.AWAITING && labwares.any?(&:ready_for_claim?)
+    status==MaterialSubmission.PRINTED && labwares.any?(&:ready_for_claim?)
   end
 
   def claim_claimable_labwares

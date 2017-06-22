@@ -2,7 +2,7 @@ class CompletedSubmissionsController < ApplicationController
 
 	def index
 		@unprinted_submissions = MaterialSubmission.active
-		@printed_submissions = MaterialSubmission.awaiting
+		@printed_submissions = MaterialSubmission.printed
 		@printers = Printer.all
 	end
 
@@ -17,7 +17,7 @@ class CompletedSubmissionsController < ApplicationController
 		end
 
 		completed_submissions.each do |ms|
-			ms.update_attributes!({ status: MaterialSubmission.AWAITING }) if ms.active?
+			ms.update_attributes!({ status: MaterialSubmission.PRINTED }) if ms.active?
 			ms.labwares.each { |lw| lw.increment_print_count! }
 		end
 		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Print issued."}

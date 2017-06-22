@@ -23,7 +23,7 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
           address: 'Space',
         )
         s.no_of_labwares_required = 1
-        s.status = MaterialSubmission.AWAITING
+        s.status = MaterialSubmission.PRINTED
         s.save!
         s.reload
         lws = s.labwares
@@ -66,7 +66,7 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
         to_return(status: 200, body: "", headers: response_headers)
 
         @labware_type = FactoryGirl.create(:labware_type, {row_is_alpha: true})
-        @submission = FactoryGirl.create(:material_submission, user: @user, status: MaterialSubmission.AWAITING)
+        @submission = FactoryGirl.create(:material_submission, user: @user, status: MaterialSubmission.PRINTED)
         @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1", print_count: 1, contents: {"1": { id: "#{@material_uuid}" } })
         MaterialReception.create!(labware_id: @labware.id)
 
@@ -83,7 +83,7 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
       before do
         @set_uuid = SecureRandom.uuid
 
-        @submission = FactoryGirl.create(:material_submission, user: @user, status: MaterialSubmission.AWAITING)
+        @submission = FactoryGirl.create(:material_submission, user: @user, status: MaterialSubmission.PRINTED)
         @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1", print_count: 1, contents: {"1": { id: "#{@material_uuid}" } })
         
         @submission.labwares << @labware
