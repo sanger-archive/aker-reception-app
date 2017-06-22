@@ -100,6 +100,10 @@ class MaterialSubmission < ApplicationRecord
     user&.email
   end
 
+  def supply_labware_type
+    supply_labwares ? labware_type.name : "Label only"
+  end
+
   def update(params)
     update_attributes(params) && labwares.all?(&:valid?)
   end
