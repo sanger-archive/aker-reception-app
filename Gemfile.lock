@@ -10,9 +10,10 @@ GIT
 
 GIT
   remote: git://github.com/sanger/aker-authentication.git
-  revision: 4958592e3c98609d624129898a8ff56b8ae962d6
+  revision: 5e9e50c99552a06d41c42c0d01e3a9f03bd5f53b
   specs:
-    aker_authentication_gem (0.1.0)
+    aker_authentication_gem (0.1.1)
+      activemodel
       devise
       devise_ldap_authenticatable
       jwt
@@ -193,10 +194,10 @@ GEM
     database_cleaner (1.5.3)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
-    devise (4.2.1)
+    devise (4.3.0)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
-      railties (>= 4.1.0, < 5.1)
+      railties (>= 4.1.0, < 5.2)
       responders
       warden (~> 1.2.3)
     devise_ldap_authenticatable (0.8.5)
