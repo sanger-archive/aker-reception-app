@@ -1,8 +1,12 @@
 <h2>Log in</h2>
 
+<% if Rails.configuration.fake_ldap %>
+
 <div class="alert alert-danger" role="alert">
   <strong>Warning!</strong> Do not use your real password.
 </div>
+
+<% end %>
 
 <%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
   <div class="form-group">
