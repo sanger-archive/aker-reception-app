@@ -79,6 +79,8 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
 
         post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid } }
 
+        assert_requested(:patch, "#{Rails.configuration.material_url}/materials/#{@material_uuid}", body: '{"available":true}')
+
         @submission.reload
         @submission.labwares.each { |lw| expect(lw).to be_claimed }
       end
