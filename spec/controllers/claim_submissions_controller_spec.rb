@@ -10,6 +10,9 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
     sign_in(@user)
 
     allow(request.env['warden']).to receive(:authenticate!).and_return(@user)
+
+    stub_request(:get, "#{Rails.configuration.material_url}/materials/json_schema").
+      to_return(status: 200, body: '{"required": ["supplier_name", "gender", "donor_id", "phenotype", "common_name"], "type": "object", "properties": {"available": {"default": false, "required": false, "type": "boolean"}, "hmdmc_not_required_confirmed_by": {"not_blank": true, "required": false, "type": "string"}, "gender": {"required": true, "type": "string", "allowed": ["male", "female", "unknown"]}, "date_of_receipt": {"type": "string", "format": "date"}, "material_type": {"type": "string", "allowed": ["blood", "dna"]}, "hmdmc_set_by": {"not_blank": true, "required": false, "type": "string", "required_with_hmdmc": true}, "hmdmc": {"hmdmc_format": true, "type": "string", "required": false}, "donor_id": {"required": true, "type": "string"}, "phenotype": {"required": true, "type": "string"}, "supplier_name": {"required": true, "type": "string"}, "common_name": {"required": true, "type": "string", "allowed": ["Homo Sapiens", "Mouse"]}, "parents": {"type": "list", "schema": {"type": "uuid", "data_relation": {"field": "_id", "resource": "materials", "embeddable": true}}}, "owner_id": {"type": "string"}}}', headers: { 'Content-Type' => 'application/json'})
   end
 
   describe "#index" do
@@ -44,7 +47,7 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
 
   describe "#claim" do
     context 'when submission can be claimed' do
-      it "adds materials to a collection and marks the labware as claimed" do
+      it "adds materials to a collection and marks the labware as claimed and makes the materials available" do
 
         @set_uuid = SecureRandom.uuid
         @material_uuid = SecureRandom.uuid
@@ -61,9 +64,11 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
 
         @material_id_obj = {data:[{id: "#{@material_uuid}", type: "materials"}]}
         stub_request(:post, "#{Rails.configuration.set_url}sets/#{@set_uuid}/relationships/materials").
-        with(body: @material_id_obj.to_json,
-              headers: request_headers).
-        to_return(status: 200, body: "", headers: response_headers)
+          with(body: @material_id_obj.to_json,
+                headers: request_headers).
+          to_return(status: 200, body: "", headers: response_headers)
+        stub_request(:patch, "#{Rails.configuration.material_url}/materials/#{@material_uuid}").
+          to_return(status: 200, body: "", headers: response_headers)
 
         @labware_type = FactoryGirl.create(:labware_type, {row_is_alpha: true})
         @submission = FactoryGirl.create(:material_submission, user: @user, status: MaterialSubmission.PRINTED)
