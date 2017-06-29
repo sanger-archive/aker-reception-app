@@ -27,6 +27,7 @@ class ClaimSubmissionsController < ApplicationController
     end
     material_ids = submissions_material_ids(submissions)
     SetClient::Set.find(col_id).first.set_materials(material_ids)
+    material_ids.each { |mid| MatconClient::Material.new(_id: mid).update_attributes(available: true) }
     submissions.each(&:claim_claimable_labwares)
   end
 
