@@ -292,7 +292,7 @@ RSpec.describe SubmissionsController, type: :controller do
       params[:params].merge!(ethics_params)
       ac_par = ActionController::Parameters.new(ethics_params)
       ac_par.permit!
-      expect_any_instance_of(EthicsService).to receive(:update).with(ac_par, "user@sanger.ac.uk")
+      expect_any_instance_of(EthicsService).to receive(:update).with(ac_par, @user.email)
       put :update, params
       @material_submission.reload
     end

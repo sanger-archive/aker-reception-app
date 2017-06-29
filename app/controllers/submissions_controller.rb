@@ -135,7 +135,7 @@ class SubmissionsController < ApplicationController
   end
 
   def material_schema
-    MatconClient::Material.schema.body
+    MatconClient::Material.schema
   end
 
   def previous_step(step=nil)
