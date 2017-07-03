@@ -8,7 +8,7 @@
   <%= f.number_field :no_of_labwares_required,
     label: '2) How many plates or tubes do you require?', min: 0, step: 1 %>
 
-  <%= f.select :supply_labwares, [['Yes', true], ['No', false]],
+  <%= f.select :supply_labwares, [['No', false], ['Yes', true]],
     label: '3) Do you require plates or tubes to be supplied to you?' %>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
