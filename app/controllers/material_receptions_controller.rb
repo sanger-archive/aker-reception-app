@@ -3,7 +3,7 @@ class MaterialReceptionsController < ApplicationController
   before_filter :set_labware, only: :create
 
   def index
-    @material_receptions = MaterialReception.all
+    @material_receptions = MaterialReception.all.sort_by(&:id).reverse
     @material_reception = MaterialReception.new
   end
 

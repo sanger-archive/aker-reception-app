@@ -6,8 +6,8 @@ class MaterialSubmissionsController < ApplicationController
 
   def index
     if user_signed_in?
-      @pending_material_submissions = MaterialSubmission.pending.for_user(current_user)
-      @active_material_submissions = MaterialSubmission.active.for_user(current_user)
+      @pending_material_submissions = MaterialSubmission.pending.for_user(current_user).sort_by(&:id).reverse
+      @active_material_submissions = MaterialSubmission.active.for_user(current_user).sort_by(&:id).reverse
     else
       @pending_material_submissions = []
       @active_material_submissions = []
