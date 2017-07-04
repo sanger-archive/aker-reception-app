@@ -4,6 +4,12 @@
   var SUBMISSIONS_NODE = ".claiming-display .submission-list"
 
   function onClaimedSetsReception(data, status, xhr) {
+    if (HEADERS.length == 0) {
+      $('[data-field]', $(NODE)).each(function(pos, element) {
+        HEADERS.push({field: $(element).data('field'), title: $(element).text()})
+      });
+    }
+
     $('.table', $(NODE)).bootstrapTable('destroy');
     $('.table', $(NODE)).bootstrapTable({data: data, uniqueId: 'uuid', columns: HEADERS});
 
@@ -28,23 +34,12 @@
     }
   }
 
-  function init() {
-    if (HEADERS.length == 0) {
-      $('[data-field]', $(NODE)).each(function(pos, element) {
-        HEADERS.push({field: $(element).data('field'), title: $(element).text()})
-      });
-    }
-    var serviceUrl = $(NODE).data('service-url');
-    $.get(serviceUrl, onClaimedSetsReception)
-
-  }
-
   function turbolinksLoad(){
-    $('.table').bootstrapTable({data: [], columns: HEADERS});
-    init();
+    var serviceUrl = $(NODE).data('service-url');
+    $.get(serviceUrl, onClaimedSetsReception);
+    $('.table', $(SUBMISSIONS_NODE)).bootstrapTable();
   }
 
   $(document).on('turbolinks:load', turbolinksLoad);
-  $(document).ready(init);
 
 }(jQuery))

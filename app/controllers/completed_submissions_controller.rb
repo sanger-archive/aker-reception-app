@@ -1,8 +1,8 @@
 class CompletedSubmissionsController < ApplicationController
 
 	def index
-		@unprinted_submissions = MaterialSubmission.active
-		@printed_submissions = MaterialSubmission.printed
+		@unprinted_submissions = MaterialSubmission.active.sort_by(&:id).reverse
+		@printed_submissions = MaterialSubmission.printed.sort_by(&:id).reverse
 		@printers = Printer.all
 	end
 
