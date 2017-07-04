@@ -44,14 +44,12 @@
   function init() {
     $('form', $(NODE)).on('ajax:success', onFindReception);
 
-    $('[data-field]', $(SUBMISSIONS_NODE)).each(function(pos, element) {
-      if (HEADERS.length == 0) {
+    if (HEADERS.length==0) {
+      $('[data-field]', $(SUBMISSIONS_NODE)).each(function(pos, element) {
         HEADERS.push({field: $(element).data('field'), title: $(element).text()})
-      }
-    });
-
+      });
+    }
   }
   $(document).on('turbolinks:load', init);
-  $(document).ready(init);
 
 }(jQuery))
