@@ -94,7 +94,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
          to_return(:status => 200, :body => {"_items" => []}.to_json)
 
       count = MaterialReception.all.count
-      post :create, { :material_reception => {:barcode_value => 'NOT_EXISTS'}}
+      post :create, params: { :material_reception => { :barcode_value => 'NOT_EXISTS'} }
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count)
     end
@@ -102,7 +102,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     it "does not add the barcode to the list if the barcode has already been received" do
       MaterialReception.create(:labware_id => @labware.id)
       count = MaterialReception.all.count
-      post :create, { :material_reception => {:barcode_value => @labware.barcode}}
+      post :create, params: { :material_reception => {:barcode_value => @labware.barcode}}
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count)
     end
@@ -110,7 +110,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     it "does not add the barcode to the list if the barcode has not been printed" do
       @labware.assign_attributes(print_count: 0)
       count = MaterialReception.all.count
-      post :create, { :material_reception => {:barcode_value => @labware.barcode}}
+      post :create, params: { :material_reception => {:barcode_value => @labware.barcode}}
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count)
     end
@@ -128,7 +128,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
          to_return(:status => 200, :body => {"_items" => [@labware.attributes]}.to_json)
 
       count = MaterialReception.all.count
-      post :create, { :material_reception => {:barcode_value => @labware.barcode }}
+      post :create, params: { :material_reception => {:barcode_value => @labware.barcode }}
       expect(response).to have_http_status(:ok)
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count+1)

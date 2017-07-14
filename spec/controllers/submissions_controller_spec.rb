@@ -147,6 +147,7 @@ RSpec.describe SubmissionsController, type: :controller do
       allow_any_instance_of(DispatchService).to receive(:process).and_raise  "This step fails"
       allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
+
       put :update, step_params(@material_submission, :labware)
       @material_submission.reload
 
