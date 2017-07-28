@@ -129,7 +129,7 @@ private
   end
 
   def material_is_human?(material)
-    species = material['common_name']
+    species = material['scientific_name']
     species.present? && species.strip.downcase=='homo sapiens'
   end
 

@@ -17,7 +17,7 @@ RSpec.describe Labware, type: :model do
   end
 
   def make_contents(human, options={})
-    c = { 'common_name' => (human ? 'Homo Sapiens' : 'Mouse') }
+    c = { 'scientific_name' => (human ? 'Homo Sapiens' : 'Mouse') }
     if options.has_key? :hmdmc
       c['hmdmc'] = options[:hmdmc]
     end
@@ -345,14 +345,14 @@ RSpec.describe Labware, type: :model do
     end
     it "should correct set the fields on the human material" do
       expect(@lw.contents['1']).to eq({
-          'common_name' => 'Homo Sapiens',
+          'scientific_name' => 'Homo Sapiens',
           'hmdmc' => '12/345',
           'hmdmc_set_by' => 'dirk',
         })
     end
     it "should correct set the fields on the nonhuman material" do
       expect(@lw.contents['2']).to eq({
-          'common_name' => 'Mouse',
+          'scientific_name' => 'Mouse',
         })
     end
   end
@@ -365,13 +365,13 @@ RSpec.describe Labware, type: :model do
     end
     it "should correct set the fields on the human material" do
       expect(@lw.contents['1']).to eq({
-          'common_name' => 'Homo Sapiens',
+          'scientific_name' => 'Homo Sapiens',
           'hmdmc_not_required_confirmed_by' => 'dirk',
         })
     end
     it "should correct set the fields on the nonhuman material" do
       expect(@lw.contents['2']).to eq({
-          'common_name' => 'Mouse',
+          'scientific_name' => 'Mouse',
         })
     end
   end
@@ -384,12 +384,12 @@ RSpec.describe Labware, type: :model do
     end
     it "should correct set the fields on the human material" do
       expect(@lw.contents['1']).to eq({
-          'common_name' => 'Homo Sapiens',
+          'scientific_name' => 'Homo Sapiens',
         })
     end
     it "should correct set the fields on the nonhuman material" do
       expect(@lw.contents['2']).to eq({
-          'common_name' => 'Mouse',
+          'scientific_name' => 'Mouse',
         })
     end
   end

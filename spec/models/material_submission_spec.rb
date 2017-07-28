@@ -489,7 +489,7 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when there is labware with human material" do
       before do
         @submission = create(:material_submission)
-        @labware = create(:labware, material_submission: @submission, contents: { "1" => { 'common_name' => 'Homo Sapiens'}})
+        @labware = create(:labware, material_submission: @submission, contents: { "1" => { 'scientific_name' => 'Homo Sapiens'}})
       end
       it "has human material" do
         expect(@submission).to be_any_human_material
@@ -501,7 +501,7 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when there is ethical labware with human material" do
       before do
         @submission = create(:material_submission)
-        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens', 'hmdmc' => '12/345', 'hmdmc_set_by' => 'dirk'}})
+        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens', 'hmdmc' => '12/345', 'hmdmc_set_by' => 'dirk'}})
       end
       it "is ethical" do
         expect(@submission.labwares).not_to be_empty
@@ -511,7 +511,7 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when there is labware missing ethics" do
       before do
         @submission = create(:material_submission)
-        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens' }})
+        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens' }})
       end
       it "is not ethical" do
         expect(@submission).not_to be_ethical
@@ -522,33 +522,33 @@ RSpec.describe MaterialSubmission, type: :model do
   describe "#set_hmdmc" do
     before do
       @submission = create(:material_submission)
-      @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens' }})
+      @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens' }})
     end
     it "sets the hmdmc on the labware" do
       @submission.set_hmdmc('12/345', 'dirk')
-      expect(@submission.labwares.first.contents).to eq({ "1" => {'common_name' => 'Homo Sapiens', 'hmdmc' => '12/345', 'hmdmc_set_by' => 'dirk' }})
+      expect(@submission.labwares.first.contents).to eq({ "1" => {'scientific_name' => 'Homo Sapiens', 'hmdmc' => '12/345', 'hmdmc_set_by' => 'dirk' }})
     end
   end
 
   describe "#set_hmdmc_not_required" do
     before do
       @submission = create(:material_submission)
-      @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens' }})
+      @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens' }})
     end
     it "sets the not-required on the labware" do
       @submission.set_hmdmc_not_required('dirk')
-      expect(@submission.labwares.first.contents).to eq({ "1" => {'common_name' => 'Homo Sapiens', 'hmdmc_not_required_confirmed_by' => 'dirk' }})
+      expect(@submission.labwares.first.contents).to eq({ "1" => {'scientific_name' => 'Homo Sapiens', 'hmdmc_not_required_confirmed_by' => 'dirk' }})
     end
   end
 
   describe "#clear_hmdmc" do
     before do
       @submission = create(:material_submission)
-      @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens', 'hmdmc' => '12/345' }})
+      @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens', 'hmdmc' => '12/345' }})
     end
     it "clears hmdmc information from the labware" do
       @submission.clear_hmdmc
-      expect(@submission.labwares.first.contents).to eq({ "1" => {'common_name' => 'Homo Sapiens' }})
+      expect(@submission.labwares.first.contents).to eq({ "1" => {'scientific_name' => 'Homo Sapiens' }})
     end
   end
 
@@ -564,7 +564,7 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when the labware has an hmdmc" do
       before do
         @submission = create(:material_submission)
-        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens', 'hmdmc' => '12/345' }})
+        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens', 'hmdmc' => '12/345' }})
       end
       it "returns the hmdmc" do
         expect(@submission.first_hmdmc).to eq('12/345')
@@ -573,7 +573,7 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when the labware has no hmdmc" do
       before do
         @submission = create(:material_submission)
-        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens' }})
+        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens' }})
       end
       it "returns nil" do
         expect(@submission.first_hmdmc).to be_nil
@@ -593,7 +593,7 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when the labware has a hmdmc_not_required_confirmed_by" do
       before do
         @submission = create(:material_submission)
-        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens', 'hmdmc_not_required_confirmed_by' => 'dirk' }})
+        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens', 'hmdmc_not_required_confirmed_by' => 'dirk' }})
       end
       it "is confirmed_no_hmdmc" do
         expect(@submission).to be_confirmed_no_hmdmc
@@ -602,7 +602,7 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when the labware has no hmdmc_not_required_confirmed_by" do
       before do
         @submission = create(:material_submission)
-        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'common_name' => 'Homo Sapiens' }})
+        @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens' }})
       end
       it "is not confirmed_no_hmdmc" do
         expect(@submission).not_to be_confirmed_no_hmdmc

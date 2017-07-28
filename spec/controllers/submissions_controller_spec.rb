@@ -60,7 +60,7 @@ def labware_attributes_for(labwares, species)
         "donor_id" => "d",
         "phenotype" => "p",
         "supplier_name" => "s",
-        "common_name" => species,
+        "scientific_name" => species,
       }
     }
   end
@@ -88,7 +88,7 @@ RSpec.describe SubmissionsController, type: :controller do
             "donor_id",
             "phenotype",
             "supplier_name",
-            "common_name"
+            "scientific_name"
           ],
           "type":"object",
           "properties":{
@@ -124,7 +124,7 @@ RSpec.describe SubmissionsController, type: :controller do
               "required":true,
               "type":"string"
             },
-            "common_name":{
+            "scientific_name":{
               "required":true,
               "type":"string",
               "enum":[
