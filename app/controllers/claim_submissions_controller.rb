@@ -29,19 +29,25 @@ class ClaimSubmissionsController < ApplicationController
       return
     end
     material_ids = submissions_material_ids(submissions)
-    
+
     begin
       stamp = StampClient::Stamp.find(stamp_id).first
-      stamp.apply_to(material_ids)    
+      stamp.apply_to(material_ids)
     rescue JsonApiClient::Errors::AccessDenied
       raise AkerPermissionGem::NotAuthorized.new('You cannot set a stamp of permissions to the materials because you do not have the ownership of the materials you want to claim')
     end
 
-    SetClient::Set.find(col_id).first.set_materials(material_ids)    
+    SetClient::Set.find(col_id).first.set_materials(material_ids)
 
     material_ids.each { |mid| MatconClient::Material.new(_id: mid).update_attributes(available: true) }
 
     submissions.each(&:claim_claimable_labwares)
+  end
+
+  helper_method :stamp_summary
+
+  def stamp_summary(stamp)
+    "Stamp #{stamp.name} from #{stamp.owner_id}"
   end
 
   private

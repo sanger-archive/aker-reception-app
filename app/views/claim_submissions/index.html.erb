@@ -5,10 +5,10 @@
 
 <div class="container">
   <div class="stamping-display row">
-    <div class="h5"><span class="index">1.</span> Select a stamp of permissions to apply:</div> 
+    <div class="h5"><span class="index">1.</span> Select a stamp of permissions to apply:</div>
     <select class="form-control" id="stamp_id">
       <%= @stamps.each do |stamp| %>
-        <option value="<%= stamp.id %>">Stamp '<%= stamp.name %>' from '<%= stamp.owner_id %>'</option>
+        <option value="<%= stamp.id %>"><%= stamp_summary(stamp) %></option>
       <% end %>
     </select>
   </div>
