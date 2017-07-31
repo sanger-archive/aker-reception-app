@@ -47,7 +47,7 @@ class ClaimSubmissionsController < ApplicationController
   helper_method :stamp_summary
 
   def stamp_summary(stamp)
-    "Stamp #{stamp.name} from #{stamp.owner_id}"
+    "Stamp '#{stamp.name}' from '#{stamp.owner_id}'"
   end
 
   private
