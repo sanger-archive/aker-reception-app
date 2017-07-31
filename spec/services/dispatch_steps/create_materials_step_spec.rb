@@ -36,7 +36,8 @@ RSpec.describe :create_materials_step do
 
   def make_submission(labware_bio_ids)
     labwares = labware_bio_ids.map { |bio_ids| make_labware(bio_ids) }
-    @submission = double(:material_submission, labwares: labwares)
+    contact = double('contact', email: 'testing@email')
+    @submission = double(:material_submission, labwares: labwares, contact: contact)
   end
 
   def make_step(labware_bio_ids)

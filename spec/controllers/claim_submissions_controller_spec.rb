@@ -2,6 +2,20 @@ require 'rails_helper'
 require 'webmock/rspec'
 
 RSpec.describe ClaimSubmissionsController, type: :controller do
+
+  def webmock_stamp(uuid)
+    stub_request(:get, "#{Rails.configuration.stamp_url}stamps/#{@stamp_id}").
+     with(headers: {'Accept'=>'application/vnd.api+json'}).
+     to_return(status: 200, body: {"data":{"id":@stamp_id,"type":"stamps","links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}"},"attributes":{"name":"my stamp","owner-id":"emr@sanger.ac.uk"},"relationships":{"permissions":{"links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/relationships/permissions","related":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/permissions"}},"materials":{"links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/relationships/materials","related":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/materials"}}}}}.to_json, 
+      headers: { 'Content-Type' => 'application/json'})
+
+
+    stamp = double('stamp', id: uuid)
+
+    allow(StampClient::Stamp).to receive(:find).and_return([stamp])
+    stamp
+  end
+
   setup do
     @request.env['devise.mapping'] = Devise.mappings[:user]
 
@@ -13,6 +27,10 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
 
     stub_request(:get, "#{Rails.configuration.material_url}/materials/json_schema").
       to_return(status: 200, body: '{"required": ["supplier_name", "gender", "donor_id", "phenotype", "scientific_name"], "type": "object", "properties": {"available": {"default": false, "required": false, "type": "boolean"}, "hmdmc_not_required_confirmed_by": {"not_blank": true, "required": false, "type": "string"}, "gender": {"required": true, "type": "string", "allowed": ["male", "female", "unknown"]}, "date_of_receipt": {"type": "string", "format": "date"}, "material_type": {"type": "string", "allowed": ["blood", "dna"]}, "hmdmc_set_by": {"not_blank": true, "required": false, "type": "string", "required_with_hmdmc": true}, "hmdmc": {"hmdmc_format": true, "type": "string", "required": false}, "donor_id": {"required": true, "type": "string"}, "phenotype": {"required": true, "type": "string"}, "supplier_name": {"required": true, "type": "string"}, "scientific_name": {"required": true, "type": "string", "allowed": ["Homo Sapiens", "Mouse"]}, "parents": {"type": "list", "schema": {"type": "uuid", "data_relation": {"field": "_id", "resource": "materials", "embeddable": true}}}, "owner_id": {"type": "string"}}}', headers: { 'Content-Type' => 'application/json'})
+
+    stub_request(:get, "#{Rails.configuration.stamp_url}stamps").
+         with(headers: {'Accept'=>'application/vnd.api+json'}).
+         to_return(status: 200, body: [].to_json, headers: { 'Content-Type' => 'application/json'})
   end
 
   describe "#index" do
@@ -48,6 +66,9 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
   describe "#claim" do
     context 'when submission can be claimed' do
       it "adds materials to a collection and marks the labware as claimed and makes the materials available" do
+        @stamp_id = SecureRandom.uuid
+        @stamp = webmock_stamp(@stamp_id)
+        allow(@stamp).to receive(:apply_to)
 
         @set_uuid = SecureRandom.uuid
         @material_uuid = SecureRandom.uuid
@@ -77,7 +98,7 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
 
         @submission.labwares << @labware
 
-        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid } }
+        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid, stamp_id: @stamp_id } }
 
         assert_requested(:patch, "#{Rails.configuration.material_url}/materials/#{@material_uuid}", body: '{"available":true}')
 
@@ -89,6 +110,7 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
     context 'when submission not ready for claiming' do
       before do
         @set_uuid = SecureRandom.uuid
+        @stamp_id = SecureRandom.uuid
 
         @submission = FactoryGirl.create(:material_submission, user: @user, status: MaterialSubmission.PRINTED)
         @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1", print_count: 1, contents: {"1": { id: "#{@material_uuid}" } })
@@ -97,18 +119,18 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
       end
 
       it "flashes an error" do
-        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid } }
+        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid, stamp_id: @stamp_id } }
         expect(flash[:error]).to match(/submissions.*cannot be claimed/)
       end
 
       it "doesn't put the material in sets" do
         expect(SetClient::Set).not_to receive(:find)
-        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid } }
+        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid, stamp_id: @stamp_id } }
       end
 
       it "doesn't update the labware as claimed" do
         expect_any_instance_of(MaterialSubmission).not_to receive(:claim_claimable_labwares)
-        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid } }
+        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid, stamp_id: @stamp_id } }
       end
     end
   end

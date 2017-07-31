@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/harrietc52/aker-stamp-client.git
+  revision: 11a68d80c23e6df6d1a008c7473f7bed8f2ad9cb
+  specs:
+    aker_stamp_client (0.1.0)
+
+GIT
   remote: git://github.com/rails/activeresource.git
   revision: 029e282f13c9d7230470708c1046abbf65ce5dae
   branch: master
@@ -10,9 +16,9 @@ GIT
 
 GIT
   remote: git://github.com/sanger/aker-authentication.git
-  revision: 10b168e0bddecbcdcd2baf3bc460fb7bfd855e4e
+  revision: 09c11204f386071fb194d97bcbf36abd248378f2
   specs:
-    aker_authentication_gem (0.1.2)
+    aker_authentication_gem (0.1.3)
       activemodel
       devise
       devise_ldap_authenticatable
@@ -40,9 +46,9 @@ GIT
 
 GIT
   remote: git://github.com/sanger/aker-permission.git
-  revision: 184fbc371bddb467859e71ae3a0f06ba483eab9b
+  revision: 51eb6543489bd163415c39910fb56c45b1966c31
   specs:
-    aker_permission_gem (0.1.1)
+    aker_permission_gem (0.4.0)
       cancancan
 
 GIT
@@ -240,7 +246,7 @@ GEM
       activesupport (>= 4.2.0)
     gmetric (0.1.3)
     hashdiff (0.3.4)
-    i18n (0.8.4)
+    i18n (0.8.6)
     ice_nine (0.11.2)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
@@ -270,7 +276,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
     mini_portile2 (2.2.0)
-    minitest (5.10.2)
+    minitest (5.10.3)
     multi_json (1.12.1)
     multi_test (0.1.2)
     multipart-post (2.0.0)
@@ -459,6 +465,7 @@ DEPENDENCIES
   aker_authentication_gem!
   aker_credentials_gem!
   aker_permission_gem!
+  aker_stamp_client!
   bootstrap-sass (~> 3.3.6)
   bootstrap-table-rails
   bootstrap_form
@@ -508,4 +515,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.14.6
+   1.15.2

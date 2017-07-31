@@ -1,6 +1,8 @@
 class ClaimSubmissionsController < ApplicationController
 
   def index
+    @stamps = StampClient::Stamp.all
+
     @email = current_user.email
     @contact = Contact.find_by_email(@email)
     if @contact.nil?
@@ -19,6 +21,7 @@ class ClaimSubmissionsController < ApplicationController
     cp = claim_params
     sub_ids = cp[:submission_ids]
     col_id = cp[:collection_id]
+    stamp_id = cp[:stamp_id]
     submissions = MaterialSubmission.where(id: sub_ids)
     not_ready = submissions.reject(&:ready_for_claim?).map { |s| "Submission #{s.id}" }
     unless not_ready.empty?
@@ -26,8 +29,18 @@ class ClaimSubmissionsController < ApplicationController
       return
     end
     material_ids = submissions_material_ids(submissions)
-    SetClient::Set.find(col_id).first.set_materials(material_ids)
+    
+    begin
+      stamp = StampClient::Stamp.find(stamp_id).first
+      stamp.apply_to(material_ids)    
+    rescue JsonApiClient::Errors::AccessDenied
+      raise AkerPermissionGem::NotAuthorized.new('You cannot set a stamp of permissions to the materials because you do not have the ownership of the materials you want to claim')
+    end
+
+    SetClient::Set.find(col_id).first.set_materials(material_ids)    
+
     material_ids.each { |mid| MatconClient::Material.new(_id: mid).update_attributes(available: true) }
+
     submissions.each(&:claim_claimable_labwares)
   end
 
@@ -37,6 +50,7 @@ class ClaimSubmissionsController < ApplicationController
     {
       submission_ids: params.require(:submission_ids),
       collection_id: params.require(:collection_id),
+      stamp_id: params.require(:stamp_id)
     }
   end
 
