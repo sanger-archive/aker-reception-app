@@ -12,7 +12,7 @@ class CreateMaterialsStep
       contents = labware.contents
       contents.each do | address, bio_data |
         unless bio_data['id']
-          m = MatconClient::Material.create(bio_data)
+          m = MatconClient::Material.create(bio_data.merge(owner_id: @material_submission.contact.email))
           bio_data['id'] = m.id
           changed = true
         end

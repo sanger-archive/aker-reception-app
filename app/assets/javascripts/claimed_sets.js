@@ -17,14 +17,15 @@
     $('.table tbody tr', $(NODE)).each(function(pos, node) {
       var list = $('td', node);
       var collectionId = data[pos].uuid;
+
       var claimingButton = $('<button class="btn btn-default">Claim</button>');
 
       claimingButton.on('click', function(e) {
         var submissionIds = $($('table', $(SUBMISSIONS_NODE))).bootstrapTable('getAllSelections').map(function(node, pos) {
           return node.id;
         });
-
-        Aker.claim(submissionIds, collectionId);
+        var stampId = $('#stamp_id').val()
+        Aker.claim(submissionIds, collectionId, stampId);
       });
 
       $(list[list.length - 1]).html(claimingButton);

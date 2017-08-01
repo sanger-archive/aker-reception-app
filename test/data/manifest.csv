@@ -1,4 +1,4 @@
-Well Position,supplier_name,donor_id,gender,common_name,phenotype
+Well Position,supplier_name,donor_id,gender,scientific_name,phenotype
 A:1,334455,3,male,Homo Sapiens,6
 A:2,334456,3,male,Homo Sapiens,6
 A:3,334457,3,female,Homo Sapiens,6
