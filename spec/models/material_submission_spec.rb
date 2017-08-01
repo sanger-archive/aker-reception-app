@@ -370,6 +370,7 @@ RSpec.describe MaterialSubmission, type: :model do
     end
 
     it "does not claim already claimed labware" do
+      @submission.labwares[2].reload
       expect(@submission.labwares[2].claimed).to eq(@old_claim_time)
     end
 
