@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'time'
 
 RSpec.describe MaterialSubmission, type: :model do
 
@@ -358,7 +359,7 @@ RSpec.describe MaterialSubmission, type: :model do
       lws = @submission.labwares
       lws.each { |lw| lw.update_attributes(print_count: 1) }
       lws[0...3].each { |lw| create(:material_reception, labware_id: lw.id)}
-      @old_claim_time = 1.day.ago
+      @old_claim_time = Time.strptime("2000-10-31", "%Y-%m-%d")
       lws[2].update_attributes(claimed: @old_claim_time)
 
       @submission.claim_claimable_labwares
