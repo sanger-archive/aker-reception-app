@@ -4,8 +4,19 @@
 <%= render :partial => 'title_buttons' %>
 
 <div class="container">
-  <div class="claiming-display row">
-
+  <div class="stamping-display row">
+    <div class="h5"><span class="index">1.</span> Select a stamp of permissions to apply:</div>
+    <select class="form-control" id="stamp_id">
+      <%= @stamps.each do |stamp| %>
+        <option value="<%= stamp.id %>"><%= stamp_summary(stamp) %></option>
+      <% end %>
+    </select>
+  </div>
+  <div class="row">
+    &nbsp;
+  </div>
+  <div class="claiming-display row disabled">
+    <div class="h5"><span class="index">2.</span> Select a set from the table and claim it inside a collection by clicking on 'Claim':</div>
     <div class="col-md-4">
 
       <div class="row rowspace">

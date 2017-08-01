@@ -68,6 +68,8 @@ Rails.application.configure do
   config.ownership_url = 'http://localhost:4000/ownerships'
   config.ownership_url_default_proxy = 'http://localhost:4000'
 
+  config.stamp_url = 'http://localhost:7000/api/v1/'
+
   config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
 
   config.ehmdmc_url = 'http://localhost:3501/validate'

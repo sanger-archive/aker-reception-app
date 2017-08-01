@@ -30,6 +30,10 @@ Given(/^I click on "([^"]*)"$/) do |arg1|
   click_on(arg1)
 end
 
+Given(/^I check "([^"]*)"$/) do |arg1|
+  check(arg1)
+end
+
 Given(/^I go to next screen$/) do
   first('a.save').trigger('click')
 end
@@ -65,7 +69,11 @@ Then(/^I should not see any validation errors$/) do
 end
 
 When(/^I enter my details as collaborator$/) do
-  fill_in('Collaborator email', :with => 'test@test')
+  fill_in('Address', :with => 'Some address')
+end
+
+Then(/^show me the page$/) do
+  save_and_open_page
 end
 
 When(/^I select the contact "([^"]*)"$/) do |arg1|
