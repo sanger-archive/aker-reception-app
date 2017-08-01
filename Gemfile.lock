@@ -1,10 +1,4 @@
 GIT
-  remote: git://github.com/harrietc52/aker-stamp-client.git
-  revision: 11a68d80c23e6df6d1a008c7473f7bed8f2ad9cb
-  specs:
-    aker_stamp_client (0.1.0)
-
-GIT
   remote: git://github.com/rails/activeresource.git
   revision: 029e282f13c9d7230470708c1046abbf65ce5dae
   branch: master
@@ -56,6 +50,12 @@ GIT
   revision: 20a3bd511d96d4232ccae770b536013ec609a8e6
   specs:
     aker-set-client (0.2.0)
+
+GIT
+  remote: git://github.com/sanger/aker-stamp-client.git
+  revision: 0c6d4411f8b3973d3df42533db6bb4049d1ad029
+  specs:
+    aker_stamp_client (0.1.0)
 
 GIT
   remote: git://github.com/sanger/aker-study-client.git
