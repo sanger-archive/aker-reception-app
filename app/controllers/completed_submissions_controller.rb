@@ -7,6 +7,12 @@ class CompletedSubmissionsController < ApplicationController
 	end
 
 	def print
+		if params[:print_top]
+			params[:printer] = params[:printer_top]
+		elsif params[:print_bottom]
+			params[:printer] = params[:printer_bottom]
+		end
+
 		printparams = print_params
 
 		completed_submissions = MaterialSubmission.find(printparams[:completed_submission_ids])
@@ -20,7 +26,7 @@ class CompletedSubmissionsController < ApplicationController
 			ms.update_attributes!({ status: MaterialSubmission.PRINTED }) if ms.active?
 			ms.labwares.each { |lw| lw.increment_print_count! }
 		end
-		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Print issued."}
+		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Print issued to #{printparams[:printer_name]}"}
 	end
 
 private
