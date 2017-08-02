@@ -1,3 +1,5 @@
+<%= form_tag "/completed_submissions/print" do %>
 <b>Printer:</b>
 <%= collection_select(:printer, :name, @printers, :name, :name, {}, {style: "margin-left: 5px;"}) %>
 <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 10px;') %>
+<% end %>
