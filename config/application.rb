@@ -29,7 +29,5 @@ module Submission
 
     config.ldap = config_for(:ldap)
 
-    config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/models/labwares)
-
   end
 end
