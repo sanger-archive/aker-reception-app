@@ -20,6 +20,8 @@ module LDAPGroupReader
 
     def fetch_contact_details(dns)
       return [] if dns.empty?
+      # These DNs should look like "uid=XXX," followed by the content of person_base.
+      # Use a regular expression to check the format and extract the uid
       re = Regexp.new('uid=([^,=]+),' + Regexp.escape(person_base))
       uids = dns.map { |dn| dn.match(re) }.compact.map { |m| m[1] }
       return [] if uids.empty?
