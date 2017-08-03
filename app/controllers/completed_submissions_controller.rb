@@ -7,12 +7,6 @@ class CompletedSubmissionsController < ApplicationController
 	end
 
 	def print
-		if params[:print_top]
-			params[:printer] = params[:printer_top]
-		elsif params[:print_bottom]
-			params[:printer] = params[:printer_bottom]
-		end
-
 		printparams = print_params
 
 		completed_submissions = MaterialSubmission.find(printparams[:completed_submission_ids])
