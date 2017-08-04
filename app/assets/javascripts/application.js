@@ -76,7 +76,7 @@ $(document).on('turbolinks:load', function() {
 
   // Mirrors dropdown selection between both dropdown menus on the Completed
   // Submissions page
-  $('.printer_select').change(function () {
+  $('.printer_select').change(function (event) {
     // Get the selection from the dropdown that was changed then update the
     // other dropdown to the same value
     if (event.target.id == "printer_name_top") {
