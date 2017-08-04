@@ -2,13 +2,14 @@ module LDAPGroupReader
   class << self
 
     def fetch_members(name)
-      member_dns = fetch_member_dns(name)
-      fetch_contact_details(member_dns)
+      connection = make_connection
+      member_dns = fetch_member_dns(connection, name)
+      fetch_contact_details(connection, member_dns)
     end
 
   private
 
-    def fetch_member_dns(name)
+    def fetch_member_dns(connection, name)
       group_name_filter = Net::LDAP::Filter.eq('cn', name)
       group_type_filter = Net::LDAP::Filter.eq('objectclass', 'posixGroup')
       filter = group_name_filter & group_type_filter
@@ -18,7 +19,7 @@ module LDAPGroupReader
       group.send(member_attr)
     end
 
-    def fetch_contact_details(dns)
+    def fetch_contact_details(connection, dns)
       return [] if dns.empty?
       # These DNs should look like "uid=XXX," followed by the content of person_base.
       # Use a regular expression to check the format and extract the uid
@@ -32,7 +33,7 @@ module LDAPGroupReader
       results.map { |r| Contact.new(fullname: r.cn.first, email: r.mail.first) }
     end
 
-    def connection
+    def make_connection
       Devise::LDAP::Adapter.ldap_connect('')
     end
 
