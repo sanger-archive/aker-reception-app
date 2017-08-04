@@ -1,3 +1,5 @@
+require 'ldap_group_reader'
+
 class ContactGroup < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
