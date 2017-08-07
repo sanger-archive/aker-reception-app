@@ -158,19 +158,9 @@ protected
     step == steps.first
   end
 
-  helper_method :material_submission, :last_step?, :first_step?, :material_schema, :labware_at_index, :hmdmc_info
+  helper_method :material_submission, :last_step?, :first_step?, :material_schema, :labware_at_index
 
 private
-
-  def hmdmc_info
-    "<p>Commercially available human cell lines are defined as "\
-    "human cells that have been cultured and have divided "\
-    "outside the body, and have been purchased from a "\
-    "recognised commercial supplier.</p>\n"\
-    "<p>This definition does not include, for example, "\
-    "cell lines obtained from a collaborating academic "\
-    "institution.</p>".html_safe
-  end
 
   def material_submission_params
     params.require(:material_submission).permit(
