@@ -20,7 +20,7 @@ class CompletedSubmissionsController < ApplicationController
 			ms.update_attributes!({ status: MaterialSubmission.PRINTED }) if ms.active?
 			ms.labwares.each { |lw| lw.increment_print_count! }
 		end
-		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Print issued."}
+		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Print issued to #{printparams[:printer_name]}"}
 	end
 
 private
