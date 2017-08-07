@@ -1,4 +1,6 @@
 
+require 'cucumber/rspec/doubles'
+
 Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
   LabwareType.create(
     name: 'ABgene AB_0800',
@@ -8,6 +10,27 @@ Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
     col_is_alpha: false,
     row_is_alpha: true
   )  
+end
+
+Given(/^I have a material service running$/) do
+  MatconClient::Material.stub(:schema).and_return({
+      'required' => ['REQUIRED_FREE', 'REQUIRED_ENUM', 'scientific_name'],
+      'properties' => {
+        'scientific_name' => {
+          'required' => true
+        },
+        'OPTIONAL' => {
+          'required' => false,
+        },
+        'REQUIRED_FREE' => {
+          'required' => true,
+        },
+        'REQUIRED_ENUM' => {
+          'required' => true,
+          'allowed' => ['ALPHA', 'BETA', 'GAMMA'],
+        }
+      },
+    })
 end
 
 Given(/^I have the internal contact "([^"]*)"$/) do |arg1|
@@ -43,7 +66,7 @@ Then(/^I am in "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I select a type of labware$/) do 
-  find('#material_submission_labware_type_id_1').set(true)
+  find("input[name=\"material_submission[labware_type_id]\"]").set(true)
 end
 
 Given(/^I want to create (\d+) labware$/) do |arg1|

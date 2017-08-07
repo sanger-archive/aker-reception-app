@@ -11,6 +11,7 @@ Background:
 Given I have defined labware of type "ABgene AB_0800"
 And I have the internal contact "test@test"
 And I am logged in
+And I have a material service running
 
 Scenario:
 
@@ -26,10 +27,12 @@ And I click on "Next"
 
 Then I am in "Biomaterial Provenance"
 
-Given I upload the file "test/data/manifest.csv"
+Given I upload the file "test/data/testing_1.csv"
 Then I should display the data of my file
+
 When I go to next screen
 Then I should not see any validation errors
+
 And I am in "Ethics"
 
 When I check "I confirm that no HMDMC is required"
