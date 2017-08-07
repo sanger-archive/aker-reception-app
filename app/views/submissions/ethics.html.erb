@@ -13,7 +13,10 @@
       </div>
     </li>
     <br/>
-    <li><p>Commercial cell line: no HMDMC required</p>
+    <li>
+      <p>Commercial cell line: no HMDMC required
+        <button type="button" class="btn btn-link has-popover" data-html="true" data-toggle="popover" title="What's this?" data-content="<%= hmdmc_info.html_safe %>"><small>What's this?</small></button>
+      </p>
       <%= f.check_box :confirm_hmdmc_not_required, label: 'I confirm that no HMDMC is required',
           checked: material_submission.confirmed_no_hmdmc? %>
     </li>

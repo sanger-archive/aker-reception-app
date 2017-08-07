@@ -150,3 +150,10 @@ function fillInTableFromFile(table, files) {
     skipEmptyLines: true
   })
 }
+
+$(document).ready(function() {
+  $('.has-tooltip').tooltip();
+  $('.has-popover').popover({
+    trigger: 'hover'
+  });
+});
