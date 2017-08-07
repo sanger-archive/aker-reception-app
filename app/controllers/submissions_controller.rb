@@ -169,7 +169,7 @@ private
     "recognised commercial supplier.</p>\n"\
     "<p>This definition does not include, for example, "\
     "cell lines obtained from a collaborating academic "\
-    "institution.</p>"
+    "institution.</p>".html_safe
   end
 
   def material_submission_params
