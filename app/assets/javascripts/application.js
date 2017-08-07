@@ -18,9 +18,6 @@
 //= require component_builder
 //= require single_table_manager
 //= require barcode_reader
-//= require react
-//= require react_ujs
-//= require components
 //= require_tree .
 //= require bootstrap-table
 
