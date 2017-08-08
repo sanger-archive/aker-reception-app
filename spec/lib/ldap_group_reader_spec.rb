@@ -28,7 +28,7 @@ RSpec.describe LDAPGroupReader do
 
     context 'when the group does not exist' do
       before do
-        expect(ldap).to receive(:search).
+        allow(ldap).to receive(:search).
           with(filter: group_filter, base: group_base, attributes: [member_attr]).
           and_return([])
       end
@@ -46,7 +46,7 @@ RSpec.describe LDAPGroupReader do
       end
 
       before do
-        expect(ldap).to receive(:search).
+        allow(ldap).to receive(:search).
           with(filter: group_filter, base: group_base, attributes: [member_attr]).
           and_return([ldap_group])
       end
@@ -73,7 +73,7 @@ RSpec.describe LDAPGroupReader do
         }
 
         before do
-          expect(ldap).to receive(:search).
+          allow(ldap).to receive(:search).
             with(filter: person_filter, base: person_base, attributes: ['cn', 'mail']).
             and_return(ldap_people)
         end
