@@ -26,12 +26,14 @@ RSpec.describe LDAPGroupReader do
       Net::LDAP::Filter.eq('cn', group_name) & Net::LDAP::Filter.eq('objectclass', 'posixGroup')
     }
 
+    before do
+      allow(ldap).to receive(:search).
+        with(filter: group_filter, base: group_base, attributes: [member_attr]).
+        and_return(found_groups)
+    end
+
     context 'when the group does not exist' do
-      before do
-        allow(ldap).to receive(:search).
-          with(filter: group_filter, base: group_base, attributes: [member_attr]).
-          and_return([])
-      end
+      let(:found_groups) { [] }
 
       it 'should return an empty array' do
         expect(LDAPGroupReader.fetch_members(group_name)).to be_empty
@@ -44,12 +46,7 @@ RSpec.describe LDAPGroupReader do
         allow(lg).to receive(member_attr).and_return(ldap_group_members)
         lg
       end
-
-      before do
-        allow(ldap).to receive(:search).
-          with(filter: group_filter, base: group_base, attributes: [member_attr]).
-          and_return([ldap_group])
-      end
+      let(:found_groups) { [ldap_group] }
 
       context 'when the group has no members' do
         let(:ldap_group_members) { [] }
@@ -58,7 +55,6 @@ RSpec.describe LDAPGroupReader do
           expect(LDAPGroupReader.fetch_members(group_name)).to be_empty
         end
       end
-
 
       context 'when the group has members' do
         let(:member_uids) { ['alpha', 'beta', 'gamma'] }
@@ -72,9 +68,13 @@ RSpec.describe LDAPGroupReader do
           Net::LDAP::Filter.eq('uid', 'alpha') | Net::LDAP::Filter.eq('uid', 'beta') | Net::LDAP::Filter.eq('uid', 'gamma')
         }
 
+        let(:active_person_filter) {
+          person_filter & LDAPGroupReader.send(:active_people_filter)
+        }
+
         before do
           allow(ldap).to receive(:search).
-            with(filter: person_filter, base: person_base, attributes: ['cn', 'mail']).
+            with(filter: active_person_filter, base: person_base, attributes: ['cn', 'mail']).
             and_return(ldap_people)
         end
 

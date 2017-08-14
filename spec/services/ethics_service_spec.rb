@@ -25,7 +25,7 @@ RSpec.describe :ethics_service do
   describe '#update' do
 
     def stub_ehmdmc(hmdmc, status_code)
-      stub_request(:get, "http://localhost:3501/validate?hmdmc=#{hmdmc.sub('/','_')}").to_return(status: status_code)
+      stub_request(:get, "#{Rails.configuration.ehmdmc_url}?hmdmc=#{hmdmc.sub('/','_')}").to_return(status: status_code)
     end
 
     def run(params)
