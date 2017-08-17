@@ -147,8 +147,7 @@ function fillInTableFromFile(table, files) {
     skipEmptyLines: true
   })
 }
-
-$(document).ready(function() {
+$(document).on("turbolinks:load", function() {
   $('.has-tooltip').tooltip();
   $('.has-popover').popover({
     trigger: 'hover'
