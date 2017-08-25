@@ -55,8 +55,7 @@ RSpec.describe :create_sets_step do
 
       it "should create a set" do
         expect(SetClient::Set).to have_received(:create).with(
-          name: "Submission #{@submission.id}",
-          owner_id: @submission.contact.email,
+          name: "Submission #{@submission.id}"
         )
         expect(@sets.length).to eq 1
       end
@@ -73,7 +72,8 @@ RSpec.describe :create_sets_step do
         expect(@sets.first).to have_received(:set_materials).with(uuids)
       end
       it "should lock the set" do
-        expect(@sets.first).to have_received(:update_attributes).with(locked: true)
+        expect(@sets.first).to have_received(:update_attributes).with({
+          locked: true, owner_id: @submission.contact.email})
       end
     end
 
