@@ -22,7 +22,7 @@ RSpec.describe MaterialSubmissionsController, type: :controller do
       @labware = Labware.create(material_submission: @material_submission, labware_index: 1, barcode: "AKER-1", print_count: 1, contents: {"1": { id: "#{@material_uuid}" } })
       @material_submission.labwares << @labware
 
-      expect{ delete :destroy, :id => @material_submission.id}
+      expect { delete :destroy, params: { id: @material_submission.id }}
       .to change(MaterialSubmission, :count).by(-1)
       .and change(Labware, :count).by(-1)
     end

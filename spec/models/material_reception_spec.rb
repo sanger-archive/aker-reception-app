@@ -6,25 +6,25 @@ RSpec.describe MaterialReception, type: :model do
   describe "#build" do
     it "returns a validation message when the barcode does not exist" do
       labware = build :labware_with_barcode_and_material_submission
-      expect { create :material_reception, labware_id: labware.id }.to raise_error
+      expect { create :material_reception, labware_id: labware.id }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "returns a validation message when the barcode has been received already" do
       labware = create(:labware_with_barcode_and_material_submission, print_count: 1)
       create :material_reception, labware_id: labware.id
-      expect { create :material_reception, labware_id: labware.id }.to raise_error
+      expect { create :material_reception, labware_id: labware.id }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "returns a validation message when the barcode has not been printed yet" do
       labware = create(:labware_with_barcode_and_material_submission)
-      expect { create :material_reception, labware_id: labware.id }.to raise_error
+      expect { create :material_reception, labware_id: labware.id }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "creates the reception object when the barcode has not been received and it has been printed" do
       labware = create(:labware_with_barcode_and_material_submission, print_count: 1)
       r = create :material_reception, labware_id: labware.id
       expect(r.valid?).to eq(true)
-    end    
+    end
   end
 
   describe "#presenter" do
