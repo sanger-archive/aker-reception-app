@@ -4,6 +4,7 @@
 */
 @import "bootstrap-sprockets";
 @import "paper.min";
+// @import "bootstrap";
 @import "font-awesome-sprockets";
 @import "font-awesome";
 @import "datatables";
@@ -36,11 +37,6 @@ textarea.halvsies { height: 150px; width: 33% }
 
 .rowspace {
   margin-bottom: 20px;
-}
-
-.claimed-sets {
-  padding-left: 3em;
-  padding-right: 3em;
 }
 
 body {
