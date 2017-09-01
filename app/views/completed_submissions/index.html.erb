@@ -1,7 +1,6 @@
 <% content_for :main_title do %>
   Completed Submissions
 <% end %>
-<%= render :partial => 'title_buttons' %>
 <%= form_tag(controller: "completed_submissions", action: "print", method: "post") do %>
 
 <div class="row">

@@ -15,19 +15,33 @@
 
   </head>
   <body>
-
-  <div class="container">
-
-    <div class="row page-header">
-      <div class="col-md-8 col-xs-8">
-        <h1>Aker <small><%= yield(:main_title) %></small></h1>
-      </div>
-      <div class="col-md-4 col-xs-4 text-right">
-        <%= yield(:title_button) if content_for?(:title_button) %>
-         <%= link_to 'Log Out', destroy_user_session_url, class: 'btn btn-default vcenter', style: 'margin-top: 28px', method: :delete if user_signed_in? %>
-      </div>
+    <nav class="navbar navbar-inverse">
+    <div class="container">
+    <div class="navbar-header">
+    <!-- Display the hamburher button if screen isn't wide enough -->
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="#">Aker</a>
     </div>
+    <div class="collapse navbar-collapse">
+    <ul class="nav navbar-nav">
+      <li><%= link_to 'Creation', material_submissions_path %></li>
+      <li><%= link_to 'Print', completed_submissions_path %></li>
+      <li><%= link_to 'Reception', material_receptions_path %></li>
+      <li><%= link_to 'Claim', claim_submissions_path %></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><%= link_to 'Log Out', destroy_user_session_url, method: :delete if user_signed_in? %></li>
+    </ul>
+    </div>
+    </div>
+    </nav>
 
+  <div class="container" id="content">
+    <h1><%= yield(:main_title) %></h1>
     <%= render "flashes" %>
 
     <%= yield %>
