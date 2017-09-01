@@ -19,14 +19,14 @@
     <div class="container">
     <div class="navbar-header">
     <!-- Display the hamburher button if screen isn't wide enough -->
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navBar">
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
     <a class="navbar-brand" href="#">Aker</a>
     </div>
-    <div class="collapse navbar-collapse">
+    <div class="collapse navbar-collapse" id="navBar">
     <ul class="nav navbar-nav">
       <li><%= link_to 'Creation', material_submissions_path %></li>
       <li><%= link_to 'Print', completed_submissions_path %></li>
