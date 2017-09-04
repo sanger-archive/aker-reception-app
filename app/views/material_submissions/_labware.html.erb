@@ -1,5 +1,5 @@
 <table class="table">
-  <% keys = list_contents_keys(labwares) %>
+  <% keys = list_contents_keys(labwares).delete("id") %>
   <% if keys.empty? %>
     <thead><tr><th>barcode</th></tr></thead>
     <tbody>
