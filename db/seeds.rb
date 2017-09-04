@@ -63,6 +63,10 @@ Contact.create(
   fullname: "Chris",
   email: "cs24@sanger.ac.uk"
   )
+  Contact.create(
+    fullname: "Phil",
+    email: "pj5@sanger.ac.uk"
+    )
 
 Printer.create(
   name: 'd304bc',
