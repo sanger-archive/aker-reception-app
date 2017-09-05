@@ -28,10 +28,7 @@
     </div>
     <div class="collapse navbar-collapse" id="navBar">
     <ul class="nav navbar-nav">
-      <li><%= link_to 'Creation', material_submissions_path, id: ('current_page' if (params[:controller] == 'material_submissions' && params[:action] != 'show') || params[:controller] == 'submissions') %></li>
-      <li><%= link_to 'Print', completed_submissions_path, id: ('current_page' if params[:controller] == 'completed_submissions') %></li>
-      <li><%= link_to 'Reception', material_receptions_path, id: ('current_page' if params[:controller] == 'material_receptions') %></li>
-      <li><%= link_to 'Claim', claim_submissions_path, id: ('current_page' if params[:controller] == 'claim_submissions') %></li>
+      <%= navlinks %>
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li><%= link_to 'Log Out', destroy_user_session_url, method: :delete if user_signed_in? %></li>
