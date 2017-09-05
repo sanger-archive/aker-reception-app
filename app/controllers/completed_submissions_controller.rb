@@ -7,6 +7,10 @@ class CompletedSubmissionsController < ApplicationController
 	end
 
 	def print
+		unless params.has_key?(:completed_submission_ids)
+			return print_error "You must select at least one submission to print"
+		end
+
 		printparams = print_params
 
 		completed_submissions = MaterialSubmission.find(printparams[:completed_submission_ids])
