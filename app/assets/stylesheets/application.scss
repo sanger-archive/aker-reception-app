@@ -2,9 +2,9 @@
 *= require rails_bootstrap_forms
 *= require bootstrap-table
 */
-
 @import "bootstrap-sprockets";
-@import "bootstrap";
+@import "paper.min";
+// @import "bootstrap";
 @import "font-awesome-sprockets";
 @import "font-awesome";
 @import "datatables";
@@ -39,8 +39,25 @@ textarea.halvsies { height: 150px; width: 33% }
   margin-bottom: 20px;
 }
 
-.claimed-sets {
-  padding-left: 3em;
-  padding-right: 3em;
+body {
+  background-color: #e0ebeb;
 }
 
+.container#content {
+  margin-top: 20px;
+  padding-bottom: 10px;
+  background-color: white;
+  margin-bottom: 20px;
+}
+
+.bg-info {
+  background-color: #d9edf7;
+}
+
+h1 {
+  font-size: 40px;
+}
+
+h2 {
+  font-size: 35px;
+}

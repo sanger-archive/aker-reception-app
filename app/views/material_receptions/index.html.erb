@@ -1,41 +1,29 @@
-
 <% content_for :main_title do %>
-  Material Reception
+Material Reception
 <% end %>
 
-<%= render :partial => 'title_buttons' %>
-
-
-  <div class="alert alert-danger invisible" role="alert">
-    <!-- h4 class='alert-title'>Error!</h4 -->
-    <p class='alert-msg'>&nbsp;</p>
-  </div>
+<div class="alert alert-danger invisible" role="alert">
+  <!-- h4 class='alert-title'>Error!</h4 -->
+  <p class='alert-msg'>&nbsp;</p>
+</div>
 
 <div  data-psd-component-class="LoadingIcon" data-psd-component-parameters="<%= { listenFormCssSelector: 'form'}.to_json %>">
-<div class="row" data-psd-component-class='BarcodeReader' data-psd-component-parameters="<%= @material_receptions.map(&:presenter).to_json %>">
-<%= bootstrap_form_for(@material_reception, remote: true) do |f| %>
-  <div class="center-block">
+  <div class="row rowspace" data-psd-component-class='BarcodeReader' data-psd-component-parameters="<%= @material_receptions.map(&:presenter).to_json %>">
+    <%= bootstrap_form_for(@material_reception, remote: true) do |f| %>
+    <div class="center-block">
 
-  <div class='input-group col-md-10 col-md-offset-1 col-xs-10 col-xs-offset-1'>
-    <span class="input-group-addon glyphicon glyphicon-barcode" aria-hidden="true" style="top:0px;padding-left:1em;"></span>
-    <%= f.text_field :barcode_value, :placeholder => 'Scan a barcode', hide_label: true, autocomplete: 'off', :style => 'padding-right:1em;' %>
-  </div>
-  </div>
-
-  <div>
-    &nbsp;
-  </div>
-
-
-  <div class="">
-    <div class="col-md-12">
-      <h2>Received material  <span class="spinner"><span class="fa fa-refresh" /></span></h2>
-
-
-      <%= render "material_receptions", material_receptions: @material_receptions %>
+      <div class='input-group col-md-10 col-md-offset-1 col-xs-10 col-xs-offset-1'>
+        <span class="input-group-addon glyphicon glyphicon-barcode" aria-hidden="true" style="top:0px;padding-left:1em;"></span>
+        <%= f.text_field :barcode_value, :placeholder => 'Scan a barcode', hide_label: true, autocomplete: 'off', :style => 'padding-right:1em;' %>
+      </div>
     </div>
-  </div>
-<% end %>
-</div>
-</div>
+    </div>
 
+    <div class="row">
+      <div class="col-md-12">
+        <h2>Received material  <span class="spinner"><span class="fa fa-refresh" /></span></h2>
+        <%= render "material_receptions", material_receptions: @material_receptions %>
+      </div>
+    </div>
+    <% end %>
+</div>

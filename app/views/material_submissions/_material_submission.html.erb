@@ -10,7 +10,7 @@
 
     <% else %>
 
-      <%= link_to 'Continue', material_submission_build_path(id: material_submission.status || 'labware', material_submission_id: material_submission.id), class: 'btn btn-primary' %>
+      <%= link_to 'Continue', material_submission_build_path(id: material_submission.status || 'labware', material_submission_id: material_submission.id), style: 'margin-right: 15px;', class: 'btn btn-primary' %>
 
       <%= link_to 'Cancel', material_submission,
             method: :delete,
