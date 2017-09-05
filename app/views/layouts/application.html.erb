@@ -15,7 +15,6 @@
 
   </head>
   <body>
-<<<<<<< HEAD
     <nav class="navbar navbar-inverse">
     <div class="container">
     <div class="navbar-header">
@@ -35,22 +34,9 @@
       <li><%= link_to 'Claim', claim_submissions_path %></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
-      <li><%= link_to 'Log Out', destroy_user_session_url, method: :delete if user_signed_in? %></li>
+      <li><%= link_to 'Log Out', destroy_user_session_path, method: :delete if user_signed_in? %></li>
     </ul>
     </div>
-=======
-
-  <div class="container">
-
-    <div class="row page-header">
-      <div class="col-md-8 col-xs-8">
-        <h1>Aker <small><%= yield(:main_title) %></small></h1>
-      </div>
-      <div class="col-md-4 col-xs-4 text-right">
-        <%= yield(:title_button) if content_for?(:title_button) %>
-         <%= link_to 'Log Out', destroy_user_session_path, class: 'btn btn-default vcenter', style: 'margin-top: 28px', method: :delete if user_signed_in? %>
-      </div>
->>>>>>> 0ea94c6... A151 - update UX with a few minor changes
     </div>
     </nav>
 
