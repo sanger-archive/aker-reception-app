@@ -34,7 +34,7 @@
       <li><%= link_to 'Claim', claim_submissions_path %></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
-      <li><%= link_to 'Log Out', destroy_user_session_url, method: :delete if user_signed_in? %></li>
+      <li><%= link_to 'Log Out', destroy_user_session_path, method: :delete if user_signed_in? %></li>
     </ul>
     </div>
     </div>

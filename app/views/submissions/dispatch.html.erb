@@ -12,7 +12,7 @@
     </div>
 
     <div class="col-md-6 col-xs-12">
-      <h2>Contact</h2>
+      <h2>Sanger Sample Custodian</h2>
 
       <p>The following contact will be notified when the materials arrive at Sanger Institute:</p>
 
@@ -21,12 +21,12 @@
 
   <div class="row">
     <div class="col-md-6 col-xs-12">
-      <%= f.text_area :address, value: "Dr. Alan Kay\n\n80 Xerox Palo Alto Research Center\nA place\nUSA", control_class: 'form-control halvsies', style: 'resize: none; width: 100%;' %>
+      <%= f.text_area :address, label: "Address to send labware to", placeholder: "Your Name\n\nAddress\nCity\nPostcode\nCountry", control_class: 'form-control halvsies', style: 'resize: none; width: 100%;' %>
     </div>
 
     <div class="col-md-6 col-xs-12">
       <div class="row">
-        <%= f.collection_select :contact_id, ContactGroup.all_contacts, :id, :fullname_and_email, { class: "form-control contact" } %>
+        <%= f.collection_select :contact_id, ContactGroup.all_contacts, :id, :fullname_and_email, { label: "Sanger Sample Custodian" }, { class: "form-control contact" } %>
       </div>
       <div class="row">
         <div><b>Your submission is</b></div>
