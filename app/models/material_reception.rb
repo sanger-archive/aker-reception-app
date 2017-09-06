@@ -1,5 +1,6 @@
 class MaterialReception < ApplicationRecord
 
+  belongs_to :labware
   validates :labware_id, uniqueness: { message: "cannot be received twice" }
   validate :validate_barcode_printed, on: :create
 

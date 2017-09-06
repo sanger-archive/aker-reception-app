@@ -1,46 +1,44 @@
 (function($,undefined) {
-  var HEADERS =[];
-  var NODE = '.claimed-sets';
-  var SUBMISSIONS_NODE = ".claiming-display .submission-list"
+  var SUBMISSIONS_NODE = ".claiming-display"
 
-  function onClaimedSetsReception(data, status, xhr) {
-    if (HEADERS.length == 0) {
-      $('[data-field]', $(NODE)).each(function(pos, element) {
-        HEADERS.push({field: $(element).data('field'), title: $(element).text()})
-      });
-    }
-
-    $('.table', $(NODE)).bootstrapTable('destroy');
-    $('.table', $(NODE)).bootstrapTable({data: data, uniqueId: 'uuid', columns: HEADERS});
-
-
-    $('.table tbody tr', $(NODE)).each(function(pos, node) {
-      var list = $('td', node);
-      var collectionId = data[pos].uuid;
-
-      var claimingButton = $('<button class="btn btn-default">Claim</button>');
-
-      claimingButton.on('click', function(e) {
-        var submissionIds = $($('table', $(SUBMISSIONS_NODE))).bootstrapTable('getAllSelections').map(function(node, pos) {
-          return node.id;
-        });
-        var stampId = $('#stamp_id').val()
-        Aker.claim(submissionIds, collectionId, stampId);
-      });
-
-      $(list[list.length - 1]).html(claimingButton);
+  function getSelectedRowsIds(submissionTable) {
+    return submissionTable.bootstrapTable('getAllSelections').map(function(node, pos) {
+      return node.id;
     });
-    if (data.length > 0) {
-      $(NODE).trigger('dragAndDrop.attachHandlers');
-    }
   }
 
-  function turbolinksLoad(){
-    var serviceUrl = $(NODE).data('service-url');
-    $.get(serviceUrl, onClaimedSetsReception);
-    $('.table', $(SUBMISSIONS_NODE)).bootstrapTable();
+  function setupClaiming(){
+    // Cache the jQuery elements
+    var submissionTable = $('.table', $(SUBMISSIONS_NODE));
+    var stampSelect     = $('#stamp_id');
+    var stampButton     = $('#stamp_button');
+    var submissionIds   = $('#_submission_ids');
+
+    // Initialise it as a Bootstrap table
+    submissionTable.bootstrapTable();
+
+    // On any check events we want to either enable the Stamp button (if something is selected)
+    // or disable it if nothing is selected. We also want to build the list of submission ids as
+    // hidden inputs from the bootstrap table
+    var checkEvents = "check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table";
+    submissionTable.on(checkEvents, function(e) {
+      var selectedRowIds = getSelectedRowsIds(submissionTable);
+
+      $('input.hidden-submission-id').remove();
+
+      selectedRowIds.forEach(function(submissionId) {
+        submissionIds.clone()
+                     .removeAttr("id")
+                     .addClass("hidden-submission-id")
+                     .val(submissionId)
+                     .insertAfter(submissionIds);
+      });
+
+      stampButton.prop("disabled", (selectedRowIds.length == 0));
+    });
+
   }
 
-  $(document).on('turbolinks:load', turbolinksLoad);
+  $(document).on('turbolinks:load', setupClaiming);
 
 }(jQuery))
