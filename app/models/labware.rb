@@ -4,28 +4,14 @@ class Labware < ApplicationRecord
 
   scope :with_barcode, ->(barcode) { where(barcode: barcode) }
 
+  delegate :num_of_rows, :num_of_cols, :col_is_alpha, :row_is_alpha, to: :labware_type
+
   def labware_type
     material_submission.labware_type
   end
 
   def increment_print_count!
     update_attributes(print_count: print_count+1)
-  end
-
-  def num_of_rows
-    labware_type.num_of_rows
-  end
-
-  def num_of_cols
-    labware_type.num_of_cols
-  end
-
-  def col_is_alpha
-    labware_type.col_is_alpha
-  end
-
-  def row_is_alpha
-    labware_type.row_is_alpha
   end
 
   def size

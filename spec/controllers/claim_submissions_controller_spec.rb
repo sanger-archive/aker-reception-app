@@ -6,7 +6,7 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
   def webmock_stamp(uuid)
     stub_request(:get, "#{Rails.configuration.stamp_url}stamps/#{@stamp_id}").
      with(headers: {'Accept'=>'application/vnd.api+json'}).
-     to_return(status: 200, body: {"data":{"id":@stamp_id,"type":"stamps","links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}"},"attributes":{"name":"my stamp","owner-id":"emr@sanger.ac.uk"},"relationships":{"permissions":{"links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/relationships/permissions","related":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/permissions"}},"materials":{"links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/relationships/materials","related":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/materials"}}}}}.to_json, 
+     to_return(status: 200, body: {"data":{"id":@stamp_id,"type":"stamps","links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}"},"attributes":{"name":"my stamp","owner-id":"emr@sanger.ac.uk"},"relationships":{"permissions":{"links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/relationships/permissions","related":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/permissions"}},"materials":{"links":{"self":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/relationships/materials","related":"#{Rails.configuration.stamp_url}stamps/#{@stamp_id}/materials"}}}}}.to_json,
       headers: { 'Content-Type' => 'application/json'})
 
 
@@ -65,7 +65,7 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
 
   describe "#claim" do
     context 'when submission can be claimed' do
-      it "adds materials to a collection and marks the labware as claimed and makes the materials available" do
+      it "marks the labware as claimed and makes the materials available" do
         @stamp_id = SecureRandom.uuid
         @stamp = webmock_stamp(@stamp_id)
         allow(@stamp).to receive(:apply_to)
@@ -82,23 +82,17 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
         with(headers: request_headers).
         to_return(status: 200, body: @set_obj.to_json, headers: response_headers)
 
-
-        @material_id_obj = {data:[{id: "#{@material_uuid}", type: "materials"}]}
-        stub_request(:post, "#{Rails.configuration.set_url}sets/#{@set_uuid}/relationships/materials").
-          with(body: @material_id_obj.to_json,
-                headers: request_headers).
-          to_return(status: 200, body: "", headers: response_headers)
         stub_request(:patch, "#{Rails.configuration.material_url}/materials/#{@material_uuid}").
           to_return(status: 200, body: "", headers: response_headers)
 
         @labware_type = FactoryGirl.create(:labware_type, {row_is_alpha: true})
-        @submission = FactoryGirl.create(:material_submission, user: @user, status: MaterialSubmission.PRINTED)
+        @submission = FactoryGirl.create(:material_submission, contact: @contact, status: MaterialSubmission.PRINTED)
         @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1", print_count: 1, contents: {"1": { id: "#{@material_uuid}" } })
         MaterialReception.create!(labware_id: @labware.id)
 
         @submission.labwares << @labware
 
-        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid, stamp_id: @stamp_id } }
+        post :create, {params: { submission_ids: [@submission.id], stamp_id: @stamp_id } }
 
         assert_requested(:patch, "#{Rails.configuration.material_url}/materials/#{@material_uuid}", body: '{"available":true}')
 
@@ -112,25 +106,20 @@ RSpec.describe ClaimSubmissionsController, type: :controller do
         @set_uuid = SecureRandom.uuid
         @stamp_id = SecureRandom.uuid
 
-        @submission = FactoryGirl.create(:material_submission, user: @user, status: MaterialSubmission.PRINTED)
+        @submission = FactoryGirl.create(:material_submission, contact: @contact, status: MaterialSubmission.PRINTED)
         @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1", print_count: 1, contents: {"1": { id: "#{@material_uuid}" } })
-        
+
         @submission.labwares << @labware
       end
 
       it "flashes an error" do
-        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid, stamp_id: @stamp_id } }
+        post :create, {params: { submission_ids: [@submission.id], stamp_id: @stamp_id } }
         expect(flash[:error]).to match(/submissions.*cannot be claimed/)
-      end
-
-      it "doesn't put the material in sets" do
-        expect(SetClient::Set).not_to receive(:find)
-        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid, stamp_id: @stamp_id } }
       end
 
       it "doesn't update the labware as claimed" do
         expect_any_instance_of(MaterialSubmission).not_to receive(:claim_claimable_labwares)
-        post :claim, {params: { submission_ids: [@submission.id], collection_id:  @set_uuid, stamp_id: @stamp_id } }
+        post :create, {params: { submission_ids: [@submission.id], stamp_id: @stamp_id } }
       end
     end
   end
