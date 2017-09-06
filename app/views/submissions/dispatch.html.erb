@@ -25,17 +25,10 @@
     </div>
 
     <div class="col-md-6 col-xs-12">
-      <div class="row">
         <%= f.collection_select :contact_id, ContactGroup.all_contacts, :id, :fullname_and_email, { label: "Sanger Sample Custodian" }, { class: "form-control contact" } %>
-      </div>
-      <div class="row">
         <div><b>Your submission is</b></div>
        <span><h1>Submission <%= material_submission.id %></h1></span>
-      </div>
-
     </div>
-
-
   </div>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
