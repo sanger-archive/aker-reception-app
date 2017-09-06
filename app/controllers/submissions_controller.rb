@@ -67,10 +67,10 @@ class SubmissionsController < ApplicationController
 
         cleanup = !success
       rescue => e
-        puts "*"*70
-        puts "Error from dispatch service:"
-        puts e
-        puts e.backtrace
+        logger.error "*"*70
+        logger.error "Error from dispatch service:"
+        logger.error e
+        logger.error e.backtrace
       ensure
         if !success && !cleanup
           @material_submission.broken!
