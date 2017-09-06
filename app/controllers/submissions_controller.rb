@@ -1,8 +1,3 @@
-require 'dispatch_steps/create_materials_step'
-require 'dispatch_steps/create_sets_step'
-require 'dispatch_steps/create_containers_step'
-require 'dispatch_steps/fail_step'
-
 class SubmissionsController < ApplicationController
 
   include Wicked::Wizard
@@ -59,9 +54,9 @@ class SubmissionsController < ApplicationController
       cleanup = false
       begin
         success = DispatchService.new.process([
-          CreateMaterialsStep.new(material_submission),
-          CreateContainersStep.new(material_submission),
-          CreateSetsStep.new(material_submission),
+          DispatchSteps::CreateMaterialsStep.new(material_submission),
+          DispatchSteps::CreateContainersStep.new(material_submission),
+          DispatchSteps::CreateSetsStep.new(material_submission),
           # CreateSetsStep should be last, because it is the least cleanupable
         ])
 
