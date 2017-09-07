@@ -134,6 +134,7 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.1)
       public_suffix (~> 2.0, >= 2.0.2)
+    amq-protocol (2.2.0)
     arel (7.1.4)
     ast (2.3.0)
     autoprefixer-rails (7.1.1.2)
@@ -150,6 +151,8 @@ GEM
     bootstrap-table-rails (1.11.1.1)
     bootstrap_form (2.7.0)
     builder (3.2.3)
+    bunny (0.9.0.pre10)
+      amq-protocol (>= 1.4.0)
     byebug (9.0.6)
     cancancan (2.0.0)
     capybara (2.14.3)
@@ -456,6 +459,7 @@ DEPENDENCIES
   bootstrap-sass (~> 3.3.6)
   bootstrap-table-rails
   bootstrap_form
+  bunny (= 0.9.0.pre10)
   byebug
   capybara
   coffee-rails (~> 4.2)
@@ -500,4 +504,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.15.2
+   1.15.4
