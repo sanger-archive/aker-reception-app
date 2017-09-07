@@ -2,17 +2,20 @@ FactoryGirl.define do
   factory :labware do
     sequence(:labware_index) { |n| n }
     material_submission
-    claimed false
+    print_count 0
+    barcode nil
+    container_id nil
 
-    # Labware is "ready_for_claim" if it has a Material Reception (i.e. it has been received)
-    # and it has not been claimed already (i.e. claimed is false)
-    factory :labware_ready_for_claim do
+    trait :printed do
       print_count 1
-
-      after(:create) do |labware|
-        create(:material_reception, labware: labware)
-      end
     end
+
+    trait :has_contents do
+      contents { { "1": { 'id': 1, 'scientific_name': 'Homo Sapiens' } } }
+    end
+
+    factory :printed_labware, traits: [:printed]
+    factory :printed_with_contents_labware, traits: [:printed, :has_contents]
   end
 
   factory :labware_with_barcode_and_material_submission, class: :labware do

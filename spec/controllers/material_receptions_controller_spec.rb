@@ -116,19 +116,18 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     end
 
     it "adds the barcode to the list if the barcode exists and has not been received yet" do
-      @labware.update_attributes(print_count: 1, barcode: 'AKER_500', container_id: 'testing-uuid')
-      @material_submission = FactoryGirl.create(:material_submission, user: @user)
-      @labware.update_attributes(material_submission_id: @material_submission.id)
+      labware = create(:printed_with_contents_labware, barcode: 'AKER_500', container_id: 'testing-uuid')
 
-      stub_request(:get, Rails.configuration.material_url+"/containers/#{@labware.container_id}").
+      stub_request(:get, Rails.configuration.material_url+"/containers/#{labware.container_id}").
          with(:headers => {'Content-Type'=>'application/json'}).
-         to_return(:status => 200, :body => @labware.attributes.to_json, :headers => {})
-      stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{@labware.barcode}%22%7D").
+         to_return(:status => 200, :body => labware.attributes.to_json, :headers => {})
+      stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{labware.barcode}%22%7D").
          with(:headers => {'Content-Type'=>'application/json'}).
-         to_return(:status => 200, :body => {"_items" => [@labware.attributes]}.to_json)
+         to_return(:status => 200, :body => {"_items" => [labware.attributes]}.to_json)
 
       count = MaterialReception.all.count
-      post :create, params: { :material_reception => {:barcode_value => @labware.barcode }}
+      expect_any_instance_of(MatconClient::Material).to receive(:update_attributes).and_return(true)
+      post :create, params: { :material_reception => {:barcode_value => labware.barcode }}
       expect(response).to have_http_status(:ok)
       MaterialReception.all.reload
       expect(MaterialReception.all.count).to eq(count+1)

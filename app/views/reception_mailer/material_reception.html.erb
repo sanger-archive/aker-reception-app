@@ -15,5 +15,11 @@
 
 </table>
 
+<% if @material_reception.all_received? %>
+
+<p>All labware for Submission <%= @material_submission.id %> has now arrived.</p>
+
+<% end %>
+
 <p>Regards,</p>
 <p>AKER</p>

@@ -76,25 +76,8 @@ class MaterialSubmission < ApplicationRecord
     update_attributes(status: MaterialSubmission.BROKEN)
   end
 
-  def ready_for_claim?
-    status==MaterialSubmission.PRINTED && labwares.any?(&:ready_for_claim?)
-  end
-
-  def claim_claimable_labwares
-    now = DateTime.now
-    labwares_ready_for_claim.each { |lw| lw.update_attributes!(claimed: now) }
-  end
-
   def no_of_labwares_required
     super || 0
-  end
-
-  def labwares_unclaimed
-    labwares.reject(&:claimed?)
-  end
-
-  def labwares_ready_for_claim
-    labwares.select(&:ready_for_claim?)
   end
 
   def invalid_labwares
