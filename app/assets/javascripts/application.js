@@ -18,8 +18,8 @@
 //= require component_builder
 //= require single_table_manager
 //= require barcode_reader
-//= require_tree .
 //= require bootstrap-table
+//= require_tree .
 
 var field_mapping = {
   position: 'position',
