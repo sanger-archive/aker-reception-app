@@ -9,7 +9,7 @@ Rails.application.routes.draw do
     put :biomaterial_data, controller: 'submissions'
   end
 
-  resources :completed_submissions
+  resources :completed_submissions, only: [:index]
   post '/completed_submissions/print', to: 'completed_submissions#print'
 
 end
