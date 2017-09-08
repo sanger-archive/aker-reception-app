@@ -122,46 +122,6 @@ RSpec.describe Labware, type: :model do
     end
   end
 
-  describe '#claimed?' do
-    before do
-      @labware = create(:labware, print_count: 1)
-      create(:material_reception, labware_id: @labware.id)
-    end
-    context "when labware has been claimed" do
-      before do
-        @labware.update_attributes(claimed: DateTime.now)
-      end
-      it { expect(@labware).to be_claimed }
-    end
-    context "when labware has not been claimed" do
-      it { expect(@labware).not_to be_claimed }
-    end
-  end
-
-  describe '#ready_for_claim?' do
-    before do
-      @labware = create(:labware, print_count: 1)
-    end
-    context 'when labware has been received and not claimed' do
-      before do
-        create(:material_reception, labware_id: @labware.id)
-      end
-      it { expect(@labware).to be_ready_for_claim }
-    end
-
-    context 'when labware has not been received' do
-      it { expect(@labware).not_to be_ready_for_claim }
-    end
-
-    context 'when labware has been received and claimed' do
-      before do
-        create(:material_reception, labware_id: @labware.id)
-        @labware.update_attributes(claimed: DateTime.now)
-      end
-      it { expect(@labware).not_to be_ready_for_claim }
-    end
-  end
-
   describe "properties taken from labware type" do
     before do
       @lw1 = make_labware(1, 2, false, true)
@@ -201,30 +161,6 @@ RSpec.describe Labware, type: :model do
       @labware.increment_print_count!
       expect(@labware.print_count).to eq 2
     end
-  end
-
-  describe "#with_barcode" do
-    before do
-      @lw1 = make_labware(1, 2, false, false, {barcode: 'AKER-1'})
-      @lw2 = make_labware(1, 2, false, false, {barcode: 'AKER-2'})
-      @lw1.save!
-      @lw2.save!
-    end
-
-    it "should find the labware with the right barcode" do
-      r = Labware.with_barcode('AKER-1')
-      expect(r.length).to eq 1
-      expect(r.first). to eq @lw1
-      r = Labware.with_barcode('AKER-2')
-      expect(r.length).to eq 1
-      expect(r.first). to eq @lw2
-    end
-
-    it "should not find the labware with the wrong barcode" do
-      r = Labware.with_barcode('AKER-0')
-      expect(r).to be_empty
-    end
-
   end
 
   describe "#any_human_material?" do

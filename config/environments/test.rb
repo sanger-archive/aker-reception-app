@@ -39,17 +39,17 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
-  config.material_url = "http://external-server:5000"
+  config.material_url = "http://localhost:5000"
   ENV['MATERIALS_URL'] = config.material_url
-  config.set_url = 'http://external-server:1500/api/v1/'
-  config.set_url_default_proxy = 'http://external-server:1500'
-  config.ownership_url = 'http://external-server:4000/ownerships'
-  config.ownership_url_default_proxy = 'http://external-server:4000'
-  config.pmb_uri = ENV.fetch('PMB_URI','http://external-server:10000/v1')
-  config.stamp_url = 'http://external-server:7000/api/v1/'
-  config.study_url = 'http://external-server:3300/api/v1/'
+  config.set_url = 'http://localhost:1500/api/v1/'
+  config.set_url_default_proxy = 'http://localhost:1500'
+  config.ownership_url = 'http://localhost:4000/ownerships'
+  config.ownership_url_default_proxy = 'http://localhost:4000'
+  config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
+  config.stamp_url = 'http://localhost:7000/api/v1/'
+  config.study_url = 'http://localhost:3300/api/v1/'
 
-  config.ehmdmc_url = 'http://external-server:3501/validate'
+  config.ehmdmc_url = 'http://localhost:3501/validate'
 
   config.printing_disabled = true
 
