@@ -28,9 +28,6 @@ class EventPublisher
 
   def publish(message)
     create_connection if !connected?
-    puts "@queue: #{@queue}"
-    puts "@exchange: #{@exchange}"
-    puts "message.generate_json: #{message.generate_json}"
     @exchange.publish(message.generate_json, routing_key: @queue.name)
     @channel.wait_for_confirms
     if @channel.unconfirmed_set.count > 0

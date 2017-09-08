@@ -56,6 +56,8 @@ Rails.application.configure do
   config.jwt_secret_key = 'test'
 
   config.enable_events_sending = false
+  config.events_queue_name = 'aker.events'
+  config.events_queue_connection = "amqp://guest:guest@localhost:5672"
 
   config.fake_ldap = true
 
