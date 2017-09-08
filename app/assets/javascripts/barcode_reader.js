@@ -45,14 +45,14 @@
 
   proto.alert = function(msg) {
     $('.alert .alert-msg').html(msg);
-    $('.alert').toggleClass('invisible', false);
+    $('.alert').toggleClass('hidden', false);
   };
 
   proto.onReceivedBarcode = function(e, json) {
     if (typeof json.error !== 'undefined') {
       this.alert(json.error);
     } else {
-      $('.alert').toggleClass('invisible', true);
+      $('.alert').toggleClass('hidden', true);
       this.addRow(json);
     }
   };
