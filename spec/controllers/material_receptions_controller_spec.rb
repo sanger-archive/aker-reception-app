@@ -116,6 +116,8 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     end
 
     it "adds the barcode to the list if the barcode exists and has not been received yet" do
+      material_double = instance_double("MatconClient::Material", update_attributes: true)
+      allow(MatconClient::Material).to receive(:new).and_return(material_double)
       labware = create(:printed_with_contents_labware, barcode: 'AKER_500', container_id: 'testing-uuid')
 
       stub_request(:get, Rails.configuration.material_url+"/containers/#{labware.container_id}").
@@ -126,7 +128,6 @@ RSpec.describe MaterialReceptionsController, type: :controller do
          to_return(:status => 200, :body => {"_items" => [labware.attributes]}.to_json)
 
       count = MaterialReception.all.count
-      expect_any_instance_of(MatconClient::Material).to receive(:update_attributes).and_return(true)
       post :create, params: { :material_reception => {:barcode_value => labware.barcode }}
       expect(response).to have_http_status(:ok)
       MaterialReception.all.reload
