@@ -24,7 +24,7 @@ class MaterialSubmission < ApplicationRecord
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :labware_or_later?
   validates :labware_type_id, presence: true, if: :labware_or_later?
-  validates :address, presence: true, if: :active?
+  validates :address, presence: true, if: :dispatched?
   validates :contact, presence: true, if: :active?
   validate :each_labware_has_contents, if: :active?
 
@@ -38,6 +38,10 @@ class MaterialSubmission < ApplicationRecord
 
   def active?
     status == MaterialSubmission.ACTIVE
+  end
+
+  def dispatched?
+    status_was == 'dispatch'
   end
 
   def active_or_labware?
@@ -132,6 +136,23 @@ class MaterialSubmission < ApplicationRecord
     labwares && labwares.any? { |lw| lw.confirmed_no_hmdmc? }
   end
 
+  # return the user who confirmed the hmdmc
+  # we currently assume that all the contents of the labware are populated with
+  # the same hmdmc data
+  def first_confirmed_no_hmdmc
+    return nil if labwares.nil?
+    labwares.each do |lw|
+      h = lw.first_confirmed_no_hmdmc
+      return h if h
+    end
+    nil
+  end
+
+  # get the total number of samples for this submission
+  def total_samples
+    labwares.each.sum(&:size)
+  end
+
   private
 
   # Deletes any labware linked to this submission, and creates
@@ -149,6 +170,5 @@ class MaterialSubmission < ApplicationRecord
       errors.add(:labwares, "must each have at least one Biomaterial")
     end
   end
-
 
 end
