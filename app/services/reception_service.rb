@@ -1,3 +1,5 @@
+# This service is responsible for creating a new MaterialReception
+# and updating all materials in labwares to available: true
 class ReceptionService
 
   delegate :presenter, to: :material_reception
