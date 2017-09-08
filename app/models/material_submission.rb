@@ -24,7 +24,7 @@ class MaterialSubmission < ApplicationRecord
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :labware_or_later?
   validates :labware_type_id, presence: true, if: :labware_or_later?
-  validates :address, presence: true, if: :dispatched?
+  validates :address, presence: true, if: :last_step?
   validates :contact, presence: true, if: :active?
   validate :each_labware_has_contents, if: :active?
 
@@ -40,8 +40,9 @@ class MaterialSubmission < ApplicationRecord
     status == MaterialSubmission.ACTIVE
   end
 
-  def dispatched?
-    status_was == 'dispatch'
+  def last_step?
+    return false if @last_step.nil?
+    @last_step
   end
 
   def active_or_labware?
@@ -97,6 +98,10 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def update(params)
+    if !params[:last_step].nil?
+      @last_step = params[:last_step]
+      params.delete(:last_step)
+    end
     update_attributes(params) && labwares.all?(&:valid?)
   end
 
