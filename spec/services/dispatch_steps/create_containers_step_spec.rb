@@ -58,7 +58,7 @@ RSpec.describe :create_containers_step do
   end
 
   def make_step
-    @step = CreateContainersStep.new(make_submission)
+    @step = DispatchSteps::CreateContainersStep.new(make_submission)
   end
 
   describe "#up" do

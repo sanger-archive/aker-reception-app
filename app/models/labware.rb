@@ -2,7 +2,7 @@ class Labware < ApplicationRecord
   belongs_to :material_submission
   has_one :material_reception
 
-  scope :with_barcode, ->(barcode) { where(barcode: barcode) }
+  delegate :num_of_rows, :num_of_cols, :col_is_alpha, :row_is_alpha, to: :labware_type
 
   def labware_type
     material_submission.labware_type
@@ -12,36 +12,12 @@ class Labware < ApplicationRecord
     update_attributes(print_count: print_count+1)
   end
 
-  def num_of_rows
-    labware_type.num_of_rows
-  end
-
-  def num_of_cols
-    labware_type.num_of_cols
-  end
-
-  def col_is_alpha
-    labware_type.col_is_alpha
-  end
-
-  def row_is_alpha
-    labware_type.row_is_alpha
-  end
-
   def size
     num_of_rows * num_of_cols
   end
 
   def barcode_printed?
     print_count > 0
-  end
-
-  def claimed?
-    claimed.present?
-  end
-
-  def ready_for_claim?
-    received? && !claimed?
   end
 
   def received?

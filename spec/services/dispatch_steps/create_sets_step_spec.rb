@@ -42,7 +42,7 @@ RSpec.describe :create_sets_step do
 
   def make_step(set_id)
     make_submission(set_id)
-    @step = CreateSetsStep.new(@submission)
+    @step = DispatchSteps::CreateSetsStep.new(@submission)
   end
 
   describe "#up" do
