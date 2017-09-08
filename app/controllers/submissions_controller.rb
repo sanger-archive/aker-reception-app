@@ -88,6 +88,9 @@ class SubmissionsController < ApplicationController
       MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
 
+      # upon successful submission, send an event for the warehouse to pickup
+      send_message_to_queue @material_submission
+
     end
 
     material_submission.update_attributes(status: get_next_status) if material_submission.valid?

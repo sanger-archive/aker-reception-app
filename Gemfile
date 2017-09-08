@@ -93,6 +93,7 @@ end
 group :test do
   gem 'cucumber-rails', :require => false
   gem 'rspec-json_expectations'
+  gem 'timecop'
   # database_cleaner is not required, but highly recommended
 end
 
