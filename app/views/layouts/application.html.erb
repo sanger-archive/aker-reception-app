@@ -24,12 +24,10 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="#">Aker</a>
+    <%= link_to 'Aker', root_path, class: "navbar-brand" %>
     </div>
     <div class="collapse navbar-collapse" id="navBar">
-    <ul class="nav navbar-nav">
-      <%= navlinks %>
-    </ul>
+    <%= render 'navlinks' %>
     <ul class="nav navbar-nav navbar-right">
       <li><%= link_to 'Log Out', destroy_user_session_path, method: :delete if user_signed_in? %></li>
     </ul>

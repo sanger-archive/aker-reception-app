@@ -8,16 +8,13 @@ class MaterialReceptionsController < ApplicationController
   end
 
   def create
-    @material_reception = MaterialReception.create(:labware_id => @labware_id)
+    reception_service = ReceptionService.new(labware: @labware)
 
-    if @material_reception.save
-      ReceptionMailer.material_reception(@material_reception).deliver_later
-      # Only check if the set is complete is material_reception saved
-      if @material_reception.all_received?
-        ReceptionMailer.complete_set(@material_reception).deliver_later
-      end
+    if reception_service.process
+      ReceptionMailer.material_reception(reception_service.material_reception).deliver_later
     end
-    render json: @material_reception.presenter
+
+    render json: reception_service.presenter
   end
 
   private
@@ -26,8 +23,7 @@ class MaterialReceptionsController < ApplicationController
   end
 
   def set_labware
-    @labware = Labware.with_barcode(material_reception_params[:barcode_value]).first
-    @labware_id = @labware&.id
+    @labware ||= Labware.find_by(barcode: material_reception_params[:barcode_value])
   end
 
 end

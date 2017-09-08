@@ -41,7 +41,7 @@ RSpec.describe :create_materials_step do
   end
 
   def make_step(labware_bio_ids)
-    @step = CreateMaterialsStep.new(make_submission(labware_bio_ids))
+    @step = DispatchSteps::CreateMaterialsStep.new(make_submission(labware_bio_ids))
   end
 
   describe "#up" do

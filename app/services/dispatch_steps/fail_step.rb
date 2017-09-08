@@ -1,8 +1,10 @@
-class FailStep
-	def up
-    raise "This step fails"
-  end
+module DispatchSteps
+  class FailStep
+    def up
+      raise "This step fails"
+    end
 
-  def down
+    def down
+    end
   end
 end
