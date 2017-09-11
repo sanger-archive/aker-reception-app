@@ -82,6 +82,10 @@ Rails.application.configure do
   config.jwt_exp_time = 2 * 60
   config.jwt_nbf_time = 1 * 60
 
+  config.enable_events_sending = false
+  config.events_queue_name = 'aker.events'
+  config.events_queue_connection = "amqp://guest:guest@localhost:5672"
+
   config.fake_ldap = true
 
   config.action_mailer.default_url_options = { host: 'localhost', port: Rails::Server.new.options[:Port] }

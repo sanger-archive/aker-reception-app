@@ -35,7 +35,7 @@ class SubmissionsController < ApplicationController
         @status_success = material_submission.update(material_submission_params)
       end
     else
-      @status_success = material_submission.update(material_submission_params.merge(status: step.to_s))
+      @status_success = material_submission.update(material_submission_params.merge(status: step.to_s, last_step: last_step?))
     end
 
     unless @status_success
@@ -88,6 +88,9 @@ class SubmissionsController < ApplicationController
       MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
       MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
 
+      # upon successful submission, send an event for the warehouse to pickup
+      message = EventMessage.new(submission: @material_submission)
+      EventService.publish(message)
     end
 
     material_submission.update_attributes(status: get_next_status) if material_submission.valid?
