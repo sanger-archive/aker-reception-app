@@ -2,14 +2,7 @@ class MaterialReception < ApplicationRecord
 
   belongs_to :labware
   validates :labware_id, uniqueness: { message: "already received" }
-  validates :material_reception_uuid, presence: true
   validate :barcode_printed?, on: :create
-
-  after_initialize :create_uuid
-
-  def create_uuid
-    self.material_reception_uuid ||= SecureRandom.uuid
-  end
 
   def barcode_value
     labware&.barcode
