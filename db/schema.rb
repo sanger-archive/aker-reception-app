@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170911122047) do
+ActiveRecord::Schema.define(version: 20170911105043) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,7 +66,6 @@ ActiveRecord::Schema.define(version: 20170911122047) do
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
     t.integer  "labware_id",              null: false
-    t.string   "material_reception_uuid"
     t.index ["labware_id"], name: "index_material_receptions_on_labware_id", unique: true, using: :btree
   end
 
