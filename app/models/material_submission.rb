@@ -24,11 +24,14 @@ class MaterialSubmission < ApplicationRecord
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :labware_or_later?
   validates :labware_type_id, presence: true, if: :labware_or_later?
-  validates :address, presence: true, if: :active?
-  validates :contact, presence: true, if: :active?
-  validate :each_labware_has_contents, if: :active?
+  validates :address, presence: true, if: :last_step?
+  validates :contact, presence: true, if: :last_step?
+  validate :each_labware_has_contents, if: :last_step?
+  validates :material_submission_uuid, presence: true
 
   before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
+
+  after_initialize :create_uuid
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :printed, -> { where(status: MaterialSubmission.PRINTED) }
@@ -36,8 +39,17 @@ class MaterialSubmission < ApplicationRecord
   scope :pending, -> { where(status: [nil, 'labware', 'provenance', 'ethics', 'dispatch']) }
   scope :for_user, ->(user) { where(user_id: user.id) }
 
+  def create_uuid
+    self.material_submission_uuid ||= SecureRandom.uuid
+  end
+
   def active?
     status == MaterialSubmission.ACTIVE
+  end
+
+  def last_step?
+    return false if @last_step.nil?
+    @last_step
   end
 
   def active_or_labware?
@@ -93,6 +105,10 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def update(params)
+    if !params[:last_step].nil?
+      @last_step = params[:last_step]
+      params.delete(:last_step)
+    end
     update_attributes(params) && labwares.all?(&:valid?)
   end
 
@@ -132,6 +148,23 @@ class MaterialSubmission < ApplicationRecord
     labwares && labwares.any? { |lw| lw.confirmed_no_hmdmc? }
   end
 
+  # return the user who confirmed the hmdmc
+  # we currently assume that all the contents of the labware are populated with
+  # the same hmdmc data
+  def first_confirmed_no_hmdmc
+    return nil if labwares.nil?
+    labwares.each do |lw|
+      h = lw.first_confirmed_no_hmdmc
+      return h if h
+    end
+    nil
+  end
+
+  # get the total number of samples for this submission
+  def total_samples
+    labwares.sum(&:size)
+  end
+
   private
 
   # Deletes any labware linked to this submission, and creates
@@ -149,6 +182,5 @@ class MaterialSubmission < ApplicationRecord
       errors.add(:labwares, "must each have at least one Biomaterial")
     end
   end
-
 
 end

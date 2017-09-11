@@ -57,6 +57,8 @@ gem 'aker_credentials_gem', :github => 'sanger/aker-credentials'
 gem 'aker_authentication_gem', :github => 'sanger/aker-authentication'
 gem 'aker_permission_gem', :github => 'sanger/aker-permission'
 
+gem "bunny", "= 0.9.0.pre10"
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
@@ -91,6 +93,7 @@ end
 group :test do
   gem 'cucumber-rails', :require => false
   gem 'rspec-json_expectations'
+  gem 'timecop'
   # database_cleaner is not required, but highly recommended
 end
 

@@ -11,7 +11,12 @@ class MaterialReceptionsController < ApplicationController
     reception_service = ReceptionService.new(labware: @labware)
 
     if reception_service.process
-      ReceptionMailer.material_reception(reception_service.material_reception).deliver_later
+      material_reception = reception_service.material_reception
+      ReceptionMailer.material_reception(material_reception).deliver_later
+
+      # send message upon successful reception
+      message = EventMessage.new(reception: material_reception)
+      EventService.publish(message)
     end
 
     render json: reception_service.presenter
