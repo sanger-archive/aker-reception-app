@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'EventMessage' do
 
-  context '#initialize messages' do
+  describe '#initialize messages' do
     it 'is initalized with a params object for a submission' do
       s = instance_double('MaterialSubmission')
       message = EventMessage.new(submission: s)
@@ -16,12 +16,16 @@ RSpec.describe 'EventMessage' do
     end
   end
 
-  context '#generates JSON' do
+  describe '#generates JSON' do
     it 'generates json for a submission' do
 
       submission = build(:material_submission, status: MaterialSubmission.ACTIVE)
 
       allow(SecureRandom).to receive(:uuid).and_return 'a_uuid'
+      allow(submission).to receive(:first_hmdmc).and_return '12/000'
+      allow(submission).to receive(:total_samples).and_return 12
+      allow(submission).to receive(:first_confirmed_no_hmdmc).and_return 'test@test.com'
+
 
       message = EventMessage.new(submission: submission)
 
@@ -35,11 +39,11 @@ RSpec.describe 'EventMessage' do
         expect(json["uuid"]).to eq 'a_uuid'
         expect(json["timestamp"]).to eq Time.now.utc.iso8601
         expect(json["user_identifier"]).to eq submission.user.email
-        expect(json["metadata"]["hmdmc_number"]).to eq submission.first_hmdmc
-        expect(json["metadata"]["sample_custodian"]).to eq submission.contact.email
-        expect(json["metadata"]["total_samples"]).to eq submission.total_samples
+        expect(json["metadata"]["hmdmc_number"]).to eq '12/000'
+        expect(json["metadata"]["sample_custodian"]).to eq 'jeff@jeff'
+        expect(json["metadata"]["total_samples"]).to eq 12
         expect(json["metadata"]["zipkin_trace_id"]).to eq 'a_trace_id'
-        expect(json["metadata"]["confirmed_no_hmdmc"]).to eq submission.first_confirmed_no_hmdmc
+        expect(json["metadata"]["confirmed_no_hmdmc"]).to eq 'test@test.com'
       end
     end
 
@@ -49,6 +53,7 @@ RSpec.describe 'EventMessage' do
       reception = build(:material_reception, labware_id: labware.id)
 
       allow(SecureRandom).to receive(:uuid).and_return 'a_uuid'
+      allow(reception).to receive(:barcode_value).and_return 'AKER-1'
 
       message = EventMessage.new(reception: reception)
 
@@ -62,7 +67,7 @@ RSpec.describe 'EventMessage' do
         expect(json["uuid"]).to eq 'a_uuid'
         expect(json["timestamp"]).to eq Time.now.utc.iso8601
         expect(json["user_identifier"]).to eq labware.material_submission.user.email
-        expect(json["metadata"]["barcode"]).to eq reception.barcode_value
+        expect(json["metadata"]["barcode"]).to eq 'AKER-1'
         expect(json["metadata"]["samples"]).to eq reception.labware.size
         expect(json["metadata"]["zipkin_trace_id"]).to eq 'a_trace_id'
       end

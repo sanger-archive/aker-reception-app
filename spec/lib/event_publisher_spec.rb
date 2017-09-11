@@ -29,7 +29,7 @@ RSpec.describe 'EventPublisher' do
 
   end
 
-  context '#create_connection' do
+  describe '#create_connection' do
 
     it 'initialize methods are called' do
 
@@ -57,7 +57,7 @@ RSpec.describe 'EventPublisher' do
     end
   end
 
-  context '#set_config' do
+  describe '#set_config' do
     it 'starts a new connection' do
 
       params = { event_conn: 'event_conn', queue_name: 'queue_name' }
@@ -83,22 +83,22 @@ RSpec.describe 'EventPublisher' do
       allow(@queue).to receive(:name).and_return(@params[:queue_name])
     end
 
-    # it 'publishes a new message to the queue' do
-    #   unconfirmed_sets = Set.new([])
-    #   allow(@channel).to receive(:unconfirmed_set).and_return(unconfirmed_sets)
-    #
-    #   ep = EventPublisher.new(@params)
-    #   expect(@exchange).to receive(:publish).with('message', routing_key: @params[:queue_name])
-    #   ep.publish(@event_message)
-    # end
-    #
-    # it 'raises exception if unconfirmed set is not empty' do
-    #   unconfirmed_sets = Set.new([1])
-    #   allow(@channel).to receive(:unconfirmed_set).and_return(unconfirmed_sets)
-    #
-    #   ep = EventPublisher.new(@params)
-    #   expect(@exchange).to receive(:publish).with('message', routing_key: @params[:queue_name])
-    #   expect{ep.publish(@event_message)}.to raise_error(/unconfirmed/)
-    # end
+    it 'publishes a new message to the queue' do
+      unconfirmed_sets = Set.new([])
+      allow(@channel).to receive(:unconfirmed_set).and_return(unconfirmed_sets)
+
+      ep = EventPublisher.new(@params)
+      expect(@exchange).to receive(:publish).with('message', routing_key: @params[:queue_name])
+      ep.publish(@event_message)
+    end
+
+    it 'raises exception if unconfirmed set is not empty' do
+      unconfirmed_sets = Set.new([1])
+      allow(@channel).to receive(:unconfirmed_set).and_return(unconfirmed_sets)
+
+      ep = EventPublisher.new(@params)
+      expect(@exchange).to receive(:publish).with('message', routing_key: @params[:queue_name])
+      expect{ep.publish(@event_message)}.to raise_error(/unconfirmed/)
+    end
   end
 end

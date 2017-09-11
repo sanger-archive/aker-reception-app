@@ -30,4 +30,3 @@ coverage
 /public/assets/**
 
 .DS_Store
-node_modules

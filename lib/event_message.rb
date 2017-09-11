@@ -40,8 +40,8 @@ class EventMessage
         {
           "role_type": "submission",
           "subject_type": "submission",
-          "subject_friendly_name": "submission.?",
-          "subject_uuid": @submission.id,
+          "subject_friendly_name": "submission.#{@submission.id}",
+          "subject_uuid": @submission.material_submission_uuid,
         },
       ],
       "metadata": {
@@ -50,7 +50,6 @@ class EventMessage
         "sample_custodian": @submission.contact.email,
         "total_samples": @submission.total_samples,
         "zipkin_trace_id": EventMessage.trace_id,
-        # "num_materials": @submission.set.meta["size"],
       },
     }.to_json
   end
@@ -68,8 +67,8 @@ class EventMessage
         {
           "role_type": "submission",
           "subject_type": "submission",
-          "subject_friendly_name": "submission.?",
-          "subject_uuid": submission.id,
+          "subject_friendly_name": "reception.#{@reception.id}",
+          "subject_uuid": @reception.material_reception_uuid,
         },
       ],
       "metadata": {
