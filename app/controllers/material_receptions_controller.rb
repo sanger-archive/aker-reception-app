@@ -13,7 +13,10 @@ class MaterialReceptionsController < ApplicationController
     if reception_service.process
       material_reception = reception_service.material_reception
       ReceptionMailer.material_reception(material_reception).deliver_later
-      send_message_to_queue material_reception
+
+      # send message upon successful reception
+      message = EventMessage.new(reception: material_reception)
+      EventService.publish(message)
     end
 
     render json: reception_service.presenter

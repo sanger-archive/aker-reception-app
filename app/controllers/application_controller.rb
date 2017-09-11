@@ -14,13 +14,4 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # creates and publishes (sends) a message
-  def send_message_to_queue(sender)
-    if sender.is_a?(MaterialSubmission)
-      message = EventMessage.new(submission: sender)
-    elsif sender.is_a?(MaterialReception)
-      message = EventMessage.new(reception: sender)
-    end
-    EventService.publish(message)
-  end
 end
