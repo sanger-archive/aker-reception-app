@@ -25,8 +25,8 @@ class MaterialSubmission < ApplicationRecord
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :labware_or_later?
   validates :labware_type_id, presence: true, if: :labware_or_later?
   validates :address, presence: true, if: :last_step?
-  validates :contact, presence: true, if: :active?
-  validate :each_labware_has_contents, if: :active?
+  validates :contact, presence: true, if: :last_step?
+  validate :each_labware_has_contents, if: :last_step?
   validates :material_submission_uuid, presence: true
 
   before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }

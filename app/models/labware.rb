@@ -86,9 +86,11 @@ class Labware < ApplicationRecord
   # return the first 'hmdmc_not_required_confirmed_by' within the labware's contents (samples)
   def first_confirmed_no_hmdmc
     return nil if contents.nil?
-    contents.each do |k, v|
-      hmdmc_confirmed_by = confirmed_no_hmdmc? && v['hmdmc_not_required_confirmed_by']
-      return hmdmc_confirmed_by if hmdmc_confirmed_by
+    if confirmed_no_hmdmc?
+      contents.each do |k, v|
+        hmdmc_confirmed_by = v['hmdmc_not_required_confirmed_by']
+        return hmdmc_confirmed_by if hmdmc_confirmed_by.present?
+      end
     end
     nil
   end
