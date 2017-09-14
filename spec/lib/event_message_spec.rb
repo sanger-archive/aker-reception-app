@@ -29,7 +29,7 @@ RSpec.describe 'EventMessage' do
 
       message = EventMessage.new(submission: submission)
 
-      allow(EventMessage).to receive(:trace_id).and_return 'a_trace_id'
+      allow(message).to receive(:trace_id).and_return 'a_trace_id'
 
       Timecop.freeze do
         json = JSON.parse(message.generate_json)
@@ -57,7 +57,7 @@ RSpec.describe 'EventMessage' do
 
       message = EventMessage.new(reception: reception)
 
-      allow(EventMessage).to receive(:trace_id).and_return 'a_trace_id'
+      allow(message).to receive(:trace_id).and_return 'a_trace_id'
 
       Timecop.freeze do
         json = JSON.parse(message.generate_json)
