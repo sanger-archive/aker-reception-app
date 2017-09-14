@@ -31,7 +31,7 @@ class EventMessage
   # generate the JSON message specific to a submission
   def generate_submission_json
     {
-      "event_type": "aker.events.submission.#{@submission.status}",
+      "event_type": "aker.events.submission.created",
       "lims_id": "aker",
       "uuid": SecureRandom.uuid,
       "timestamp": Time.now.utc.iso8601,
@@ -40,7 +40,7 @@ class EventMessage
         {
           "role_type": "submission",
           "subject_type": "submission",
-          "subject_friendly_name": "submission.#{@submission.id}",
+          "subject_friendly_name": "Submission #{@submission.id}",
           "subject_uuid": @submission.material_submission_uuid,
         },
       ],
@@ -58,7 +58,7 @@ class EventMessage
   def generate_reception_json
     submission = @reception.labware.material_submission
     {
-      "event_type": "aker.events.submission.#{submission.status}",
+      "event_type": "aker.events.submission.received",
       "lims_id": "aker",
       "uuid": SecureRandom.uuid,
       "timestamp": Time.now.utc.iso8601,
@@ -67,7 +67,7 @@ class EventMessage
         {
           "role_type": "submission",
           "subject_type": "submission",
-          "subject_friendly_name": "submission.#{submission.id}",
+          "subject_friendly_name": "Submission #{submission.id}",
           "subject_uuid": submission.material_submission_uuid,
         },
       ],
