@@ -34,7 +34,7 @@ RSpec.describe 'EventMessage' do
       Timecop.freeze do
         json = JSON.parse(message.generate_json)
 
-        expect(json["event_type"]).to eq "aker.events.submission.#{MaterialSubmission.ACTIVE}"
+        expect(json["event_type"]).to eq "aker.events.submission.created"
         expect(json["lims_id"]).to eq 'aker'
         expect(json["uuid"]).to eq 'a_uuid'
         expect(json["timestamp"]).to eq Time.now.utc.iso8601
@@ -62,7 +62,7 @@ RSpec.describe 'EventMessage' do
       Timecop.freeze do
         json = JSON.parse(message.generate_json)
 
-        expect(json["event_type"]).to eq "aker.events.submission.#{MaterialSubmission.PRINTED}"
+        expect(json["event_type"]).to eq "aker.events.submission.received"
         expect(json["lims_id"]).to eq 'aker'
         expect(json["uuid"]).to eq 'a_uuid'
         expect(json["timestamp"]).to eq Time.now.utc.iso8601
