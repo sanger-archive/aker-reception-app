@@ -10,7 +10,7 @@
   <tr>
     <td><%= @material_submission.id %></td>
     <td><%= @labware.barcode %></td>
-    <td><%= @material_submission.created_at %></td>
+    <td><%= localize(@material_submission.created_at, format: :terse) %></td>
   </tr>
 
 </table>
