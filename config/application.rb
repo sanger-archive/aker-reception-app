@@ -27,8 +27,6 @@ module Submission
 
     end
 
-    config.assets.paths << Rails.root.join("vendor", "assets", "fonts")
-
     config.ldap = config_for(:ldap)
 
   end
