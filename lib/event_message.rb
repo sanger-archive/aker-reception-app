@@ -9,14 +9,8 @@ class EventMessage
     @reception = params[:reception]
   end
 
-  # ?
-  def self.annotate_zipkin(span)
-    @trace_id = span.to_h[:traceId]
-  end
-
-  # ?
-  def self.trace_id
-    @trace_id
+  def trace_id
+    ZipkinTracer::TraceContainer.current&.next_id&.trace_id&.to_s
   end
 
   # wrapper method to create the JSON message
@@ -49,7 +43,7 @@ class EventMessage
         "confirmed_no_hmdmc": @submission.first_confirmed_no_hmdmc,
         "sample_custodian": @submission.contact.email,
         "total_samples": @submission.total_samples,
-        "zipkin_trace_id": EventMessage.trace_id,
+        "zipkin_trace_id": trace_id,
       },
     }.to_json
   end
@@ -74,7 +68,7 @@ class EventMessage
       "metadata": {
         "barcode": @reception.barcode_value,
         "samples": @reception.labware.size,
-        "zipkin_trace_id": EventMessage.trace_id,
+        "zipkin_trace_id": trace_id,
       },
     }.to_json
   end
