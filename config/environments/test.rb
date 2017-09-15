@@ -37,9 +37,6 @@ Rails.application.configure do
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
-  # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = false
-
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
   config.material_url = "http://localhost:5000"
