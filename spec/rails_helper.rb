@@ -86,6 +86,9 @@ RSpec.configure do |config|
 
   config.before(:each, js: true) do
     DatabaseCleaner.strategy = :truncation
+
+    # https://robots.thoughtbot.com/speed-up-javascript-capybara-specs-by-blacklisting-urls
+    page.driver.browser.url_blacklist = ["https://fonts.googleapis.com"]
   end
 
   config.before(:each) do

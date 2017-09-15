@@ -312,15 +312,15 @@ RSpec.describe MaterialSubmission, type: :model do
         @submission.labwares[0].update_attributes(contents: {"1" => { "gender" => "male" }})
       end
 
-      it "active save should return false" do
-        @submission.status = MaterialSubmission.ACTIVE
+      it "save on last step (dispatch) should return false" do
+        @submission.update(last_step: true)
         expect(@submission.save).to eq(false)
       end
     end
 
-    context "when none of the labware has contents" do
+    context "when none of the labware has contents on the last step of the process (dispatch)" do
       it "active save should return false" do
-        @submission.status = MaterialSubmission.ACTIVE
+        @submission.update(last_step: true)
         expect(@submission.save).to eq(false)
       end
     end
