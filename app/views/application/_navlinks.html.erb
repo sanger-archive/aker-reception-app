@@ -3,7 +3,7 @@
     <%= link_to 'Submissions', material_submissions_path, id: ('current_page' if (params[:controller] == 'material_submissions' && params[:action] != 'show') || params[:controller] == 'submissions') %>
   </li>
   <li>
-    <%= link_to 'Print', completed_submissions_path, id: ('current_page' if params[:controller] == 'completed_submissions') %>
+    <%= link_to 'Print labware barcodes', completed_submissions_path, id: ('current_page' if params[:controller] == 'completed_submissions') %>
   </li>
   <li>
     <%= link_to 'Reception', material_receptions_path, id: ('current_page' if params[:controller] == 'material_receptions') %>

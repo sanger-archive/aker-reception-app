@@ -9,14 +9,8 @@ class EventMessage
     @reception = params[:reception]
   end
 
-  # ?
-  def self.annotate_zipkin(span)
-    @trace_id = span.to_h[:traceId]
-  end
-
-  # ?
-  def self.trace_id
-    @trace_id
+  def trace_id
+    ZipkinTracer::TraceContainer.current&.next_id&.trace_id&.to_s
   end
 
   # wrapper method to create the JSON message
@@ -31,7 +25,7 @@ class EventMessage
   # generate the JSON message specific to a submission
   def generate_submission_json
     {
-      "event_type": "aker.events.submission.#{@submission.status}",
+      "event_type": "aker.events.submission.created",
       "lims_id": "aker",
       "uuid": SecureRandom.uuid,
       "timestamp": Time.now.utc.iso8601,
@@ -40,7 +34,7 @@ class EventMessage
         {
           "role_type": "submission",
           "subject_type": "submission",
-          "subject_friendly_name": "submission.#{@submission.id}",
+          "subject_friendly_name": "Submission #{@submission.id}",
           "subject_uuid": @submission.material_submission_uuid,
         },
       ],
@@ -49,7 +43,7 @@ class EventMessage
         "confirmed_no_hmdmc": @submission.first_confirmed_no_hmdmc,
         "sample_custodian": @submission.contact.email,
         "total_samples": @submission.total_samples,
-        "zipkin_trace_id": EventMessage.trace_id,
+        "zipkin_trace_id": trace_id,
       },
     }.to_json
   end
@@ -58,7 +52,7 @@ class EventMessage
   def generate_reception_json
     submission = @reception.labware.material_submission
     {
-      "event_type": "aker.events.submission.#{submission.status}",
+      "event_type": "aker.events.submission.received",
       "lims_id": "aker",
       "uuid": SecureRandom.uuid,
       "timestamp": Time.now.utc.iso8601,
@@ -67,14 +61,14 @@ class EventMessage
         {
           "role_type": "submission",
           "subject_type": "submission",
-          "subject_friendly_name": "submission.#{submission.id}",
+          "subject_friendly_name": "Submission #{submission.id}",
           "subject_uuid": submission.material_submission_uuid,
         },
       ],
       "metadata": {
         "barcode": @reception.barcode_value,
         "samples": @reception.labware.size,
-        "zipkin_trace_id": EventMessage.trace_id,
+        "zipkin_trace_id": trace_id,
       },
     }.to_json
   end
