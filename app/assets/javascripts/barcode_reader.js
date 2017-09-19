@@ -32,6 +32,11 @@
   };
 
   proto.addRow = function(rowInfo) {
+    // Use moment for time formatting: http://momentjs.com/
+    // Set locale
+    moment.locale('en-gb');
+    // Convert to date with time:  19 Sep 2017 10:09
+    rowInfo.created_at = moment(rowInfo.created_at).format('lll');
     this.rows.push(rowInfo);
     this.containerTable.trigger('DataTableInitialization.addRow', [[rowInfo.labware.barcode, rowInfo.created_at]]);
   };

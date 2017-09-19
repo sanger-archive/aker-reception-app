@@ -63,9 +63,9 @@ ActiveRecord::Schema.define(version: 20170911105043) do
   end
 
   create_table "material_receptions", force: :cascade do |t|
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.integer  "labware_id",              null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer  "labware_id", null: false
     t.index ["labware_id"], name: "index_material_receptions_on_labware_id", unique: true, using: :btree
   end
 
