@@ -11,6 +11,7 @@ class ReceptionService
   end
 
   def process
+    # Python eve date format currently defaults to the RFC1123 standard: a, %d %b %Y %H:%M:%S GMT
     format = Time.now.strftime('%a, %d %b %Y %T GMT')
     begin
       ActiveRecord::Base.transaction do
