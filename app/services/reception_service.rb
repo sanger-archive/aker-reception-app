@@ -11,10 +11,13 @@ class ReceptionService
   end
 
   def process
+    format = Time.now.strftime('%a, %d %b %Y %T GMT')
     begin
       ActiveRecord::Base.transaction do
         material_reception.save!
-        material_ids.each { |mid| MatconClient::Material.new(_id: mid).update_attributes(available: true) }
+        material_ids.each { |mid|
+          MatconClient::Material.new(_id: mid).update_attributes(available: true, date_of_receipt: format)
+        }
       end
     rescue Faraday::ConnectionFailed, MatconClient::Errors::ApiError => e
       material_reception.errors[:base] << 'Labware could not be received at this time.'
