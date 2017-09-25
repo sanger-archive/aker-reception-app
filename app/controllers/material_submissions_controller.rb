@@ -1,11 +1,10 @@
 class MaterialSubmissionsController < ApplicationController
-
   def schema
     render :json => MatconClient::Material.schema
   end
 
   def index
-    if user_signed_in?
+    if jwt_provided?
       @pending_material_submissions = MaterialSubmission.pending.for_user(current_user).sort_by(&:id).reverse
       @active_material_submissions = MaterialSubmission.active.for_user(current_user).sort_by(&:id).reverse
     else
@@ -15,7 +14,7 @@ class MaterialSubmissionsController < ApplicationController
   end
 
   def new
-    material_submission = MaterialSubmission.create!(user: current_user)
+    material_submission = MaterialSubmission.create!(owner_email: current_user.email)
 
     redirect_to material_submission_build_path(
       id: Wicked::FIRST_STEP,

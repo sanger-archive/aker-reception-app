@@ -1,17 +1,19 @@
 require 'rails_helper'
+require 'ostruct'
 
 RSpec.feature "DualPrintForms", type: :feature do
 
   describe "printer selection", js: true do
     before :each do
-      @user = create(:user)
-      sign_in(@user)
+      @user = OpenStruct.new(:email => 'user@sanger.ac.uk', :groups => ['world'])
+      allow_any_instance_of(JWTCredentials).to receive(:current_user).and_return(@user)
+
       @printer1 = create(:printer, name: "Printer 1")
       @printer2 = create(:printer, name: "Printer 2")
 
       @contact = create(:contact)
       @matsub = create(:material_submission, #no_of_labwares_required: 1,
-      supply_labwares: false, user_id: @user.id, address: "1 street", set_id: "03ae0fde-5657-4eda-ab34-178894d41f86",
+      supply_labwares: false, owner_email: @user.email, address: "1 street", set_id: "03ae0fde-5657-4eda-ab34-178894d41f86",
       status: 'active', contact_id: @contact.id)
 
       visit completed_submissions_path

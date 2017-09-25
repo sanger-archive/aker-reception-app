@@ -1,5 +1,6 @@
 require 'rails_helper'
 require 'webmock/rspec'
+require 'ostruct'
 
 def step_params(material_submission, step_name)
   p = {
@@ -70,16 +71,16 @@ end
 RSpec.describe SubmissionsController, type: :controller do
   describe "Using the steps defined by wicked" do
     setup do
-      @request.env['devise.mapping'] = Devise.mappings[:user]
+      # @request.env['devise.mapping'] = Devise.mappings[:user]
 
-      @user = FactoryGirl.create(:user)
-      sign_in(@user)
+      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      allow(controller).to receive(:current_user).and_return(@user)
 
       @labware_type = FactoryGirl.create :labware_type, {
         num_of_cols: 1,
         num_of_rows: 1
       }
-      @material_submission = FactoryGirl.create(:material_submission, user: @user)
+      @material_submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
       @contact = FactoryGirl.create :contact
       schema = %Q(
         {
