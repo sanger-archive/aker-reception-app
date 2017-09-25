@@ -71,8 +71,6 @@ end
 RSpec.describe SubmissionsController, type: :controller do
   describe "Using the steps defined by wicked" do
     setup do
-      # @request.env['devise.mapping'] = Devise.mappings[:user]
-
       @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
       allow(controller).to receive(:current_user).and_return(@user)
 
