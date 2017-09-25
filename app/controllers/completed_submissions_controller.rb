@@ -1,4 +1,5 @@
 class CompletedSubmissionsController < ApplicationController
+	before_action :require_jwt
 
 	def index
 		@unprinted_submissions = MaterialSubmission.active.sort_by(&:id).reverse
@@ -27,14 +28,23 @@ class CompletedSubmissionsController < ApplicationController
 		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Print issued to #{printparams[:printer_name]}"}
 	end
 
-private
+	private
+
 	def print_params
 		{
 			completed_submission_ids: params.require(:completed_submission_ids).map { |s| s.to_i },
 			printer_name: params.require(:printer).require(:name)
 		}
 	end
-    def print_error(message)
-    	redirect_back fallback_location: completed_submissions_url, flash: { error: message }
+
+  def print_error(message)
+  	redirect_back fallback_location: completed_submissions_url, flash: { error: message }
+  end
+
+  def require_jwt
+    unless current_user
+      redirect_to Rails.configuration.login_url
     end
+  end
+
 end

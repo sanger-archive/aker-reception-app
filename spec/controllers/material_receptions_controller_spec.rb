@@ -3,132 +3,143 @@ require 'webmock/rspec'
 require 'ostruct'
 
 RSpec.describe MaterialReceptionsController, type: :controller do
-  describe "When scanning a barcode" do
-    setup do
-      stub_request(:post, Rails.configuration.material_url+'/containers').
-         with(:body => {"num_of_cols"=> 12,"num_of_rows"=>8,"col_is_alpha"=>false,"row_is_alpha"=>true}.to_json,
-              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-                'Content-Type'=>'application/json',
-                }).
-         to_return(:status => 200, :body => {
-            "_updated"=> "Wed, 22 Feb 2017 23:30:11 GMT",
-            "num_of_cols"=> 12,
-            "barcode"=> "AKER-110",
-            "num_of_rows"=> 8,
-            "col_is_alpha"=> false,
-            "_links"=> {
-            "self"=> {
-            "href"=> "containers/382ce837-478c-49a3-86a8-7af34bb898cf",
-            "title"=> "Container"
-            },
-            "collection"=> {
-            "href"=> "containers",
-            "title"=> "containers"
-            },
-            "parent"=> {
-            "href"=> "/",
-            "title"=> "home"
-            }
-            },
-            "_created"=> "Wed, 22 Feb 2017 22:42:38 GMT",
-            "row_is_alpha"=> true,
-            "_id"=> "382ce837-478c-49a3-86a8-7af34bb898cf"
-            }.to_json, :headers => {})
 
+  context 'when no JWT is included' do
+    before do
+      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      @submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
+    end
+    it 'redirects to the login page' do
+      get :index
+      expect(response).to redirect_to(Rails.configuration.login_url)
+    end
+  end
 
-      stub_request(:get, Rails.configuration.material_url+'/containers/382ce837-478c-49a3-86a8-7af34bb898cf').
-         with(
-              :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-                'Content-Type'=>'application/json',
-                }).
-         to_return(:status => 200, :body => {
-            "_updated"=> "Wed, 22 Feb 2017 23:30:11 GMT",
-            "num_of_cols"=> 12,
-            "barcode"=> "AKER-110",
-            "num_of_rows"=> 8,
-            "col_is_alpha"=> false,
-            "_links"=> {
-            "self"=> {
-            "href"=> "containers/382ce837-478c-49a3-86a8-7af34bb898cf",
-            "title"=> "Container"
-            },
-            "collection"=> {
-            "href"=> "containers",
-            "title"=> "containers"
-            },
-            "parent"=> {
-            "href"=> "/",
-            "title"=> "home"
-            }
-            },
-            "_created"=> "Wed, 22 Feb 2017 22:42:38 GMT",
-            "row_is_alpha"=> true,
-            "_id"=> "382ce837-478c-49a3-86a8-7af34bb898cf"
-            }.to_json, :headers => {})
-
+  context 'when JWT is included' do
+    before do
       @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
       allow(controller).to receive(:current_user).and_return(@user)
 
-      @labware_type = FactoryGirl.create(:labware_type, {:row_is_alpha => true})
-
       @submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
-
       @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1")
-
-      allow(request.env['warden']).to receive(:authenticate!).and_return(@user)
-
       @submission.labwares << @labware
-
-      stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{@labware.barcode}%22%7D").
-         with(:headers => {'Content-Type'=>'application/json'}).
-         to_return(:status => 200, :body => {"_items" => []}.to_json)
-
+      @labware_type = FactoryGirl.create(:labware_type, {:row_is_alpha => true})
     end
 
-    it "does not add the barcode to the list if the barcode does not exist" do
-      stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22NOT_EXISTS%22%7D").
-         with(:headers => {'Content-Type'=>'application/json'}).
-         to_return(:status => 200, :body => {"_items" => []}.to_json)
+    describe "When scanning a barcode" do
+      setup do
+        stub_request(:post, Rails.configuration.material_url+'/containers').
+           with(:body => {"num_of_cols"=> 12,"num_of_rows"=>8,"col_is_alpha"=>false,"row_is_alpha"=>true}.to_json,
+                :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+                  'Content-Type'=>'application/json',
+                  }).
+           to_return(:status => 200, :body => {
+              "_updated"=> "Wed, 22 Feb 2017 23:30:11 GMT",
+              "num_of_cols"=> 12,
+              "barcode"=> "AKER-110",
+              "num_of_rows"=> 8,
+              "col_is_alpha"=> false,
+              "_links"=> {
+              "self"=> {
+              "href"=> "containers/382ce837-478c-49a3-86a8-7af34bb898cf",
+              "title"=> "Container"
+              },
+              "collection"=> {
+              "href"=> "containers",
+              "title"=> "containers"
+              },
+              "parent"=> {
+              "href"=> "/",
+              "title"=> "home"
+              }
+              },
+              "_created"=> "Wed, 22 Feb 2017 22:42:38 GMT",
+              "row_is_alpha"=> true,
+              "_id"=> "382ce837-478c-49a3-86a8-7af34bb898cf"
+              }.to_json, :headers => {})
 
-      count = MaterialReception.all.count
-      post :create, params: { :material_reception => { :barcode_value => 'NOT_EXISTS'} }
-      MaterialReception.all.reload
-      expect(MaterialReception.all.count).to eq(count)
-    end
 
-    it "does not add the barcode to the list if the barcode has already been received" do
-      MaterialReception.create(:labware_id => @labware.id)
-      count = MaterialReception.all.count
-      post :create, params: { :material_reception => {:barcode_value => @labware.barcode}}
-      MaterialReception.all.reload
-      expect(MaterialReception.all.count).to eq(count)
-    end
+        stub_request(:get, Rails.configuration.material_url+'/containers/382ce837-478c-49a3-86a8-7af34bb898cf').
+           with(
+                :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+                  'Content-Type'=>'application/json',
+                  }).
+           to_return(:status => 200, :body => {
+              "_updated"=> "Wed, 22 Feb 2017 23:30:11 GMT",
+              "num_of_cols"=> 12,
+              "barcode"=> "AKER-110",
+              "num_of_rows"=> 8,
+              "col_is_alpha"=> false,
+              "_links"=> {
+              "self"=> {
+              "href"=> "containers/382ce837-478c-49a3-86a8-7af34bb898cf",
+              "title"=> "Container"
+              },
+              "collection"=> {
+              "href"=> "containers",
+              "title"=> "containers"
+              },
+              "parent"=> {
+              "href"=> "/",
+              "title"=> "home"
+              }
+              },
+              "_created"=> "Wed, 22 Feb 2017 22:42:38 GMT",
+              "row_is_alpha"=> true,
+              "_id"=> "382ce837-478c-49a3-86a8-7af34bb898cf"
+              }.to_json, :headers => {})
 
-    it "does not add the barcode to the list if the barcode has not been printed" do
-      @labware.assign_attributes(print_count: 0)
-      count = MaterialReception.all.count
-      post :create, params: { :material_reception => {:barcode_value => @labware.barcode}}
-      MaterialReception.all.reload
-      expect(MaterialReception.all.count).to eq(count)
-    end
+        stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{@labware.barcode}%22%7D").
+           with(:headers => {'Content-Type'=>'application/json'}).
+           to_return(:status => 200, :body => {"_items" => []}.to_json)
+      end
 
-    it "adds the barcode to the list if the barcode exists and has not been received yet" do
-      material_double = instance_double("MatconClient::Material", update_attributes: true)
-      allow(MatconClient::Material).to receive(:new).and_return(material_double)
-      labware = create(:printed_with_contents_labware, barcode: 'AKER_500', container_id: 'testing-uuid')
+      it "does not add the barcode to the list if the barcode does not exist" do
+        stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22NOT_EXISTS%22%7D").
+           with(:headers => {'Content-Type'=>'application/json'}).
+           to_return(:status => 200, :body => {"_items" => []}.to_json)
 
-      stub_request(:get, Rails.configuration.material_url+"/containers/#{labware.container_id}").
-         with(:headers => {'Content-Type'=>'application/json'}).
-         to_return(:status => 200, :body => labware.attributes.to_json, :headers => {})
-      stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{labware.barcode}%22%7D").
-         with(:headers => {'Content-Type'=>'application/json'}).
-         to_return(:status => 200, :body => {"_items" => [labware.attributes]}.to_json)
+        count = MaterialReception.all.count
+        post :create, params: { :material_reception => { :barcode_value => 'NOT_EXISTS'} }
+        MaterialReception.all.reload
+        expect(MaterialReception.all.count).to eq(count)
+      end
 
-      count = MaterialReception.all.count
-      post :create, params: { :material_reception => {:barcode_value => labware.barcode }}
-      expect(response).to have_http_status(:ok)
-      MaterialReception.all.reload
-      expect(MaterialReception.all.count).to eq(count+1)
+      it "does not add the barcode to the list if the barcode has already been received" do
+        MaterialReception.create(:labware_id => @labware.id)
+        count = MaterialReception.all.count
+        post :create, params: { :material_reception => {:barcode_value => @labware.barcode}}
+        MaterialReception.all.reload
+        expect(MaterialReception.all.count).to eq(count)
+      end
+
+      it "does not add the barcode to the list if the barcode has not been printed" do
+        @labware.assign_attributes(print_count: 0)
+        count = MaterialReception.all.count
+        post :create, params: { :material_reception => {:barcode_value => @labware.barcode}}
+        MaterialReception.all.reload
+        expect(MaterialReception.all.count).to eq(count)
+      end
+
+      it "adds the barcode to the list if the barcode exists and has not been received yet" do
+        material_double = instance_double("MatconClient::Material", update_attributes: true)
+        allow(MatconClient::Material).to receive(:new).and_return(material_double)
+        labware = create(:printed_with_contents_labware, barcode: 'AKER_500', container_id: 'testing-uuid')
+
+        stub_request(:get, Rails.configuration.material_url+"/containers/#{labware.container_id}").
+           with(:headers => {'Content-Type'=>'application/json'}).
+           to_return(:status => 200, :body => labware.attributes.to_json, :headers => {})
+        stub_request(:get, Rails.configuration.material_url+"/containers?where=%7B%22barcode%22:%22#{labware.barcode}%22%7D").
+           with(:headers => {'Content-Type'=>'application/json'}).
+           to_return(:status => 200, :body => {"_items" => [labware.attributes]}.to_json)
+
+        count = MaterialReception.all.count
+        post :create, params: { :material_reception => {:barcode_value => labware.barcode }}
+        expect(response).to have_http_status(:ok)
+        MaterialReception.all.reload
+        expect(MaterialReception.all.count).to eq(count+1)
+      end
     end
   end
+
 end

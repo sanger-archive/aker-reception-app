@@ -69,16 +69,13 @@ def labware_attributes_for(labwares, species)
 end
 
 RSpec.describe SubmissionsController, type: :controller do
+
   describe "Using the steps defined by wicked" do
     setup do
-      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
-      allow(controller).to receive(:current_user).and_return(@user)
-
       @labware_type = FactoryGirl.create :labware_type, {
         num_of_cols: 1,
         num_of_rows: 1
       }
-      @material_submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
       @contact = FactoryGirl.create :contact
       schema = %Q(
         {
@@ -142,159 +139,178 @@ RSpec.describe SubmissionsController, type: :controller do
        to_return(status: 200, body: schema, headers: {})
     end
 
-    it "does not update the submission if the state is not pending (ie broken)" do
-      allow_any_instance_of(DispatchService).to receive(:process).and_raise  "This step fails"
-      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+    context 'when no JWT is included' do
+      before do
+        @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+        @material_submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
+      end
 
-
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
-
-      put :biomaterial_data, step_params(@material_submission, :provenance)
-      @material_submission.reload
-
-      put :update, step_params(@material_submission, :dispatch)
-      @material_submission.reload
-
-      put :update, step_params(@material_submission, :dispatch)
-      @material_submission.reload
-
-      expect(@material_submission.status).to eq('broken')
-      expect(flash[:error]).to match("This submission cannot be updated.")
+      it 'redirects to the login page' do
+        put :update, step_params(@material_submission, :labware)
+        expect(response).to redirect_to(Rails.configuration.login_url)
+      end
     end
 
-    it "does not complete the submission if any steps have not been performed" do
-      put :update, step_params(@material_submission, :dispatch)
-      @material_submission.reload
-      expect(@material_submission.status).not_to eq('active')
-    end
+    context 'what JWT is included' do
+      before do
+        @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+        allow(controller).to receive(:current_user).and_return(@user)
+        @material_submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
+      end
 
-    it "does not update the submission state if any required data of steps has not been provided" do
-      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+      it "does not update the submission if the state is not pending (ie broken)" do
+        allow_any_instance_of(DispatchService).to receive(:process).and_raise  "This step fails"
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
 
-      put :biomaterial_data, step_params(@material_submission, :provenance)
-      @material_submission.reload
+        put :biomaterial_data, step_params(@material_submission, :provenance)
+        @material_submission.reload
 
-      put :update, step_params(@material_submission, :dispatch_contact_error)
-      @material_submission.reload
+        put :update, step_params(@material_submission, :dispatch)
+        @material_submission.reload
 
-      expect(@material_submission.status).to eq('dispatch')
-    end
+        put :update, step_params(@material_submission, :dispatch)
+        @material_submission.reload
 
-    it "updates the submission state to active when all steps are successful and DispatchSerivce#process returns true" do
-      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
-      allow_any_instance_of(DispatchService).to receive(:process).and_return(true)
+        expect(@material_submission.status).to eq('broken')
+        expect(flash[:error]).to match("This submission cannot be updated.")
+      end
 
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
+      it "does not complete the submission if any steps have not been performed" do
+        put :update, step_params(@material_submission, :dispatch)
+        @material_submission.reload
+        expect(@material_submission.status).not_to eq('active')
+      end
 
-      put :biomaterial_data, step_params(@material_submission, :provenance)
-      @material_submission.reload
+      it "does not update the submission state if any required data of steps has not been provided" do
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-      put :update, step_params(@material_submission, :dispatch)
-      @material_submission.reload
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
 
-      expect(flash[:notice]).to match('Your submission has been created')
-      expect(@material_submission.status).to eq('active')
-    end
+        put :biomaterial_data, step_params(@material_submission, :provenance)
+        @material_submission.reload
 
-    it "does not update submission status if DispatchSerivce#process returns false" do
-      allow_any_instance_of(DispatchService).to receive(:process).and_return false
-      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+        put :update, step_params(@material_submission, :dispatch_contact_error)
+        @material_submission.reload
 
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
+        expect(@material_submission.status).to eq('dispatch')
+      end
 
-      put :biomaterial_data, step_params(@material_submission, :provenance)
-      @material_submission.reload
+      it "updates the submission state to active when all steps are successful and DispatchSerivce#process returns true" do
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+        allow_any_instance_of(DispatchService).to receive(:process).and_return(true)
 
-      put :update, step_params(@material_submission, :dispatch)
-      @material_submission.reload
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
 
-      expect(@material_submission.status).to eq('dispatch')
-      expect(flash[:error]).to match("The submission could not be created")
-    end
+        put :biomaterial_data, step_params(@material_submission, :provenance)
+        @material_submission.reload
 
-    it "updates the submission status to broken if DispatchSerivce#process raises an exception" do
-      allow_any_instance_of(DispatchService).to receive(:process).and_raise  "This step fails"
-      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+        put :update, step_params(@material_submission, :dispatch)
+        @material_submission.reload
 
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
+        expect(flash[:notice]).to match('Your submission has been created')
+        expect(@material_submission.status).to eq('active')
+      end
 
-      put :biomaterial_data, step_params(@material_submission, :provenance)
-      @material_submission.reload
+      it "does not update submission status if DispatchSerivce#process returns false" do
+        allow_any_instance_of(DispatchService).to receive(:process).and_return false
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-      put :update, step_params(@material_submission, :dispatch)
-      @material_submission.reload
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
 
-      expect(@material_submission.status).to eq('broken')
-      expect(flash[:error]).to match("There has been a problem with the submission. Please contact support.")
-    end
+        put :biomaterial_data, step_params(@material_submission, :provenance)
+        @material_submission.reload
 
-    it "updates the labware contents if ProvenanceServive#set_biomaterial_data returns no errors" do
-      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+        put :update, step_params(@material_submission, :dispatch)
+        @material_submission.reload
 
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
+        expect(@material_submission.status).to eq('dispatch')
+        expect(flash[:error]).to match("The submission could not be created")
+      end
 
-      expect(@material_submission.labwares.first.contents).to eq nil
+      it "updates the submission status to broken if DispatchSerivce#process raises an exception" do
+        allow_any_instance_of(DispatchService).to receive(:process).and_raise  "This step fails"
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-      put :biomaterial_data, step_params(@material_submission, :provenance)
-      @material_submission.reload
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
 
-      expect(@material_submission.labwares.first.contents).not_to eq nil
-      expect(@material_submission.status).to eq('dispatch')
-    end
+        put :biomaterial_data, step_params(@material_submission, :provenance)
+        @material_submission.reload
 
-    it "does not update submission status if ProvenanceServive#set_biomaterial_data returns errors" do
-      allow_any_instance_of(ProvenanceService).to receive(:set_biomaterial_data).and_return [false, ['error', 'error']]
+        put :update, step_params(@material_submission, :dispatch)
+        @material_submission.reload
 
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
+        expect(@material_submission.status).to eq('broken')
+        expect(flash[:error]).to match("There has been a problem with the submission. Please contact support.")
+      end
 
-      expect(@material_submission.labwares.first.contents).to eq nil
+      it "updates the labware contents if ProvenanceServive#set_biomaterial_data returns no errors" do
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-      put :biomaterial_data, step_params(@material_submission, :provenance)
-      @material_submission.reload
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
 
-      expect(@material_submission.status).to eq('provenance')
-    end
+        expect(@material_submission.labwares.first.contents).to eq nil
 
-    it "moves on to the ethics step if the labware contains human material" do
-      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
-      put :biomaterial_data, step_params(@material_submission, :provenance_human)
-      @material_submission.reload
-      expect(@material_submission.status).to eq('ethics')
-    end
+        put :biomaterial_data, step_params(@material_submission, :provenance)
+        @material_submission.reload
 
-    it "skips the ethics step if the labware does not contain human material" do
-      allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
-      put :update, step_params(@material_submission, :labware)
-      @material_submission.reload
-      put :biomaterial_data, step_params(@material_submission, :provenance)
-      @material_submission.reload
-      expect(@material_submission.status).to eq('dispatch')
-    end
+        expect(@material_submission.labwares.first.contents).not_to eq nil
+        expect(@material_submission.status).to eq('dispatch')
+      end
 
-    it "runs ethics in the ethics service" do
-      ethics_params = {
-        hmdmc_1: '12',
-        hmdmc_2: '345',
-        confirm_hmdmc_not_required: '0',
-      }
-      params = step_params(@material_submission, :ethics)
-      params[:params].merge!(ethics_params)
-      ac_par = ActionController::Parameters.new(ethics_params)
-      ac_par.permit!
-      expect_any_instance_of(EthicsService).to receive(:update).with(ac_par, @user.email)
-      put :update, params
-      @material_submission.reload
+      it "does not update submission status if ProvenanceServive#set_biomaterial_data returns errors" do
+        allow_any_instance_of(ProvenanceService).to receive(:set_biomaterial_data).and_return [false, ['error', 'error']]
+
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
+
+        expect(@material_submission.labwares.first.contents).to eq nil
+
+        put :biomaterial_data, step_params(@material_submission, :provenance)
+        @material_submission.reload
+
+        expect(@material_submission.status).to eq('provenance')
+      end
+
+      it "moves on to the ethics step if the labware contains human material" do
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
+        put :biomaterial_data, step_params(@material_submission, :provenance_human)
+        @material_submission.reload
+        expect(@material_submission.status).to eq('ethics')
+      end
+
+      it "skips the ethics step if the labware does not contain human material" do
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+        put :update, step_params(@material_submission, :labware)
+        @material_submission.reload
+        put :biomaterial_data, step_params(@material_submission, :provenance)
+        @material_submission.reload
+        expect(@material_submission.status).to eq('dispatch')
+      end
+
+      it "runs ethics in the ethics service" do
+        ethics_params = {
+          hmdmc_1: '12',
+          hmdmc_2: '345',
+          confirm_hmdmc_not_required: '0',
+        }
+        params = step_params(@material_submission, :ethics)
+        params[:params].merge!(ethics_params)
+        ac_par = ActionController::Parameters.new(ethics_params)
+        ac_par.permit!
+        expect_any_instance_of(EthicsService).to receive(:update).with(ac_par, @user.email)
+        put :update, params
+        @material_submission.reload
+      end
     end
 
   end
