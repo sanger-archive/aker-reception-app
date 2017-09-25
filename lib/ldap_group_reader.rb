@@ -40,8 +40,8 @@ module LDAPGroupReader
     def active_people_filter
       # All these fields and values are basically magic.
       Net::LDAP::Filter.eq('sangerActiveAccount', :TRUE) &
-      Net::LDAP::Filter.eq('sangerRealPerson', :TRUE) &
-      Net::LDAP::Filter.ne('sangerEmployeeStatus', 99)
+        Net::LDAP::Filter.eq('sangerRealPerson', :TRUE) &
+        Net::LDAP::Filter.ne('sangerEmployeeStatus', 99)
     end
 
     def make_connection
