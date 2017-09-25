@@ -5,9 +5,6 @@ require 'ostruct'
 RSpec.describe MaterialReceptionsController, type: :controller do
   describe "When scanning a barcode" do
     setup do
-
-      # @request.env['devise.mapping'] = Devise.mappings[:user]
-
       stub_request(:post, Rails.configuration.material_url+'/containers').
          with(:body => {"num_of_cols"=> 12,"num_of_rows"=>8,"col_is_alpha"=>false,"row_is_alpha"=>true}.to_json,
               :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
