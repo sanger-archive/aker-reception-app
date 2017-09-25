@@ -52,10 +52,11 @@ gem 'aker_stamp_client', github: 'sanger/aker-stamp-client'
 #gem 'material_service_client', '~> 1.0.1', github: 'sanger/material_service_client_gem'
 
 gem 'bootstrap-table-rails'
-
-gem 'aker_credentials_gem', :github => 'sanger/aker-credentials'
-gem 'aker_authentication_gem', :github => 'sanger/aker-authentication'
+gem 'aker_credentials_gem', github: 'sanger/aker-credentials', branch: 'noguest'
 gem 'aker_permission_gem', :github => 'sanger/aker-permission'
+
+gem "net-ldap"
+gem "devise_ldap_authenticatable"
 
 gem "bunny", "= 0.9.0.pre10"
 

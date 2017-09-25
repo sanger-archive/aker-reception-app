@@ -1,5 +1,10 @@
-
 require 'cucumber/rspec/doubles'
+
+Before do
+  user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+  MaterialSubmissionsController.any_instance.stub(:current_user).and_return(user)
+  SubmissionsController.any_instance.stub(:current_user).and_return(user)
+end
 
 Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
   LabwareType.create(
@@ -9,7 +14,7 @@ Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
     num_of_rows: 8,
     col_is_alpha: false,
     row_is_alpha: true
-  )  
+  )
 end
 
 Given(/^I have a material service running$/) do
@@ -38,11 +43,7 @@ Given(/^I have the internal contact "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I am logged in$/) do
-  user = User.first || FactoryGirl.create(:user)
-  visit '/users/sign_in'
-  fill_in "user_email", with: user.email
-  fill_in "user_password", with: user.password
-  click_on "Log in"
+  visit root_path
 end
 
 Given(/^I visit the homepage$/) do
@@ -65,7 +66,7 @@ Then(/^I am in "([^"]*)"$/) do |arg1|
   expect(page.has_content?(arg1)).to eq(true)
 end
 
-Given(/^I select a type of labware$/) do 
+Given(/^I select a type of labware$/) do
   find("input[name=\"material_submission[labware_type_id]\"]").set(true)
 end
 
@@ -100,7 +101,7 @@ Then(/^show me the page$/) do
 end
 
 When(/^I select the contact "([^"]*)"$/) do |arg1|
-  select('test@test', :from => 'Contact')
+  select(arg1, :from => 'Sanger Sample Custodian')
 end
 
 Then(/^I should see "([^"]*)"$/) do |arg1|

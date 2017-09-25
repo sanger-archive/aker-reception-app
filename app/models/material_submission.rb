@@ -12,7 +12,6 @@ class MaterialSubmission < ApplicationRecord
     'broken'
   end
 
-  belongs_to :user
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
@@ -28,6 +27,7 @@ class MaterialSubmission < ApplicationRecord
   validates :contact, presence: true, if: :last_step?
   validate :each_labware_has_contents, if: :last_step?
   validates :material_submission_uuid, presence: true
+  validates :owner_email, presence: true
 
   before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
 
@@ -37,7 +37,7 @@ class MaterialSubmission < ApplicationRecord
   scope :printed, -> { where(status: MaterialSubmission.PRINTED) }
   # broken submissions are not listed
   scope :pending, -> { where(status: [nil, 'labware', 'provenance', 'ethics', 'dispatch']) }
-  scope :for_user, ->(user) { where(user_id: user.id) }
+  scope :for_user, ->(owner) { where(owner_email: owner.email) }
 
   def create_uuid
     self.material_submission_uuid ||= SecureRandom.uuid
@@ -94,10 +94,6 @@ class MaterialSubmission < ApplicationRecord
 
   def invalid_labwares
     labwares.select(&:invalid?)
-  end
-
-  def email
-    user&.email
   end
 
   def supply_labware_type

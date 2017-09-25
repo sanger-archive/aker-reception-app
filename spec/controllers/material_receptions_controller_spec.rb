@@ -1,12 +1,10 @@
 require 'rails_helper'
 require 'webmock/rspec'
+require 'ostruct'
 
 RSpec.describe MaterialReceptionsController, type: :controller do
   describe "When scanning a barcode" do
     setup do
-
-      @request.env['devise.mapping'] = Devise.mappings[:user]
-
       stub_request(:post, Rails.configuration.material_url+'/containers').
          with(:body => {"num_of_cols"=> 12,"num_of_rows"=>8,"col_is_alpha"=>false,"row_is_alpha"=>true}.to_json,
               :headers => {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -68,13 +66,12 @@ RSpec.describe MaterialReceptionsController, type: :controller do
             "_id"=> "382ce837-478c-49a3-86a8-7af34bb898cf"
             }.to_json, :headers => {})
 
-
-      @user = FactoryGirl.create(:user)
-      sign_in(@user)
+      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      allow(controller).to receive(:current_user).and_return(@user)
 
       @labware_type = FactoryGirl.create(:labware_type, {:row_is_alpha => true})
 
-      @submission = FactoryGirl.create(:material_submission, user: @user)
+      @submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
 
       @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1")
 
