@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170911105043) do
+ActiveRecord::Schema.define(version: 20170922105201) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -78,11 +78,12 @@ ActiveRecord::Schema.define(version: 20170911105043) do
     t.datetime "updated_at",               null: false
     t.text     "address"
     t.integer  "contact_id"
-    t.integer  "user_id"
     t.uuid     "set_id"
     t.string   "material_submission_uuid"
+    t.string   "owner_email"
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id", using: :btree
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id", using: :btree
+    t.index ["owner_email"], name: "index_material_submissions_on_owner_email", using: :btree
   end
 
   create_table "printers", force: :cascade do |t|
@@ -91,20 +92,6 @@ ActiveRecord::Schema.define(version: 20170911105043) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_printers_on_name", unique: true, using: :btree
-  end
-
-  create_table "users", force: :cascade do |t|
-    t.string   "email",               default: "", null: false
-    t.datetime "remember_created_at"
-    t.integer  "sign_in_count",       default: 0,  null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-    t.string   "remember_token"
-    t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
   end
 
   add_foreign_key "labwares", "material_submissions"

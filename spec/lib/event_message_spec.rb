@@ -38,7 +38,7 @@ RSpec.describe 'EventMessage' do
         expect(json["lims_id"]).to eq 'aker'
         expect(json["uuid"]).to eq 'a_uuid'
         expect(json["timestamp"]).to eq Time.now.utc.iso8601
-        expect(json["user_identifier"]).to eq submission.user.email
+        expect(json["user_identifier"]).to eq submission.owner_email
         expect(json["metadata"]["hmdmc_number"]).to eq '12/000'
         expect(json["metadata"]["sample_custodian"]).to eq 'jeff@jeff'
         expect(json["metadata"]["total_samples"]).to eq 12
@@ -66,7 +66,7 @@ RSpec.describe 'EventMessage' do
         expect(json["lims_id"]).to eq 'aker'
         expect(json["uuid"]).to eq 'a_uuid'
         expect(json["timestamp"]).to eq Time.now.utc.iso8601
-        expect(json["user_identifier"]).to eq labware.material_submission.user.email
+        expect(json["user_identifier"]).to eq labware.material_submission.owner_email
         expect(json["metadata"]["barcode"]).to eq 'AKER-1'
         expect(json["metadata"]["samples"]).to eq reception.labware.size
         expect(json["metadata"]["zipkin_trace_id"]).to eq 'a_trace_id'

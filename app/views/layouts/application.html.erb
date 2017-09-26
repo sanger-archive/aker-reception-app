@@ -28,7 +28,13 @@
     <div class="collapse navbar-collapse" id="navBar">
     <%= render 'navlinks' %>
     <ul class="nav navbar-nav navbar-right">
-      <li><%= link_to 'Log Out', destroy_user_session_path, method: :delete if user_signed_in? %></li>
+      <li>
+        <% if jwt_provided? %>
+          <%= link_to 'Log out', Rails.configuration.logout_url, method: :delete if Rails.configuration.logout_url %>
+        <% else %>
+          <%= link_to 'Log in', Rails.configuration.login_url if Rails.configuration.login_url %>
+        <% end %>
+      </li>
     </ul>
     </div>
     </div>

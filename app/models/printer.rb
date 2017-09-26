@@ -30,7 +30,7 @@ private
 				barcode: lw.barcode,
 				sanger_human_barcode: lw.barcode,
 				date: Date.today.to_s,
-				collaborator_email: submission.email,
+				collaborator_email: submission.owner_email,
 				uricode: '', # Don't know what this is supposed to be
 				number: i,
 				total_number: submission.labwares.length,

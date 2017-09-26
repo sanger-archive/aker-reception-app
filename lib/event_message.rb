@@ -29,7 +29,7 @@ class EventMessage
       "lims_id": "aker",
       "uuid": SecureRandom.uuid,
       "timestamp": Time.now.utc.iso8601,
-      "user_identifier": @submission.user.email,
+      "user_identifier": @submission.owner_email,
       "roles": [
         {
           "role_type": "submission",
@@ -56,7 +56,7 @@ class EventMessage
       "lims_id": "aker",
       "uuid": SecureRandom.uuid,
       "timestamp": Time.now.utc.iso8601,
-      "user_identifier": submission.user.email,
+      "user_identifier": submission.owner_email,
       "roles": [
         {
           "role_type": "submission",

@@ -89,5 +89,9 @@ Rails.application.configure do
   config.fake_ldap = true
 
   config.action_mailer.default_url_options = { host: 'localhost', port: Rails::Server.new.options[:Port] }
+  config.default_jwt_user = { email: ENV.fetch('USER', 'user')+'@sanger.ac.uk', groups: ['world'] }
+
+  config.login_url = '#'
+  config.logout_url = '#'
 
 end

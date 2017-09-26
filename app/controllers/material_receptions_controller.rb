@@ -1,6 +1,7 @@
 class MaterialReceptionsController < ApplicationController
 
   before_action :set_labware, only: :create
+  before_action :require_jwt
 
   def index
     @material_receptions = MaterialReception.all.sort_by(&:id).reverse
@@ -23,12 +24,19 @@ class MaterialReceptionsController < ApplicationController
   end
 
   private
+
   def material_reception_params
     params.require(:material_reception).permit(:barcode_value)
   end
 
   def set_labware
     @labware ||= Labware.find_by(barcode: material_reception_params[:barcode_value])
+  end
+
+  def require_jwt
+    unless current_user
+      redirect_to Rails.configuration.login_url
+    end
   end
 
 end
