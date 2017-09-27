@@ -3,6 +3,8 @@ require 'rails/commands/server'
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # config.relative_url_root = '/submission'
+
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
   # since you don't have to restart the web server when you make code changes.
@@ -55,7 +57,6 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   config.action_mailer.delivery_method = :sendmail
-  config.action_mailer.default_url_options = { host: 'example.com' }
 
   config.material_url = 'http://localhost:5000'
 
@@ -88,7 +89,7 @@ Rails.application.configure do
 
   config.fake_ldap = true
 
-  config.action_mailer.default_url_options = { host: 'localhost', port: Rails::Server.new.options[:Port] }
+  config.action_mailer.default_url_options = { host: 'localhost', script_name: config.relative_url_root, only_path: false, port: Rails::Server.new.options[:Port] }
   config.default_jwt_user = { email: ENV.fetch('USER', 'user')+'@sanger.ac.uk', groups: ['world'] }
 
   config.login_url = '#'
