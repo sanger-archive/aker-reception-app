@@ -145,7 +145,7 @@ class SubmissionsController < ApplicationController
 
 
   def finish_wizard_path
-    root_path
+    material_submissions_path
   end
 
 protected
