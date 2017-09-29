@@ -17,4 +17,15 @@ module SubmissionHelper
     "institution.</p>".html_safe
   end
 
+  def step_classes(step)
+    steps = { "labware" => 1, "provenance" => 2, "ethics" => 3, "dispatch" => 4 }
+    if params[:id] == steps.key(step)
+      "active"
+    elsif step < steps[params[:id]]
+      "complete"
+    else
+      "upcoming"
+    end
+  end
+
 end

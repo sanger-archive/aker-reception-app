@@ -18,14 +18,37 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12">
-    <h2><%= title %></h2>
+<div class="row" id="progress-bar">
+  <div class="col-xs-2 col-xs-offset-2 bs-wizard-step <%= step_classes(1) %>">
+    <div class="text-center">Container Type</div>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div>
+    <a href="#" class="step-indicator"></a>
   </div>
-</div>
 
-<div class="progress">
-  <div class="progress-bar progress-bar-striped progress-bar-success" role="progressbar" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100" style="width: <%= progress %>%">
-    <span class="sr-only"><%= progress %>% complete (success)</span>
+  <div class="col-xs-2 bs-wizard-step <%= step_classes(2) %>">
+    <div class="text-center">Biomaterial Metadata</div>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div>
+    <a href="#" class="step-indicator"></a>
   </div>
+
+  <div class="col-xs-2 bs-wizard-step <%= step_classes(3) %>">
+    <div class="text-center">Ethics</div>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div>
+    <a href="#" class="step-indicator"></a>
+  </div>
+
+  <div class="col-xs-2 bs-wizard-step <%= step_classes(4) %>">
+    <div class="text-center">Delivery Details</div>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div>
+    <a href="#" class="step-indicator"></a>
+  </div>
+
 </div>
