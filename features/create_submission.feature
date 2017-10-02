@@ -25,7 +25,7 @@ Given I select a type of labware
 And I want to create 1 labware
 And I click on "Next"
 
-Then I am in "Biomaterial Provenance"
+Then I am in "Biomaterial Metadata"
 
 Given I upload the file "test/data/testing_1.csv"
 Then I should display the data of my file

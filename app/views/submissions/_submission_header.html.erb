@@ -18,14 +18,14 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12">
-    <h2><%= title %></h2>
-  </div>
-</div>
-
-<div class="progress">
-  <div class="progress-bar progress-bar-striped progress-bar-success" role="progressbar" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100" style="width: <%= progress %>%">
-    <span class="sr-only"><%= progress %>% complete (success)</span>
-  </div>
+<div class="row" id="progress-bar">
+  <% wizard_steps.each_with_index do |step, index| %>
+    <div class="col-xs-2 <%= "col-xs-offset-2" if index == 0 %> bs-wizard-step <%= step_classes(index) %>">
+      <div class="text-center"><%= step_titles[index] %></div>
+      <div class="progress">
+        <div class="progress-bar"></div>
+      </div>
+      <a href="#" class="step-indicator"></a>
+    </div>
+  <% end %>
 </div>
