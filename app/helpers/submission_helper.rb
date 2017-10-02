@@ -17,15 +17,18 @@ module SubmissionHelper
     "institution.</p>".html_safe
   end
 
-  def step_classes(step)
-    steps = { "labware" => 1, "provenance" => 2, "ethics" => 3, "dispatch" => 4 }
-    if params[:id] == steps.key(step)
+  def step_classes(step_index)
+    if params[:id] == wizard_steps[step_index].to_s
       "active"
-    elsif step < steps[params[:id]]
+    elsif step_index < wizard_steps.find_index(params[:id].to_sym)
       "complete"
     else
       "upcoming"
     end
+  end
+
+  def step_titles
+    ["Container Type", "Biomaterial Metadata", "Ethics", "Delivery Details"]
   end
 
 end

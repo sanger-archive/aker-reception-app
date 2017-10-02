@@ -19,36 +19,13 @@
 </div>
 
 <div class="row" id="progress-bar">
-  <div class="col-xs-2 col-xs-offset-2 bs-wizard-step <%= step_classes(1) %>">
-    <div class="text-center">Container Type</div>
-    <div class="progress">
-      <div class="progress-bar"></div>
+  <% wizard_steps.each_with_index do |step, index| %>
+    <div class="col-xs-2 <%= "col-xs-offset-2" if index == 0 %> bs-wizard-step <%= step_classes(index) %>">
+      <div class="text-center"><%= step_titles[index] %></div>
+      <div class="progress">
+        <div class="progress-bar"></div>
+      </div>
+      <a href="#" class="step-indicator"></a>
     </div>
-    <a href="#" class="step-indicator"></a>
-  </div>
-
-  <div class="col-xs-2 bs-wizard-step <%= step_classes(2) %>">
-    <div class="text-center">Biomaterial Metadata</div>
-    <div class="progress">
-      <div class="progress-bar"></div>
-    </div>
-    <a href="#" class="step-indicator"></a>
-  </div>
-
-  <div class="col-xs-2 bs-wizard-step <%= step_classes(3) %>">
-    <div class="text-center">Ethics</div>
-    <div class="progress">
-      <div class="progress-bar"></div>
-    </div>
-    <a href="#" class="step-indicator"></a>
-  </div>
-
-  <div class="col-xs-2 bs-wizard-step <%= step_classes(4) %>">
-    <div class="text-center">Delivery Details</div>
-    <div class="progress">
-      <div class="progress-bar"></div>
-    </div>
-    <a href="#" class="step-indicator"></a>
-  </div>
-
+  <% end %>
 </div>
