@@ -190,4 +190,8 @@ private
     end
   end
 
+  def finish_wizard_path
+    root_path
+  end
+
 end
