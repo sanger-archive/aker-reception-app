@@ -143,6 +143,11 @@ class SubmissionsController < ApplicationController
     return pstep
   end
 
+
+  def finish_wizard_path
+    material_submissions_path
+  end
+
 protected
 
   def material_submission
