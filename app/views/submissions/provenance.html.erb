@@ -1,101 +1,152 @@
 <%= render partial: 'submission_header' %>
 
-<div
-  data-psd-component-class="SingleTableManager"
-  data-psd-component-parameters="<%= (material_submission.labwares).to_json %>"
->
+<div data-psd-component-class="SingleTableManager"
+     data-psd-component-parameters="<%= (material_submission.labwares).to_json %>">
 
   <div class="alert alert-danger hidden" role="alert">
     <h4 class='alert-title'>Error!</h4>
     <p class='alert-msg'>&nbsp;</p>
   </div>
 
-
-
-<div id="alert-modal" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"></h4>
-      </div>
-      <div class="modal-body">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<%= bootstrap_form_tag url: material_submission_biomaterial_data_path(material_submission.id), remote: true, method: :put, html: {:'data-type' => 'json'} do |f| %>
-
-  <% labwares = material_submission.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
-
-  <%= render 'buttons', material_submission: material_submission, f: f %>
-
-  <ul class="nav nav-tabs" role="tablist">
-
-    <% labwares.each_with_index do |labware, i| %>
-      <li class="<%= 'active' if i == 0 %>" role="presentation">
-        <a data-toggle="tab" id="labware_tab[<%= labware.labware_index %>]" href="#Labware<%= labware.labware_index %>" aria-controls="Labware<%= labware.labware_index %>" role="tab">
-          Labware <%= labware.labware_index %>
-        </a>
-      </li>
-    <% end %>
-
-  </ul>
-
-  <div class="tab-content">
-    <% schema = material_schema %>
-    <% labwares.each_with_index do |labware, i| %>
-
-      <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware<%= labware.labware_index %>">
-
-         <div style="margin-top: 10px" class="well">
+  <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Select CSV mappings</h4>
+        </div>
+        <div class="modal-body">
+          <div id="modal-alert-required" class="alert alert-error" role="alert" style="display: none;">
+            All the required fields require a mapping to a CSV field.
+          </div>
+          <div id="modal-alert-ignored" class="alert alert-warning" role="alert" style="display: none;">
+            Some fields from the CSV have been ignored, please confirm that the correct matches have been made.
+          </div>
+          <p>Please select a required field on the left and the CSV field on the right you wish to map to:</p>
           <div class="row">
-            <div class="venter col-md-8">
-              Please enter material provenance, or drag &amp; drop CSV file
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="required-fields">Required fields</label>
+                <select id="required-fields" class="form-control" name="flowers" size="5">
+                </select>
+              </div>
             </div>
-            <div class="vcenter col-md-4">
-              <label style="float: right" class="btn btn-primary">
-                  Upload CSV <input type="file" class="upload-button" style="display: none;">
-              </label>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="fields-from-csv">Fields from CSV</label>
+                <select id="fields-from-csv" class="form-control" name="flowers" size="5">
+                </select>
+              </div>
             </div>
           </div>
+          <button type="button" class="btn btn-primary" onclick="matchFields();">Match</button>
+          <h5>Matched fields</h5>
+          <table id="matched-fields-table" class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Available field</th>
+                <th>Field from CSV</th>
+                <th></th>
+              </thead>
+            <tbody>
+            </tbody>
+          </table>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="finishCSVCheck();">Continue</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 
-        <table data-behavior="datatable" class="table table-condensed table-striped"
-                  data-psd-component-class='DataTableSchemaValidation' data-psd-component-parameters='{}'>
-          <thead>
-            <tr>
-              <th>Well position</th>
-              <% for header in schema['required'] %>
-                <th> <%= header %> </th>
-              <% end %>
-            </tr>
-          </thead>
+  <%= bootstrap_form_tag url: material_submission_biomaterial_data_path(material_submission.id),
+                         remote: true,
+                         method: :put,
+                         html: {:'data-type' => 'json'} do |f| %>
 
-          <tbody>
-            <% for address in labware.positions %>
-              <tr data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
-                <td><%= address %></td>
-                <% for col in schema['required'] %>
-                  <td data-psd-schema-validation-name="<%= col %>">
-                    <div class="form-group">
-                      <input class="form-control" type="text" name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]" id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]" value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
-                    </div>
-                  </td>
+    <% labwares = material_submission.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
+
+    <%= render 'buttons', material_submission: material_submission, f: f %>
+
+    <ul class="nav nav-tabs" role="tablist">
+
+      <% labwares.each_with_index do |labware, i| %>
+        <li class="<%= 'active' if i == 0 %>" role="presentation">
+          <a data-toggle="tab"
+             id="labware_tab[<%= labware.labware_index %>]"
+             href="#Labware<%= labware.labware_index %>"
+             aria-controls="Labware<%= labware.labware_index %>" role="tab">
+            Labware <%= labware.labware_index %>
+          </a>
+        </li>
+      <% end %>
+
+    </ul>
+
+    <div class="tab-content">
+      <% schema = material_schema %>
+
+      <% # Send the schema to JS to be used on the client %>
+      <%= javascript_tag do %>
+        window.materialSchema = <%= raw schema.to_json %>
+      <% end %>
+
+      <% labwares.each_with_index do |labware, i| %>
+
+        <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware<%= labware.labware_index %>">
+
+           <div style="margin-top: 10px" class="well">
+            <div class="row">
+              <div class="venter col-md-8">
+                Please enter material provenance, or drag &amp; drop CSV file
+              </div>
+              <div class="vcenter col-md-4">
+                <label style="float: right" class="btn btn-primary">
+                    Upload CSV <input type="file" class="upload-button" style="display: none;">
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <table data-behavior="datatable"
+                 class="table table-condensed table-striped"
+                 data-psd-component-class='DataTableSchemaValidation'
+                 data-psd-component-parameters='{}'>
+            <thead>
+              <tr>
+                <th>Well position</th>
+                <% for header in schema['required'] %>
+                  <th> <%= schema['properties'][header]['friendly_name'] %> </th>
                 <% end %>
               </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-    <% end %>
-  </div>
+            </thead>
 
-  <%= render 'buttons', material_submission: material_submission, f: f %>
+            <tbody>
+              <% for address in labware.positions %>
+                <tr data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
+                  <td><%= address %></td>
+                  <% for col in schema['required'] %>
+                    <td data-psd-schema-validation-name="<%= col %>">
+                      <div class="form-group">
+                        <input class="form-control"
+                               type="text"
+                               name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
+                               id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]"
+                               value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
+                      </div>
+                    </td>
+                  <% end %>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
 
-<% end %>
+    <%= render 'buttons', material_submission: material_submission, f: f %>
+
+  <% end %>
 </div>
