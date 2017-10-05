@@ -33,7 +33,7 @@ $(document).on('turbolinks:load', function() {
   $('input:file.upload-button').on('change', function() {
     var sample_table = $(this).closest('.well').siblings().find('table.dataTable');
 
-    checkCSVFields(sample_table, e.originalEvent.dataTransfer.files);
+    checkCSVFields(sample_table, $(this)[0].files);
 
     // Clearing the input allows the change event to fire again
     $(this).val(null);
