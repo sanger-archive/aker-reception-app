@@ -22,16 +22,19 @@ Given(/^I have a material service running$/) do
       'required' => ['REQUIRED_FREE', 'REQUIRED_ENUM', 'scientific_name'],
       'properties' => {
         'scientific_name' => {
-          'required' => true
+          'required' => true,
+          'field_name_regex' => "^scientific[-_\s]*(name)?$"
         },
         'OPTIONAL' => {
           'required' => false,
         },
         'REQUIRED_FREE' => {
           'required' => true,
+          'field_name_regex' => "^(REQUIRED(\s*|_*|-*))?FREE$"
         },
         'REQUIRED_ENUM' => {
           'required' => true,
+          'field_name_regex' => "^(REQUIRED(\s*|_*|-*))?ENUM$",
           'allowed' => ['ALPHA', 'BETA', 'GAMMA'],
         }
       },
