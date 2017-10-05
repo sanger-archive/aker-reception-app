@@ -6,7 +6,7 @@ const MODAL_ALERT_REQUIRED_ID = 'modal-alert-required';
 const MODAL_ALERT_IGNORED_ID = 'modal-alert-ignored';
 
 // TODO: remove DEBUG and any console.logs in final push
-const DEBUG = false;
+const DEBUG = true;
 
 // Position field that needs to be added to the schema which comes from the material service
 const POSITION_FIELD = {
@@ -35,6 +35,9 @@ function checkCSVFields(table, files) {
   // Get the table and file
   dataTable = table;
   file = files[0];
+
+  // Clear the matched fields
+  matchedFields = {};
 
   // Get the schema from the rails view
   schema = materialSchema.properties;
@@ -92,6 +95,7 @@ function checkCSVFields(table, files) {
             if (rfValue.hasOwnProperty('required') && rfValue.required && rfValue.hasOwnProperty('field_name_regex')) {
               // Match using case-insensitivity
               var pattern = new RegExp(rfValue.field_name_regex, 'i');
+
               // Check the regex pattern for the required field against the CSV field
               if (pattern.test($.trim(ffcValue))) {
                 matchedFields[rfKey] = ffcValue;
@@ -149,6 +153,9 @@ function csvFieldsIgnored() {
 
 // Checks if all required fields have been matched
 function allRequiredFieldsMatched() {
+  if (DEBUG) console.log("allRequiredFieldsMatched()");
+
+
   if (Object.keys(matchedFields).length < Object.keys(requiredFields).length) {
     return false;
   }
@@ -252,28 +259,24 @@ function fillInTableFromFile() {
       if (results.errors.length > 0) {
         displayError(csvErrorToText(results.errors));
 
+        // Stop filling in data
+        // TODO: should we clear the file if we have one row incorrect?
         return false;
       }
 
-      // Clear the table from any previous import
-      console.log(dataTable.attr('id'));
-      console.log($('#' + dataTable.attr('id') + ' > tbody'));
-      $('#' + dataTable.attr('id') + ' > tbody > tr.item').each(function() {
+      // Clear the table from previous import
+      $('#' + dataTable.attr('id') + ' > tbody > tr').each(function() {
         $this = $(this);
-        if (DEBUG) console.log($this);
-
-        var value = $this.find("span.value").html();
-        var quantity = $this.find("input.quantity").val();
+        $this.children().each (function(cell) {
+          $cell = $(this);
+          $cell.find('input').val('');
+        });
       });
-
 
       // Write each row to the datatable
       results.data.every(function(row, index) {
         // Get the row for of the well we would like to fill data
         var tableRow = $('tr[data-address="' + row[matchedFields.position] + '"]', dataTable);
-
-        if (DEBUG) console.log(tableRow);
-        if (DEBUG) console.log(matchedFields.position);
 
         // No position, no data
         if (!row[matchedFields.position] || tableRow.length == 0) {
