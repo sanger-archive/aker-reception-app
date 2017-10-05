@@ -46,8 +46,10 @@ function checkCSVFields(table, files) {
   $('#' + MODAL_ALERT_IGNORED_ID).hide();
 
   // Add position field to schema and required list
-  schema.position = POSITION_FIELD;
-  materialSchema.required.push('position');
+  if (!schema.position) {
+    schema.position = POSITION_FIELD;
+    materialSchema.required.push('position');
+  }
 
   // Get the header fields using PapaParse
   Papa.parse(file, {
@@ -180,6 +182,7 @@ function matchFields() {
     // Add the new match
     matchedFields[selectedRequiredField] = selectedFieldFromCSV;
 
+    // Add match to table and remove fields from the selects
     addRowToMatchedTable(selectedRequiredField, selectedFieldFromCSV);
     removeFieldsFromSelects(selectedRequiredField, selectedFieldFromCSV);
   } else {
@@ -234,6 +237,8 @@ function fillInTableFromFile() {
 
         return false;
       }
+
+      // TODO: Clear the table from any previous import
 
       // Write each row to the datatable
       results.data.forEach(function(row) {
