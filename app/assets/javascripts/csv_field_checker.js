@@ -5,10 +5,13 @@ const MAPPING_TABLE_ID = 'matched-fields-table';
 const MODAL_ALERT_REQUIRED_ID = 'modal-alert-required';
 const MODAL_ALERT_IGNORED_ID = 'modal-alert-ignored';
 
+// TODO: remove DEBUG and any console.logs in final push
+const DEBUG = false;
+
 // Position field that needs to be added to the schema which comes from the material service
 const POSITION_FIELD = {
   required: true,
-  field_name_regex: "^position$",
+  field_name_regex: "^(well(\\s*|_*|-*))?position$",
   friendly_name: "Position"
 }
 
@@ -23,6 +26,7 @@ var dataTable = null;
 // Checks the header fields from the CSV against the fields required for the material service
 // TODO: refactor into class
 function checkCSVFields(table, files) {
+  if (DEBUG) console.log("checkCSVFields()");
   // If we have not received any files, return
   if (files.length != 1) {
     return false
@@ -51,6 +55,9 @@ function checkCSVFields(table, files) {
     materialSchema.required.push('position');
   }
 
+  if (DEBUG) console.log("schema...");
+  if (DEBUG) console.log(schema);
+
   // Get the header fields using PapaParse
   Papa.parse(file, {
     header: true,
@@ -66,6 +73,8 @@ function checkCSVFields(table, files) {
 
       // If Papa was able to parse the CSV file, extract the header fields
       fieldsFromCSV = results.meta.fields;
+      if (DEBUG) console.log("fieldsFromCSV:");
+      if (DEBUG) console.log(fieldsFromCSV);
 
       // Do the magic!
       if (fieldsFromCSV.length > 0) {
@@ -78,17 +87,22 @@ function checkCSVFields(table, files) {
 
           // Match required and CSV fields
           // Iterate through the CSV fields, checking if it matches the regex in the required fields
-          $.each(schema, function (afKey, afValue) {
+          $.each(schema, function (rfKey, rfValue) {
             // We are only interested in the required fields at this point and they do need a regex to match against
-            if (afValue.hasOwnProperty('required') && afValue.required && afValue.hasOwnProperty('field_name_regex')) {
-              var pattern = new RegExp(afValue.field_name_regex, 'i');
+            if (rfValue.hasOwnProperty('required') && rfValue.required && rfValue.hasOwnProperty('field_name_regex')) {
+              // Match using case-insensitivity
+              var pattern = new RegExp(rfValue.field_name_regex, 'i');
               // Check the regex pattern for the required field against the CSV field
               if (pattern.test($.trim(ffcValue))) {
-                matchedFields[afKey] = ffcValue;
+                matchedFields[rfKey] = ffcValue;
+                return false;
               }
             }
           });
         });
+
+        if (DEBUG) console.log("matchedFields:");
+        if (DEBUG) console.log(matchedFields);
 
         // Create "required fields" select
         $('#' + REQUIRED_SELECT_ID).empty();
@@ -227,10 +241,13 @@ function finishCSVCheck() {
 
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile() {
+  if (DEBUG) console.log("fillInTableFromFile()");
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
     complete: function(results) {
+      if (DEBUG) console.log("results from parse...");
+      if (DEBUG) console.log(results);
       // Show any errors to the users
       if (results.errors.length > 0) {
         displayError(csvErrorToText(results.errors));
@@ -238,22 +255,38 @@ function fillInTableFromFile() {
         return false;
       }
 
-      // TODO: Clear the table from any previous import
+      // Clear the table from any previous import
+      console.log(dataTable.attr('id'));
+      console.log($('#' + dataTable.attr('id') + ' > tbody'));
+      $('#' + dataTable.attr('id') + ' > tbody > tr.item').each(function() {
+        $this = $(this);
+        if (DEBUG) console.log($this);
+
+        var value = $this.find("span.value").html();
+        var quantity = $this.find("input.quantity").val();
+      });
+
 
       // Write each row to the datatable
-      results.data.forEach(function(row) {
-        // No position, no data
-        if (!row['position']) {
-          displayError('This manifest does not have a position field for the wells');
-          return;
-        };
+      results.data.every(function(row, index) {
+        // Get the row for of the well we would like to fill data
+        var tableRow = $('tr[data-address="' + row[matchedFields.position] + '"]', dataTable);
 
-        var tableRow = $('tr[data-address="' + row['position'] + '"]', dataTable);
+        if (DEBUG) console.log(tableRow);
+        if (DEBUG) console.log(matchedFields.position);
+
+        // No position, no data
+        if (!row[matchedFields.position] || tableRow.length == 0) {
+          displayError('This manifest does not have a valid position field for the wells of row: ' + index);
+          return false;
+        };
 
         // Fill in the actual row with the data
         $.each(matchedFields, function (requiredField, csvField) {
           tableRow.find('input[name*="' + requiredField + '"]').val(row[csvField]);
         });
+
+        return true;
       });
     },
   })

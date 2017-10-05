@@ -24,7 +24,6 @@
 //= require_tree .
 
 $(document).on("turbolinks:load", function() {
-  console.log("turbolinks:load");
   $('.has-tooltip').tooltip();
   $('.has-popover').popover({
     trigger: 'hover'

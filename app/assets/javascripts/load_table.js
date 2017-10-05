@@ -21,7 +21,6 @@ $(document).on('turbolinks:load', function() {
       $(this).removeClass('is-dragover bg-info').addClass('table-striped')
     })
     .on('drop', function(e) {
-      // fillInTableFromFile($(this), e.originalEvent.dataTransfer.files);
       checkCSVFields($(this), e.originalEvent.dataTransfer.files);
     });
 
@@ -34,7 +33,7 @@ $(document).on('turbolinks:load', function() {
   $('input:file.upload-button').on('change', function() {
     var sample_table = $(this).closest('.well').siblings().find('table.dataTable');
 
-    fillInTableFromFile(sample_table, $(this)[0].files)
+    checkCSVFields(sample_table, e.originalEvent.dataTransfer.files);
 
     // Clearing the input allows the change event to fire again
     $(this).val(null);
@@ -57,9 +56,10 @@ $(document).on('turbolinks:load', function() {
 });
 
 function displayError(msg) {
-  $('.alert').html(msg);
-  $('.alert').toggleClass('invisible', false);
-  $('.alert').toggleClass('hidden', false);
+  const PAGE_ERROR_ALERT_ID = "#page-error-alert";
+  $(PAGE_ERROR_ALERT_ID).html(msg);
+  $(PAGE_ERROR_ALERT_ID).toggleClass('invisible', false);
+  $(PAGE_ERROR_ALERT_ID).toggleClass('hidden', false);
 }
 
 function csvErrorToText(list) {
