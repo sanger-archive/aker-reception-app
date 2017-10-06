@@ -27,8 +27,10 @@ And I click on "Next"
 
 Then I am in "Biomaterial Metadata"
 
-Given I upload the file "test/data/testing_1.csv"
-Then I should display the data of my file
+Given I upload the file "test/data/correct_manifest.csv"
+Then I should see data from my file like "334457"
+Then I should see data from my file like "male"
+Then I should see data from my file like "Homo Sapiens"
 
 When I go to next screen
 Then I should not see any validation errors

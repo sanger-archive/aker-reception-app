@@ -5,9 +5,6 @@ const MAPPING_TABLE_ID = 'matched-fields-table';
 const MODAL_ALERT_REQUIRED_ID = 'modal-alert-required';
 const MODAL_ALERT_IGNORED_ID = 'modal-alert-ignored';
 
-// TODO: remove DEBUG and any console.logs in final push
-const DEBUG = true;
-
 // Position field that needs to be added to the schema which comes from the material service
 const POSITION_FIELD = {
   required: true,
@@ -26,7 +23,6 @@ var dataTable = null;
 // Checks the header fields from the CSV against the fields required for the material service
 // TODO: refactor into class
 function checkCSVFields(table, files) {
-  if (DEBUG) console.log("checkCSVFields()");
   // If we have not received any files, return
   if (files.length != 1) {
     return false
@@ -58,13 +54,14 @@ function checkCSVFields(table, files) {
     materialSchema.required.push('position');
   }
 
-  if (DEBUG) console.log("schema...");
-  if (DEBUG) console.log(schema);
+  // Show the schema if we need to debug
+  debug("schema:");
+  debug(schema);
 
   // Get the header fields using PapaParse
   Papa.parse(file, {
     header: true,
-    preview: 1,
+    preview: 1, // Just get one line to do a quick check of the file
     skipEmptyLines: true,
     // The complete callback executes when the parsing is complete
     complete: function(results) {
@@ -74,10 +71,10 @@ function checkCSVFields(table, files) {
         return false;
       }
 
-      // If Papa was able to parse the CSV file, extract the header fields
+      // If Papa was able to parse the CSV file, extract the header fields and show for debugging
       fieldsFromCSV = results.meta.fields;
-      if (DEBUG) console.log("fieldsFromCSV:");
-      if (DEBUG) console.log(fieldsFromCSV);
+      debug("fieldsFromCSV:");
+      debug(fieldsFromCSV);
 
       // Do the magic!
       if (fieldsFromCSV.length > 0) {
@@ -105,8 +102,8 @@ function checkCSVFields(table, files) {
           });
         });
 
-        if (DEBUG) console.log("matchedFields:");
-        if (DEBUG) console.log(matchedFields);
+        debug("automatically matched fields:");
+        debug(matchedFields);
 
         // Create "required fields" select
         $('#' + REQUIRED_SELECT_ID).empty();
@@ -153,9 +150,6 @@ function csvFieldsIgnored() {
 
 // Checks if all required fields have been matched
 function allRequiredFieldsMatched() {
-  if (DEBUG) console.log("allRequiredFieldsMatched()");
-
-
   if (Object.keys(matchedFields).length < Object.keys(requiredFields).length) {
     return false;
   }
@@ -248,13 +242,13 @@ function finishCSVCheck() {
 
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile() {
-  if (DEBUG) console.log("fillInTableFromFile()");
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
     complete: function(results) {
-      if (DEBUG) console.log("results from parse...");
-      if (DEBUG) console.log(results);
+      debug("results from parse:");
+      debug(results);
+
       // Show any errors to the users
       if (results.errors.length > 0) {
         displayError(csvErrorToText(results.errors));
@@ -286,11 +280,30 @@ function fillInTableFromFile() {
 
         // Fill in the actual row with the data
         $.each(matchedFields, function (requiredField, csvField) {
+
           tableRow.find('input[name*="' + requiredField + '"]').val(row[csvField]);
+
+          // We also need to set the value attribute for Capybara to see and pass the test
+          // .prop is similar to .val so .attr seems to be working
+          // https://stackoverflow.com/a/6057122
+          // TODO: Find a fix or implement correctly as we are double filling the value here
+          tableRow.find('input[name*="' + requiredField + '"]').attr('value', row[csvField]);
         });
 
         return true;
       });
+      debug("importing complete!");
     },
   })
+}
+
+// Helper function to send some debugging messages if we trigger it from a parameter
+function debug(toLog) {
+  if (getURLParameter('debug') === 'true') console.log(toLog);
+}
+
+// Fancy function to get parameters from the URL
+// https://stackoverflow.com/a/11582513
+function getURLParameter(name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }

@@ -27,20 +27,20 @@
             <div class="col-md-5">
               <div class="form-group">
                 <label for="required-fields">Required fields</label>
-                <select id="required-fields" class="form-control" name="flowers" size="5">
+                <select id="required-fields" class="form-control" name="required-fields" size="5">
                 </select>
               </div>
             </div>
             <div class="col-md-5">
               <div class="form-group">
                 <label for="fields-from-csv">Fields from CSV</label>
-                <select id="fields-from-csv" class="form-control" name="flowers" size="5">
+                <select id="fields-from-csv" class="form-control" name="fields-from-csv" size="5">
                 </select>
               </div>
             </div>
             <div class="col-md-2">
               <div class="form-group">
-                <button type="button" class="btn btn-primary" onclick="matchFields();">Match</button>
+                <button id="match-fields-button" type="button" class="btn btn-primary" onclick="matchFields();">Match</button>
               </div>
             </div>
           </div>
@@ -52,14 +52,15 @@
                 <th>Available field</th>
                 <th>Field from CSV</th>
                 <th></th>
-              </thead>
+              </tr>
+            </thead>
             <tbody>
             </tbody>
           </table>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="finishCSVCheck();">Continue</button>
+          <button id="complete-csv-matching" type="button" class="btn btn-primary" onclick="finishCSVCheck();">Continue</button>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -122,7 +123,7 @@
               <tr>
                 <th>Well position</th>
                 <% for header in schema['required'] %>
-                  <th> <%= schema['properties'][header]['friendly_name'] %> </th>
+                  <th> <%= schema['properties'][header]['friendly_name'] ? schema['properties'][header]['friendly_name'] : header %> </th>
                 <% end %>
               </tr>
             </thead>
