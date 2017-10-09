@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'cucumber/rspec/doubles'
 
 Before do
@@ -19,20 +20,36 @@ end
 
 Given(/^I have a material service running$/) do
   MatconClient::Material.stub(:schema).and_return({
-      'required' => ['REQUIRED_FREE', 'REQUIRED_ENUM', 'scientific_name'],
+      'required' => ['supplier_name', 'scientific_name', 'gender', 'donor_id', 'phenotype'],
       'properties' => {
+        'supplier_name' => {
+          'required' => true,
+          'friendly_name' => "Supplier name",
+          'field_name_regex' => "^supplier[-_\s]*(name)?$",
+        },
         'scientific_name' => {
-          'required' => true
+          'required' => true,
+          'field_name_regex' => "^scientific[-_\s]*(name)?$",
+          'allowed' => ['Homo sapiens', 'Mus musculus'],
+          'friendly_name' => "Scientific name"
         },
         'OPTIONAL' => {
           'required' => false,
         },
-        'REQUIRED_FREE' => {
+        'gender' => {
           'required' => true,
+          'field_name_regex' => "^(gender|sex)$",
+          'friendly_name' => "Gender"
         },
-        'REQUIRED_ENUM' => {
+        'donor_id' => {
           'required' => true,
-          'allowed' => ['ALPHA', 'BETA', 'GAMMA'],
+          'field_name_regex' => "^donor[-_\s]*(id)?$",
+          'friendly_name' => "Donor ID"
+        },
+        'phenotype' => {
+          'required' => true,
+          'field_name_regex' => "^phenotype$",
+          'friendly_name' => "Phenotype"
         }
       },
     })
@@ -75,18 +92,16 @@ Given(/^I want to create (\d+) labware$/) do |arg1|
 end
 
 When(/^I upload the file "([^"]*)"$/) do |arg1|
-  execute_script("$('input.upload-button').show()")
-  attach_file('Upload CSV', File.absolute_path(arg1))
+  attach_file('Upload CSV', File.absolute_path(arg1), make_visible: true)
 end
 
-Then(/^I should display the data of my file$/) do
-  page.has_content?("3344556677")
+Then(/^I should see data from my file like "([^"]*)"$/) do |arg1|
+  expect(page).to have_selector("input[value='" + arg1 + "']")
 end
 
 Then(/^I should see validation errors$/) do
   expect(page.has_content?('validation')).to eq(true)
 end
-
 
 Then(/^I should not see any validation errors$/) do
   expect(page.has_content?('validation')).to eq(false)
@@ -100,8 +115,8 @@ Then(/^show me the page$/) do
   save_and_open_page
 end
 
-When(/^I select the contact "([^"]*)"$/) do |arg1|
-  select(arg1, :from => 'Sanger Sample Custodian')
+When(/^I select "([^"]*)" from the "([^"]*)" select$/) do |option, dropdown|
+  select(option, from: dropdown)
 end
 
 Then(/^I should see "([^"]*)"$/) do |arg1|
@@ -111,4 +126,19 @@ end
 Then(/^I know my shared submission identifier$/) do
   last_id = MaterialSubmission.last.id.to_s
   expect(page.has_content?("Submission "+last_id)).to eq(true)
+end
+
+# Find a select box by (label) name or id and assert the given text is selected
+Then(/^"([^"]*)" should be selected for "([^"]*)"$/) do |selected_text, dropdown|
+  expect(page).to have_select(dropdown, selected: selected_text)
+end
+
+# Find a select box by (label) name or id and assert the expected option is present
+Then(/^"([^"]*)" should contain "([^"]*)"$/) do |dropdown, text|
+  expect(page).to have_select(dropdown, with_options: [text])
+end
+
+# Find the table by name or id and assert the given amount of rows are present in it's body
+Then(/^"([^"]*)" should contain (\d+) rows$/) do |table, rows|
+  page.all('table#' + table + ' tbody tr').count.should == rows
 end

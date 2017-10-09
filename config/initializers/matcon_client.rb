@@ -5,13 +5,14 @@ Rails.application.config.after_initialize do
     ENV['HTTP_PROXY'] = nil
     ENV['http_proxy'] = nil
     ENV['https_proxy'] = nil
-    connection.faraday.proxy ''
-    connection.use JWTSerializer
-  end
 
-  if Rails.env.production? || Rails.env.staging?
-    MatconClient::Model.connection do |connection|
-      connection.use ZipkinTracer::FaradayHandler
+    # Remove deprecation warning by sending empty hash
+    # http://www.rubydoc.info/github/lostisland/faraday/Faraday/Connection
+    connection.faraday.proxy {}
+    connection.use JWTSerializer
+
+    if Rails.env.production? || Rails.env.staging?
+      connection.use ZipkinTracer::FaradayHandler, "Matcon Service"
     end
   end
 end
