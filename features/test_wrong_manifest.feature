@@ -18,6 +18,9 @@ Scenario:
 Given I visit the homepage
 
 And I click on "Create New Submission"
+# For some reason this tests needs us to click on the "Create New Submission"
+# twice to move onto the next screen
+And I click on "Create New Submission"
 
 Then I am in "Container Type"
 
