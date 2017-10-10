@@ -48,8 +48,9 @@ RSpec.describe 'EventMessage' do
     end
 
     it 'generates json for a reception' do
-
-      labware = create(:labware_with_barcode_and_material_submission, material_submission: build(:material_submission, status: MaterialSubmission.PRINTED))
+      labware = create(:labware_with_barcode_and_material_submission,
+                       material_submission: build(:material_submission,
+                                                  status: MaterialSubmission.PRINTED)                       )
       reception = build(:material_reception, labware_id: labware.id)
 
       allow(SecureRandom).to receive(:uuid).and_return 'a_uuid'
@@ -68,7 +69,7 @@ RSpec.describe 'EventMessage' do
         expect(json["timestamp"]).to eq Time.now.utc.iso8601
         expect(json["user_identifier"]).to eq labware.material_submission.owner_email
         expect(json["metadata"]["barcode"]).to eq 'AKER-1'
-        expect(json["metadata"]["samples"]).to eq reception.labware.size
+        expect(json["metadata"]["samples"]).to eq reception.labware.contents.length
         expect(json["metadata"]["zipkin_trace_id"]).to eq 'a_trace_id'
       end
     end
