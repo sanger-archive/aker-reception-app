@@ -64,7 +64,8 @@ Rails.application.configure do
   config.jwt_exp_time = 2 * 60
   config.jwt_nbf_time = 1 * 60
 
-  config.login_url = '#'
-  config.logout_url = '#'
+  config.auth_service_url = 'http://auth'
+  config.login_url = config.auth_service_url+'/login'
+  config.logout_url = config.auth_service_url+'/logout'
 
 end
