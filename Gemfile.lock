@@ -46,12 +46,6 @@ GIT
     aker_stamp_client (0.1.1)
 
 GIT
-  remote: https://github.com/sanger/aker-study-client.git
-  revision: 46f00717d5c68f9dcd70e8407dd9b1712bb7ebc9
-  specs:
-    aker-study-client (0.2.1)
-
-GIT
   remote: https://github.com/sanger/json_api_client.git
   revision: 680022ffc054bc5d69efc5cea31f85806362bfa5
   specs:
@@ -450,7 +444,6 @@ PLATFORMS
 DEPENDENCIES
   activeresource!
   aker-set-client!
-  aker-study-client!
   aker_credentials_gem!
   aker_permission_gem!
   aker_stamp_client!
@@ -505,4 +498,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.15.4
+   1.16.0.pre.2
