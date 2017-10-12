@@ -132,11 +132,11 @@ RSpec.describe SubmissionsController, type: :controller do
         }
       )
 
-    request_headers = {'Content-Type'=>'application/json', 'Accept'=>'application/json'}
+      request_headers = {'Content-Type'=>'application/json', 'Accept'=>'application/json'}
 
-    stub_request(:get, "http://localhost:5000/materials/json_schema").
-       with(headers: request_headers).
-       to_return(status: 200, body: schema, headers: {})
+      stub_request(:get, "http://localhost:5000/materials/json_schema").
+        with(headers: request_headers).
+        to_return(status: 200, body: schema, headers: {})
     end
 
     context 'when no JWT is included' do
