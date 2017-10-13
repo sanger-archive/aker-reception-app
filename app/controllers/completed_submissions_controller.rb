@@ -1,5 +1,4 @@
 class CompletedSubmissionsController < ApplicationController
-	before_action :require_jwt
 
 	def index
 		@unprinted_submissions = MaterialSubmission.active.sort_by(&:id).reverse
@@ -39,12 +38,6 @@ class CompletedSubmissionsController < ApplicationController
 
   def print_error(message)
   	redirect_back fallback_location: completed_submissions_url, flash: { error: message }
-  end
-
-  def require_jwt
-    unless current_user
-      redirect_to Rails.configuration.login_url
-    end
   end
 
 end

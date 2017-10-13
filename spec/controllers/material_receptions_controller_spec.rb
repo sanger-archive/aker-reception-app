@@ -4,6 +4,8 @@ require 'ostruct'
 
 RSpec.describe MaterialReceptionsController, type: :controller do
 
+  let(:expected_redirect) { Rails.configuration.login_url+'?'+{redirect_url: request.original_url}.to_query }
+
   context 'when no JWT is included' do
     before do
       @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
@@ -11,13 +13,14 @@ RSpec.describe MaterialReceptionsController, type: :controller do
     end
     it 'redirects to the login page' do
       get :index
-      expect(response).to redirect_to(Rails.configuration.login_url)
+      expect(response).to redirect_to(expected_redirect)
     end
   end
 
   context 'when JWT is included' do
     before do
       @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 
       @submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
