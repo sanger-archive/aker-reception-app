@@ -5,15 +5,18 @@ RSpec.describe MaterialSubmissionsController, type: :controller do
 
   describe "#index" do
     context 'when no JWT is included' do
+      let(:expected_redirect) { Rails.configuration.login_url+'?'+{redirect_url: request.original_url}.to_query }
+
       it 'redirects to the login page' do
         get :index
-        expect(response).to redirect_to(Rails.configuration.login_url)
+        expect(response).to redirect_to(expected_redirect)
       end
     end
 
     context 'when JWT is included' do
       before do
         user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+        allow(controller).to receive(:check_credentials)
         allow(controller).to receive(:current_user).and_return(user)
 
         sub1 = build(:material_submission, status: 'labware', owner_email: user.email)
@@ -40,6 +43,7 @@ RSpec.describe MaterialSubmissionsController, type: :controller do
 
     setup do
       @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 
       @labware_type = FactoryGirl.create :labware_type, {

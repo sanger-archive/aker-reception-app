@@ -2,8 +2,6 @@ class SubmissionsController < ApplicationController
   include Wicked::Wizard
   steps :labware, :provenance, :ethics, :dispatch
 
-  before_action :require_jwt
-
   def show
     if step==:ethics && !any_human_material?
       skip_step
@@ -182,12 +180,6 @@ private
 
   def labware_at_index(index)
     material_submission.labwares.select { |lw| lw.labware_index==index }.first
-  end
-
-  def require_jwt
-    unless current_user
-      redirect_to Rails.configuration.login_url
-    end
   end
 
   def finish_wizard_path

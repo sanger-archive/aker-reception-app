@@ -75,8 +75,6 @@ gem 'pmb-client', '0.1.0', github: 'sanger/pmb-client'
 # ?
 gem 'aker-set-client', github: 'sanger/aker-set-client'
 # ?
-gem 'aker-study-client', github: 'sanger/aker-study-client'
-# ?
 gem 'matcon_client', github: 'sanger/aker-matcon-client'
 # ?
 gem 'aker_stamp_client', github: 'sanger/aker-stamp-client'
