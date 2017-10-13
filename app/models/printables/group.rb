@@ -26,7 +26,7 @@ module Printables::Group
       :top_left            => printable_object[:sanger_human_barcode],
       :bottom_left         => printable_object[:date],
       :top_right           => printable_object[:collaborator_email],
-      :bottom_right        => printable_object[:uricode],
+      :bottom_right        => "Submission #{printable_object[:sub_id]}",
       :top_far_right       => printable_object[:number],
       :bottom_far_right    => "of #{printable_object[:total_number]}",
       :label_counter_right => num_prints(printable_object[:num_prints]),
@@ -37,7 +37,7 @@ module Printables::Group
     {
       :barcode                 => printable_object[:barcode],
       :top_line                => printable_object[:sanger_human_barcode],
-      :middle_line             => printable_object[:uricode],
+      :middle_line             => "Sub. ID: #{printable_object[:sub_id]}",
       :bottom_line             => printable_object[:date],
       :round_label_top_line    => printable_object[:collaborator_email],
       :round_label_bottom_line => 
