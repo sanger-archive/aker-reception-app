@@ -3,6 +3,7 @@ require 'webmock/rspec'
 require 'ostruct'
 
 RSpec.describe MaterialReceptionsController, type: :controller do
+  it_behaves_like 'service that validates credentials', [:index]
 
   let(:expected_redirect) { Rails.configuration.login_url+'?'+{redirect_url: request.original_url}.to_query }
 

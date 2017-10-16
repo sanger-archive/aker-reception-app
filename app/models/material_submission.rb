@@ -33,6 +33,8 @@ class MaterialSubmission < ApplicationRecord
 
   after_initialize :create_uuid
 
+  scope :was_dispatched, -> { where(dispatched?: true)}
+
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :printed, -> { where(status: MaterialSubmission.PRINTED) }
   # broken submissions are not listed
