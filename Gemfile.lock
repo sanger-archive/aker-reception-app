@@ -10,9 +10,9 @@ GIT
 
 GIT
   remote: https://github.com/sanger/aker-credentials.git
-  revision: 3bb0651f6b392ecf585df405ad85559eee736f3a
+  revision: 49a8a0a2811878744d2d6869784b3bdb885804a4
   specs:
-    aker_credentials_gem (0.2.3)
+    aker_credentials_gem (0.2.4)
       activesupport
       faraday
       jwt
