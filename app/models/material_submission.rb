@@ -33,7 +33,8 @@ class MaterialSubmission < ApplicationRecord
 
   after_initialize :create_uuid
 
-  scope :was_dispatched, -> { where(dispatched?: true)}
+  scope :dispatched, -> { where(dispatched?: true) }
+  scope :not_dispatched, -> { where(dispatched?: false) }
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :printed, -> { where(status: MaterialSubmission.PRINTED) }

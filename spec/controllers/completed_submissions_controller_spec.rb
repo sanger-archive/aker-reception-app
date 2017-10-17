@@ -71,7 +71,7 @@ RSpec.describe CompletedSubmissionsController, type: :controller  do
     end
     context 'when no submission has been selected' do
       it 'shows an error' do
-        post :dispatch_submission, {dispatched_submission_ids: []}
+        post :dispatch_submission, {completed_submission_ids: []}
         expect(flash[:error]).to be_present
       end      
     end
@@ -95,6 +95,7 @@ RSpec.describe CompletedSubmissionsController, type: :controller  do
         submission.reload
         expect(submission.dispatched?).to eq(true)        
       end
+
     end
   end
 

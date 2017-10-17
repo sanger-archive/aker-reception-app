@@ -3,6 +3,8 @@ class CompletedSubmissionsController < ApplicationController
 	def index
 		@unprinted_submissions = MaterialSubmission.active.sort_by(&:id).reverse
 		@printed_submissions = MaterialSubmission.printed.sort_by(&:id).reverse
+		@dispatched_submissions = MaterialSubmission.dispatched.sort_by(&:id).reverse
+		@not_dispatched_submissions = MaterialSubmission.printed.not_dispatched.sort_by(&:id).reverse
 		@printers = Printer.all
 	end
 
@@ -40,7 +42,7 @@ class CompletedSubmissionsController < ApplicationController
 		submissions.each do |submission|
 			submission.update_attributes!(dispatched?: true)
 		end
-		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Submissions dispatched"}
+		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Submissions dispatched" }
 	end
 
 	private

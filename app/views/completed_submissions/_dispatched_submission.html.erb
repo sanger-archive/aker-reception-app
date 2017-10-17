@@ -1,0 +1,9 @@
+<tr>
+  <td><%= check_box_tag("dispatched_submission_ids[]", dispatched_submission.id) unless readonly %>
+  <td><%= dispatched_submission.id %></td>
+  <td><%= dispatched_submission.status %></td>
+  <td><%= dispatched_submission.owner_email %></td>
+  <td><%= localize(dispatched_submission.created_at, format: :terse) %></td>
+  <td><%= dispatched_submission.no_of_labwares_required %></td>
+  <td><%= dispatched_submission.supply_labware_type %></td>
+</tr>

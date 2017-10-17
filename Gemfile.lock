@@ -10,6 +10,7 @@ GIT
 
 GIT
   remote: https://github.com/sanger/aker-credentials.git
+  revision: d19568e9f6e11a62d2ba44d52f40c8134bc3bd22
   specs:
     aker_credentials_gem (0.2.2)
       activesupport
