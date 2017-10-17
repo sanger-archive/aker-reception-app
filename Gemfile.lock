@@ -10,9 +10,9 @@ GIT
 
 GIT
   remote: https://github.com/sanger/aker-credentials.git
-  revision: d19568e9f6e11a62d2ba44d52f40c8134bc3bd22
+  revision: 3bb0651f6b392ecf585df405ad85559eee736f3a
   specs:
-    aker_credentials_gem (0.2.2)
+    aker_credentials_gem (0.2.3)
       activesupport
       faraday
       jwt
@@ -234,7 +234,8 @@ GEM
       activesupport (>= 4.2.0)
     gmetric (0.1.3)
     hashdiff (0.3.6)
-    i18n (0.8.6)
+    i18n (0.9.0)
+      concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
@@ -500,4 +501,4 @@ DEPENDENCIES
   zipkin-tracer
 
 BUNDLED WITH
-   1.16.0.pre.2
+   1.16.0.pre.3
