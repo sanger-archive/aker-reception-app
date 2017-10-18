@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170928105005) do
+ActiveRecord::Schema.define(version: 20171017142510) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,8 +44,9 @@ ActiveRecord::Schema.define(version: 20170928105005) do
     t.boolean  "row_is_alpha"
     t.string   "name"
     t.string   "description"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.boolean  "uses_decapper", default: false, null: false
   end
 
   create_table "labwares", force: :cascade do |t|
@@ -74,13 +75,14 @@ ActiveRecord::Schema.define(version: 20170928105005) do
     t.boolean  "supply_labwares"
     t.integer  "labware_type_id"
     t.string   "status"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
     t.text     "address"
     t.integer  "contact_id"
     t.uuid     "set_id"
     t.string   "material_submission_uuid"
     t.string   "owner_email"
+    t.boolean  "supply_decappers",         default: false, null: false
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id", using: :btree
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id", using: :btree
     t.index ["owner_email"], name: "index_material_submissions_on_owner_email", using: :btree

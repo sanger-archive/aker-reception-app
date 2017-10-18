@@ -475,7 +475,7 @@ RSpec.describe MaterialSubmission, type: :model do
         labware_type = create(:labware_type)
         @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: false)
       end
-      it "expect supply labware type to show 'Label only" do
+      it "should return 'Label only'" do
         expect(@material_submission.supply_labware_type).to eq 'Label only'
       end
     end
@@ -484,10 +484,50 @@ RSpec.describe MaterialSubmission, type: :model do
         labware_type = create(:plate_labware_type)
         @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: true)
       end
-      it "expect supply labware type to show 'Label only" do
+      it "should return the labware type name" do
         expect(@material_submission.supply_labware_type).to eq 'Plate'
       end
     end
+
+    context "when the submission needs decappers" do
+      before do
+        labware_type = create(:rack_labware_type)
+        @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: true, supply_decappers: true)
+      end
+      it "should return the labware type name with decappers" do
+        expect(@material_submission.supply_labware_type).to eq 'Rack with decappers'
+      end
+    end
+  end
+
+  describe '#supply_decappers' do
+    # supply_decappers cannot be true unless the labware type supports it, and supply_labwares is true.
+
+    let(:uses_decappers) { true }
+    let(:supply_labwares) { true }
+    let(:supply_decappers) { true }
+    let(:labware_type) { create(uses_decappers ? :rack_labware_type : :labware_type) }
+    let(:submission) { create(:material_submission, labware_type: labware_type, supply_labwares: supply_labwares, supply_decappers: supply_decappers) }
+
+    context "when the labware type does not use decappers" do
+      let(:uses_decappers) { false }
+      it { expect(submission.supply_decappers).to eq(false) }
+    end
+
+    context "when supply labwares is false" do
+      let(:supply_labwares) { false }
+      it { expect(submission.supply_decappers).to eq(false) }
+    end
+
+    context "when supply decappers is false" do
+      let(:supply_decappers) { false }
+      it { expect(submission.supply_decappers).to eq(false) }
+    end
+
+    context "when the labware type uses decappers, supply labwares is true, and supply decappers is true" do
+      it { expect(submission.supply_decappers).to eq(true) }
+    end
+
   end
 
 end

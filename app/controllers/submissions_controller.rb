@@ -161,7 +161,7 @@ private
 
   def material_submission_params
     params.require(:material_submission).permit(
-      :supply_labwares, :no_of_labwares_required, :status, :labware_type_id, :address, :contact_id, :labware
+      :supply_labwares, :supply_decappers, :no_of_labwares_required, :status, :labware_type_id, :address, :contact_id, :labware
     )
   end
 

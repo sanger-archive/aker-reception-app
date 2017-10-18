@@ -26,4 +26,14 @@ FactoryGirl.define do
     name "Tube"
     description "A tube"
   end
+
+  factory :rack_labware_type, class: LabwareType do
+    num_of_cols 12
+    num_of_rows 8
+    col_is_alpha false
+    row_is_alpha false
+    uses_decapper true
+    name "Rack"
+    description "A rack"
+  end
 end
