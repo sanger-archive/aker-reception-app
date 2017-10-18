@@ -17,7 +17,7 @@ function enableDecapper() {
 }
 
 $(document).on("turbolinks:load", function() {
-  $(".labwaretype").click(enableDecapper);
-  $(".supplylabware").click(enableDecapper);
+  $(".labwaretype").change(enableDecapper);
+  $(".supplylabware").change(enableDecapper);
   enableDecapper();
 });
