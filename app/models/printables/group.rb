@@ -37,7 +37,7 @@ module Printables::Group
     {
       :barcode                 => printable_object[:barcode],
       :top_line                => printable_object[:sanger_human_barcode],
-      :middle_line             => "Sub. ID: #{printable_object[:sub_id]}",
+      :middle_line             => "Sub. #{printable_object[:sub_id]}",
       :bottom_line             => printable_object[:date],
       :round_label_top_line    => printable_object[:collaborator_email],
       :round_label_bottom_line => 
