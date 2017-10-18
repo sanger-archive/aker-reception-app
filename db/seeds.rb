@@ -29,7 +29,7 @@ LabwareType.create(
 )
 
 LabwareType.create(
-  name: 'FluidX 0.75ml tubes in rack',
+  name: 'Rack of FluidX 0.75ml tubes',
   description: 'A rack of tubes',
   num_of_cols: 12,
   num_of_rows: 8,
@@ -39,7 +39,7 @@ LabwareType.create(
 )
 
 LabwareType.create(
-  name: 'FluidX 0.3ml tubes in rack',
+  name: 'Rack of FluidX 0.3ml tubes',
   description: 'A rack of tubes',
   num_of_cols: 12,
   num_of_rows: 8,
