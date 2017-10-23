@@ -23,6 +23,10 @@ class Printer < ApplicationRecord
 		end
 	end
 
+	def name_and_type
+		"#{name} (#{label_type})"
+	end
+
 private
 	def submission_to_printables(submission)
 		submission.labwares.map.with_index(1) do |lw,i|

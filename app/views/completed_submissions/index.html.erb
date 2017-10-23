@@ -6,8 +6,8 @@
 <div class="row">
   <div class="col-md-offset-8 col-md-4 text-right">
     <b>Printer:</b>
-    <%= collection_select(:printer, :name, @printers, :name, :name, {},
-        { style: "margin-left: 5px; width: 80px;", class: "printer_select", id: "printer_name_top"}) %>
+    <%= collection_select(:printer, :name, @printers, :name, :name_and_type, {},
+        { style: "margin-left: 5px; width: 150px;", class: "printer_select", id: "printer_name_top"}) %>
     <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 10px;', id: "print_button_top") %>
   </div>
 </div>
@@ -29,8 +29,8 @@
 <div class="row">
   <div class="col-md-offset-8 col-md-4 text-right" style="padding-bottom:10px;">
     <b>Printer:</b>
-    <%= collection_select(:printer, :name, @printers, :name, :name, {},
-        { style: "margin-left: 5px; width: 80px;", class: "printer_select", id: "printer_name_bottom" }) %>
+    <%= collection_select(:printer, :name, @printers, :name, :name_and_type, {},
+        { style: "margin-left: 5px; width: 150px;", class: "printer_select", id: "printer_name_bottom" }) %>
     <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 10px;', id: "print_button_bottom") %>
   </div>
 </div>
