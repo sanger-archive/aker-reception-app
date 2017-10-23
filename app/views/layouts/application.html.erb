@@ -28,6 +28,7 @@
     <div class="collapse navbar-collapse" id="navBar">
     <%= render 'navlinks' %>
     <ul class="nav navbar-nav navbar-right">
+      <li><p class="navbar-text">Logged in as <%= current_user.email %></p></li>
       <li>
         <% if jwt_provided? %>
           <%= link_to 'Log out', Rails.configuration.logout_url, method: :delete if Rails.configuration.logout_url %>

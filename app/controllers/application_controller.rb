@@ -12,5 +12,6 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :jwt_provided?
+  helper_method :current_user
 
 end
