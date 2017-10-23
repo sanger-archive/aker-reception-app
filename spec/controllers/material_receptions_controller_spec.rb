@@ -125,7 +125,17 @@ RSpec.describe MaterialReceptionsController, type: :controller do
         expect(MaterialReception.all.count).to eq(count)
       end
 
+      it "does not add the barcode to the list if the barcode has not been dispatched" do
+        @submission.update_attributes(dispatched: false)
+        count = MaterialReception.all.count
+        post :create, params: { :material_reception => {:barcode_value => @labware.barcode}}
+        MaterialReception.all.reload
+        expect(MaterialReception.all.count).to eq(count)
+      end      
+
       it "adds the barcode to the list if the barcode exists and has not been received yet" do
+        @submission.update_attributes(dispatched: true)
+
         material_double = instance_double("MatconClient::Material", update_attributes: true)
         allow(MatconClient::Material).to receive(:new).and_return(material_double)
         labware = create(:printed_with_contents_labware, barcode: 'AKER_500', container_id: 'testing-uuid')

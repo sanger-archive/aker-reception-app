@@ -64,7 +64,8 @@ Given(/^I am logged in$/) do
 end
 
 Given(/^I visit the homepage$/) do
-  visit('/')
+  #visit('/')
+  visit root_path
 end
 
 Given(/^I click on "([^"]*)"$/) do |arg1|

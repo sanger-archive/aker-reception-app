@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 20171016152016) do
     t.uuid     "set_id"
     t.string   "material_submission_uuid"
     t.string   "owner_email"
-    t.boolean  "dispatched?",              default: false
+    t.boolean  "dispatched",               default: false
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id", using: :btree
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id", using: :btree
     t.index ["owner_email"], name: "index_material_submissions_on_owner_email", using: :btree
