@@ -159,9 +159,10 @@ class MaterialSubmission < ApplicationRecord
     nil
   end
 
-  # get the total number of samples for this submission
+  # Get the total number of samples for this submission
+  # Do not sum the size of the labware but the actual number (length) of contents
   def total_samples
-    labwares.sum(&:size)
+    labwares.sum { |labware| labware.contents.length }
   end
 
 private

@@ -297,13 +297,18 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when every labware has contents" do
       before do
         @submission.labwares.each do |lw|
-          lw.update_attributes(contents: {"1" => { "gender" => "female" }})
+          lw.update_attributes(contents: {"1" => { "gender" => "female" }, "2" => { "gender" => "male" }})
         end
       end
 
       it "active save should return true" do
         @submission.status = MaterialSubmission.ACTIVE
         expect(@submission.save).to eq(true)
+      end
+
+      it "the total sample size should reflect the number of samples not the size of the labware" do
+        expect(@submission.total_samples).to eq(2 * 2)
+        expect(@submission.total_samples).not_to eq(@submission.labwares.sum(&:size))
       end
     end
 

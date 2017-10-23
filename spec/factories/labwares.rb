@@ -22,6 +22,7 @@ FactoryGirl.define do
     material_submission {|l| l.association(:material_submission)}
     sequence(:labware_index)
     barcode { generate(:labware_barcode) }
+    contents { { "1": { 'id': 1, 'scientific_name': 'Homo Sapiens' } } }
   end
 
   sequence :labware_barcode do |n|
