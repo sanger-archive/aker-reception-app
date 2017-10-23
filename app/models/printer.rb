@@ -15,12 +15,17 @@ class Printer < ApplicationRecord
 		return true if Rails.configuration.printing_disabled
 		print_printables(submissions.flat_map { |submission| submission_to_printables(submission) })
 	end
+
 	def print_printables(printables)
 		if label_type=='Plate'
 			print_plates(name, Printer.PLATE_TEMPLATE, printables)
 		else
 			print_tubes(name, Printer.TUBE_TEMPLATE, printables)
 		end
+	end
+
+	def printer_description
+		"#{name} (#{label_type})"
 	end
 
 private
@@ -31,7 +36,7 @@ private
 				sanger_human_barcode: lw.barcode,
 				date: Date.today.to_s,
 				collaborator_email: submission.owner_email,
-				uricode: '', # Don't know what this is supposed to be
+				sub_id: submission.id,
 				number: i,
 				total_number: submission.labwares.length,
 				num_prints: lw.print_count+1,

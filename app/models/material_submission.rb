@@ -30,6 +30,7 @@ class MaterialSubmission < ApplicationRecord
   validates :owner_email, presence: true
 
   before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
+  before_save :check_supply_decappers
 
   after_initialize :create_uuid
 
@@ -104,7 +105,9 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def supply_labware_type
-    supply_labwares ? labware_type.name : "Label only"
+    return "Label only" unless supply_labwares
+    return labware_type.name + " with decappers" if supply_decappers
+    return labware_type.name
   end
 
   def update(params)
@@ -163,12 +166,20 @@ class MaterialSubmission < ApplicationRecord
     nil
   end
 
-  # get the total number of samples for this submission
+  # Get the total number of samples for this submission
+  # Do not sum the size of the labware but the actual number (length) of contents
   def total_samples
-    labwares.sum(&:size)
+    labwares.sum { |labware| labware.contents.length }
   end
 
-  private
+private
+
+  # Make sure supply_decappers is false unless other fields are appropriate
+  def check_supply_decappers
+    if supply_decappers && !(supply_labwares && labware_type&.uses_decapper)
+      self.supply_decappers = false
+    end
+  end
 
   # Deletes any labware linked to this submission, and creates
   # new ones based on the requested labware fields

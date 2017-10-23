@@ -16,7 +16,7 @@ def tube_barcode_definition(name, type_id, barcode_type)
 		{"horizontal_magnification":"05","vertical_magnification":"05","font":"H","space_adjustment":"02","rotational_angles":"11",
 			"x_origin":"0120","y_origin":"0210","field_name":"top_line"},
 		{"horizontal_magnification":"05","vertical_magnification":"1","font":"G","space_adjustment":"00","rotational_angles":"00",
-			"x_origin":"0240","y_origin":"0165","field_name":"round_label_top_line"},
+			"x_origin":"0220","y_origin":"0165","field_name":"round_label_top_line"},
 		{"horizontal_magnification":"05","vertical_magnification":"1","font":"G","space_adjustment":"00","rotational_angles":"00",
 			"x_origin":"0220","y_origin":"0193","field_name":"round_label_bottom_line"}
 		],

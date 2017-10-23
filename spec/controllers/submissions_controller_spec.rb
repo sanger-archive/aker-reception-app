@@ -10,6 +10,7 @@ RSpec.describe SubmissionsController, type: :controller do
           when :labware
             {
               supply_labwares: true,
+              supply_decappers: true,
               no_of_labwares_required: 1,
               status: 'labware',
               labware_type_id: labware_type.id
@@ -73,7 +74,8 @@ RSpec.describe SubmissionsController, type: :controller do
   let(:labware_type) do
     FactoryGirl.create :labware_type, {
       num_of_cols: 1,
-      num_of_rows: 1
+      num_of_rows: 1,
+      uses_decapper: true,
     }
   end
 
@@ -161,7 +163,7 @@ RSpec.describe SubmissionsController, type: :controller do
         allow(controller).to receive(:current_user).and_return(user)
       end
 
-      it "does not update the submission if the state is not pending (ie broken)" do
+      it "does not update the submission if the state is not pending (i.e. broken)" do
         allow_any_instance_of(DispatchService).to receive(:process).and_raise  "This step fails"
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
@@ -208,6 +210,7 @@ RSpec.describe SubmissionsController, type: :controller do
 
         put :update, step_params(material_submission, :labware)
         material_submission.reload
+        expect(material_submission.supply_decappers).to eq(true)
 
         put :biomaterial_data, step_params(material_submission, :provenance)
         material_submission.reload

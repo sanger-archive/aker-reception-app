@@ -67,7 +67,7 @@ class EventMessage
       ],
       "metadata": {
         "barcode": @reception.barcode_value,
-        "samples": @reception.labware.size,
+        "samples": @reception.labware.contents.length,
         "zipkin_trace_id": trace_id,
       },
     }.to_json
