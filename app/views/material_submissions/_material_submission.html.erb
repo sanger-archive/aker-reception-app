@@ -1,7 +1,7 @@
 <tr>
   <td><%= material_submission.labware_type&.name || '(Not selected)' %></td>
   <td><%= material_submission.no_of_labwares_required %></td>
-  <td><%= material_submission.supply_labwares.nil? ? '(Not selected)' : material_submission.supply_labwares %></td>
+  <td><%= supply_labwares_desc(material_submission) %></td>
   <td><%= localize(material_submission.updated_at, format: :terse) %></td>
   <td>
     <% if material_submission.active? %>

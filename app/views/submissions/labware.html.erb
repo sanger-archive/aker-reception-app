@@ -2,14 +2,23 @@
 
 <%= bootstrap_form_for material_submission, url: wizard_path, method: :put  do |f| %>
 
-  <%= f.collection_radio_buttons(:labware_type_id, LabwareType.all, :id, :name,
-    label: '1) How would you like to submit your material?') %>
+  <%= f.form_group :labwar_type_id, label: { text: "1) How would you like to submit your material?" } do %>
+    <% LabwareType.all.each do |lt| %>
+      <% classes = lt.uses_decapper ? "labwaretype decappable" : "labwaretype" %>
+      <%= f.radio_button :labware_type_id, lt.id, label: lt.name, class: classes %>
+    <% end %>
+  <% end %>
 
   <%= f.number_field :no_of_labwares_required,
-    label: '2) How many plates or tubes do you require?', min: 0, step: 1 %>
+  label: '2) How many plates or tubes do you require?', min: 0, step: 1 %>
 
   <%= f.select :supply_labwares, [['No', false], ['Yes', true]],
-    label: '3) Do you require plates or tubes to be supplied to you?' %>
+  {label: '3) Do you require plates or tubes to be supplied to you?'},
+  { class: 'supplylabware' } %>
+
+  <%= f.select :supply_decappers, [['No', false], ['Yes', true]],
+  { label: '4) Do you require decappers to be supplied to you?' },
+  { class: 'supplydecapper' } %>
 
   <%= render 'buttons', material_submission: material_submission, f: f %>
 
