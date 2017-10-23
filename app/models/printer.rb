@@ -15,12 +15,17 @@ class Printer < ApplicationRecord
 		return true if Rails.configuration.printing_disabled
 		print_printables(submissions.flat_map { |submission| submission_to_printables(submission) })
 	end
+
 	def print_printables(printables)
 		if label_type=='Plate'
 			print_plates(name, Printer.PLATE_TEMPLATE, printables)
 		else
 			print_tubes(name, Printer.TUBE_TEMPLATE, printables)
 		end
+	end
+
+	def printer_description
+		"#{name} (#{label_type})"
 	end
 
 private
