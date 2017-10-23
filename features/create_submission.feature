@@ -16,7 +16,6 @@ And I have a material service running
 Scenario:
 
 Given I visit the homepage
-Then show me the page
 
 And I click on "Create New Submission"
 
