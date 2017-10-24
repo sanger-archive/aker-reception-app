@@ -1,5 +1,6 @@
 <tr>
   <td><%= check_box_tag("dispatched_submission_ids[]", dispatched_submission.id) unless readonly %></td>
+  <td><%= dispatched_submission.address %></td>
   <td><%= dispatched_submission.id %></td>
   <td><%= dispatched_submission.status %></td>
   <td><%= dispatched_submission.owner_email %></td>
