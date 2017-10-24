@@ -20,6 +20,10 @@ class Labware < ApplicationRecord
     print_count > 0
   end
 
+  def barcode_dispatched?
+    material_submission && material_submission.dispatched?
+  end
+
   def received?
     material_reception.present?
   end

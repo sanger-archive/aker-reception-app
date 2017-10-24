@@ -34,6 +34,9 @@ class MaterialSubmission < ApplicationRecord
 
   after_initialize :create_uuid
 
+  scope :dispatched, -> { where(dispatched: true) }
+  scope :not_dispatched, -> { where(dispatched: false) }
+
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :printed, -> { where(status: MaterialSubmission.PRINTED) }
   # broken submissions are not listed
@@ -42,6 +45,10 @@ class MaterialSubmission < ApplicationRecord
 
   def create_uuid
     self.material_submission_uuid ||= SecureRandom.uuid
+  end
+
+  def dispatched?
+    dispatched
   end
 
   def active?

@@ -35,4 +35,12 @@ private
     end
   end
 
+  def barcode_dispatched?
+    return unless labware
+
+    if not labware.barcode_dispatched?
+      errors.add(:labware, "barcode was not dispatched prior reception. Please contact the administrator.")
+    end    
+  end
+
 end

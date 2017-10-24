@@ -4,7 +4,6 @@ require 'ostruct'
 
 RSpec.describe SubmissionsController, type: :controller do
 
-
   def step_params(material_submission, step_name)
     p = {
         material_submission: case step_name
