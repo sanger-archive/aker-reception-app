@@ -28,6 +28,5 @@ module Submission
     end
 
     config.ldap = config_for(:ldap)
-
   end
 end
