@@ -103,6 +103,7 @@ RSpec.describe Labware, type: :model do
     context "when labware has a reception" do
       before do
         @labware = create(:labware, print_count: 1)
+        @labware.material_submission.update_attributes(dispatched: true)
         create(:material_reception, labware_id: @labware.id)
       end
 

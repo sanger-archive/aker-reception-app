@@ -3,6 +3,7 @@ class MaterialReception < ApplicationRecord
   belongs_to :labware
   validates :labware_id, uniqueness: { message: "already received" }
   validate :barcode_printed?, on: :create
+  validate :barcode_dispatched?, on: :create
 
   def barcode_value
     labware&.barcode
@@ -39,7 +40,7 @@ private
     return unless labware
 
     if not labware.barcode_dispatched?
-      errors.add(:labware, "barcode was not dispatched prior reception. Please contact the administrator.")
+      errors.add(:labware, "barcode has not been dispatched prior reception. Please contact the administrator.")
     end    
   end
 
