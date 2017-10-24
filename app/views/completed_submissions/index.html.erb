@@ -1,5 +1,5 @@
 <% content_for :main_title do %>
-  Completed Submissions
+  Dispatch Labware
 <% end %>
 <%= form_tag(controller: "completed_submissions", action: "print", method: "post") do %>
 
@@ -16,6 +16,15 @@
   <div class="col-md-12">
     <h4>These barcodes need printing</h4>
     <%= render "completed_submission_table", completed_submissions: @unprinted_submissions %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-offset-8 col-md-4 text-right">
+    <b>Printer:</b>
+    <%= collection_select(:printer, :name, @printers, :name, :printer_description, {},
+        { class: "printer_select", id: "printer_name_top"}) %>
+    <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 10px;', id: "print_button_top") %>
   </div>
 </div>
 
@@ -40,14 +49,6 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-offset-8 col-md-4 text-right">
-    <b>Printer:</b>
-    <%= collection_select(:printer, :name, @printers, :name, :printer_description, {},
-        { class: "printer_select", id: "printer_name_bottom" }) %>
-    <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 10px;', id: "print_button_bottom") %>
-  </div>
-</div>
 
 <div class="row" id="printed-submissions-row">
   <div class="col-md-12">
@@ -55,7 +56,26 @@
           Previously Printed Submissions
         </a>
     <div id="collapsePrintedSubmissions" class="collapse">
+      <div class="row">
+        <div class="col-md-offset-8 col-md-4 text-right">
+          <b>Printer:</b>
+          <%= collection_select(:printer, :name, @printers, :name, :printer_description, {},
+              { class: "printer_select", id: "printer_name_bottom" }) %>
+          <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 10px;', id: "print_button_bottom") %>
+        </div>
+      </div>
+
       <%= render "completed_submission_table", completed_submissions: @printed_submissions %>
+
+      <div class="row">
+        <div class="col-md-offset-8 col-md-4 text-right">
+          <b>Printer:</b>
+          <%= collection_select(:printer, :name, @printers, :name, :printer_description, {},
+              { class: "printer_select", id: "printer_name_bottom" }) %>
+          <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 10px;', id: "print_button_bottom") %>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
