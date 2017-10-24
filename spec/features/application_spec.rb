@@ -26,7 +26,7 @@ RSpec.describe 'Application', type: :feature do
 
       it "appends '| Aker' to completed submission title" do
         visit completed_submissions_path
-        expect(page).to have_content("Completed Submissions")
+        expect(page).to have_content("Dispatch Labware")
       end
 
       it "appends '| Aker' to material receptions title" do

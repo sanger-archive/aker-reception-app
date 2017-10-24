@@ -42,15 +42,13 @@ $(document).on('turbolinks:load', function() {
   // Mirrors dropdown selection between both dropdown menus on the Completed
   // Submissions page
   $('.printer_select').change(function (event) {
-    // Get the selection from the dropdown that was changed then update the
-    // other dropdown to the same value
-    if (event.target.id == "printer_name_top") {
-      var selected_printer = $('#printer_name_top').val();
-      $('#printer_name_bottom').val(selected_printer);
-    } else if (event.target.id == "printer_name_bottom") {
-      var selected_printer = $('#printer_name_bottom').val();
-      $('#printer_name_top').val(selected_printer);
-    }
+    var value = $(event.target).val();
+    var id = event.target.id;
+    $('.printer_select').each(function(pos, node) {
+      if (node.id!==id) {
+        $(node).val(value);
+      }
+    })
   });
 
 });
