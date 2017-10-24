@@ -96,4 +96,10 @@ Rails.application.configure do
   config.login_url = config.auth_service_url+'/login'
   config.logout_url = config.auth_service_url+'/logout'
 
+  config.urls = { submission: "",
+                  permissions: "",
+                  sets: "",
+                  projects: "",
+                  work_orders: "" }
+
 end
