@@ -21,6 +21,24 @@
 
 <div class="row">
   <div class="col-md-12">
+    <h2>Awaiting dispatch Submissions</h2>
+    <%= render partial: "dispatched_submission_table", locals: { dispatched_submissions: @not_dispatched_submissions, readonly: false}  %>
+    <% if @not_dispatched_submissions.count > 0 %>
+      <%= submit_tag("Dispatch", formaction: completed_submissions_dispatch_url, class: 'btn btn-primary', style: 'margin-left: 10px;', id: "print_button_bottom") %>    
+    <% end %>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-12">
+    <h2>Dispatched Submissions</h2>
+    <%= render partial: "dispatched_submission_table", locals: { dispatched_submissions: @dispatched_submissions, readonly: true } %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
     <h2>Previously Printed Submissions</h2>
     <%= render "completed_submission_table", completed_submissions: @printed_submissions %>
   </div>
@@ -36,3 +54,4 @@
 </div>
 
 <% end %>
+

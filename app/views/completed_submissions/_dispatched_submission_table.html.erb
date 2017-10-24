@@ -1,0 +1,18 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Submission ID</th>
+      <th>Status</th>
+      <th><%= I18n.translate "activerecord.attributes.material_submission.email" %></th>
+      <th>Date Created</th>
+      <th>Number of labware</th>
+      <th>Supply labware type</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <%= render partial: "dispatched_submission", collection: dispatched_submissions, locals: { readonly: readonly } %>
+  </tbody>
+
+</table>

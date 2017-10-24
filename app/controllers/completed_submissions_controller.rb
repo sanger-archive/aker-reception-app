@@ -1,8 +1,11 @@
 class CompletedSubmissionsController < ApplicationController
 
 	def index
-		@unprinted_submissions = MaterialSubmission.active.sort_by(&:id).reverse
-		@printed_submissions = MaterialSubmission.printed.sort_by(&:id).reverse
+		ms_ordered = MaterialSubmission.order(id: :desc)
+		@unprinted_submissions = ms_ordered.active
+		@printed_submissions = ms_ordered.printed
+		@dispatched_submissions = ms_ordered.dispatched
+		@not_dispatched_submissions = ms_ordered.printed.not_dispatched
 		@printers = Printer.all
 	end
 
@@ -27,6 +30,22 @@ class CompletedSubmissionsController < ApplicationController
 		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Print issued to #{printparams[:printer_name]}"}
 	end
 
+	def dispatch_submission
+		unless params.has_key?(:dispatched_submission_ids)
+			return print_error "You must select at least one submission to dispatch"
+		end
+
+		submissions = MaterialSubmission.find(dispatch_params[:dispatched_submission_ids])
+		unless submissions.all? {|s| s.status == MaterialSubmission.PRINTED }
+			return print_error "Some of the submissions to dispatch have not been printed yet"
+		end
+
+		submissions.each do |submission|
+			submission.update_attributes!(dispatched: true)
+		end
+		redirect_back fallback_location: completed_submissions_url, flash: { notice: "Submissions dispatched" }
+	end
+
 	private
 
 	def print_params
@@ -34,6 +53,12 @@ class CompletedSubmissionsController < ApplicationController
 			completed_submission_ids: params.require(:completed_submission_ids).map { |s| s.to_i },
 			printer_name: params.require(:printer).require(:name)
 		}
+	end
+
+	def dispatch_params
+		{
+			dispatched_submission_ids: params.require(:dispatched_submission_ids).map { |s| s.to_i }
+		}		
 	end
 
   def print_error(message)

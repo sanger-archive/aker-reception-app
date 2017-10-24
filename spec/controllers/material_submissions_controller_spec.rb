@@ -2,6 +2,7 @@ require 'rails_helper'
 require 'ostruct'
 
 RSpec.describe MaterialSubmissionsController, type: :controller do
+  it_behaves_like 'service that validates credentials', [:index]
 
   describe "#index" do
     context 'when no JWT is included' do
