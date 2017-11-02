@@ -55,9 +55,14 @@
 
   proto.onReceivedBarcode = function(e, json) {
     if (typeof json.error !== 'undefined') {
+      $('.alert').toggleClass('alert-success', false);
+      $('.alert').toggleClass('alert-danger', true);
       this.alert(json.error);
     } else {
-      $('.alert').toggleClass('hidden', true);
+      $('.alert .alert-msg').html("Barcode scanned");
+      $('.alert').toggleClass('alert-danger', false);
+      $('.alert').toggleClass('alert-success', true);
+      $('.alert').toggleClass('hidden', false);
       this.addRow(json);
     }
   };
