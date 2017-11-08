@@ -84,6 +84,13 @@ class MaterialSubmission < ApplicationRecord
     active? || status==MaterialSubmission.PRINTED
   end
 
+  def after_provenance?
+    return false unless labwares.present?
+    return false unless status
+    return false if ['labware', 'provenance'].include?(status)
+    return labwares.all? { |labware| labware.contents.present? }
+  end
+
   def pending?
     status.nil? || ['labware', 'provenance', 'ethics', 'dispatch'].include?(status)
   end
