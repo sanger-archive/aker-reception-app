@@ -48,6 +48,14 @@ GIT
     aker_stamp_client (0.2.0)
 
 GIT
+  remote: https://github.com/sanger/bootstrap-sass.git
+  revision: adb7ae34d498024611e4d1ad6adf1b4d38f96b0e
+  specs:
+    bootstrap-sass (3.3.7)
+      autoprefixer-rails (>= 5.2.1)
+      sass (>= 3.3.4)
+
+GIT
   remote: https://github.com/sanger/json_api_client.git
   revision: 680022ffc054bc5d69efc5cea31f85806362bfa5
   specs:
@@ -129,16 +137,13 @@ GEM
     backports (3.10.3)
     bcrypt (3.1.11)
     bindex (0.5.0)
-    bootstrap-sass (3.3.7)
-      autoprefixer-rails (>= 5.2.1)
-      sass (>= 3.3.4)
     bootstrap-table-rails (1.11.1.1)
     bootstrap_form (2.7.0)
     builder (3.2.3)
     bunny (0.9.0.pre10)
       amq-protocol (>= 1.4.0)
     byebug (9.1.0)
-    cancancan (2.0.0)
+    cancancan (2.1.0)
     capybara (2.15.4)
       addressable
       mini_mime (>= 0.1.3)
@@ -452,7 +457,7 @@ DEPENDENCIES
   aker_credentials_gem!
   aker_permission_gem!
   aker_stamp_client!
-  bootstrap-sass (~> 3.3.6)
+  bootstrap-sass (~> 3.3.6)!
   bootstrap-table-rails
   bootstrap_form
   bunny (= 0.9.0.pre10)

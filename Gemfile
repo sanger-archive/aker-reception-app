@@ -62,8 +62,6 @@ gem "bunny", "= 0.9.0.pre10"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # ?
-gem 'bootstrap-sass', '~> 3.3.6'
-# ?
 gem 'font-awesome-sass'
 
 
@@ -84,6 +82,8 @@ gem 'json_api_client', github: 'sanger/json_api_client'
 gem 'aker_credentials_gem', github: 'sanger/aker-credentials'
 # ?
 gem 'aker_permission_gem', github: 'sanger/aker-permission'
+# Official Sass port of Bootstrap 2 and 3. http://getbootstrap.com/css/#sass
+gem 'bootstrap-sass', '~> 3.3.6', github: 'sanger/bootstrap-sass'
 
 
 ###
