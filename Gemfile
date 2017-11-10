@@ -109,9 +109,11 @@ group :test do
   gem 'rspec-json_expectations'
   # ?
   gem 'timecop'
-  # ?
+  # Code coverage for Ruby 1.9+ with a powerful configuration library and automatic merging of
+  # coverage across test suites - https://github.com/colszowka/simplecov
   gem 'simplecov', require: false
-  # ?
+  # SimpleCov formatter to generate a simple index.html Rcov style
+  # https://github.com/fguillen/simplecov-rcov
   gem 'simplecov-rcov'
   # ?
   gem 'rubycritic'
@@ -134,7 +136,7 @@ group :development, :test do
   # ?
   gem 'poltergeist'
   # ?
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   # database_cleaner is not required, but highly recommended
   gem 'database_cleaner'
 end
