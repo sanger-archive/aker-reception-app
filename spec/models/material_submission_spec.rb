@@ -532,7 +532,12 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when the labware type uses decappers, supply labwares is true, and supply decappers is true" do
       it { expect(submission.supply_decappers).to eq(true) }
     end
+  end
 
+  describe '#owner_email' do
+    it 'should be sanitised' do
+      expect(create(:material_submission, owner_email: '   USER@EMAIL  ').owner_email).to eq('user@email')
+    end
   end
 
 end
