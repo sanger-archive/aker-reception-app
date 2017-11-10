@@ -33,27 +33,27 @@ RSpec.describe CompletedSubmissionsController, type: :controller  do
         allow(@printer).to receive(:print_submissions).and_return(true)
       end
       it 'displays a text telling that' do
-        post :print, @params
+        post :print, params: @params
         expect(response).to redirect_to(completed_submissions_url)
         expect(flash[:notice]).to be_present
       end
 
       it 'increments the count of prints for each labware printed' do
         labware_prints = @labwares.map(&:print_count)
-        post :print, @params 
+        post :print, params: @params 
         expect(@submission.labwares.map{|l| l.print_count}.zip(labware_prints).all? do |a,b|
           a==b
         end).to eq(true)
       end
 
       it 'changes the status of the submission' do
-        post :print, @params 
+        post :print, params: @params 
         @submission.reload
         expect(@submission.status).to eq(MaterialSubmission.PRINTED)
       end
 
       it 'redirects to the printing page' do
-        post :print, @params 
+        post :print, params: @params 
         expect(response).to have_http_status(:redirect)
       end
 
@@ -71,7 +71,7 @@ RSpec.describe CompletedSubmissionsController, type: :controller  do
     end
     context 'when no submission has been selected' do
       it 'shows an error' do
-        post :dispatch_submission, {completed_submission_ids: []}
+        post :dispatch_submission, params: {completed_submission_ids: []}
         expect(flash[:error]).to be_present
       end      
     end
@@ -81,7 +81,7 @@ RSpec.describe CompletedSubmissionsController, type: :controller  do
         }
       }
       it 'does not dispatch the submission' do
-        post :dispatch_submission, {dispatched_submission_ids: [submission.id]}
+        post :dispatch_submission, params: {dispatched_submission_ids: [submission.id]}
         expect(submission.dispatched?).to eq(false)
       end
     end
@@ -91,7 +91,7 @@ RSpec.describe CompletedSubmissionsController, type: :controller  do
         }
       }      
       it 'selects the submission as dispatched' do
-        post :dispatch_submission, {dispatched_submission_ids: [submission.id]}
+        post :dispatch_submission, params: {dispatched_submission_ids: [submission.id]}
         submission.reload
         expect(submission.dispatched?).to eq(true)        
       end
