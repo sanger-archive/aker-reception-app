@@ -10,7 +10,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
   context 'when no JWT is included' do
     before do
       @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
-      @submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
+      @submission = FactoryBot.create(:material_submission, owner_email: @user.email)
     end
     it 'redirects to the login page' do
       get :index
@@ -24,10 +24,10 @@ RSpec.describe MaterialReceptionsController, type: :controller do
       allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 
-      @submission = FactoryGirl.create(:material_submission, owner_email: @user.email)
+      @submission = FactoryBot.create(:material_submission, owner_email: @user.email)
       @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1")
       @submission.labwares << @labware
-      @labware_type = FactoryGirl.create(:labware_type, {:row_is_alpha => true})
+      @labware_type = FactoryBot.create(:labware_type, {:row_is_alpha => true})
     end
 
     describe "When scanning a barcode" do
