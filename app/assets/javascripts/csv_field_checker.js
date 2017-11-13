@@ -1,5 +1,5 @@
 const MODAL_ID = 'myModal';
-const REQUIRED_SELECT_ID = 'required-fields';
+const FORM_FIELD_SELECT_ID = 'form-fields';
 const CSV_SELECT_ID = 'fields-from-csv';
 const MAPPING_TABLE_ID = 'matched-fields-table';
 const MODAL_ALERT_REQUIRED_ID = 'modal-alert-required';
@@ -9,14 +9,16 @@ const MODAL_ALERT_IGNORED_ID = 'modal-alert-ignored';
 const POSITION_FIELD = {
   required: true,
   field_name_regex: "^(well(\\s*|_*|-*))?position$",
-  friendly_name: "Position"
+  friendly_name: "Position",
+  show_on_form: true
 }
 
 // Set a few global variables -- bad idea, should move this all into a class!
 var matchedFields = {};
 var schema = {};
-var requiredFields = [];
+var fieldsOnForm = [];
 var fieldsFromCSV = [];
+var requiredFields = [];
 var file = null;
 var dataTable = null;
 
@@ -37,6 +39,7 @@ function checkCSVFields(table, files) {
 
   // Get the schema from the rails view
   schema = materialSchema.properties;
+  fieldsOnForm = materialSchema.show_on_form;
   requiredFields = materialSchema.required;
 
   // Check that we have received a schema
@@ -51,7 +54,7 @@ function checkCSVFields(table, files) {
   // Add position field to schema and required list
   if (!schema.position) {
     schema.position = POSITION_FIELD;
-    materialSchema.required.push('position');
+    materialSchema.show_on_form.push('position');
   }
 
   // Show the schema if we need to debug
@@ -83,13 +86,13 @@ function checkCSVFields(table, files) {
         $('#' + CSV_SELECT_ID).empty();
         // Add an option for each field
         $.each(fieldsFromCSV, function (ffcKey, ffcValue) {
-          addFieldToSelect(CSV_SELECT_ID, ffcValue, ffcValue);
+          addFieldToSelect(CSV_SELECT_ID, ffcValue, ffcValue, false);
 
-          // Match required and CSV fields
-          // Iterate through the CSV fields, checking if it matches the regex in the required fields
+          // Match form fields and CSV fields
+          // Iterate through the CSV fields, checking if it matches the regex in the visible fields
           $.each(schema, function (rfKey, rfValue) {
-            // We are only interested in the required fields at this point and they do need a regex to match against
-            if (rfValue.hasOwnProperty('required') && rfValue.required && rfValue.hasOwnProperty('field_name_regex')) {
+            // We are only interested in the visible (show_on_form = true) fields at this point and they need a regex to match against
+            if (rfValue.hasOwnProperty('show_on_form') && rfValue.show_on_form && rfValue.hasOwnProperty('field_name_regex')) {
               // Match using case-insensitivity
               var pattern = new RegExp(rfValue.field_name_regex, 'i');
 
@@ -106,12 +109,10 @@ function checkCSVFields(table, files) {
         debug(matchedFields);
 
         // Create "required fields" select
-        $('#' + REQUIRED_SELECT_ID).empty();
+        $('#' + FORM_FIELD_SELECT_ID).empty();
         $.each(schema, function (key, value) {
-          if (value.hasOwnProperty('required') && value.required) {
-            if (value.friendly_name) {
-              addFieldToSelect(REQUIRED_SELECT_ID, key, value.friendly_name + ' (' + key + ')');
-            }
+          if (value.hasOwnProperty('show_on_form') && value.show_on_form && value.friendly_name) {
+            addFieldToSelect(FORM_FIELD_SELECT_ID, key, value.friendly_name + ' (' + key + ')', value.required);
           }
         });
 
@@ -127,7 +128,7 @@ function checkCSVFields(table, files) {
         // Only show the modal dialog if there are un-matched fields or we have ignored fields from the CSV
         var fieldsIgnored = csvFieldsIgnored();
         if (fieldsIgnored) $('#' + MODAL_ALERT_IGNORED_ID).show();
-        if (!allRequiredFieldsMatched() || fieldsIgnored) {
+        if (!allRequiredMatched() || fieldsIgnored) {
           $('#' + MODAL_ID).modal('toggle');
         } else {
           fillInTableFromFile();
@@ -141,34 +142,33 @@ function checkCSVFields(table, files) {
 
 // Checks if there are more fields in the CSV that could have been ignored
 function csvFieldsIgnored() {
-  if ((Object.keys(matchedFields).length == Object.keys(requiredFields).length)
-        && (fieldsFromCSV.length > Object.keys(requiredFields).length)) {
+  if ((Object.keys(matchedFields).length == Object.keys(fieldsOnForm).length)
+        && (fieldsFromCSV.length > Object.keys(fieldsOnForm).length)) {
     return true;
   }
   return false;
 }
 
 // Checks if all required fields have been matched
-function allRequiredFieldsMatched() {
-  if (Object.keys(matchedFields).length < Object.keys(requiredFields).length) {
-    return false;
-  }
-  return true;
+function allRequiredMatched() {
+  return requiredFields.every(function(val) {
+    return Object.keys(matchedFields).indexOf(val) >= 0;
+  })
 }
 
 // Remove the matched fields from the selects to prevent users from selecting them again
-function removeFieldsFromSelects(requiredField, csvField) {
-  $("#" + REQUIRED_SELECT_ID + " option[value='" + requiredField + "']").remove();
+function removeFieldsFromSelects(formField, csvField) {
+  $("#" + FORM_FIELD_SELECT_ID + " option[value='" + formField + "']").remove();
   $("#" + CSV_SELECT_ID + " option[value='" + csvField + "']").remove();
 }
 
 // Adds the required and CSV field to the matched table
-function addRowToMatchedTable(requiredField, csvField) {
+function addRowToMatchedTable(formField, csvField) {
   $('#' + MAPPING_TABLE_ID + ' > tbody:last-child')
     .append($('<tr>')
       .append(
-        $('<td>').text(schema[requiredField].friendly_name),
-        $('<td>').text(requiredField),
+        $('<td>').text(schema[formField].friendly_name),
+        $('<td>').text(formField),
         $('<td>').text(csvField),
         $('<td>').append(
           $('<button>').attr({
@@ -189,17 +189,17 @@ function addRowToMatchedTable(requiredField, csvField) {
 
 // Match the fields selected in the required and CSV selects
 function matchFields() {
-  var selectedRequiredField = $('#' + REQUIRED_SELECT_ID + ' :selected').val();
+  var selectedformField = $('#' + FORM_FIELD_SELECT_ID + ' :selected').val();
   var selectedFieldFromCSV = $('#' + CSV_SELECT_ID + ' :selected').val();
 
   // Check that both fields have been selected
-  if (selectedRequiredField && selectedFieldFromCSV) {
+  if (selectedformField && selectedFieldFromCSV) {
     // Add the new match
-    matchedFields[selectedRequiredField] = selectedFieldFromCSV;
+    matchedFields[selectedformField] = selectedFieldFromCSV;
 
     // Add match to table and remove fields from the selects
-    addRowToMatchedTable(selectedRequiredField, selectedFieldFromCSV);
-    removeFieldsFromSelects(selectedRequiredField, selectedFieldFromCSV);
+    addRowToMatchedTable(selectedformField, selectedFieldFromCSV);
+    removeFieldsFromSelects(selectedformField, selectedFieldFromCSV);
   } else {
     alert("Please select a required field and a field from the CSV.");
   }
@@ -208,28 +208,28 @@ function matchFields() {
 // Unmatch fields and add them back to the selects
 function unmatchFields(row) {
   // Extract the data from the row
-  var requiredField = row.children()[1].innerHTML;
+  var formField = row.children()[1].innerHTML;
   var fieldFromCSV = row.children()[2].innerHTML;
 
   // Add fields back to the selects
-  addFieldToSelect(REQUIRED_SELECT_ID, requiredField, schema[requiredField].friendly_name + ' (' + requiredField + ')');
-  addFieldToSelect(CSV_SELECT_ID, fieldFromCSV, fieldFromCSV);
+  addFieldToSelect(FORM_FIELD_SELECT_ID, formField, schema[formField].friendly_name + ' (' + formField + ')', schema[formField].required);
+  addFieldToSelect(CSV_SELECT_ID, fieldFromCSV, fieldFromCSV, false);
 
   // Remove the property
-  delete matchedFields[requiredField];
+  delete matchedFields[formField];
 }
 
 // Add options back to the specific select
-function addFieldToSelect(select, value, text) {
+function addFieldToSelect(select, value, text, required) {
   $('#' + select).append($('<option>', {
     value: value,
-    text : text
+    text : required ? '*' + text : text
   }));
 }
 
 // Completes the matching
 function finishCSVCheck() {
-  if (allRequiredFieldsMatched()) {
+  if (allRequiredMatched()) {
     fillInTableFromFile();
 
     // Hide the modal after all the data has been imported
@@ -279,15 +279,21 @@ function fillInTableFromFile() {
         };
 
         // Fill in the actual row with the data
-        $.each(matchedFields, function (requiredField, csvField) {
+        $.each(matchedFields, function (formField, csvField) {
+          if (schema[formField]["allowed"] === undefined) {
+            // Text input fields
+            tableRow.find('input[name*="' + formField + '"]').val(row[csvField]);
 
-          tableRow.find('input[name*="' + requiredField + '"]').val(row[csvField]);
-
-          // We also need to set the value attribute for Capybara to see and pass the test
-          // .prop is similar to .val so .attr seems to be working
-          // https://stackoverflow.com/a/6057122
-          // TODO: Find a fix or implement correctly as we are double filling the value here
-          tableRow.find('input[name*="' + requiredField + '"]').attr('value', row[csvField]);
+            // We also need to set the value attribute for Capybara to see and pass the test
+            // .prop is similar to .val so .attr seems to be working
+            // https://stackoverflow.com/a/6057122
+            // TODO: Find a fix or implement correctly as we are double filling the value here
+            tableRow.find('input[name*="' + formField + '"]').attr('value', row[csvField]);
+          } else {
+            // Dropdown input fields
+            tableRow.find('select[name*="' + formField + '"]').val(row[csvField].toLowerCase());
+            // TODO regex checks?
+          }
         });
 
         return true;
