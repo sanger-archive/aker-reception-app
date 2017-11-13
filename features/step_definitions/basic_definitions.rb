@@ -3,8 +3,8 @@ require 'cucumber/rspec/doubles'
 
 Before do
   user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
-  MaterialSubmissionsController.any_instance.stub(:current_user).and_return(user)
-  SubmissionsController.any_instance.stub(:current_user).and_return(user)
+  ApplicationController.any_instance.stub(:check_credentials)
+  ApplicationController.any_instance.stub(:current_user).and_return(user)
 end
 
 Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
