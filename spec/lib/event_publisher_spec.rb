@@ -4,8 +4,10 @@ require 'set'
 
 RSpec.describe 'EventPublisher' do
 
+  let(:bunny) { double('Bunny') }
+
   setup do
-    Bunny ||= double('Bunny')
+    stub_const("Bunny", bunny)
     allow_any_instance_of(EventPublisher).to receive(:add_close_connection_handler).and_return true
   end
 
@@ -17,7 +19,7 @@ RSpec.describe 'EventPublisher' do
 
     allow(@queue).to receive(:bind).with(@exchange).and_return(@queue)
     allow(@queue).to receive(:name).and_return("queue name")
-    allow(Bunny).to receive(:new).with(params[:event_conn], threaded: false).and_return(@connection)
+    allow(bunny).to receive(:new).with(params[:event_conn], threaded: false).and_return(@connection)
     allow(@connection).to receive(:start)
     allow(@connection).to receive(:create_channel).and_return(@channel)
     allow(@channel).to receive(:queue).and_return(@queue)
@@ -74,7 +76,6 @@ RSpec.describe 'EventPublisher' do
 
   context '#publish' do
     setup do
-      Bunny = double('Bunny')
       @params = { event_conn: 'event_conn', queue_name: 'queue_name' }
       mock_connection(@params)
       @event_message = instance_double("EventMessage")
