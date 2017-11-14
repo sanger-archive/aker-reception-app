@@ -2,9 +2,11 @@
 require 'cucumber/rspec/doubles'
 
 Before do
-  user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
-  ApplicationController.any_instance.stub(:check_credentials)
-  ApplicationController.any_instance.stub(:current_user).and_return(user)
+  user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: ['world'])
+  @logged_in = false
+  allow_any_instance_of(ApplicationController).to receive(:current_user) { @logged_in ? user : nil }
+  allow_any_instance_of(ApplicationController).to receive(:jwt_provided?) { @logged_in }
+  allow_any_instance_of(ApplicationController).to receive(:check_credentials).and_wrap_original { |m, *args| @logged_in || m.call(*args) }
 end
 
 Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
@@ -20,7 +22,7 @@ end
 
 Given(/^I have a material service running$/) do
   MatconClient::Material.stub(:schema).and_return({
-      'required' => ['supplier_name', 'scientific_name', 'gender', 'donor_id', 'phenotype'],
+      'show_on_form' => ['supplier_name', 'scientific_name', 'gender', 'donor_id', 'phenotype'],
       'properties' => {
         'supplier_name' => {
           'required' => true,
@@ -60,7 +62,7 @@ Given(/^I have the internal contact "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I am logged in$/) do
-  visit root_path
+  @logged_in = true
 end
 
 Given(/^I visit the homepage$/) do
