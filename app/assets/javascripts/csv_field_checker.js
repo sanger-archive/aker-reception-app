@@ -280,18 +280,25 @@ function fillInTableFromFile() {
 
         // Fill in the actual row with the data
         $.each(matchedFields, function (formField, csvField) {
+          var value = row[csvField].trim();
           if (schema[formField]["allowed"] === undefined) {
             // Text input fields
-            tableRow.find('input[name*="' + formField + '"]').val(row[csvField]);
+            tableRow.find('input[name*="' + formField + '"]').val(value);
 
             // We also need to set the value attribute for Capybara to see and pass the test
             // .prop is similar to .val so .attr seems to be working
             // https://stackoverflow.com/a/6057122
             // TODO: Find a fix or implement correctly as we are double filling the value here
-            tableRow.find('input[name*="' + formField + '"]').attr('value', row[csvField]);
+            tableRow.find('input[name*="' + formField + '"]').attr('value', value);
           } else {
             // Dropdown input fields
-            tableRow.find('select[name*="' + formField + '"]').val(row[csvField].toLowerCase());
+            value = value.toLowerCase();
+            var selectValue = schema[formField]["allowed"].find((x) => x.toLowerCase()===value);
+            if (value && !selectValue) {
+              displayError("The value '"+value+"' could not be entered for field '"+formField+"'.");
+              return false;
+            }
+            tableRow.find('select[name*="' + formField + '"]').val(selectValue);
             // TODO regex checks?
           }
         });
