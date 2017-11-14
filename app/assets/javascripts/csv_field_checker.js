@@ -292,8 +292,7 @@ function fillInTableFromFile() {
             tableRow.find('input[name*="' + formField + '"]').attr('value', value);
           } else {
             // Dropdown input fields
-            value = value.toLowerCase();
-            var selectValue = schema[formField]["allowed"].find((x) => x.toLowerCase()===value);
+            var selectValue = find_ci(schema[formField]["allowed"], value);
             if (value && !selectValue) {
               displayError("The value '"+value+"' could not be entered for field '"+formField+"'.");
               return false;
@@ -308,6 +307,17 @@ function fillInTableFromFile() {
       debug("importing complete!");
     },
   })
+}
+
+function find_ci(array, value) {
+  var len = array.length;
+  value = value.toLowerCase();
+  for (var i = 0; i < len; ++i) {
+    if (array[i].toLowerCase()===value) {
+      return array[i];
+    }
+  }
+  return null;
 }
 
 // Helper function to send some debugging messages if we trigger it from a parameter
