@@ -137,7 +137,9 @@ When(/^I upload the file "([^"]*)"$/) do |arg1|
 end
 
 Then(/^I should see data from my file like "([^"]*)"$/) do |arg1|
-  expect(page).to have_selector("input[value='" + arg1 + "']")
+  unless page.has_selector?("input[value='"+arg1+"']")
+    expect(page).to have_selector("select[value='"+arg1+"']")
+  end
 end
 
 Then(/^I should see validation errors$/) do
@@ -149,7 +151,7 @@ Then(/^I should not see any validation errors$/) do
 end
 
 When(/^I enter my details as collaborator$/) do
-  fill_in('Address', :with => 'Some address')
+  fill_in('Address', with: 'Some address')
 end
 
 Then(/^show me the page$/) do

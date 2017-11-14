@@ -298,6 +298,7 @@ function fillInTableFromFile() {
               return false;
             }
             tableRow.find('select[name*="' + formField + '"]').val(selectValue);
+            tableRow.find('select[name*="' + formField + '"]').attr('value', selectValue);
             // TODO regex checks?
           }
         });
