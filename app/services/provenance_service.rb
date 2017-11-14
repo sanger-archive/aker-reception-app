@@ -1,3 +1,5 @@
+require 'ehmdmc_client'
+
 # Service to deal with complicated "provenance" (i.e. data fields for biomaterial)
 class ProvenanceService
 
@@ -12,20 +14,39 @@ class ProvenanceService
     return [] if labware_data.nil?
     error_messages = []
     labware_data.each do |address, bio_data|
-      @schema['properties'].each do | property_name, property_data|
+      @schema['properties'].each do |property_name, property_data|
         field_data = bio_data[property_name]
         field_data = field_data.strip if field_data
         field_data = nil if field_data and field_data.empty?
         if field_data.nil?
-          if property_data['required']
-            add_error(error_messages, labware_index, address, property_name, "The required field #{property_name} is not given.")
+          if property_data['required'] && property_name != 'hmdmc'
+            add_error(error_messages,
+                      labware_index,
+                      address,
+                      property_name,
+                      "The required field #{property_name} is not given.")
           end
         else
+          # Check HMDMC server-side
+          hmdmc_error = check_hmdmc(field_data, bio_data) if property_name == 'hmdmc'
+          unless hmdmc_error.blank?
+            add_error(error_messages,
+                      labware_index,
+                      address,
+                      property_name,
+                      hmdmc_error)
+          end
+
           enum_items = property_data['allowed']
           if enum_items
-            i = enum_items.index { |x| x.casecmp(field_data)==0 }
+            i = enum_items.index { |x| x.casecmp(field_data) == 0 }
             if i.nil?
-              add_error(error_messages, labware_index, address, property_name, "The field #{property_name} needs to be one of the following: #{enum_items}.")
+              add_error(
+                error_messages,
+                labware_index,
+                address,
+                property_name,
+                "The field #{property_name} needs to be one of the following: #{enum_items}.")
             else
               bio_data[property_name] = enum_items[i]
             end
@@ -42,7 +63,7 @@ class ProvenanceService
   # - [true, []] - nothing went wrong
   # - [false, [error1, error2, ...]] - some stuff went wrong; here is the information
   # - [false, []] - something unexpected went wrong
-  def set_biomaterial_data(material_submission, labware_params)
+  def set_biomaterial_data(material_submission, labware_params, current_user)
     all_errors = []
 
     general_error_field = default_field
@@ -60,17 +81,21 @@ class ProvenanceService
             unless value.blank?
               filtered_data[address] = {} if filtered_data[address].nil?
               filtered_data[address][fieldName] = value.strip()
+
+              # Add HMDMC set_by field for each sample
+              filtered_data[address]['hmdmc_set_by'] = current_user.email if fieldName == 'hmdmc'
             end
           end
         end
       end
 
-
       filtered_data = nil if filtered_data.empty?
 
       if filtered_data.nil? && !general_error_field.nil?
         error_messages = [{
-          errors: { general_error_field => "At least one material must be specified for each item of labware" },
+          errors: {
+            general_error_field => 'At least one material must be specified for each item of labware'
+          },
           labwareIndex: labware_index,
           address: labware.positions[0],
           update_successful: false,
@@ -85,7 +110,7 @@ class ProvenanceService
     return success, all_errors
   end
 
-private
+  private
 
   # Get a field from the schema, not caring too much about which one
   def default_field
@@ -98,7 +123,7 @@ private
 
   # Adds a validation error to the given error_messages.
   def add_error(error_messages, labware_index, address, field, msg)
-    i = error_messages.index { |x| x[:labwareIndex]==labware_index && x[:address]==address }
+    i = error_messages.index { |x| x[:labwareIndex] == labware_index && x[:address] == address }
     if i.nil?
       error_message = {
         errors: {},
@@ -114,4 +139,21 @@ private
     error_message[:errors][field.to_sym] = msg
   end
 
+  # Performs some checks based on the presence of HMDMC
+  def check_hmdmc(hmdmc_number, bio_data)
+    # Only allow human material/samples to have HMDMC numbers
+    # TODO: Change to taxon_id
+    species = bio_data['scientific_name']
+    unless species.present? && species.strip.downcase == 'homo sapiens'
+      return 'Only human material are to have HMDMC numbers associated.'
+    end
+    # Check format validity
+    unless hmdmc_number.match(/^[0-9]{2}\/[0-9]{3}$/)
+      return 'The HMDMC number must be of the format ##/###.'
+    end
+    # Check the actual number with the HMDMC service
+    unless EHMDMCClient.validate?(hmdmc_number)
+      return "The HMDMC number #{hmdmc_number} could not be validated with the eHMDMC service."
+    end
+  end
 end

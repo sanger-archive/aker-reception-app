@@ -17,4 +17,5 @@ To initialize the label templates, you need to modify `Rails.configuration.pmb_u
 * [PhantomJS](http://phantomjs.org/) - install with `npm install -g phantomjs`
 
 ## Running tests
+* Before running tests, make sure that the test database has been fully migrated: `bin/rails db:migrate RAILS_ENV=test`
 To execute the current tests, run: `bundle exec rspec`

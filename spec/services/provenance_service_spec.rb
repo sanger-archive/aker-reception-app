@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe :provenance_service do
 
+  let(:user) { 'dirk@sanger.ac.uk' }
+
   setup do
     @schema = {
       'required' => ['REQUIRED_FREE', 'REQUIRED_ENUM'],
@@ -122,7 +124,7 @@ RSpec.describe :provenance_service do
 
   describe "#set_biomaterial_data" do
     def make_submission(labwares)
-      submission = double(:material_submission, labwares: labwares)
+      double(:material_submission, labwares: labwares)
     end
 
     def make_labwares(number)
@@ -180,7 +182,7 @@ RSpec.describe :provenance_service do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
         @data = { "1" => good_labware_data_long, "2" => good_labware_data_short }
-        @success, @errors = @service.set_biomaterial_data(@submission, @data)
+        @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
       it "should succeed" do
@@ -217,7 +219,7 @@ RSpec.describe :provenance_service do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
         @data = { "1" => missing_field_labware_data, "2" => enum_field_wrong_labware_data }
-        @success, @errors = @service.set_biomaterial_data(@submission, @data)
+        @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
       it "should not succeed" do
@@ -248,7 +250,7 @@ RSpec.describe :provenance_service do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
         @data = { "1" => good_labware_data_short }
-        @success, @errors = @service.set_biomaterial_data(@submission, @data)
+        @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
       it "should not succeed" do
@@ -279,7 +281,7 @@ RSpec.describe :provenance_service do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
         @data = { "1" => good_labware_data_short, "2" => { "1" => { 'REQUIRED_FREE' => '' } }}
-        @success, @errors = @service.set_biomaterial_data(@submission, @data)
+        @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
       it "should not succeed" do
