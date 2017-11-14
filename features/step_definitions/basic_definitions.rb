@@ -21,39 +21,77 @@ Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I have a material service running$/) do
-  MatconClient::Material.stub(:schema).and_return({
-      'show_on_form' => ['supplier_name', 'scientific_name', 'gender', 'donor_id', 'phenotype'],
-      'properties' => {
-        'supplier_name' => {
-          'required' => true,
-          'friendly_name' => "Supplier name",
-          'field_name_regex' => "^supplier[-_\s]*(name)?$",
+  MatconClient::Material.stub(:schema).and_return(
+    {
+      "show_on_form" => [
+        "scientific_name",
+        "gender",
+        "donor_id",
+        "phenotype",
+        "supplier_name"
+      ],
+      "required" => [
+        "scientific_name",
+        "gender",
+        "donor_id",
+        "phenotype",
+        "supplier_name"
+      ],
+      "type" => "object",
+      "properties" => {
+        "scientific_name" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Scientific name",
+          "field_name_regex" => "^scientific[-_\\s]*(name)?$",
+          "allowed" => [
+            "Homo sapiens",
+            "Mus musculus"
+          ],
+          "type" => "string"
         },
-        'scientific_name' => {
-          'required' => true,
-          'field_name_regex' => "^scientific[-_\s]*(name)?$",
-          'allowed' => ['Homo sapiens', 'Mus musculus'],
-          'friendly_name' => "Scientific name"
+        "gender" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Gender",
+          "field_name_regex" => "^(gender|sex)$",
+          "allowed" => [
+            "male",
+            "female",
+            "unknown",
+            "not applicable",
+            "mixed",
+            "hermaphrodite"
+          ],
+          "type" => "string"
         },
-        'OPTIONAL' => {
-          'required' => false,
+        "donor_id" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Donor ID",
+          "field_name_regex" => "^donor[-_\\s]*(id)?$",
+          "type" => "string"
         },
-        'gender' => {
-          'required' => true,
-          'field_name_regex' => "^(gender|sex)$",
-          'friendly_name' => "Gender"
+        "phenotype" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => false,
+          "friendly_name" => "Phenotype",
+          "field_name_regex" => "^phenotype$",
+          "type" => "string"
         },
-        'donor_id' => {
-          'required' => true,
-          'field_name_regex' => "^donor[-_\s]*(id)?$",
-          'friendly_name' => "Donor ID"
-        },
-        'phenotype' => {
-          'required' => true,
-          'field_name_regex' => "^phenotype$",
-          'friendly_name' => "Phenotype"
+        "supplier_name" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Supplier name",
+          "field_name_regex" => "^supplier[-_\\s]*(name)?$",
+          "type" => "string"
         }
-      },
+      }
     })
 end
 
@@ -83,7 +121,7 @@ Given(/^I go to next screen$/) do
 end
 
 Then(/^I am in "([^"]*)"$/) do |arg1|
-  expect(page.has_content?(arg1)).to eq(true)
+  expect(page).to have_content(arg1)
 end
 
 Given(/^I select a type of labware$/) do
@@ -103,11 +141,11 @@ Then(/^I should see data from my file like "([^"]*)"$/) do |arg1|
 end
 
 Then(/^I should see validation errors$/) do
-  expect(page.has_content?('validation')).to eq(true)
+  expect(page).to have_content('validation')
 end
 
 Then(/^I should not see any validation errors$/) do
-  expect(page.has_content?('validation')).to eq(false)
+  expect(page).not_to have_content('validation')
 end
 
 When(/^I enter my details as collaborator$/) do
@@ -123,12 +161,12 @@ When(/^I select "([^"]*)" from the "([^"]*)" select$/) do |option, dropdown|
 end
 
 Then(/^I should see "([^"]*)"$/) do |arg1|
-  expect(page.has_content?(arg1)).to eq(true)
+  expect(page).to have_content(arg1)
 end
 
 Then(/^I know my shared submission identifier$/) do
   last_id = MaterialSubmission.last.id.to_s
-  expect(page.has_content?("Submission "+last_id)).to eq(true)
+  expect(page).to have_content("Submission "+last_id)
 end
 
 # Find a select box by (label) name or id and assert the given text is selected
