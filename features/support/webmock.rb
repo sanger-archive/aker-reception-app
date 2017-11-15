@@ -1,2 +1,2 @@
 require 'webmock/cucumber'
-WebMock.disable_net_connect!(:allow_localhost => true)
+WebMock.disable_net_connect!(allow: %r{__identify__})
