@@ -51,9 +51,10 @@ function checkCSVFields(table, files) {
   $('#' + MODAL_ALERT_REQUIRED_ID).hide();
   $('#' + MODAL_ALERT_IGNORED_ID).hide();
 
-  // Add position field to schema and required list
+  // Add position field to schema, required list and show on form list
   if (!schema.position) {
     schema.position = POSITION_FIELD;
+    materialSchema.required.push('position');
     materialSchema.show_on_form.push('position');
   }
 
@@ -294,7 +295,7 @@ function fillInTableFromFile() {
             // Dropdown input fields
             var selectValue = find_ci(schema[formField]["allowed"], value);
             if (value && !selectValue) {
-              displayError("The value '"+value+"' could not be entered for field '"+formField+"'.");
+              displayError("Validation Error: The value '" + value + "' could not be entered for field '" + formField + "'.");
               return false;
             }
             tableRow.find('select[name*="' + formField + '"]').val(selectValue);

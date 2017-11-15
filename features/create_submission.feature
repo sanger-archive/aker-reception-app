@@ -28,21 +28,22 @@ And I click on "Next"
 Then I am in "Biomaterial Metadata"
 
 Given I upload the file "test/data/correct_manifest.csv"
-Then I should see data from my file like "334457"
-And I should see data from my file like "male"
-And I should see data from my file like "Homo sapiens"
+Then I should see data from my file like a textbox containing "334457"
+And I should see data from my file like a dropdown with "male" selected
+And I should see data from my file like a dropdown with "Homo sapiens" selected
 
 When I go to next screen
 Then I should not see any validation errors
 
-And I am in "Ethics"
+## Following tests are commented pending HMDC integration into submission form
+# And I am in "Ethics"
 
-When I check "I confirm that no HMDMC is required"
-And I click on "Next"
+# When I check "I confirm that no HMDMC is required"
+# And I click on "Next"
 
-Then I am in "Delivery Details"
+# Then I am in "Delivery Details"
 
-Given I enter my details as collaborator
-When I select "test@test" from the "Sanger Sample Custodian" select
+# Given I enter my details as collaborator
+# When I select "test@test" from the "Sanger Sample Custodian" select
 
-Then I know my shared submission identifier
+# Then I know my shared submission identifier

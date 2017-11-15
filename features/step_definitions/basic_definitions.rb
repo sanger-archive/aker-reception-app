@@ -28,14 +28,17 @@ Given(/^I have a material service running$/) do
         "gender",
         "donor_id",
         "phenotype",
-        "supplier_name"
+        "supplier_name",
+        "is_tumour",
+        "tissue_type"
       ],
       "required" => [
         "scientific_name",
         "gender",
         "donor_id",
-        "phenotype",
-        "supplier_name"
+        "supplier_name",
+        "is_tumour",
+        "tissue_type"
       ],
       "type" => "object",
       "properties" => {
@@ -90,6 +93,34 @@ Given(/^I have a material service running$/) do
           "friendly_name" => "Supplier name",
           "field_name_regex" => "^supplier[-_\\s]*(name)?$",
           "type" => "string"
+        },
+        "is_tumour" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "allowed" => [
+            "tumour",
+            "normal"
+          ],
+          "friendly_name" => "Tumour?",
+          "field_name_regex" => "^(tumour|tumor)$",
+          "type" => "string"
+        },
+        "tissue_type" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "allowed" => [
+            "dna/rna",
+            "blood",
+            "saliva",
+            "tissue",
+            "cells",
+            "lysed cells"
+          ],
+          "friendly_name" => "Tissue Type",
+          "field_name_regex" => "^tissue[-_\s]type$",
+          "type" => "string"
         }
       }
     })
@@ -136,10 +167,17 @@ When(/^I upload the file "([^"]*)"$/) do |arg1|
   attach_file('Upload CSV', File.absolute_path(arg1), make_visible: true)
 end
 
-Then(/^I should see data from my file like "([^"]*)"$/) do |arg1|
-  unless page.has_selector?("input[value='"+arg1+"']")
-    expect(page).to have_selector("select[value='"+arg1+"']")
-  end
+Then(/^I should see data from my file like a textbox containing "([^"]*)"$/) do |arg1|
+  expect(page).to have_selector("input[value='" + arg1 + "']")
+end
+
+Then(/^I should see data from my file like a dropdown with "([^"]*)" selected$/) do |arg1|
+  expect(page).to have_selector("select[value='" + arg1 + "']")
+end
+
+Then(/^abcI should see data from my file like a dropdown with "([^"]*)" selected$/) do |arg1|
+  save_and_open_page
+  expect(page).to have_selector("select[value='" + arg1 + "']")
 end
 
 Then(/^I should see validation errors$/) do
