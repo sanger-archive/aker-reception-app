@@ -38,18 +38,22 @@ Then "form-fields" should contain "Supplier name (supplier_name)"
 Then "form-fields" should contain "Gender (gender)"
 Then "form-fields" should contain "Donor ID (donor_id)"
 Then "form-fields" should contain "Phenotype (phenotype)"
+Then "form-fields" should contain "*Tumour? (is_tumour)"
+Then "form-fields" should contain "*Tissue Type (tissue_type)"
 
 
 Then "fields-from-csv" should contain "Well Positio"
-Then "fields-from-csv" should contain "Material"
+Then "fields-from-csv" should contain "sciname"
 Then "fields-from-csv" should contain "Dono"
 Then "fields-from-csv" should contain "ender"
-Then "fields-from-csv" should contain "Common Name"
+Then "fields-from-csv" should contain "supname"
 Then "fields-from-csv" should contain "Phenotyp"
+Then "fields-from-csv" should contain "Tissue"
+Then "fields-from-csv" should contain "cancer"
 
 Then "matched-fields-table" should contain 0 rows
 
-When I select "Position (position)" from the "form-fields" select
+When I select "*Position (position)" from the "form-fields" select
 Then "*Position (position)" should be selected for "form-fields"
 
 When I select "Well Positio" from the "fields-from-csv" select
@@ -58,25 +62,25 @@ Then "Well Positio" should be selected for "fields-from-csv"
 Given I click on "match-fields-button"
 Then "matched-fields-table" should contain 1 rows
 
-When I select "Scientific name (scientific_name)" from the "form-fields" select
-When I select "Material" from the "fields-from-csv" select
+When I select "*Scientific name (scientific_name)" from the "form-fields" select
+When I select "sciname" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
 Then "matched-fields-table" should contain 2 rows
 
-When I select "Supplier name (supplier_name)" from the "form-fields" select
-When I select "Common Name" from the "fields-from-csv" select
+When I select "*Supplier name (supplier_name)" from the "form-fields" select
+When I select "supname" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
 Then "matched-fields-table" should contain 3 rows
 
-When I select "Gender (gender)" from the "form-fields" select
+When I select "*Gender (gender)" from the "form-fields" select
 When I select "ender" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
 Then "matched-fields-table" should contain 4 rows
 
-When I select "Donor ID (donor_id)" from the "form-fields" select
+When I select "*Donor ID (donor_id)" from the "form-fields" select
 When I select "Dono" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
@@ -88,21 +92,21 @@ When I select "Phenotyp" from the "fields-from-csv" select
 Given I click on "match-fields-button"
 Then "matched-fields-table" should contain 6 rows
 
-When I select "Tissue Type (tissue_type)" from the "form-fields" select
+When I select "*Tissue Type (tissue_type)" from the "form-fields" select
 When I select "Tissue" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
 Then "matched-fields-table" should contain 7 rows
 
-When I select "Tumour? (is_tumour)" from the "form-fields" select
-When I select "cancerous" from the "fields-from-csv" select
+When I select "*Tumour? (is_tumour)" from the "form-fields" select
+When I select "cancer" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
 Then "matched-fields-table" should contain 8 rows
 
 Given I click on "complete-csv-matching"
 
-Then abcI should see data from my file like a dropdown with "lysed cells" selected
+Then I should see data from my file like a dropdown with "lysed cells" selected
 Then I should see data from my file like a dropdown with "female" selected
 Then I should see data from my file like a dropdown with "Homo sapiens" selected
 

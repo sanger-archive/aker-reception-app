@@ -175,11 +175,6 @@ Then(/^I should see data from my file like a dropdown with "([^"]*)" selected$/)
   expect(page).to have_selector("select[value='" + arg1 + "']")
 end
 
-Then(/^abcI should see data from my file like a dropdown with "([^"]*)" selected$/) do |arg1|
-  save_and_open_page
-  expect(page).to have_selector("select[value='" + arg1 + "']")
-end
-
 Then(/^I should see validation errors$/) do
   expect(page).to have_content('validation')
 end
