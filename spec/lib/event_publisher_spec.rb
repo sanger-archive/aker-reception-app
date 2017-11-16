@@ -76,6 +76,7 @@ RSpec.describe 'EventPublisher' do
 
   context '#publish' do
     setup do
+      Bunny ||= double('Bunny')
       @params = { event_conn: 'event_conn', queue_name: 'queue_name' }
       mock_connection(@params)
       @event_message = instance_double("EventMessage")
