@@ -17,24 +17,24 @@
         </div>
         <div class="modal-body">
           <div id="modal-alert-required" class="alert alert-error" role="alert" style="display: none;">
-            All the required fields require a mapping to a CSV field.
+            All the required fields must be mapped to a CSV field.
           </div>
           <div id="modal-alert-ignored" class="alert alert-warning" role="alert" style="display: none;">
             Some fields from the CSV have been ignored, please confirm that the correct matches have been made.
           </div>
-          <p>Please select a required field on the left and the CSV field on the right you wish to map to:</p>
+          <p>Please select a form field on the left and the CSV field on the right, then press the "Match" button to map them. Fields marked with a * must be mapped.</p>
           <div class="row">
             <div class="col-md-5">
               <div class="form-group">
-                <label for="required-fields">Required fields</label>
-                <select id="required-fields" class="form-control" name="required-fields" size="5">
+                <label for="form-fields">Fields on Form</label>
+                <select id="form-fields" class="form-control" name="form-fields" size="8">
                 </select>
               </div>
             </div>
             <div class="col-md-5">
               <div class="form-group">
                 <label for="fields-from-csv">Fields from CSV</label>
-                <select id="fields-from-csv" class="form-control" name="fields-from-csv" size="5">
+                <select id="fields-from-csv" class="form-control" name="fields-from-csv" size="8">
                 </select>
               </div>
             </div>
@@ -123,7 +123,7 @@
               <tr>
                 <th></th>
                 <% for header in schema['show_on_form'] %>
-                  <th> <%= schema['properties'][header]['friendly_name'] ? schema['properties'][header]['friendly_name'] : header %> </th>
+                  <th> <%= schema['properties'][header]['friendly_name'] || header %> </th>
                 <% end %>
               </tr>
             </thead>
