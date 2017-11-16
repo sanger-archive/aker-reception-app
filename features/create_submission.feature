@@ -43,6 +43,6 @@ And I click on "Next"
 Then I am in "Delivery Details"
 
 Given I enter my details as collaborator
-When I select "test@test" from the "Sanger Sample Custodian" select
+When I select "test@test" from the "Sanger Sample Guardian" select
 
 Then I know my shared submission identifier
