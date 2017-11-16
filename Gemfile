@@ -53,12 +53,12 @@ gem 'forgery'
 gem 'pg'
 # ?
 gem 'zipkin-tracer'
+# Pure Ruby LDAP library. Read more: https://github.com/ruby-ldap/ruby-net-ldap
+gem 'net-ldap'
+# Devise Module for LDAP. Read more: https://github.com/cschiewek/devise_ldap_authenticatable
+gem 'devise_ldap_authenticatable', '~> 0.8.5'
 # ?
-gem "net-ldap"
-# ?
-gem "devise_ldap_authenticatable"
-# ?
-gem "bunny", "= 0.9.0.pre10"
+gem 'bunny', '= 0.9.0.pre10'
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # ?
@@ -136,7 +136,7 @@ group :development, :test do
   # ?
   gem 'poltergeist'
   # ?
-  gem 'factory_bot_rails'
+  gem 'factory_bot_rails', '~> 4.8'
   # database_cleaner is not required, but highly recommended
   gem 'database_cleaner'
 end
@@ -144,9 +144,9 @@ end
 # Deployment group
 group :deployment do
   # ?
-  gem "psd_logger", github: "sanger/psd_logger"
+  gem 'psd_logger', github: 'sanger/psd_logger'
   # # ?
-  gem "gmetric", "~>0.1.3"
+  gem 'gmetric', '~> 0.1.3'
   # ?
-  gem "exception_notification"
+  gem 'exception_notification'
 end
