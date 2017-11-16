@@ -1,6 +1,6 @@
 @javascript
 
-Feature: Test wrong manifest CSV file
+Feature: Test manifest CSV file with unrecognised headers
 
 Because I am a collaborator working remotely
 And I want to send samples to an internal contact at the institute
@@ -30,7 +30,7 @@ And I click on "Next"
 
 Then I am in "Biomaterial Metadata"
 
-Given I upload the file "test/data/incorrect_manifest.csv"
+Given I upload the file "test/data/incorrect_headers_manifest.csv"
 Then I should see "Select CSV mappings"
 Then "form-fields" should contain "Position (position)"
 Then "form-fields" should contain "Scientific name (scientific_name)"
@@ -109,6 +109,3 @@ Given I click on "complete-csv-matching"
 Then I should see data from my file like a dropdown with "lysed cells" selected
 Then I should see data from my file like a dropdown with "female" selected
 Then I should see data from my file like a dropdown with "Homo sapiens" selected
-
-When I go to next screen
-Then I should see validation errors
