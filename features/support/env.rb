@@ -57,6 +57,10 @@ end
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
 require 'capybara/poltergeist'
-Capybara.javascript_driver = :poltergeist
+Capybara.register_driver :poltergeist_debug do |app|
+  Capybara::Poltergeist::Driver.new(app,
+                                    inspector: true,
+                                    url_blacklist: ['https://fonts.googleapis.com'])
+end
 
-
+Capybara.javascript_driver = :poltergeist_debug

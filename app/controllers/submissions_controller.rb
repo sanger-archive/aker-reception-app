@@ -10,8 +10,8 @@ class SubmissionsController < ApplicationController
   end
 
   def update
-    unless material_submission.pending?
-      flash[:error] = "This submission cannot be updated."
+    sub_service = UpdateSubmissionService.new(material_submission, flash)
+    unless sub_service.ready_for_step(params[:id])
       render_wizard
       return
     end

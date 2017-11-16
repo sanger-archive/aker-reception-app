@@ -309,6 +309,12 @@ RSpec.describe SubmissionsController, type: :controller do
           hmdmc_2: '345',
           confirm_hmdmc_not_required: '0',
         }
+
+        allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
+        put :update, step_params(material_submission, :labware)
+        put :biomaterial_data, step_params(material_submission, :provenance)
+        material_submission.reload
+
         params = step_params(material_submission, :ethics)
         params[:params].merge!(ethics_params)
         ac_par = ActionController::Parameters.new(ethics_params)

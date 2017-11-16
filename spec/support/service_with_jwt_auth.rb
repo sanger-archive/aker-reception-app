@@ -2,9 +2,9 @@ shared_examples_for 'service that validates credentials' do |actions|
 
   context 'checking controller actions' do
     HTTP_VERB ||= {
-      :create => :post,
-      :update => :put,
-      :destroy => :delete
+      create: :post,
+      update: :put,
+      destroy: :delete,
     }
     [actions].flatten.compact.each do |action|
       context "for #{action}" do
@@ -24,7 +24,7 @@ shared_examples_for 'service that validates credentials' do |actions|
 
         context 'when credentials are right' do
           it 'remains in the same page' do
-            @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+            @user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: ['world'])
             allow(controller).to receive(:check_credentials)
             allow(controller).to receive(:current_user).and_return(@user)
 

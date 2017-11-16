@@ -30,8 +30,10 @@ class MaterialSubmission < ApplicationRecord
   validates :material_submission_uuid, presence: true
   validates :owner_email, presence: true
 
-  before_save :create_labware,
-              if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
+  before_validation :sanitise_owner
+  before_save :sanitise_owner
+
+  before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
   before_save :check_supply_decappers
 
   after_initialize :create_uuid
@@ -84,6 +86,13 @@ class MaterialSubmission < ApplicationRecord
   def active_or_printed?
     return false if status.nil?
     active? || status==MaterialSubmission.PRINTED
+  end
+
+  def after_provenance?
+    return false unless labwares.present?
+    return false unless status
+    return false if ['labware', 'provenance'].include?(status)
+    return labwares.all? { |labware| labware.contents.present? }
   end
 
   def pending?
@@ -172,7 +181,16 @@ class MaterialSubmission < ApplicationRecord
     labwares.sum { |labware| labware.contents.length }
   end
 
-  private
+  def sanitise_owner
+    if owner_email
+      sanitised = owner_email.strip.downcase
+      if sanitised != owner_email
+        self.owner_email = sanitised
+      end
+    end
+  end
+
+private
 
   # Make sure supply_decappers is false unless other fields are appropriate
   def check_supply_decappers

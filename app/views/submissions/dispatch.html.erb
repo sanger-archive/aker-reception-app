@@ -12,7 +12,7 @@
     </div>
 
     <div class="col-md-6 col-xs-12">
-      <h2>Sanger Sample Custodian</h2>
+      <h2>Sanger Sample Guardian</h2>
 
       <p>The following contact will be notified when the materials arrive at Sanger Institute:</p>
 
@@ -25,7 +25,7 @@
     </div>
 
     <div class="col-md-6 col-xs-12">
-        <%= f.collection_select :contact_id, ContactGroup.all_contacts, :id, :fullname_and_email, { label: "Sanger Sample Custodian" }, { class: "form-control contact" } %>
+        <%= f.collection_select :contact_id, ContactGroup.all_contacts, :id, :fullname_and_email, { label: "Sanger Sample Guardian" }, { class: "form-control contact" } %>
         <div><b>Your submission is</b></div>
        <span><h1>Submission <%= material_submission.id %></h1></span>
     </div>
