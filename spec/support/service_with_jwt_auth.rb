@@ -17,7 +17,7 @@ shared_examples_for 'service that validates credentials' do |actions|
 
         context 'when credentials are wrong' do
           it 'redirects to the login page' do
-            send (HTTP_VERB[action]||:get), action, params: {}, headers: { HTTP_X_AUTHORISATION: 'wrong' }
+            send (HTTP_VERB[action]||:get), action, params: { headers: { HTTP_X_AUTHORISATION: 'wrong' } }
             expect(response).to have_http_status(:redirect)
           end
         end
@@ -30,7 +30,7 @@ shared_examples_for 'service that validates credentials' do |actions|
 
             send (HTTP_VERB[action]||:get), action
             expect(response).to have_http_status(:success)
-          end 
+          end
         end
       end
     end
