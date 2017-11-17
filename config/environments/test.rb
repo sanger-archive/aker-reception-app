@@ -48,6 +48,7 @@ Rails.application.configure do
   config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
   config.stamp_url = 'http://localhost:7000/api/v1/'
   config.study_url = 'http://localhost:3300/api/v1/'
+  config.taxonomy_service_url = 'https://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/tax-id'
 
   config.ehmdmc_url = 'http://localhost:3501/validate'
 

@@ -9,6 +9,12 @@ RSpec.describe :provenance_service do
         'OPTIONAL' => {
           'required' => false,
         },
+        'tax_id' => {
+          'required' => false
+        },
+        'scientific_name' => {
+          'required' => false
+        },
         'REQUIRED_FREE' => {
           'required' => true,
         },
@@ -18,7 +24,7 @@ RSpec.describe :provenance_service do
         }
       },
     }
-    @service = ProvenanceService.new(@schema)
+    @service = ProvenanceService.new(@schema.to_json)
   end
 
   describe "#validate" do
@@ -304,5 +310,7 @@ RSpec.describe :provenance_service do
         expect(@labwares[1]).to have_received(:update_attributes).with(contents: nil)
       end
     end
+
+
   end
 end

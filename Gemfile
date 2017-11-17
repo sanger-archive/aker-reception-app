@@ -66,6 +66,8 @@ gem 'bootstrap-sass', '~> 3.3.6'
 # ?
 gem 'font-awesome-sass'
 
+gem 'ejs'
+
 
 ###
 # Sanger gems
@@ -85,6 +87,9 @@ gem 'aker_credentials_gem', github: 'sanger/aker-credentials'
 # ?
 gem 'aker_permission_gem', github: 'sanger/aker-permission'
 
+gem 'aker-taxonomy-client', path: '/Users/emr/projects/aker-taxonomy-client'
+
+gem 'faraday-http-cache'
 
 ###
 # Groups
@@ -120,7 +125,7 @@ end
 # Development and test groups
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platform: :mri
+  #gem 'byebug', platform: :mri
   # ?
   gem 'sqlite3'
   # ?
@@ -131,6 +136,13 @@ group :development, :test do
   gem 'launchy'
   # ?
   gem 'capybara'
+
+  gem 'sinatra'
+
+  gem 'capybara-webmock'
+
+  gem 'puffing-billy'
+
   # ?
   gem 'poltergeist'
   # ?
