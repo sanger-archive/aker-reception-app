@@ -83,6 +83,26 @@ Printer.create(
   label_type: 'Plate',
 )
 Printer.create(
+  name: 'f225bc',
+  label_type: 'Plate',
+)
+Printer.create(
+  name: 'g216abc',
+  label_type: 'Plate',
+)
+Printer.create(
+  name: 'g214bc',
+  label_type: 'Plate',
+)
+Printer.create(
   name: 'e367bc',
+  label_type: 'Tube',
+)
+Printer.create(
+  name: 'g216bc',
+  label_type: 'Tube',
+)
+Printer.create(
+  name: 'aa313bc',
   label_type: 'Tube',
 )
