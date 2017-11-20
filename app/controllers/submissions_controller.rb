@@ -141,6 +141,12 @@ class SubmissionsController < ApplicationController
     return pstep
   end
 
+  def cached_taxonomies
+    {}
+  end
+
+
+
 protected
 
   def material_submission

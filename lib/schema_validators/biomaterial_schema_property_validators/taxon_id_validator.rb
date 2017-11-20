@@ -9,7 +9,7 @@ module SchemaValidators
 
       def find_by_tax_id(tax_id)
         if taxonomies_memoized.nil?
-          taxonomies_memoized = {}
+          @taxonomies_memoized = {}
         end
         if !taxonomies_memoized[tax_id]
           taxonomies_memoized[tax_id] = TaxonomyClient::Taxonomy.find(tax_id)

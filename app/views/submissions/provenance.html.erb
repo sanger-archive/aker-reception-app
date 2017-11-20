@@ -137,7 +137,8 @@
                     {
                       taxonomyServiceUrl: Rails.configuration.taxonomy_service_url,
                       relativeCssSelectorSciName: 'td[data-psd-schema-validation-name=scientific_name] input',
-                      relativeCssSelectorTaxId: 'td[data-psd-schema-validation-name=tax_id] input'
+                      relativeCssSelectorTaxId: 'td[data-psd-schema-validation-name=tax_id] input',
+                      cachedTaxonomies: controller.cached_taxonomies || {}
                     }.to_json %>"
                   data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
                   <td><%= address %></td>

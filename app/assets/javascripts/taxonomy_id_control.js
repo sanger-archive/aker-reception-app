@@ -8,6 +8,8 @@
     this.inputSciName = $(this.node).find(this.relativeCssSelectorSciName);
     this.inputTaxId = $(this.node).find(this.relativeCssSelectorTaxId);
 
+    this._cacheStorage = params.cachedTaxonomies || {};
+
     this.attachHandlers();
   };
 
@@ -56,6 +58,15 @@
     this.inputSciName.attr('title', scientificName);
   };
 
+  proto.onSuccessFindTaxId = function(data) {
+    this.setScientificName(data.scientificName);
+    this.markInputsAs('has-success');
+  };
+
+  proto.onErrorFindTaxId = function() {
+    this.markInputsAs('has-error');
+  };
+
   proto.findTaxId = function() {
     var taxId = this.inputTaxId.val();
     this.inputSciName.val('');    
@@ -63,16 +74,14 @@
       if (taxId.length == 0) {
         return;
       }
+      if (typeof this._cacheStorage[taxId] !== 'undefined') {
+        return this.onSuccessFindTaxId(this._cacheStorage[taxId]);
+      }
       $.ajax({
         url: this.taxonomyServiceUrl+'/'+taxId,
         method: 'GET',
-        success: $.proxy(function(data) {
-          this.setScientificName(data.scientificName);
-          this.markInputsAs('has-success');
-        }, this),
-        error: $.proxy(function() {
-          this.markInputsAs('has-error');
-        }, this)
+        success: $.proxy(this.onSuccessFindTaxId, this),
+        error: $.proxy(this.onErrorFindTaxId, this)
       });      
     } else {
       this.markInputsAs('has-error');
