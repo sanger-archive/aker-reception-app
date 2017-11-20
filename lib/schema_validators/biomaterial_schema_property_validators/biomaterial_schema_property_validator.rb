@@ -34,7 +34,6 @@ module SchemaValidators
         else
           error_message = error_messages[i]
         end
-
         error_message[:errors][field.to_sym] = msg
       end
 
