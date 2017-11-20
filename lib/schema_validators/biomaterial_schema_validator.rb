@@ -16,8 +16,8 @@ module SchemaValidators
     attr_accessor :validators
 
 
-    def initialize(schema_json)
-      @schema = JSON.parse(schema_json)
+    def initialize(schema)
+      @schema = schema
       @error_messages = []
       build_validators(@schema)
     end

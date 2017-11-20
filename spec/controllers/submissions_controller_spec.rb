@@ -83,7 +83,7 @@ RSpec.describe SubmissionsController, type: :controller do
 
   describe "Using the steps defined by wicked" do
     setup do
-      schema = %Q(
+      schema = 
         {
           "required":[
             "gender",
@@ -136,13 +136,11 @@ RSpec.describe SubmissionsController, type: :controller do
             }
           }
         }
-      )
+      
 
       request_headers = {'Content-Type'=>'application/json', 'Accept'=>'application/json'}
 
-      stub_request(:get, "http://localhost:5000/materials/json_schema").
-        with(headers: request_headers).
-        to_return(status: 200, body: schema, headers: {})
+      allow(MatconClient::Material).to receive(:schema).and_return(schema.as_json)
     end
 
     let(:user) { OpenStruct.new(email: 'other@sanger.ac.uk', groups: ['world']) }

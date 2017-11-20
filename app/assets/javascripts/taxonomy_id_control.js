@@ -14,9 +14,19 @@
   var proto = TaxonomyIdControl.prototype;
 
   proto.attachHandlers = function() {
-    this.inputSciName.attr('readonly', true);
+    
     this.inputTaxId.on('keyup', $.proxy(this.findTaxId, this));
+    this.inputTaxId.on('blur', $.proxy(this.findTaxId, this));
     this.inputTaxId.on('keyup', $.proxy(this.onKeyUp, this));
+
+    // When focus on the scientific name, send the focus to the next input, as this input
+    // is not editable
+    this.inputSciName.attr('readonly', true);
+    this.inputSciName.on('focus', $.proxy(this.focusToNextInput, this, this.inputSciName));
+  };
+
+  proto.focusToNextInput = function(input) {
+    input.closest('td').next().find('input').focus();
   };
 
   proto.onKeyUp = function(e) {
@@ -35,8 +45,10 @@
 
   proto.markInputsAs = function(mark) {
     this.inputTaxId.parent().removeClass(this.previousMark);
+    this.inputSciName.parent().removeClass(this.previousMark);
     this.previousMark = mark;
     this.inputTaxId.parent().addClass(this.previousMark);
+    this.inputSciName.parent().addClass(this.previousMark);
   }
 
   proto.setScientificName = function(scientificName) {

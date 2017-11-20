@@ -79,8 +79,8 @@ RSpec.configure do |config|
   #Capybara.javascript_driver = :capybara_webmock_poltergeist
 
 
-   Capybara.javascript_driver = :selenium_chrome
-  #Capybara.javascript_driver = :poltergeist_billy
+   #Capybara.javascript_driver = :selenium_chrome
+  Capybara.javascript_driver = :poltergeist
 
   config.include Capybara::DSL
 

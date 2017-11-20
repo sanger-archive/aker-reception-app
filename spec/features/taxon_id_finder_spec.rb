@@ -14,25 +14,25 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
       WebMock.disable_net_connect!(:allow_localhost => true)
 
       allow(MatconClient::Material).to receive(:schema).and_return({
-          'required' => ['tax_id', 'scientific_name', 'supplier_name', 'donor_id', 'gender', 'phenotype'],
-          'properties' => {
-            'supplier_name' => {'required' => true, 'friendly_name' => 'Supplier name', 'field_name_regex' => "^supplier[-_\s]*(name)?$"},
-            'donor_id' => {'required' => true, 'friendly_name' => 'Donor Id', 'field_name_regex' => "^donor[-_\s]*(id)?$"},
-            'gender' => {'required' => true, 'friendly_name' => 'Gender','field_name_regex' => "^gender$"},
-            'phenotype' => {'required' => true, 'friendly_name' => 'Phenotype','field_name_regex' => "^phenotype$"},
-            'tax_id' => {
-              'required' => true,
-              'friendly_name' => "Tax Id",
-              'field_name_regex' => "^tax[-_\s]*(id)?$",
-            },
-            'scientific_name' => {
-              'required' => true,
-              'field_name_regex' => "^scientific[-_\s]*(name)?$",
-              'allowed' => ['Homo sapiens', 'Mus musculus'],
-              'friendly_name' => "Scientific name"
-            }
+        'required' => ['tax_id', 'scientific_name', 'supplier_name', 'donor_id', 'gender', 'phenotype'],
+        'properties' => {
+          'supplier_name' => {'required' => true, 'friendly_name' => 'Supplier name', 'field_name_regex' => "^supplier[-_\s]*(name)?$"},
+          'donor_id' => {'required' => true, 'friendly_name' => 'Donor Id', 'field_name_regex' => "^donor[-_\s]*(id)?$"},
+          'gender' => {'required' => true, 'friendly_name' => 'Gender','field_name_regex' => "^gender$"},
+          'phenotype' => {'required' => true, 'friendly_name' => 'Phenotype','field_name_regex' => "^phenotype$"},
+          'tax_id' => {
+            'required' => true,
+            'friendly_name' => "Tax Id",
+            'field_name_regex' => "^tax[-_\s]*(id)?$",
+          },
+          'scientific_name' => {
+            'required' => true,
+            'field_name_regex' => "^scientific[-_\s]*(name)?$",
+            'allowed' => ['Homo sapiens', 'Mus musculus'],
+            'friendly_name' => "Scientific name"
           }
-        })
+        }
+      })
 
       allow_any_instance_of(JWTCredentials).to receive(:check_credentials)
       allow_any_instance_of(JWTCredentials).to receive(:current_user).and_return(user)
@@ -73,12 +73,12 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
             attach_file('Upload CSV', File.absolute_path("test/data/manifest_with_tax_id.csv"), make_visible: true)
           end
           it 'validates in the server using the taxonomy service', js: true  do
-            within(first('form > .row > .col-md-12')) { click_on('Next') }
-            check('I confirm that no HMDMC is required')
-            click_on('Next')
+            tax_info = double('taxonomy_info', {taxId: '9606', scientificName: 'Homo sapiens'})
+            allow(TaxonomyClient::Taxonomy).to receive(:find).with("9606").and_return(tax_info)
 
+            within(first('form > .row > .col-md-12')) { click_on('Next') }
+            
             expect(page).not_to have_selector(".has-error")
-            expect(find_by_id('labware[1]address[A:1]fieldName[scientific_name]').value.length>0).to eq(true)
           end
         end
 

@@ -24,7 +24,7 @@ RSpec.describe :provenance_service do
         }
       },
     }
-    @service = ProvenanceService.new(@schema.to_json)
+    @service = ProvenanceService.new(@schema)
   end
 
   describe "#validate" do

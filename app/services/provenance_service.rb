@@ -12,7 +12,6 @@ class ProvenanceService
   # Checks the given labware data against the schema to see if it looks OK.
   # Returns an array of errors. If the list is empty, the data seems to be OK.
   def validate(labware_index, labware_data)
-
     schema_validator.error_messages = []
 
     if labware_data.empty? && !schema_validator.default_field.nil?
