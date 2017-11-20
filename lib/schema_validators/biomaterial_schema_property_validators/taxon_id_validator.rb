@@ -29,10 +29,6 @@ module SchemaValidators
           return false          
         end
 
-        if tax_id == '1'
-          add_error(labware_index, address, property_name, "The Tax Id provided 1 for Root is not a valid taxonomy id.")
-          return false
-        end
         unless scientific_name == obtained_value
           add_error(labware_index, address, property_name, "The Tax Id provided (#{tax_id}) does not match the scientific name provided '#{scientific_name}'. The taxonomy service indicates it should be '#{obtained_value}.")
           return false

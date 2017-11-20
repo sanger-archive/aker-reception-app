@@ -195,11 +195,18 @@
           var message = data.messages[i];
           this.resetCellNameErrors(message.labwareIndex);
         }
+        this.resetMainAlertError();
 
         for (var i=0; i<data.messages.length; i++) {
           var message = data.messages[i];
           var address = message.address;
-          this.storeCellNameError(message.labwareIndex, address, message.errors);
+          if (address) {
+            this.storeCellNameError(message.labwareIndex, address, message.errors);
+          } else {
+            this.addErrorToMainAlertError('<li>Labware '+message.labwareIndex+', errors: '+Object.values(message.errors)[0]+"</li>");
+            var tab = document.getElementById("labware_tab["+message.labwareIndex+"]");
+            this.setErrorToTab(tab);
+          }
         }
       }
     }
@@ -369,6 +376,15 @@
     $('.alert .alert-title').html(data.title);
     $('.alert .alert-msg').html(data.body);
     $('.alert').toggleClass('hidden', false);
+  };
+
+  proto.resetMainAlertError = function() {
+    $('.alert .alert-msg').html('');
+  };
+
+
+  proto.addErrorToMainAlertError = function(text) {
+    $('.alert .alert-msg').append(text);
   };
 
   proto.isEmptyErrorCells = function() {
