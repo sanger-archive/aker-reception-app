@@ -48,6 +48,16 @@ GIT
     aker_stamp_client (0.1.1)
 
 GIT
+  remote: https://github.com/sanger/aker-taxonomy-client.git
+  revision: 7ae34cadecce830f3a4039982efae4f79a6144cd
+  specs:
+    aker-taxonomy-client (0.1.0)
+      activemodel
+      activesupport
+      faraday
+      faraday_middleware
+
+GIT
   remote: https://github.com/sanger/bootstrap-sass.git
   revision: adb7ae34d498024611e4d1ad6adf1b4d38f96b0e
   specs:
@@ -78,15 +88,6 @@ GIT
   revision: dd2d634114df75b1d8535715c169a7fc99521389
   specs:
     psd_logger (0.1.6)
-
-PATH
-  remote: /Users/emr/projects/aker-taxonomy-client
-  specs:
-    aker-taxonomy-client (0.1.0)
-      activemodel
-      activesupport
-      faraday
-      faraday_middleware
 
 GEM
   remote: https://rubygems.org/
@@ -219,7 +220,6 @@ GEM
       net-ldap (>= 0.6.0, <= 0.11)
     diff-lcs (1.3)
     docile (1.1.5)
-    ejs (1.1.1)
     equalizer (0.0.11)
     erubis (2.7.0)
     exception_notification (4.2.2)
@@ -498,7 +498,6 @@ DEPENDENCIES
   cucumber-rails
   database_cleaner
   devise_ldap_authenticatable (~> 0.8.5)
-  ejs
   exception_notification
   factory_bot_rails (~> 4.8)
   faraday-http-cache

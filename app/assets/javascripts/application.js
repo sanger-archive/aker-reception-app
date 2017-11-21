@@ -21,8 +21,6 @@
 //= require bootstrap-table
 //= require csv_field_checker
 //= require load_table
-//= require taxonomy_control
-//= require_tree ./templates
 //= require_tree .
 
 $(document).on("turbolinks:load", function() {

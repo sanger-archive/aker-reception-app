@@ -9,7 +9,6 @@
 @import "select2-bootstrap";
 @import "rails_bootstrap_forms";
 @import "bootstrap-table";
-@import "selectize";
 
 textarea.halvsies { height: 150px; width: 33% }
 
@@ -154,33 +153,3 @@ h2 {
 .dropdown-menu {
   margin-left: -14px;
 }
-
-.tax-id {
-  font-weight: bold;
-}
-.common-name {
-  text-transform: capitalize;
-  font-style: italic;
-}
-
-.display-name {
-  text-transform: capitalize;
-  font-style: italic;
-}
-
-.select2-dropdown--below {
-  //width: 300px !important;
-   width: 300px !important;
-}
-
-.select2-container--open {
-
-  width: 300px !important;
-}
-
-.select2-selection__clear {
-  position: absolute !important;
-  right: -1.5em;
-  z-index: 1000;
-}
-
