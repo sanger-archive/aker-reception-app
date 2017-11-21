@@ -32,11 +32,3 @@ $(document).on("turbolinks:load", function() {
   });
 });
 
-$(document).on("turbolinks:load", function() {
-  $('td[data-psd-schema-validation-name=scientific_name] input').each(function(pos, input) {
-    //var selectNode = $('<select style="width: 100%;"></select>');
-    //var selectNode = $('<input disabled="disabled"></input>')
-    //$(input).replaceWith(selectNode)
-    //new TaxonomyControl(selectNode, []);
-  });
-});

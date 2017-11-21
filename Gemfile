@@ -64,8 +64,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # ?
 gem 'font-awesome-sass'
 
-gem 'ejs'
-
 
 ###
 # Sanger gems
@@ -87,9 +85,7 @@ gem 'aker_permission_gem', github: 'sanger/aker-permission'
 # Official Sass port of Bootstrap 2 and 3. http://getbootstrap.com/css/#sass
 gem 'bootstrap-sass', '~> 3.3.6', github: 'sanger/bootstrap-sass'
 
-gem 'aker-taxonomy-client', path: '/Users/emr/projects/aker-taxonomy-client'
-
-gem 'faraday-http-cache'
+gem 'aker-taxonomy-client', path: 'sanger/aker-taxonomy-client'
 
 ###
 # Groups
