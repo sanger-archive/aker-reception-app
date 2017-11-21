@@ -172,7 +172,6 @@ end
 
 When(/^I upload the file "([^"]*)"$/) do |arg1|
   attach_file('Upload CSV', File.absolute_path(arg1), make_visible: true)
-  sleep(5)
 end
 
 Given(/^I debug$/) do 
