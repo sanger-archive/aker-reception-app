@@ -13,7 +13,7 @@
 
       <% unless first_step? %>
         <%= link_to 'Previous', previous_wizard_path,
-              class: 'btn btn-warning pull-left',
+              class: 'btn btn-primary pull-left',
               data: { confirm: 'Are you sure you wish to go back? You will lose unsaved progress on the curent step' },
               style: "margin-right: 10px" %>
       <% end %>
