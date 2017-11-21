@@ -115,48 +115,51 @@
             </div>
           </div>
           <p style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</p>
+          <p><strong>Note:</strong> If necessary, the table can be scrolled horizontally to view all of the fields</p>
 
-          <table data-behavior="datatable"
-                 class="table table-condensed table-striped"
-                 data-psd-component-class='DataTableSchemaValidation'
-                 data-psd-component-parameters='{}'>
-            <thead>
-              <tr>
-                <th></th>
-                <% for header in schema['show_on_form'] %>
-                  <th> <%= schema['properties'][header]['friendly_name'] || header %> </th>
-                <% end %>
-              </tr>
-            </thead>
-
-            <tbody>
-              <% for address in labware.positions %>
-                <tr data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
-                  <td><%= address %></td>
-                  <% for col in schema['show_on_form'] %>
-                    <td data-psd-schema-validation-name="<%= col %>">
-                      <div class="form-group">
-                        <% if material_schema["properties"][col]['allowed'] %>
-                          <select class="form-control"
-                                  name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
-                                  id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]">
-                            <option value=""></option>
-                            <%= options_for_select(material_schema["properties"][col]['allowed'], (labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present?))%>
-                          </select>
-                        <% else %>
-                          <input class="form-control"
-                                type="<%= material_schema["properties"][col]["field_type"] || 'text' %>"
-                                name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
-                                id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]"
-                                value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
-                        <% end %>
-                      </div>
-                    </td>
+          <div style="overflow: scroll;">
+            <table data-behavior="datatable"
+                   class="table table-condensed table-striped"
+                   data-psd-component-class='DataTableSchemaValidation'
+                   data-psd-component-parameters='{}'>
+              <thead>
+                <tr>
+                  <th></th>
+                  <% for header in schema['show_on_form'] %>
+                    <th> <%= schema['properties'][header]['friendly_name'] || header %> </th>
                   <% end %>
                 </tr>
-              <% end %>
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                <% for address in labware.positions %>
+                  <tr data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
+                    <td><%= address %></td>
+                    <% for col in schema['show_on_form'] %>
+                      <td data-psd-schema-validation-name="<%= col %>">
+                        <div class="form-group">
+                          <% if material_schema["properties"][col]['allowed'] %>
+                            <select class="form-control"
+                                    name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
+                                    id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]">
+                              <option value=""></option>
+                              <%= options_for_select(material_schema["properties"][col]['allowed'], (labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present?))%>
+                            </select>
+                          <% else %>
+                            <input class="form-control"
+                                  type="<%= material_schema["properties"][col]["field_type"] || 'text' %>"
+                                  name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
+                                  id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]"
+                                  value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
+                          <% end %>
+                        </div>
+                      </td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
         </div>
       <% end %>
     </div>
