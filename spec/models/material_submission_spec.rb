@@ -383,17 +383,6 @@ RSpec.describe MaterialSubmission, type: :model do
     end
   end
 
-  describe "#set_hmdmc" do
-    before do
-      @submission = create(:material_submission)
-      @labware = create(:labware, material_submission: @submission, contents: { "1" => {'scientific_name' => 'Homo Sapiens' }})
-    end
-    it "sets the hmdmc on the labware" do
-      @submission.set_hmdmc('12/345', 'dirk')
-      expect(@submission.labwares.first.contents).to eq({ "1" => {'scientific_name' => 'Homo Sapiens', 'hmdmc' => '12/345', 'hmdmc_set_by' => 'dirk' }})
-    end
-  end
-
   describe "#set_hmdmc_not_required" do
     before do
       @submission = create(:material_submission)
@@ -532,7 +521,12 @@ RSpec.describe MaterialSubmission, type: :model do
     context "when the labware type uses decappers, supply labwares is true, and supply decappers is true" do
       it { expect(submission.supply_decappers).to eq(true) }
     end
+  end
 
+  describe '#owner_email' do
+    it 'should be sanitised' do
+      expect(create(:material_submission, owner_email: '   USER@EMAIL  ').owner_email).to eq('user@email')
+    end
   end
 
 end

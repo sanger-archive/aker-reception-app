@@ -45,11 +45,17 @@ class Labware < ApplicationRecord
       y = (1..num_of_rows).map(&:to_s)
     end
 
-    y.product(x).map { |a,b| a+':'+b }
+    y.product(x).map { |a,b| a + ':' + b }
   end
 
+  # Determine if there is any any human material in this labware
   def any_human_material?
     contents && contents.any? { |address, data| material_is_human?(data) }
+  end
+
+  # Determine if there is any any human material, in this labware, without a HMDMC number set
+  def any_human_material_no_hmdmc?
+    contents && contents.any? { |address, data| material_is_human_no_hmdmc?(data) }
   end
 
   def ethical?
@@ -57,12 +63,8 @@ class Labware < ApplicationRecord
     contents.all? { |address, data| check_ethics(data) }
   end
 
-  def set_hmdmc(hmdmc, username)
-    _set_hmdmc(hmdmc, false, username)
-  end
-
   def set_hmdmc_not_required(username)
-    _set_hmdmc(nil, true, username)
+    _set_hmdmc_not_required(username)
   end
 
   def clear_hmdmc
@@ -76,7 +78,7 @@ class Labware < ApplicationRecord
 
   def first_hmdmc
     return nil if contents.nil?
-    contents.each do |k,v|
+    contents.each do |_k, v|
       h = material_is_human?(v) && v['hmdmc']
       return h if h
     end
@@ -84,14 +86,16 @@ class Labware < ApplicationRecord
   end
 
   def confirmed_no_hmdmc?
-    contents && contents.any? { |k,v| material_is_human?(v) && v['hmdmc_not_required_confirmed_by'].present? }
+    contents && contents.any? do |_k, v|
+      material_is_human?(v) && v['hmdmc_not_required_confirmed_by'].present?
+    end
   end
 
-  # return the first 'hmdmc_not_required_confirmed_by' within the labware's contents (samples)
+  # Return the first 'hmdmc_not_required_confirmed_by' within the labware's contents (samples)
   def first_confirmed_no_hmdmc
     return nil if contents.nil?
     if confirmed_no_hmdmc?
-      contents.each do |k, v|
+      contents.each do |_k, v|
         hmdmc_confirmed_by = v['hmdmc_not_required_confirmed_by']
         return hmdmc_confirmed_by if hmdmc_confirmed_by.present?
       end
@@ -99,20 +103,17 @@ class Labware < ApplicationRecord
     nil
   end
 
-private
+  private
 
-  def _set_hmdmc(hmdmc, confirmed_not_required, username)
+  # Set the HMDMC not required field (hmdmc_not_required_confirmed_by) for all samples which are
+  #   human and do not have HMDMC numbers assigned.
+  def _set_hmdmc_not_required(username)
     return if contents.nil?
-    contents.each do |address, data|
+    contents.each do |_address, data|
       human = material_is_human?(data)
-      if human && !confirmed_not_required
-        data['hmdmc'] = hmdmc
-        data['hmdmc_set_by'] = username
-      else
+      if human && data['hmdmc'].blank?
         data.delete('hmdmc')
         data.delete('hmdmc_set_by')
-      end
-      if human && confirmed_not_required
         data['hmdmc_not_required_confirmed_by'] = username
       else
         data.delete('hmdmc_not_required_confirmed_by')
@@ -120,9 +121,20 @@ private
     end
   end
 
+  # TODO: This should be changed to use the taxon_id when it is incorporated
+  # Determine if the given material/sample is a human or "homo sapien" sample
   def material_is_human?(material)
     species = material['scientific_name']
-    species.present? && species.strip.downcase=='homo sapiens'
+    species.present? && species.strip.downcase == 'homo sapiens'
+  end
+
+  # TODO: This should be changed to use the taxon_id when it is incorporated
+  # Determine if the given material/sample is a human or "homo sapien" sample and has no HMDMC
+  #   number accompanying it
+  def material_is_human_no_hmdmc?(material)
+    species = material['scientific_name']
+    hmdmc = material['hmdmc']
+    species.present? && species.strip.downcase == 'homo sapiens' && hmdmc.blank?
   end
 
   def check_ethics(data)

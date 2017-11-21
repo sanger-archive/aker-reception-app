@@ -120,10 +120,8 @@
   proto.isTabWithContent = function(tab) {
     var data = this.dataForTab(tab); // data is the labware for this tab
 
-    return (data["contents"]!=null);
+    return (data["contents"] != null);
     // TODO -- this needs to examine data more closely
-
-
 
     // if (data.content===null) {
     //   return false;
@@ -191,13 +189,13 @@
     if (data && data.messages) {
 
       for (var key in data) {
-        for (var i=0; i<data.messages.length; i++) {
+        for (var i = 0; i < data.messages.length; i++) {
           var message = data.messages[i];
           this.resetCellNameErrors(message.labwareIndex);
         }
         this.resetMainAlertError();
 
-        for (var i=0; i<data.messages.length; i++) {
+        for (var i = 0; i<data.messages.length; i++) {
           var message = data.messages[i];
           var address = message.address;
           if (address) {
@@ -281,6 +279,9 @@
     });
   };
 
+  /**
+   * Returns the fields from the cell of the given ID
+   */
   proto.fieldsForId = function(id) {
     var matching = id.match(/labware\[([0-9]*)\]address\[([A-Z0-9:]*)\]fieldName\[(\w*)\]/);
     if (matching) {
@@ -294,19 +295,20 @@
   }
 
   proto.saveInput = function(data, pos, input) {
-    if (data==null) {
+    if (data == null) {
       return;
     }
 
     var id = $(input).attr('id');
     var info = this.fieldsForId(id);
 
-    if (info && data.labware_index==info.labwareIndex) {
+    if (info && data.labware_index == info.labwareIndex) {
 
+      // Get and santize the value of the input
       var v = $(input).val();
-      if (v!=null) {
+      if (v != null) {
         v = $.trim(v);
-        if (v=='') {
+        if (v == '') {
           v = null;
         }
       }
@@ -318,7 +320,7 @@
           data["contents"][info.address] = {}
         }
         data["contents"][info.address][info.fieldName] = v;
-      } else if (this.fieldData(data, info.address, info.fieldName)!=null) {
+      } else if (this.fieldData(data, info.address, info.fieldName) != null) {
         data["contents"][info.address][info.fieldName] = null;
       }
     }
@@ -352,7 +354,7 @@
   // This returns the labware object linked to the tab
   proto.dataForTab = function(tab) {
     for (var key in this.params) {
-      if ($(tab).attr('href') === ('#Labware'+this.params[key].labware_index)) {
+      if ($(tab).attr('href') === ('#Labware' + this.params[key].labware_index)) {
         return this.params[key];
       }
     }

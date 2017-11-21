@@ -4,7 +4,8 @@ module SchemaValidators
     @@VALIDATION_CLASSES = [ 
       SchemaValidators::BiomaterialSchemaPropertyValidators::RequiredFieldValidator, 
       SchemaValidators::BiomaterialSchemaPropertyValidators::AllowedValuesValidator, 
-      SchemaValidators::BiomaterialSchemaPropertyValidators::TaxonIdValidator 
+      SchemaValidators::BiomaterialSchemaPropertyValidators::TaxonIdValidator,
+      SchemaValidators::BiomaterialSchemaPropertyValidators::HmdmcValidator 
     ]
 
     def self.VALIDATION_CLASSES

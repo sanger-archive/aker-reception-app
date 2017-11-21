@@ -38,7 +38,7 @@ class ProvenanceService
   # - [true, []] - nothing went wrong
   # - [false, [error1, error2, ...]] - some stuff went wrong; here is the information
   # - [false, []] - something unexpected went wrong
-  def set_biomaterial_data(material_submission, labware_params)
+  def set_biomaterial_data(material_submission, labware_params, current_user)
     all_errors = []
 
     success = true
@@ -54,6 +54,9 @@ class ProvenanceService
             unless value.blank?
               filtered_data[address] = {} if filtered_data[address].nil?
               filtered_data[address][fieldName] = value.strip()
+
+              # Add HMDMC set_by field for each sample
+              filtered_data[address]['hmdmc_set_by'] = current_user.email if fieldName == 'hmdmc'
             end
           end
         end
@@ -71,6 +74,5 @@ class ProvenanceService
     success &= all_errors.empty?
     return success, all_errors
   end
-
 
 end

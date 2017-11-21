@@ -2,6 +2,13 @@ require 'rails_helper'
 require 'ldap_group_reader'
 
 RSpec.describe ContactGroup, type: :model do
+
+  describe '#name' do
+    it 'should be sanitised' do
+      expect(create(:contact_group, name: '  ALPHA  ').name).to eq('alpha')
+    end
+  end
+
   describe 'validity' do
     it 'can be valid' do
       expect(build(:contact_group)).to be_valid
@@ -15,6 +22,15 @@ RSpec.describe ContactGroup, type: :model do
       let(:other) { create(:contact_group) }
 
       it { expect(build(:contact_group, name: other.name)).not_to be_valid }
+    end
+
+    it 'is not valid without a unique sanitised name' do
+      create(:contact_group, name: 'alpha')
+      expect(build(:contact_group, name: '  ALPHA  ')).not_to be_valid
+    end
+
+    it 'is valid with a unique sanitised name' do
+      expect(build(:contact_group, name: '  ALPHA  ')).to be_valid
     end
   end
 

@@ -2,9 +2,11 @@
 require 'cucumber/rspec/doubles'
 
 Before do
-  user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
-  MaterialSubmissionsController.any_instance.stub(:current_user).and_return(user)
-  SubmissionsController.any_instance.stub(:current_user).and_return(user)
+  user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: ['world'])
+  @logged_in = false
+  allow_any_instance_of(ApplicationController).to receive(:current_user) { @logged_in ? user : nil }
+  allow_any_instance_of(ApplicationController).to receive(:jwt_provided?) { @logged_in }
+  allow_any_instance_of(ApplicationController).to receive(:check_credentials).and_wrap_original { |m, *args| @logged_in || m.call(*args) }
 end
 
 Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
@@ -19,39 +21,115 @@ Given(/^I have defined labware of type "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I have a material service running$/) do
-  MatconClient::Material.stub(:schema).and_return({
-      'required' => ['supplier_name', 'scientific_name', 'gender', 'donor_id', 'phenotype'],
-      'properties' => {
-        'supplier_name' => {
-          'required' => true,
-          'friendly_name' => "Supplier name",
-          'field_name_regex' => "^supplier[-_\s]*(name)?$",
+  MatconClient::Material.stub(:schema).and_return(
+    {
+      "show_on_form" => [
+        "scientific_name",
+        "taxon_id",
+        "gender",
+        "donor_id",
+        "phenotype",
+        "supplier_name",
+        "is_tumour",
+        "tissue_type"
+      ],
+      "required" => [
+        "taxon_id",
+        "scientific_name",
+        "gender",
+        "donor_id",
+        "supplier_name",
+        "is_tumour",
+        "tissue_type"
+      ],
+      "type" => "object",
+      "properties" => {
+        "taxon_id" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Tax id",
+          "field_name_regex" => "^taxon[-_\\s]*(id)?$",
+          "type" => "string"
         },
-        'scientific_name' => {
-          'required' => true,
-          'field_name_regex' => "^scientific[-_\s]*(name)?$",
-          'allowed' => ['Homo sapiens', 'Mus musculus'],
-          'friendly_name' => "Scientific name"
+
+        "scientific_name" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Scientific name",
+          "field_name_regex" => "^scientific[-_\\s]*(name)?$",
+          "type" => "string"
         },
-        'OPTIONAL' => {
-          'required' => false,
+        "gender" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Gender",
+          "field_name_regex" => "^(gender|sex)$",
+          "allowed" => [
+            "male",
+            "female",
+            "unknown",
+            "not applicable",
+            "mixed",
+            "hermaphrodite"
+          ],
+          "type" => "string"
         },
-        'gender' => {
-          'required' => true,
-          'field_name_regex' => "^(gender|sex)$",
-          'friendly_name' => "Gender"
+        "donor_id" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Donor ID",
+          "field_name_regex" => "^donor[-_\\s]*(id)?$",
+          "type" => "string"
         },
-        'donor_id' => {
-          'required' => true,
-          'field_name_regex' => "^donor[-_\s]*(id)?$",
-          'friendly_name' => "Donor ID"
+        "phenotype" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => false,
+          "friendly_name" => "Phenotype",
+          "field_name_regex" => "^phenotype$",
+          "type" => "string"
         },
-        'phenotype' => {
-          'required' => true,
-          'field_name_regex' => "^phenotype$",
-          'friendly_name' => "Phenotype"
+        "supplier_name" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Supplier name",
+          "field_name_regex" => "^supplier[-_\\s]*(name)?$",
+          "type" => "string"
+        },
+        "is_tumour" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "allowed" => [
+            "tumour",
+            "normal"
+          ],
+          "friendly_name" => "Tumour?",
+          "field_name_regex" => "^(tumour|tumor)$",
+          "type" => "string"
+        },
+        "tissue_type" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "allowed" => [
+            "dna/rna",
+            "blood",
+            "saliva",
+            "tissue",
+            "cells",
+            "lysed cells"
+          ],
+          "friendly_name" => "Tissue Type",
+          "field_name_regex" => "^tissue[-_\s]type$",
+          "type" => "string"
         }
-      },
+      }
     })
 end
 
@@ -60,7 +138,7 @@ Given(/^I have the internal contact "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I am logged in$/) do
-  visit root_path
+  @logged_in = true
 end
 
 Given(/^I visit the homepage$/) do
@@ -77,11 +155,11 @@ Given(/^I check "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I go to next screen$/) do
-  first('a.save').trigger('click')
+  within(first('form > .row > .col-md-12')) { click_on('Next') }
 end
 
 Then(/^I am in "([^"]*)"$/) do |arg1|
-  expect(page.has_content?(arg1)).to eq(true)
+  expect(page).to have_content(arg1)
 end
 
 Given(/^I select a type of labware$/) do
@@ -94,22 +172,31 @@ end
 
 When(/^I upload the file "([^"]*)"$/) do |arg1|
   attach_file('Upload CSV', File.absolute_path(arg1), make_visible: true)
+  sleep(5)
 end
 
-Then(/^I should see data from my file like "([^"]*)"$/) do |arg1|
+Given(/^I debug$/) do 
+  binding.pry
+end
+
+Then(/^I should see data from my file like a textbox containing "([^"]*)"$/) do |arg1|
   expect(page).to have_selector("input[value='" + arg1 + "']")
 end
 
+Then(/^I should see data from my file like a dropdown with "([^"]*)" selected$/) do |arg1|
+  expect(page).to have_selector("select[value='" + arg1 + "']")
+end
+
 Then(/^I should see validation errors$/) do
-  expect(page.has_content?('validation')).to eq(true)
+  expect(page).to have_content('validation')
 end
 
 Then(/^I should not see any validation errors$/) do
-  expect(page.has_content?('validation')).to eq(false)
+  expect(page).not_to have_content('validation')
 end
 
 When(/^I enter my details as collaborator$/) do
-  fill_in('Address', :with => 'Some address')
+  fill_in('Address', with: 'Some address')
 end
 
 Then(/^show me the page$/) do
@@ -121,12 +208,12 @@ When(/^I select "([^"]*)" from the "([^"]*)" select$/) do |option, dropdown|
 end
 
 Then(/^I should see "([^"]*)"$/) do |arg1|
-  expect(page.has_content?(arg1)).to eq(true)
+  expect(page).to have_content(arg1)
 end
 
 Then(/^I know my shared submission identifier$/) do
   last_id = MaterialSubmission.last.id.to_s
-  expect(page.has_content?("Submission "+last_id)).to eq(true)
+  expect(page).to have_content("Submission "+last_id)
 end
 
 # Find a select box by (label) name or id and assert the given text is selected

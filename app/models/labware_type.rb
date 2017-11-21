@@ -6,8 +6,20 @@ class LabwareType < ApplicationRecord
   validates :col_is_alpha, inclusion: { in: [true, false] }
   validates :row_is_alpha, inclusion: { in: [true, false] }
 
+  before_validation :sanitise_name
+  before_save :sanitise_name
+
   def size
     num_of_cols * num_of_rows
+  end
+
+  def sanitise_name
+    if name
+      sanitised = name.strip.gsub(/\s+/, ' ')
+      if sanitised != name
+        self.name = sanitised
+      end
+    end
   end
 
 end

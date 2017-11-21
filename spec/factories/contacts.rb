@@ -1,6 +1,11 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :contact do
     fullname 'Jeff'
-    email 'jeff@jeff'    
+    email { generate(:contact_email) }
+  end
+
+
+  sequence :contact_email do |n|
+    "user#{n}@email"
   end
 end

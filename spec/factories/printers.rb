@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :printer do
     name "MyString"
     label_type "MyString"

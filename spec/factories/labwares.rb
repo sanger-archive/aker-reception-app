@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :labware do
     sequence(:labware_index) { |n| n }
     material_submission

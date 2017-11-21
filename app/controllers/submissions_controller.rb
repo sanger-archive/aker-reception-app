@@ -3,7 +3,7 @@ class SubmissionsController < ApplicationController
   steps :labware, :provenance, :ethics, :dispatch
 
   def show
-    if step==:ethics && !any_human_material?
+    if step == :ethics && !any_human_material_no_hmdmc?
       skip_step
     end
     render_wizard
@@ -16,15 +16,16 @@ class SubmissionsController < ApplicationController
       return
     end
 
-    if params[:id]=="ethics"
+    if params[:id] == "ethics"
       return ethics_update
     end
 
-    if params[:id]=="provenance"
+    if params[:id] == "provenance"
       labware_params = params["material_submission"]["labware"]
       service = ProvenanceService.new(material_schema)
 
-      @status_success, @invalid_data = service.set_biomaterial_data(material_submission, labware_params)
+      @status_success, @invalid_data = service.set_biomaterial_data(material_submission,
+                                                                    labware_params)
       # Return here so we don't advance to the next step if we're just changing tabs
       if params["material_submission"]["change_tab"]
         render_wizard
@@ -34,7 +35,9 @@ class SubmissionsController < ApplicationController
         @status_success = material_submission.update(material_submission_params)
       end
     else
-      @status_success = material_submission.update(material_submission_params.merge(status: step.to_s, last_step: last_step?))
+      @status_success = material_submission.update(material_submission_params.merge(
+        status: step.to_s,
+        last_step: last_step?))
     end
 
     unless @status_success
@@ -96,23 +99,26 @@ class SubmissionsController < ApplicationController
     render_wizard material_submission
   end
 
-  # receive biomaterial data, validate it and save it in the labware's json column
+  # Receive biomaterial data, validate it and save it in the labware's 'contents' column (JSON)
   def biomaterial_data
     # Make sure we don't let anyone update the data after the wizard has completed
     raise "This submission cannot be updated." unless material_submission.pending?
 
     labware_params = params["material_submission"]["labware"]
     service = ProvenanceService.new(material_schema)
-    @update_successful, @invalid_data = service.set_biomaterial_data(material_submission, labware_params)
+    @update_successful, @invalid_data = service.set_biomaterial_data(material_submission,
+                                                                     labware_params,
+                                                                     current_user)
 
     if @update_successful && !params["material_submission"]["change_tab"]
-      @update_successful = material_submission.update_attributes(status: (any_human_material? ? 'ethics' : 'dispatch'))
+      @update_successful = material_submission.update_attributes(
+        status: (any_human_material_no_hmdmc? ? 'ethics' : 'dispatch'))
     end
 
-    if !@update_successful && (material_submission.status=='dispatch' || material_submission.status=='ethics')
-      # If the given provenance is incomplete or wrong, make sure
-      # they're not in a later step (because they could have gone
-      # back and incorrected the material data).
+    if !@update_successful &&
+        (material_submission.status == 'dispatch' || material_submission.status == 'ethics')
+      # If the given provenance is incomplete or wrong, make sure they're not in a later step
+      #   (because they could have gone back and incorrected the material data).
       material_submission.update_attributes(status: :provenance)
     end
   end
@@ -135,9 +141,9 @@ class SubmissionsController < ApplicationController
     MatconClient::Material.schema
   end
 
-  def previous_step(step=nil)
+  def previous_step(step = nil)
     pstep = super(step)
-    return :provenance if pstep==:ethics && !any_human_material?
+    return :provenance if pstep == :ethics && !any_human_material_no_hmdmc?
     return pstep
   end
 
@@ -166,9 +172,14 @@ protected
 private
 
   def material_submission_params
-    params.require(:material_submission).permit(
-      :supply_labwares, :supply_decappers, :no_of_labwares_required, :status, :labware_type_id, :address, :contact_id, :labware
-    )
+    params.require(:material_submission).permit(:supply_labwares,
+                                                :supply_decappers,
+                                                :no_of_labwares_required,
+                                                :status,
+                                                :labware_type_id,
+                                                :address,
+                                                :contact_id,
+                                                :labware)
   end
 
   def ethics_params
@@ -184,8 +195,13 @@ private
     material_submission&.any_human_material?
   end
 
+  # Check whether there is human material without HMDMC numbers in this submission
+  def any_human_material_no_hmdmc?
+    material_submission&.any_human_material_no_hmdmc?
+  end
+
   def labware_at_index(index)
-    material_submission.labwares.select { |lw| lw.labware_index==index }.first
+    material_submission.labwares.select { |lw| lw.labware_index == index }.first
   end
 
   def finish_wizard_path

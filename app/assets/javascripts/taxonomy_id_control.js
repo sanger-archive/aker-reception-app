@@ -8,7 +8,11 @@
     this.inputSciName = $(this.node).find(this.relativeCssSelectorSciName);
     this.inputTaxId = $(this.node).find(this.relativeCssSelectorTaxId);
 
-    this._cacheStorage = params.cachedTaxonomies || {};
+    if (typeof window._taxonomyCache == 'undefined') {
+      window._taxonomyCache = {};
+    }
+    window._taxonomyCache = $.extend(window._taxonomyCache, params.cachedTaxonomies);
+    this._cacheStorage = window._taxonomyCache;
 
     this.attachHandlers();
   };
@@ -16,10 +20,11 @@
   var proto = TaxonomyIdControl.prototype;
 
   proto.attachHandlers = function() {
-    
-    this.inputTaxId.on('keyup', $.proxy(this.findTaxId, this));
-    this.inputTaxId.on('blur', $.proxy(this.findTaxId, this));
-    this.inputTaxId.on('keyup', $.proxy(this.onKeyUp, this));
+    $(this.node).closest('table').on('psd.update-table', $.proxy(this.findTaxId, this, true));
+    this.inputTaxId.on('keyup', $.proxy(this.findTaxId, this, false));
+    this.inputTaxId.on('change', $.proxy(this.findTaxId, this, false));
+    this.inputTaxId.on('blur', $.proxy(this.findTaxId, this, false));
+    this.inputTaxId.on('keyup', $.proxy(this.onKeyUp, this, false));
 
     // When focus on the scientific name, send the focus to the next input, as this input
     // is not editable
@@ -59,6 +64,7 @@
   };
 
   proto.onSuccessFindTaxId = function(data) {
+    this._cacheStorage[data.taxId] = data;
     this.setScientificName(data.scientificName);
     this.markInputsAs('has-success');
   };
@@ -67,7 +73,7 @@
     this.markInputsAs('has-error');
   };
 
-  proto.findTaxId = function() {
+  proto.findTaxId = function(synchronous) {
     var taxId = this.inputTaxId.val();
     this.inputSciName.val('');    
     if (this.validateTaxId(taxId)) {
@@ -81,7 +87,8 @@
         url: this.taxonomyServiceUrl+'/'+taxId,
         method: 'GET',
         success: $.proxy(this.onSuccessFindTaxId, this),
-        error: $.proxy(this.onErrorFindTaxId, this)
+        error: $.proxy(this.onErrorFindTaxId, this),
+        async: !synchronous
       });      
     } else {
       this.markInputsAs('has-error');
