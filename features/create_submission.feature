@@ -17,7 +17,7 @@ Scenario:
 
 Given I visit the homepage
 
-And I click on "Create New Submission"
+And I click on "Create"
 
 Then I am in "Container Type"
 
@@ -30,7 +30,7 @@ Then I am in "Biomaterial Metadata"
 Given I upload the file "test/data/correct_manifest.csv"
 Then I should see data from my file like a textbox containing "334457"
 And I should see data from my file like a dropdown with "male" selected
-And I should see data from my file like a dropdown with "Homo sapiens" selected
+And I should see data from my file like a textbox containing "Homo Sapiens"
 
 When I go to next screen
 Then I should not see any validation errors

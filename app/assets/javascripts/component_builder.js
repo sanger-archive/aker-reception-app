@@ -15,13 +15,24 @@
   };
 
   proto.instantiateNode = function(node) {
-    var className = $(node).data('psd-component-class');
-    if (typeof this.components[className] === 'undefined') {
-      console.log('Builder cannot find the class '+className);
+    var classNames = $(node).data('psd-component-class');
+    var paramsList = $(node).data('psd-component-parameters');
+
+    if (!(classNames instanceof Array)) {
+      classNames = [classNames];
+      paramsList = [paramsList];
     }
-    $(node).removeAttr('data-psd-component-class');
-    var params = $(node).data('psd-component-parameters');
-    this.addInstance(new this.components[className](node, params));
+
+    for (var i=0; i< classNames.length; i++) {
+      var className = classNames[i];
+      var params = paramsList[i];
+
+      if (typeof this.components[className] === 'undefined') {
+        console.log('Builder cannot find the class '+className);
+      }
+      $(node).removeAttr('data-psd-component-class');
+      this.addInstance(new this.components[className](node, params));
+    }
   };
 
   proto.builderProcess = function() {

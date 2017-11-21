@@ -17,10 +17,11 @@ Scenario:
 
 Given I visit the homepage
 
-And I click on "Create New Submission"
+#And I click on "Create New Submission"
 # For some reason this tests needs us to click on the "Create New Submission"
 # twice to move onto the next screen
-And I click on "Create New Submission"
+And I click on "Create"
+And I click on "Create"
 
 Then I am in "Container Type"
 
@@ -51,7 +52,7 @@ Then "fields-from-csv" should contain "Phenotyp"
 Then "fields-from-csv" should contain "Tissue"
 Then "fields-from-csv" should contain "cancer"
 
-Then "matched-fields-table" should contain 0 rows
+Then "matched-fields-table" should contain 1 rows
 
 When I select "*Position (position)" from the "form-fields" select
 Then "*Position (position)" should be selected for "form-fields"
@@ -60,52 +61,52 @@ When I select "Well Positio" from the "fields-from-csv" select
 Then "Well Positio" should be selected for "fields-from-csv"
 
 Given I click on "match-fields-button"
-Then "matched-fields-table" should contain 1 rows
+Then "matched-fields-table" should contain 2 rows
 
 When I select "*Scientific name (scientific_name)" from the "form-fields" select
 When I select "sciname" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
-Then "matched-fields-table" should contain 2 rows
+Then "matched-fields-table" should contain 3 rows
 
 When I select "*Supplier name (supplier_name)" from the "form-fields" select
 When I select "supname" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
-Then "matched-fields-table" should contain 3 rows
+Then "matched-fields-table" should contain 4 rows
 
 When I select "*Gender (gender)" from the "form-fields" select
 When I select "ender" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
-Then "matched-fields-table" should contain 4 rows
+Then "matched-fields-table" should contain 5 rows
 
 When I select "*Donor ID (donor_id)" from the "form-fields" select
 When I select "Dono" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
-Then "matched-fields-table" should contain 5 rows
+Then "matched-fields-table" should contain 6 rows
 
 When I select "Phenotype (phenotype)" from the "form-fields" select
 When I select "Phenotyp" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
-Then "matched-fields-table" should contain 6 rows
+Then "matched-fields-table" should contain 7 rows
 
 When I select "*Tissue Type (tissue_type)" from the "form-fields" select
 When I select "Tissue" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
-Then "matched-fields-table" should contain 7 rows
+Then "matched-fields-table" should contain 8 rows
 
 When I select "*Tumour? (is_tumour)" from the "form-fields" select
 When I select "cancer" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
-Then "matched-fields-table" should contain 8 rows
+Then "matched-fields-table" should contain 9 rows
 
 Given I click on "complete-csv-matching"
 
 Then I should see data from my file like a dropdown with "lysed cells" selected
 Then I should see data from my file like a dropdown with "female" selected
-Then I should see data from my file like a dropdown with "Homo sapiens" selected
+#Then I should see data from my file like a textbox containing "Homo sapiens"

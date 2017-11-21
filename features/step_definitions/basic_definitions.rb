@@ -25,6 +25,7 @@ Given(/^I have a material service running$/) do
     {
       "show_on_form" => [
         "scientific_name",
+        "taxon_id",
         "gender",
         "donor_id",
         "phenotype",
@@ -33,6 +34,7 @@ Given(/^I have a material service running$/) do
         "tissue_type"
       ],
       "required" => [
+        "taxon_id",
         "scientific_name",
         "gender",
         "donor_id",
@@ -42,16 +44,21 @@ Given(/^I have a material service running$/) do
       ],
       "type" => "object",
       "properties" => {
+        "taxon_id" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Tax id",
+          "field_name_regex" => "^taxon[-_\\s]*(id)?$",
+          "type" => "string"
+        },
+
         "scientific_name" => {
           "show_on_form" => true,
           "searchable" => true,
           "required" => true,
           "friendly_name" => "Scientific name",
           "field_name_regex" => "^scientific[-_\\s]*(name)?$",
-          "allowed" => [
-            "Homo sapiens",
-            "Mus musculus"
-          ],
           "type" => "string"
         },
         "gender" => {
@@ -148,7 +155,7 @@ Given(/^I check "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I go to next screen$/) do
-  first('a.save').trigger('click')
+  within(first('form > .row > .col-md-12')) { click_on('Next') }
 end
 
 Then(/^I am in "([^"]*)"$/) do |arg1|
@@ -165,6 +172,11 @@ end
 
 When(/^I upload the file "([^"]*)"$/) do |arg1|
   attach_file('Upload CSV', File.absolute_path(arg1), make_visible: true)
+  sleep(5)
+end
+
+Given(/^I debug$/) do 
+  binding.pry
 end
 
 Then(/^I should see data from my file like a textbox containing "([^"]*)"$/) do |arg1|

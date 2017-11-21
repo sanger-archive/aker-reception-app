@@ -21,11 +21,22 @@
 //= require bootstrap-table
 //= require csv_field_checker
 //= require load_table
+//= require taxonomy_control
+//= require_tree ./templates
 //= require_tree .
 
 $(document).on("turbolinks:load", function() {
   $('.has-tooltip').tooltip();
   $('.has-popover').popover({
     trigger: 'hover'
+  });
+});
+
+$(document).on("turbolinks:load", function() {
+  $('td[data-psd-schema-validation-name=scientific_name] input').each(function(pos, input) {
+    //var selectNode = $('<select style="width: 100%;"></select>');
+    //var selectNode = $('<input disabled="disabled"></input>')
+    //$(input).replaceWith(selectNode)
+    //new TaxonomyControl(selectNode, []);
   });
 });

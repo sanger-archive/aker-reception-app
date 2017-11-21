@@ -66,6 +66,7 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 
+
   <%= bootstrap_form_tag url: material_submission_biomaterial_data_path(material_submission.id),
                          remote: true,
                          method: :put,
@@ -131,7 +132,16 @@
 
             <tbody>
               <% for address in labware.positions %>
-                <tr data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
+                <tr 
+                  data-psd-component-class='TaxonomyIdControl'
+                  data-psd-component-parameters="<%=
+                    {
+                      taxonomyServiceUrl: Rails.configuration.taxonomy_service_url,
+                      relativeCssSelectorSciName: 'td[data-psd-schema-validation-name=scientific_name] input',
+                      relativeCssSelectorTaxId: 'td[data-psd-schema-validation-name=taxon_id] input',
+                      cachedTaxonomies: controller.cached_taxonomies || {}
+                    }.to_json %>"
+                  data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
                   <td><%= address %></td>
                   <% for col in schema['show_on_form'] %>
                     <td data-psd-schema-validation-name="<%= col %>">

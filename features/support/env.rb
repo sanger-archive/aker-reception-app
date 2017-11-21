@@ -64,3 +64,4 @@ Capybara.register_driver :poltergeist_debug do |app|
 end
 
 Capybara.javascript_driver = :poltergeist_debug
+#Capybara.javascript_driver = :selenium_chrome
