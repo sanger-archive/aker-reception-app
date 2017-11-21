@@ -70,7 +70,8 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   Capybara.register_driver :poltergeist_debug do |app|
-    Capybara::Poltergeist::Driver.new(app, :inspector => true, js_errors: true, debug: true)
+    Capybara::Poltergeist::Driver.new(app, :inspector => true, js_errors: true, debug: true, 
+                                    url_blacklist: ['https://fonts.googleapis.com'])
   end
 
   #Capybara.default_driver = :capybara_webmock_poltergeist
@@ -79,7 +80,7 @@ RSpec.configure do |config|
 
 
   #Capybara.javascript_driver = :selenium_chrome
-  Capybara.javascript_driver = :poltergeist
+  Capybara.javascript_driver = :poltergeist_debug
 
   config.include Capybara::DSL
 
