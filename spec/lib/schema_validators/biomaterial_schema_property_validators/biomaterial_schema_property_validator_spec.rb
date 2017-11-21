@@ -30,27 +30,32 @@ RSpec.describe SchemaValidators::BiomaterialSchemaPropertyValidators::Biomateria
   end
 
   context '#add_error' do
+    let(:errors) {
+      [
+        {labwareIndex: 1, address: '1', errors: {}},
+        {labwareIndex: 1, address: '2', errors: {}},
+        {labwareIndex: 2, address: '1', errors: {}}
+      ]
+    }
+
     context 'when adding an error to the slot of a labware that already exists' do
-      let(:errors) {
-        [
-          {labwareIndex: 1, address: '1', errors: {}},
-          {labwareIndex: 1, address: '2', errors: {}},
-          {labwareIndex: 2, address: '1', errors: {}}
-        ]
-      }
       it 'adds the error in the corresponding element of the list of errors' do
         allow(validator).to receive(:error_messages).and_return(errors)
 
         prop_validator.add_error(1, '2', 'common_name', 'a message')
         prop_validator.add_error(1, '2', 'supplier_name', 'a message')
-        
-        expect(errors[0][:errors].keys.length).to eq(2)
-        expect(errors[1][:errors].keys.length).to eq(0)
+
+        expect(errors[0][:errors].keys.length).to eq(0)
+        expect(errors[1][:errors].keys.length).to eq(2)
         expect(errors[2][:errors].keys.length).to eq(0)
       end
     end
-    context 'when either the slot does not exist' do
+    context 'when either the slot or the labware do not exist' do
       it 'creates a new error element' do
+        allow(validator).to receive(:error_messages).and_return(errors)
+
+        prop_validator.add_error(1, '3', 'common_name', 'a message')
+        expect(prop_validator.error_messages[3][:errors].keys.length).to eq(1)
       end
     end
   end
