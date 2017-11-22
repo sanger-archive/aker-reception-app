@@ -9,7 +9,6 @@ require 'rspec/rails'
 require 'capybara/rails'
 require 'capybara/rspec'
 require 'capybara/poltergeist'
-require 'capybara/webmock'
 
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -32,15 +31,6 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
-  config.before(:suite) do
-    Capybara::Webmock.start
-  end
-
-  config.after(:suite) do
-    Capybara::Webmock.stop
-  end
-
-
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
 

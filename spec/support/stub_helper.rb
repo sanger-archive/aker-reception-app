@@ -1,5 +1,3 @@
-require 'sinatra/base'
-
 module StubHelper
 
   def stub_matcon_client_schema

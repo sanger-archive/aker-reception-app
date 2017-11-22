@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'webmock/rspec'
 require 'support/stub_helper'
 require 'support/wait_for_ajax'
 
@@ -11,8 +10,6 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
     let(:user) { OpenStruct.new(:email => 'user@sanger.ac.uk', :groups => ['world']) }
 
     before do
-      WebMock.disable_net_connect!(:allow_localhost => true)
-
 
       allow(MatconClient::Material).to receive(:schema).and_return({
         'show_on_form' => ['taxon_id', 'scientific_name', 'supplier_name', 'donor_id', 'gender', 'phenotype'],

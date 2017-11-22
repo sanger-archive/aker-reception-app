@@ -136,9 +136,6 @@ group :development, :test do
   gem 'launchy'
   # ?
   gem 'capybara'
-
-  gem 'capybara-webmock'
-
   # ?
   gem 'poltergeist'
   # ?

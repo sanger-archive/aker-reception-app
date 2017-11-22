@@ -18,7 +18,6 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'simplecov'
 require 'simplecov-rcov'
-require 'capybara/webmock'
 
 SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter
 SimpleCov.start

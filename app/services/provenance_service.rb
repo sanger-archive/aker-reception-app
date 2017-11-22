@@ -62,9 +62,6 @@ class ProvenanceService
         end
       end
 
-
-      #filtered_data = nil if filtered_data.empty?
-
       error_messages = validate(labware_index, filtered_data)
       filtered_data = nil if filtered_data.empty?
 
