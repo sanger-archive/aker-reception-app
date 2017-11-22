@@ -12,6 +12,12 @@ Given I have defined labware of type "ABgene AB_0800"
 And I have the internal contact "test@test"
 And I am logged in
 And I have a material service running
+And the taxonomy service has the following taxonomies defined:
+
+| Taxon Id | Scientific Name       |
+| 9606     | Homo sapiens          |
+| 1234     | One specie            |
+| 4567     | Another different one |
 
 Scenario:
 

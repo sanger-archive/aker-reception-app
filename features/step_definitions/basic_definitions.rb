@@ -137,6 +137,21 @@ Given(/^I have the internal contact "([^"]*)"$/) do |arg1|
   Contact.create(fullname: arg1, email: arg1)
 end
 
+Given(/^the taxonomy service has the following taxonomies defined:$/) do |table|
+  cached_taxonomies = {}
+  table.hashes.each_with_index do |taxonomy, index|
+    tax_info = double('taxonomy_info', { taxId: taxonomy['Taxon Id'], scientificName: taxonomy['Scientific Name']})
+    cached_taxonomies[tax_info.taxId] = { taxId: tax_info.taxId, scientificName: tax_info.scientificName}
+    allow(TaxonomyClient::Taxonomy).to receive(:find).with(tax_info.taxId).and_return(tax_info)
+  end
+  allow_any_instance_of(SubmissionsController).to receive(:cached_taxonomies).and_return(cached_taxonomies)
+end
+
+When(/^I should see a modal with the text "([^"]*)"$/) do |text|
+  sleep 3
+  step("I should see \"#{text}\"")
+end
+
 Given(/^I am logged in$/) do
   @logged_in = true
 end
@@ -144,6 +159,7 @@ end
 Given(/^I visit the homepage$/) do
   #visit('/')
   visit root_path
+  step("I should see \"Material Submission\"")
 end
 
 Given(/^I click on "([^"]*)"$/) do |arg1|

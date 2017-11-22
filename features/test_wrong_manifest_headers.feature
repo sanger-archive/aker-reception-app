@@ -12,16 +12,23 @@ Given I have defined labware of type "ABgene AB_0800"
 And I have the internal contact "test@test"
 And I am logged in
 And I have a material service running
+And the taxonomy service has the following taxonomies defined:
+
+| Taxon Id | Scientific Name       |
+| 9606     | Homo sapiens          |
+| 1234     | One specie            |
+| 4567     | Another different one |
+
 
 Scenario:
 
 Given I visit the homepage
-
+Then I click on "Create New Submission"
 #And I click on "Create New Submission"
 # For some reason this tests needs us to click on the "Create New Submission"
 # twice to move onto the next screen
-And I click on "Create"
-And I click on "Create"
+#And I click on "Create"
+#And I click on "Create"
 
 Then I am in "Container Type"
 
@@ -32,7 +39,7 @@ And I click on "Next"
 Then I am in "Biomaterial Metadata"
 
 Given I upload the file "test/data/incorrect_headers_manifest.csv"
-Then I should see "Select CSV mappings"
+Then I should see a modal with the text "Select CSV mappings"
 Then "form-fields" should contain "Position (position)"
 Then "form-fields" should contain "Scientific name (scientific_name)"
 Then "form-fields" should contain "Supplier name (supplier_name)"
