@@ -39,23 +39,30 @@
     <div class="collapse navbar-collapse" id="navBar">
     <%= render 'navlinks' %>
     <ul class="nav navbar-nav navbar-right">
-        <% if jwt_provided? %>
-          <li><p class="navbar-text">Logged in as <%= current_user.email %></p></li>
-          <li><%= link_to 'Log out', Rails.configuration.logout_url, method: :delete if Rails.configuration.logout_url %></li>
-        <% else %>
-          <li><%= link_to 'Log in', Rails.configuration.login_url if Rails.configuration.login_url %></li>
-        <% end %>
+      <li class="navbar-text"><strong><%= Rails.env.upcase %></strong></li>
+      <% if jwt_provided? %>
+        <li><p class="navbar-text">Logged in as <%= current_user.email %></p></li>
+        <li><%= link_to 'Log out', Rails.configuration.logout_url, method: :delete if Rails.configuration.logout_url %></li>
+      <% else %>
+        <li><%= link_to 'Log in', Rails.configuration.login_url if Rails.configuration.login_url %></li>
+      <% end %>
     </ul>
     </div>
     </div>
     </nav>
 
-  <div class="container" id="content">
-    <h1><%= yield(:main_title) %></h1>
+<div class="container" id="content">
+  <div class="row">
+    <div class="col-md-8">
+        <h1><%= yield(:main_title) %></h1>
+    </div>
+    <div class="col-md-4">
+        <%= yield(:title_button) if content_for?(:title_button) %>
+    </div>
+  </div>
     <%= render "flashes" %>
 
     <%= yield %>
-
-  </div>
+</div>
   </body>
 </html>

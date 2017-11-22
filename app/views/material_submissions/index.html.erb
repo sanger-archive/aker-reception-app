@@ -1,11 +1,11 @@
 <% content_for :main_title do %>
   Material Submission
 <% end %>
-<div class="row">
-  <div class="col-md-12">
-    <%= link_to 'Create New Submission', new_material_submission_path, class: 'btn btn-success vcenter' %>
-  </div>
-</div>
+<% content_for :title_button do %>
+  <%= link_to 'Create New Submission', new_material_submission_path,
+        class: 'btn btn-success pull-right',
+        style: "margin-top: 23px" %>
+<% end %>
 
 <div class="row">
   <div class="col-md-12">

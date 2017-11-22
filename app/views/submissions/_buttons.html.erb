@@ -1,26 +1,27 @@
 <div class="row">
   <div class="col-md-12">
     <div style="margin: 10px 0">
-      <% unless first_step? %>
-        <%= link_to 'Back', previous_wizard_path, class: 'btn btn-default' %>
-      <% end %>
-
       <% if (last_step?) %>
-        <%= f.submit "Save & Exit", class: "btn btn-primary", style: "float: right" %>
+        <%= f.submit "Save & Exit", class: "btn btn-success pull-right" %>
       <% else %>
         <% if step == :provenance %>
-          <%= link_to "Next", wizard_path(:ethics), {class: "btn btn-default save", style: "float: right" } %>
+          <%= link_to "Next", wizard_path(:ethics), {class: "btn btn-primary save pull-right" } %>
         <% else %>
-          <%= f.submit "Next", class: "btn btn-default", style: "float: right" %>
+          <%= f.submit "Next", class: "btn btn-primary pull-right" %>
         <% end %>
       <% end %>
 
-      <%= link_to 'Cancel', material_submission,
+      <% unless first_step? %>
+        <%= link_to 'Previous', previous_wizard_path,
+              class: 'btn btn-primary pull-left',
+              data: { confirm: 'Are you sure you wish to go back? You will lose unsaved progress on the curent step' },
+              style: "margin-right: 10px" %>
+      <% end %>
+
+      <%= link_to 'Cancel Submission', material_submission,
             method: :delete,
-            class: 'btn btn-danger',
-            data: { confirm: 'Are you sure you wish to cancel this submission?' },
-            style: "float: right; margin-right: 7px"
-      %>
+            class: 'btn btn-danger pull-left',
+            data: { confirm: 'Are you sure you wish to cancel this submission?' } %>
     </div>
   </div>
 </div>
