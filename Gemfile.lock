@@ -152,6 +152,7 @@ GEM
     builder (3.2.3)
     bunny (0.9.0.pre10)
       amq-protocol (>= 1.4.0)
+    byebug (9.1.0)
     cancancan (2.0.0)
     capybara (2.15.3)
       addressable
@@ -292,7 +293,6 @@ GEM
     multi_json (1.12.2)
     multi_test (0.1.2)
     multipart-post (2.0.0)
-    mustermann (1.0.1)
     net-ldap (0.11)
     nio4r (2.1.0)
     nokogiri (1.8.1)
@@ -312,8 +312,6 @@ GEM
     public_suffix (3.0.0)
     puma (3.10.0)
     rack (2.0.3)
-    rack-protection (2.0.0)
-      rack
     rack-proxy (0.6.2)
       rack
     rack-test (0.6.3)
@@ -411,11 +409,6 @@ GEM
     simplecov-html (0.10.2)
     simplecov-rcov (0.2.3)
       simplecov (>= 0.4.1)
-    sinatra (2.0.0)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.0)
-      tilt (~> 2.0)
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-watcher-listen (2.0.1)
@@ -492,6 +485,7 @@ DEPENDENCIES
   bootstrap-table-rails
   bootstrap_form
   bunny (= 0.9.0.pre10)
+  byebug
   capybara
   capybara-webmock
   coffee-rails (~> 4.2)
@@ -525,7 +519,6 @@ DEPENDENCIES
   select2-rails
   simplecov
   simplecov-rcov
-  sinatra
   spring
   spring-watcher-listen (~> 2.0.0)
   sqlite3
