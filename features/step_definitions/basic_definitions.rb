@@ -31,7 +31,8 @@ Given(/^I have a material service running$/) do
         "phenotype",
         "supplier_name",
         "is_tumour",
-        "tissue_type"
+        "tissue_type",
+        "hmdmc"
       ],
       "required" => [
         "taxon_id",
@@ -99,6 +100,14 @@ Given(/^I have a material service running$/) do
           "required" => true,
           "friendly_name" => "Supplier name",
           "field_name_regex" => "^supplier[-_\\s]*(name)?$",
+          "type" => "string"
+        },
+        "hmdmc" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => false,
+          "friendly_name" => "HMDMC No.",
+          "field_name_regex" => "^hmdmc$",
           "type" => "string"
         },
         "is_tumour" => {
