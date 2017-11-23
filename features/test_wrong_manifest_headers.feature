@@ -65,7 +65,7 @@ Then "Well Positio" should be selected for "fields-from-csv"
 Given I click on "match-fields-button"
 Then "matched-fields-table" should contain 2 rows
 
-When I select "*Scientific name (scientific_name)" from the "form-fields" select
+When I select "Scientific name (scientific_name)" from the "form-fields" select
 When I select "sciname" from the "fields-from-csv" select
 
 Given I click on "match-fields-button"
