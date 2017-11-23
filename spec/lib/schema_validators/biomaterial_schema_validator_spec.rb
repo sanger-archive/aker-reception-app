@@ -9,7 +9,7 @@ RSpec.describe SchemaValidators::BiomaterialSchemaValidator do
         'OPTIONAL' => {
           'required' => false,
         },
-        'tax_id' => {
+        'taxon_id' => {
           'required' => false
         },
         'scientific_name' => {
@@ -29,13 +29,13 @@ RSpec.describe SchemaValidators::BiomaterialSchemaValidator do
 
   context '#properties_to_validate' do
     it 'returns the properties from the loaded json schema' do
-      expect(validator.properties_to_validate).to eq(['OPTIONAL', 'tax_id', 'scientific_name', 'REQUIRED_FREE', 'REQUIRED_ENUM'])
+      expect(validator.properties_to_validate).to eq(['OPTIONAL', 'taxon_id', 'scientific_name', 'REQUIRED_FREE', 'REQUIRED_ENUM'])
     end
   end
   context '#validators_for' do
     it 'returns the list of valid validators for the field specified' do
       expect(validator.validators_for('OPTIONAL').length).to eq(0)
-      expect(validator.validators_for('tax_id').map(&:class)).to eq([
+      expect(validator.validators_for('taxon_id').map(&:class)).to eq([
         SchemaValidators::BiomaterialSchemaPropertyValidators::TaxonIdValidator
       ])
       expect(validator.validators_for('scientific_name').length).to eq(0)

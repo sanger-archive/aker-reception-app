@@ -2,12 +2,12 @@ module StubHelper
 
   def stub_matcon_client_schema
     allow(MatconClient::Material).to receive(:schema).and_return({
-        'required' => ['tax_id', 'supplier_name', 'scientific_name', 'gender', 'donor_id', 'phenotype'],
+        'required' => ['taxon_id', 'supplier_name', 'scientific_name', 'gender', 'donor_id', 'phenotype'],
         'properties' => {
-          'tax_id' => {
+          'taxon_id' => {
             'required' => true,
-            'friendly_name' => "Tax Id",
-            'field_name_regex' => "^tax[-_\s]*(id)?$",
+            'friendly_name' => "Taxon Id",
+            'field_name_regex' => "^taxon[-_\s]*(id)?$",
           },
           'supplier_name' => {
             'required' => true,

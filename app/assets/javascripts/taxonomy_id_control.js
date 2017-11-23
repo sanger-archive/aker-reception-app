@@ -51,12 +51,19 @@
   };
 
   proto.markInputsAs = function(mark) {
-    this.inputTaxId.parent().removeClass(this.previousMark);
-    this.inputSciName.parent().removeClass(this.previousMark);
+    this.toggleMark(this.previousMark, false);
+    this.toggleMark(this.previousMark, false);
+
     this.previousMark = mark;
-    this.inputTaxId.parent().addClass(this.previousMark);
-    this.inputSciName.parent().addClass(this.previousMark);
+
+    this.toggleMark(this.previousMark, true);
+    this.toggleMark(this.previousMark, true);
   }
+
+  proto.toggleMark = function(mark, toggle) {
+    this.inputTaxId.parent().toggleClass(this.previousMark, toggle);
+    this.inputSciName.parent().toggleClass(this.previousMark, toggle);
+  };
 
   proto.setScientificName = function(scientificName) {
     this.inputSciName.val(scientificName);
@@ -78,6 +85,8 @@
     this.inputSciName.val('');    
     if (this.validateTaxId(taxId)) {
       if (taxId.length == 0) {
+        this.toggleMark('has-success', false);
+        this.toggleMark('has-error', false);
         return;
       }
       if (typeof this._cacheStorage[taxId] !== 'undefined') {
