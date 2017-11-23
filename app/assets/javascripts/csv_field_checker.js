@@ -307,6 +307,7 @@ function fillInTableFromFile() {
         return true;
       });
       debug("importing complete!");
+      dataTable.trigger('psd.update-table');      
     },
   })
 }

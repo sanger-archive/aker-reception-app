@@ -131,7 +131,9 @@
    */
   proto.validateSchemaField = function(e, htmlField) {
     // Get the properties of the field from the schema
-    this._loadedSchema.properties['hmdmc']['required'] = false;
+    if (this._loadedSchema.properties['hmdmc']) {
+      this._loadedSchema.properties['hmdmc']['required'] = false;
+    }
     var fieldProperties = this._loadedSchema.properties[htmlField.name];
 
     var failed = false;

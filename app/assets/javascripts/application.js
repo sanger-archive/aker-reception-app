@@ -29,3 +29,4 @@ $(document).on("turbolinks:load", function() {
     trigger: 'hover'
   });
 });
+

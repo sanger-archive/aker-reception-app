@@ -12,12 +12,18 @@ Given I have defined labware of type "ABgene AB_0800"
 And I have the internal contact "test@test"
 And I am logged in
 And I have a material service running
+And the taxonomy service has the following taxonomies defined:
+
+| Taxon Id | Scientific Name       |
+| 9606     | Homo sapiens          |
+| 1234     | One specie            |
+| 4567     | Another different one |
 
 Scenario:
 
 Given I visit the homepage
 
-And I click on "Create New Submission"
+And I click on "Create"
 
 Then I am in "Container Type"
 
@@ -30,7 +36,7 @@ Then I am in "Biomaterial Metadata"
 Given I upload the file "test/data/correct_manifest.csv"
 Then I should see data from my file like a textbox containing "334457"
 And I should see data from my file like a dropdown with "male" selected
-And I should see data from my file like a dropdown with "Homo sapiens" selected
+And I should see data from my file like a textbox containing "Homo sapiens"
 
 When I go to next screen
 Then I should not see any validation errors

@@ -1,60 +1,35 @@
-require 'ehmdmc_client'
+require 'schema_validators'
 
 # Service to deal with complicated "provenance" (i.e. data fields for biomaterial)
 class ProvenanceService
 
+  attr_accessor :schema_validator
+
   def initialize(schema)
-    @schema = schema
+    @schema_validator = SchemaValidators::BiomaterialSchemaValidator.new(schema)
   end
 
   # Checks the given labware data against the schema to see if it looks OK.
   # Returns an array of errors. If the list is empty, the data seems to be OK.
   def validate(labware_index, labware_data)
-    return [] if @schema.nil?
-    return [] if labware_data.nil?
-    error_messages = []
-    labware_data.each do |address, bio_data|
-      @schema['properties'].each do |property_name, property_data|
-        field_data = bio_data[property_name]
-        field_data = field_data.strip if field_data
-        field_data = nil if field_data and field_data.empty?
-        if field_data.nil?
-          if property_data['required'] && property_name != 'hmdmc'
-            add_error(error_messages,
-                      labware_index,
-                      address,
-                      property_name,
-                      "The required field #{property_name} is not given.")
-          end
-        else
-          # Check HMDMC server-side
-          hmdmc_error = check_hmdmc(field_data, bio_data) if property_name == 'hmdmc'
-          unless hmdmc_error.blank?
-            add_error(error_messages,
-                      labware_index,
-                      address,
-                      property_name,
-                      hmdmc_error)
-          end
+    schema_validator.error_messages = []
 
-          enum_items = property_data['allowed']
-          if enum_items
-            i = enum_items.index { |x| x.casecmp(field_data) == 0 }
-            if i.nil?
-              add_error(
-                error_messages,
-                labware_index,
-                address,
-                property_name,
-                "The field #{property_name} needs to be one of the following: #{enum_items}.")
-            else
-              bio_data[property_name] = enum_items[i]
-            end
-          end
-        end
+    if labware_data.empty? && !schema_validator.default_field.nil?
+      schema_validator.error_messages = [{
+        errors: { schema_validator.default_field => "At least one material must be specified for each item of labware" },
+        labwareIndex: labware_index,
+        address: labware_data.keys.first,
+        update_successful: false,
+      }]
+    else
+      return [] if labware_data.empty?
+
+      labware_data.each do |address, bio_data|
+        schema_validator.validate(labware_index, address, bio_data)
       end
+
+      schema_validator.error_messages
     end
-    error_messages
   end
 
   # Process request to set the json data for labware in a given submission.
@@ -65,8 +40,6 @@ class ProvenanceService
   # - [false, []] - something unexpected went wrong
   def set_biomaterial_data(material_submission, labware_params, current_user)
     all_errors = []
-
-    general_error_field = default_field
 
     success = true
 
@@ -89,20 +62,9 @@ class ProvenanceService
         end
       end
 
+      error_messages = validate(labware_index, filtered_data)
       filtered_data = nil if filtered_data.empty?
 
-      if filtered_data.nil? && !general_error_field.nil?
-        error_messages = [{
-          errors: {
-            general_error_field => 'At least one material must be specified for each item of labware'
-          },
-          labwareIndex: labware_index,
-          address: labware.positions[0],
-          update_successful: false,
-        }]
-      else
-        error_messages = validate(labware_index, filtered_data)
-      end
       success &= labware.update_attributes(contents: filtered_data)
       all_errors += error_messages unless error_messages.empty?
     end
@@ -110,50 +72,4 @@ class ProvenanceService
     return success, all_errors
   end
 
-  private
-
-  # Get a field from the schema, not caring too much about which one
-  def default_field
-    sr = @schema['required']
-    return sr.first.to_sym if sr && !sr.empty?
-    sp = @schema['properties']
-    return sp.keys.first.to_sym if sp && !sp.empty?
-    nil
-  end
-
-  # Adds a validation error to the given error_messages.
-  def add_error(error_messages, labware_index, address, field, msg)
-    i = error_messages.index { |x| x[:labwareIndex] == labware_index && x[:address] == address }
-    if i.nil?
-      error_message = {
-        errors: {},
-        labwareIndex: labware_index,
-        address: address,
-        update_successful: true,
-      }
-      error_messages.push(error_message)
-    else
-      error_message = error_messages[i]
-    end
-
-    error_message[:errors][field.to_sym] = msg
-  end
-
-  # Performs some checks based on the presence of HMDMC
-  def check_hmdmc(hmdmc_number, bio_data)
-    # Only allow human material/samples to have HMDMC numbers
-    # TODO: Change to taxon_id
-    species = bio_data['scientific_name']
-    unless species.present? && species.strip.downcase == 'homo sapiens'
-      return 'Only human material are to have HMDMC numbers associated.'
-    end
-    # Check format validity
-    unless hmdmc_number.match(/^[0-9]{2}\/[0-9]{3}$/)
-      return 'The HMDMC number must be of the format ##/###.'
-    end
-    # Check the actual number with the HMDMC service
-    unless EHMDMCClient.validate?(hmdmc_number)
-      return "The HMDMC number #{hmdmc_number} could not be validated with the eHMDMC service."
-    end
-  end
 end
