@@ -42,6 +42,11 @@ function checkCSVFields(table, files) {
   fieldsOnForm = materialSchema.show_on_form;
   requiredFields = materialSchema.required;
 
+  // Remove "Scientific Name" from required fields, as it is populated based on taxon ID
+  var sci_name_index = materialSchema.required.indexOf("scientific_name");
+  requiredFields.splice(sci_name_index, 1);
+  materialSchema.properties.scientific_name.required = false;
+
   // Check that we have received a schema
   if (Object.keys(schema).length < 1) {
     return false

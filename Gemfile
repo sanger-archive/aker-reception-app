@@ -142,6 +142,8 @@ group :development, :test do
   gem 'factory_bot_rails', '~> 4.8'
   # database_cleaner is not required, but highly recommended
   gem 'database_cleaner'
+
+  gem 'selenium-webdriver'
 end
 
 # Deployment group
