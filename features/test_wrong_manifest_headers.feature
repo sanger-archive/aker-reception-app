@@ -35,6 +35,7 @@ Then I am in "Biomaterial Metadata"
 
 Given I upload the file "test/data/incorrect_headers_manifest.csv"
 Then I should see a modal with the text "Select CSV mappings"
+Then "form-fields" should contain "Taxon Id (taxon_id)"
 Then "form-fields" should contain "Position (position)"
 Then "form-fields" should contain "Scientific name (scientific_name)"
 Then "form-fields" should contain "Supplier name (supplier_name)"
@@ -45,6 +46,7 @@ Then "form-fields" should contain "*Tumour? (is_tumour)"
 Then "form-fields" should contain "*Tissue Type (tissue_type)"
 
 
+Then "fields-from-csv" should contain "tax_id"
 Then "fields-from-csv" should contain "Well Positio"
 Then "fields-from-csv" should contain "sciname"
 Then "fields-from-csv" should contain "Dono"
@@ -53,6 +55,16 @@ Then "fields-from-csv" should contain "supname"
 Then "fields-from-csv" should contain "Phenotyp"
 Then "fields-from-csv" should contain "Tissue"
 Then "fields-from-csv" should contain "cancer"
+
+Then "matched-fields-table" should contain 0 rows
+
+When I select "*Taxon Id (taxon_id)" from the "form-fields" select
+Then "*Taxon Id (taxon_id)" should be selected for "form-fields"
+
+When I select "tax_id" from the "fields-from-csv" select
+Then "tax_id" should be selected for "fields-from-csv"
+
+Given I click on "match-fields-button"
 
 Then "matched-fields-table" should contain 1 rows
 
@@ -111,4 +123,4 @@ Given I click on "complete-csv-matching"
 
 Then I should see data from my file like a dropdown with "lysed cells" selected
 Then I should see data from my file like a dropdown with "female" selected
-#Then I should see data from my file like a textbox containing "Homo sapiens"
+Then I should see data from my file like a textbox containing "Homo sapiens"

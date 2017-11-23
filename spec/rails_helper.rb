@@ -63,12 +63,6 @@ RSpec.configure do |config|
     Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
   end
 
-  #Capybara.default_driver = :capybara_webmock_poltergeist
-  #Capybara.current_driver = :capybara_webmock_poltergeist
-  #Capybara.javascript_driver = :capybara_webmock_poltergeist
-
-
-  #Capybara.javascript_driver = :selenium_chrome
   Capybara.javascript_driver = :poltergeist_debug
 
   config.include Capybara::DSL

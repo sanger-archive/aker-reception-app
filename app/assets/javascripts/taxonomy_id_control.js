@@ -66,6 +66,7 @@
   };
 
   proto.setScientificName = function(scientificName) {
+    this.inputSciName.attr('value', scientificName);
     this.inputSciName.val(scientificName);
     this.inputSciName.attr('title', scientificName);
   };
@@ -82,7 +83,7 @@
 
   proto.findTaxId = function(synchronous) {
     var taxId = this.inputTaxId.val();
-    this.inputSciName.val('');    
+    this.inputSciName.attr('value', '');    
     if (this.validateTaxId(taxId)) {
       if (taxId.length == 0) {
         this.toggleMark('has-success', false);

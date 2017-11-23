@@ -35,7 +35,6 @@ Given(/^I have a material service running$/) do
       ],
       "required" => [
         "taxon_id",
-        "scientific_name",
         "gender",
         "donor_id",
         "supplier_name",
@@ -48,7 +47,7 @@ Given(/^I have a material service running$/) do
           "show_on_form" => true,
           "searchable" => true,
           "required" => true,
-          "friendly_name" => "Tax id",
+          "friendly_name" => "Taxon Id",
           "field_name_regex" => "^taxon[-_\\s]*(id)?$",
           "type" => "string"
         },

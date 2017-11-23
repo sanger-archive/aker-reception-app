@@ -36,7 +36,7 @@ Then I am in "Biomaterial Metadata"
 Given I upload the file "test/data/correct_manifest.csv"
 Then I should see data from my file like a textbox containing "334457"
 And I should see data from my file like a dropdown with "male" selected
-And I should see data from my file like a textbox containing "Homo Sapiens"
+And I should see data from my file like a textbox containing "Homo sapiens"
 
 When I go to next screen
 Then I should not see any validation errors

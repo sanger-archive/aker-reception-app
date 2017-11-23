@@ -13,7 +13,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
 
       allow(MatconClient::Material).to receive(:schema).and_return({
         'show_on_form' => ['taxon_id', 'scientific_name', 'supplier_name', 'donor_id', 'gender', 'phenotype'],
-        'required' => ['taxon_id', 'scientific_name', 'supplier_name', 'donor_id', 'gender', 'phenotype'],
+        'required' => ['taxon_id', 'supplier_name', 'donor_id', 'gender', 'phenotype'],
         'properties' => {
           'supplier_name' => {'type': 'string', 'required' => true, 'friendly_name' => 'Supplier name', 'field_name_regex' => "^supplier[-_\s]*(name)?$"},
           'donor_id' => {'type': 'string', 'required' => true, 'friendly_name' => 'Donor Id', 'field_name_regex' => "^donor[-_\s]*(id)?$"},
@@ -25,7 +25,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
             'field_name_regex' => "^tax[-_\s]*(id)?$",
           },
           'scientific_name' => {'type': 'string', 
-            'required' => true,
+            'required' => false,
             'field_name_regex' => "^scientific[-_\s]*(name)?$",
             'friendly_name' => "Scientific name"
           }
