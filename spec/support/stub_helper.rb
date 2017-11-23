@@ -2,7 +2,7 @@ module StubHelper
 
   def stub_matcon_client_schema
     allow(MatconClient::Material).to receive(:schema).and_return({
-        'required' => ['taxon_id', 'supplier_name', 'gender', 'donor_id', 'phenotype'],
+        'required' => ['taxon_id', 'scientific_name', 'supplier_name', 'gender', 'donor_id', 'phenotype'],
         'properties' => {
           'taxon_id' => {
             'required' => true,
@@ -15,7 +15,7 @@ module StubHelper
             'field_name_regex' => "^supplier[-_\s]*(name)?$",
           },
           'scientific_name' => {
-            'required' => false,
+            'required' => true,
             'field_name_regex' => "^scientific[-_\s]*(name)?$",
             'allowed' => ['Homo sapiens', 'Mus musculus'],
             'friendly_name' => "Scientific name"
