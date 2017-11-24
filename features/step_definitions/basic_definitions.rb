@@ -25,15 +25,17 @@ Given(/^I have a material service running$/) do
     {
       "show_on_form" => [
         "scientific_name",
+        "taxon_id",
         "gender",
         "donor_id",
         "phenotype",
         "supplier_name",
         "is_tumour",
-        "tissue_type"
+        "tissue_type",
+        "hmdmc"
       ],
       "required" => [
-        "scientific_name",
+        "taxon_id",
         "gender",
         "donor_id",
         "supplier_name",
@@ -42,16 +44,21 @@ Given(/^I have a material service running$/) do
       ],
       "type" => "object",
       "properties" => {
+        "taxon_id" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => true,
+          "friendly_name" => "Taxon Id",
+          "field_name_regex" => "^taxon[-_\\s]*(id)?$",
+          "type" => "string"
+        },
+
         "scientific_name" => {
           "show_on_form" => true,
           "searchable" => true,
           "required" => true,
           "friendly_name" => "Scientific name",
           "field_name_regex" => "^scientific[-_\\s]*(name)?$",
-          "allowed" => [
-            "Homo sapiens",
-            "Mus musculus"
-          ],
           "type" => "string"
         },
         "gender" => {
@@ -94,6 +101,14 @@ Given(/^I have a material service running$/) do
           "field_name_regex" => "^supplier[-_\\s]*(name)?$",
           "type" => "string"
         },
+        "hmdmc" => {
+          "show_on_form" => true,
+          "searchable" => true,
+          "required" => false,
+          "friendly_name" => "HMDMC No.",
+          "field_name_regex" => "^hmdmc$",
+          "type" => "string"
+        },
         "is_tumour" => {
           "show_on_form" => true,
           "searchable" => true,
@@ -130,6 +145,21 @@ Given(/^I have the internal contact "([^"]*)"$/) do |arg1|
   Contact.create(fullname: arg1, email: arg1)
 end
 
+Given(/^the taxonomy service has the following taxonomies defined:$/) do |table|
+  cached_taxonomies = {}
+  table.hashes.each_with_index do |taxonomy, index|
+    tax_info = double('taxonomy_info', { taxId: taxonomy['Taxon Id'], scientificName: taxonomy['Scientific Name']})
+    cached_taxonomies[tax_info.taxId] = { taxId: tax_info.taxId, scientificName: tax_info.scientificName}
+    allow(TaxonomyClient::Taxonomy).to receive(:find).with(tax_info.taxId).and_return(tax_info)
+  end
+  allow_any_instance_of(SubmissionsController).to receive(:cached_taxonomies).and_return(cached_taxonomies)
+end
+
+When(/^I should see a modal with the text "([^"]*)"$/) do |text|
+  sleep 3
+  step("I should see \"#{text}\"")
+end
+
 Given(/^I am logged in$/) do
   @logged_in = true
 end
@@ -137,6 +167,7 @@ end
 Given(/^I visit the homepage$/) do
   #visit('/')
   visit root_path
+  step("I should see \"Material Submission\"")
 end
 
 Given(/^I click on "([^"]*)"$/) do |arg1|
@@ -148,7 +179,7 @@ Given(/^I check "([^"]*)"$/) do |arg1|
 end
 
 Given(/^I go to next screen$/) do
-  first('a.save').trigger('click')
+  within(first('form > .row > .col-md-12')) { click_on('Next') }
 end
 
 Then(/^I am in "([^"]*)"$/) do |arg1|
@@ -165,6 +196,10 @@ end
 
 When(/^I upload the file "([^"]*)"$/) do |arg1|
   attach_file('Upload CSV', File.absolute_path(arg1), make_visible: true)
+end
+
+Given(/^I debug$/) do 
+  binding.pry
 end
 
 Then(/^I should see data from my file like a textbox containing "([^"]*)"$/) do |arg1|

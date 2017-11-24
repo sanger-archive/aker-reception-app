@@ -85,6 +85,9 @@ gem 'aker_permission_gem', github: 'sanger/aker-permission'
 # Official Sass port of Bootstrap 2 and 3. http://getbootstrap.com/css/#sass
 gem 'bootstrap-sass', '~> 3.3.6', github: 'sanger/bootstrap-sass'
 
+gem 'aker-taxonomy-client', github: 'sanger/aker-taxonomy-client'
+
+gem 'faraday-http-cache'
 
 ###
 # Groups
@@ -139,6 +142,8 @@ group :development, :test do
   gem 'factory_bot_rails', '~> 4.8'
   # database_cleaner is not required, but highly recommended
   gem 'database_cleaner'
+
+  gem 'selenium-webdriver'
 end
 
 # Deployment group
