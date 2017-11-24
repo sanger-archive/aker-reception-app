@@ -232,16 +232,16 @@ $dev: #1f7a30;
 
 
 // UAT environment
-$uat: #a01b1b;
+$uat: #2196F3;
 // Set colour for Aker button background
-#uat.navbar-inverse .navbar-nav > .open > a {
+#production.navbar-inverse .navbar-nav > .open > a {
   background-color: darken($uat, 12.5%);
   &:hover, &:focus {
     background-color: darken($uat, 12.5%);
   }
 }
 // Navigation bar background colour
-#uat {
+#production {
   background-color: $uat;
 }
 #current-page-uat {
