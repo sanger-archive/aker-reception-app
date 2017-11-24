@@ -14,6 +14,9 @@
     window._taxonomyCache = $.extend(window._taxonomyCache, params.cachedTaxonomies);
     this._cacheStorage = window._taxonomyCache;
 
+    this.numAjaxCalls = 0;
+    this.lastStoredCall = (-1);
+
     this.attachHandlers();
   };
 
@@ -71,6 +74,19 @@
     this.inputSciName.attr('title', scientificName);
   };
 
+  /**
+  * There is a chance that the response of the Ajax calls come back in a different order to the one they were
+  * emited to the server, leaving with an inconsistent value from what the user typed. This method ensures that
+  * we will ignore any ajax response that is older than the last one we have used to update the interface.
+  **/
+  proto.executeHandlerOnlyIfNewerCall = function(handler, numCall) {
+    var restArguments = Array.prototype.splice.call(arguments, 2);
+    if (numCall > this.lastStoredCall) {
+      this.lastStoredCall = numCall;
+      return handler.apply(this, restArguments);
+    }
+  };
+
   proto.onSuccessFindTaxId = function(data) {
     this._cacheStorage[data.taxId] = data;
     this.setScientificName(data.scientificName);
@@ -83,7 +99,7 @@
 
   proto.findTaxId = function(synchronous) {
     var taxId = this.inputTaxId.val();
-    this.inputSciName.attr('value', '');    
+    this.setScientificName('');    
     if (this.validateTaxId(taxId)) {
       if (taxId.length == 0) {
         this.toggleMark('has-success', false);
@@ -93,11 +109,13 @@
       if (typeof this._cacheStorage[taxId] !== 'undefined') {
         return this.onSuccessFindTaxId(this._cacheStorage[taxId]);
       }
+
+      this.numAjaxCalls += 1;
       $.ajax({
         url: this.taxonomyServiceUrl+'/'+taxId,
         method: 'GET',
-        success: $.proxy(this.onSuccessFindTaxId, this),
-        error: $.proxy(this.onErrorFindTaxId, this),
+        success: $.proxy(this.executeHandlerOnlyIfNewerCall, this, this.onSuccessFindTaxId, this.numAjaxCalls),
+        error: $.proxy(this.executeHandlerOnlyIfNewerCall, this, this.onErrorFindTaxId, this.numAjaxCalls),
         async: !synchronous
       });      
     } else {
