@@ -14,7 +14,7 @@
   var proto = DataTableSchemaValidation.prototype;
 
   proto.loadSchema = function() {
-    return $.ajax({url: '/materials_schema',
+    return $.ajax({url: this.params.material_schema_url,
       success: $.proxy(function(json) {
         this._loadedSchema = json;
         return this._loadedSchema;
