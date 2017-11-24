@@ -83,7 +83,7 @@
 
   proto.findTaxId = function(synchronous) {
     var taxId = this.inputTaxId.val();
-    this.inputSciName.attr('value', '');    
+    this.setScientificName('');    
     if (this.validateTaxId(taxId)) {
       if (taxId.length == 0) {
         this.toggleMark('has-success', false);
