@@ -80,7 +80,7 @@
   * we will ignore any ajax response that is older than the last one we have used to update the interface.
   **/
   proto.executeHandlerOnlyIfNewerCall = function(handler, numCall) {
-    var restArguments = arguments.split(2);
+    var restArguments = Array.prototype.splice.call(arguments, 2);
     if (numCall > this.lastStoredCall) {
       this.lastStoredCall = numCall;
       return handler.apply(this, restArguments);
@@ -114,8 +114,8 @@
       $.ajax({
         url: this.taxonomyServiceUrl+'/'+taxId,
         method: 'GET',
-        success: $.proxy(this.executeHandlerOnlyIfNewerCall, this.numAjaxCalls, this.onSuccessFindTaxId, this),
-        error: $.proxy(this.executeHandlerOnlyIfNewerCall, this.numAjaxCalls, this.onErrorFindTaxId, this),
+        success: $.proxy(this.executeHandlerOnlyIfNewerCall, this, this.onSuccessFindTaxId, this.numAjaxCalls),
+        error: $.proxy(this.executeHandlerOnlyIfNewerCall, this, this.onErrorFindTaxId, this.numAjaxCalls),
         async: !synchronous
       });      
     } else {
