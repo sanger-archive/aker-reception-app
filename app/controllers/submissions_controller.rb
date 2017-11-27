@@ -87,9 +87,6 @@ class SubmissionsController < ApplicationController
         return
       end
 
-      MaterialSubmissionMailer.submission_confirmation(material_submission).deliver_later
-      MaterialSubmissionMailer.notify_contact(material_submission).deliver_later
-
       # upon successful submission, send an event for the warehouse to pickup
       message = EventMessage.new(submission: @material_submission)
       EventService.publish(message)

@@ -13,6 +13,10 @@ class EventMessage
     ZipkinTracer::TraceContainer.current&.next_id&.trace_id&.to_s
   end
 
+  def deputies
+    StampClient::Deputy.where(user_email: @submission.owner_email).map(&:deputy)
+  end
+
   # wrapper method to create the JSON message
   def generate_json
     if @submission
@@ -39,11 +43,13 @@ class EventMessage
         },
       ],
       "metadata": {
+        "submission_id": @submission.id,
         "hmdmc_number": @submission.first_hmdmc,
         "confirmed_no_hmdmc": @submission.first_confirmed_no_hmdmc,
         "sample_custodian": @submission.contact.email,
         "total_samples": @submission.total_samples,
         "zipkin_trace_id": trace_id,
+        "deputies": deputies,
       },
     }.to_json
   end
@@ -69,6 +75,9 @@ class EventMessage
         "barcode": @reception.barcode_value,
         "samples": @reception.labware.contents.length,
         "zipkin_trace_id": trace_id,
+        "created_at": @reception.created_at.to_time.utc.iso8601,
+        "sample_custodian": submission.contact.email,
+        "all_received": @reception.all_received?
       },
     }.to_json
   end
