@@ -13,7 +13,7 @@ class EventMessage
     ZipkinTracer::TraceContainer.current&.next_id&.trace_id&.to_s
   end
 
-  # list the deputies for an event, when fake_ldap is false
+  # list all the deputies of a user, when fake_ldap is false
   def deputies
     if Rails.configuration.fake_ldap
       return []
