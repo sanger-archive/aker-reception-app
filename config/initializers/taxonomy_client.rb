@@ -15,5 +15,9 @@ Rails.application.config.after_initialize do
       connection.use ZipkinTracer::FaradayHandler, "Taxonomy Service"
     end
   end
-  TaxonomyClient::Taxonomy.connection.faraday.proxy=Rails.configuration.aker_deployment_default_proxy
+
+  # Don't use proxy in local development
+  if !Rails.env.development?
+    TaxonomyClient::Taxonomy.connection.faraday.proxy = Rails.configuration.aker_deployment_default_proxy
+  end
 end
