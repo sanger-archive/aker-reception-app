@@ -13,8 +13,21 @@ class EventMessage
     ZipkinTracer::TraceContainer.current&.next_id&.trace_id&.to_s
   end
 
+  # list the deputies for an event, when fake_ldap is false
   def deputies
-    StampClient::Deputy.where(user_email: @submission.owner_email).map(&:deputy)
+    if Rails.configuration.fake_ldap
+      return []
+    end
+    submission = @submission || @reception.labware.material_submission
+    deputy_emails = []
+    StampClient::Deputy.where(user_email: submission.owner_email).map(&:deputy).each do |deputy|
+      if deputy.include?('@')
+        deputy_emails << deputy
+      else
+        deputy_emails += LDAPGroupReader.fetch_members(deputy).map(&:email)
+      end
+    end
+    deputy_emails
   end
 
   # wrapper method to create the JSON message
@@ -77,7 +90,8 @@ class EventMessage
         "zipkin_trace_id": trace_id,
         "created_at": @reception.created_at.to_time.utc.iso8601,
         "sample_custodian": submission.contact.email,
-        "all_received": @reception.all_received?
+        "all_received": @reception.all_received?,
+        "deputies": deputies,
       },
     }.to_json
   end
