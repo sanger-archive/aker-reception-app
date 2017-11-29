@@ -17,7 +17,7 @@ RSpec.describe 'EventMessage' do
   end
 
   describe '#generates JSON' do
-    it 'generates json for a submission' do
+    it 'for a submission' do
 
       submission = build(:material_submission, status: MaterialSubmission.ACTIVE)
 
@@ -26,10 +26,10 @@ RSpec.describe 'EventMessage' do
       allow(submission).to receive(:total_samples).and_return 12
       allow(submission).to receive(:first_confirmed_no_hmdmc).and_return 'test@test.com'
 
-
       message = EventMessage.new(submission: submission)
 
       allow(message).to receive(:trace_id).and_return 'a_trace_id'
+      allow(message).to receive(:deputies).and_return ['ab1', 'group1']
 
       Timecop.freeze do
         json = JSON.parse(message.generate_json)
@@ -47,7 +47,7 @@ RSpec.describe 'EventMessage' do
       end
     end
 
-    it 'generates json for a reception' do
+    it 'for a reception' do
       labware = create(:labware_with_barcode_and_material_submission,
                        material_submission: build(:material_submission,
                                                   status: MaterialSubmission.PRINTED)                       )
@@ -55,10 +55,12 @@ RSpec.describe 'EventMessage' do
 
       allow(SecureRandom).to receive(:uuid).and_return 'a_uuid'
       allow(reception).to receive(:barcode_value).and_return 'AKER-1'
+      allow(reception).to receive(:created_at).and_return Time.now
 
       message = EventMessage.new(reception: reception)
 
       allow(message).to receive(:trace_id).and_return 'a_trace_id'
+      allow(message).to receive(:deputies).and_return ['ab1', 'group1']
 
       Timecop.freeze do
         json = JSON.parse(message.generate_json)
