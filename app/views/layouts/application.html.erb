@@ -11,10 +11,9 @@
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= csrf_meta_tags %>
 
-
   </head>
   <body>
-    <nav class="navbar navbar-inverse">
+    <nav class="navbar navbar-inverse" id="<%= Rails.env.downcase %>">
     <div class="container">
     <div class="navbar-header">
     <!-- Display the hamburger button if screen isn't wide enough -->
