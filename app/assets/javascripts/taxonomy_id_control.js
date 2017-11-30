@@ -23,7 +23,7 @@
   var proto = TaxonomyIdControl.prototype;
 
   proto.attachHandlers = function() {
-    $(this.node).closest('table').on('psd.update-table', $.proxy(this.findTaxId, this, true));
+    $(this.node).closest('table').on('psd.update-table', $.proxy(this.onUpdateTable, this));
     this.inputTaxId.on('keyup', $.proxy(this.findTaxId, this, false));
     this.inputTaxId.on('change', $.proxy(this.findTaxId, this, false));
     this.inputTaxId.on('blur', $.proxy(this.findTaxId, this, false));
@@ -33,6 +33,43 @@
     // is not editable
     this.inputSciName.attr('readonly', true);
     this.inputSciName.on('focus', $.proxy(this.focusToNextInput, this, this.inputSciName));
+  };
+
+  proto.showWarning = function() {
+    var warningAlert = $('#warning-messages');
+    warningAlert.html(
+        ["<div>The manifest should not provide a scientific name, as this value is obtained from the taxonomy id.</div>",
+        "<div><b><u>We will ignore the value of the scientific name from the manifest and will use the corresponding for the taxonomy id provided.</u></b> </div>", 
+        "<div>Please review the value of the scientific name in this view. If this is not what you expected please review the contents of the manifest and provide the appropiate ",
+        "taxonomy id</div>"].join('')
+    );
+    warningAlert.toggleClass('hidden', false);
+  };
+
+  proto.hideWarning = function() {
+    var warningAlert = $('#warning-messages');
+    warningAlert.toggleClass('hidden', true);
+  };
+
+  proto.manifestWithScientificNameWarning = function() {
+    this.hideWarning();
+    if (this.getScientificName().length > 0) {
+      this.showWarning();
+    }
+  };
+
+  proto.manifestWithDifferentValueForScientificNameInputWarning = function() {
+    var previousValue = this.getScientificName();    
+    this.findTaxId(true);
+    var actualValue = this.getScientificName();
+    if ((previousValue.length > 0) && (previousValue != actualValue)) {
+      this.markInputsAs('has-warning');
+    }
+  };
+
+  proto.onUpdateTable = function() {
+    this.manifestWithScientificNameWarning();
+    this.manifestWithDifferentValueForScientificNameInputWarning();
   };
 
   proto.focusToNextInput = function(input) {
@@ -74,6 +111,14 @@
     this.inputSciName.attr('title', scientificName);
   };
 
+  proto.getScientificName = function() {
+    return this.inputSciName.val();
+  };
+
+  proto.getTaxonId = function() {
+    return this.inputTaxId.val();
+  };
+
   /**
   * There is a chance that the response of the Ajax calls come back in a different order to the one they were
   * emited to the server, leaving with an inconsistent value from what the user typed. This method ensures that
@@ -98,7 +143,7 @@
   };
 
   proto.findTaxId = function(synchronous) {
-    var taxId = this.inputTaxId.val();
+    var taxId = this.getTaxonId();
     this.setScientificName('');    
     if (this.validateTaxId(taxId)) {
       if (taxId.length == 0) {
