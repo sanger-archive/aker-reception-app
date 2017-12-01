@@ -1,4 +1,6 @@
-# ABgene AB_0800
+# frozen_string_literal: true
+
+# ABgene AB_0800
 LabwareType.create(
   name: 'ABgene AB-0800 shallow well PCR plate',
   description: '0.2ml full skirted clear/colourless 96 well plates (volume <100µl)',
@@ -54,55 +56,55 @@ Contact.create(
 )
 
 Contact.create(
-  fullname: "Dave",
-  email: "dr6@sanger.ac.uk"
+  fullname: 'Dave',
+  email: 'dr6@sanger.ac.uk'
 )
 Contact.create(
-  fullname: "Harriet",
-  email: "hc6@sanger.ac.uk"
+  fullname: 'Harriet',
+  email: 'hc6@sanger.ac.uk'
 )
 Contact.create(
-  fullname: "Rich",
-  email: "rl15@sanger.ac.uk"
+  fullname: 'Rich',
+  email: 'rl15@sanger.ac.uk'
 )
 Contact.create(
-  fullname: "Eduardo",
-  email: "emr@sanger.ac.uk"
+  fullname: 'Eduardo',
+  email: 'emr@sanger.ac.uk'
 )
 Contact.create(
-  fullname: "Chris",
-  email: "cs24@sanger.ac.uk"
+  fullname: 'Chris',
+  email: 'cs24@sanger.ac.uk'
 )
 Contact.create(
-  fullname: "Phil",
-  email: "pj5@sanger.ac.uk"
+  fullname: 'Phil',
+  email: 'pj5@sanger.ac.uk'
 )
 
 Printer.create(
   name: 'd304bc',
-  label_type: 'Plate',
+  label_type: 'Plate'
 )
 Printer.create(
   name: 'f225bc',
-  label_type: 'Plate',
+  label_type: 'Plate'
 )
 Printer.create(
   name: 'g216abc',
-  label_type: 'Plate',
+  label_type: 'Plate'
 )
 Printer.create(
   name: 'g214bc',
-  label_type: 'Plate',
+  label_type: 'Plate'
 )
 Printer.create(
   name: 'e367bc',
-  label_type: 'Tube',
+  label_type: 'Tube'
 )
 Printer.create(
   name: 'g216bc',
-  label_type: 'Tube',
+  label_type: 'Tube'
 )
 Printer.create(
   name: 'aa313bc',
-  label_type: 'Tube',
+  label_type: 'Tube'
 )
