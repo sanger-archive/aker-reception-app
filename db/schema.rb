@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171110100334) do
+ActiveRecord::Schema.define(version: 20171201151450) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -101,7 +101,7 @@ ActiveRecord::Schema.define(version: 20171110100334) do
     t.index ["name"], name: "index_printers_on_name", unique: true, using: :btree
   end
 
-  add_foreign_key "labwares", "material_submissions"
+  add_foreign_key "labwares", "material_submissions", on_delete: :cascade
   add_foreign_key "material_receptions", "labwares"
   add_foreign_key "material_submissions", "contacts"
   add_foreign_key "material_submissions", "labware_types"
