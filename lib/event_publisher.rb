@@ -1,24 +1,30 @@
+# frozen_string_literal: true
+
 require 'event_message'
 
+# The EventPublisher configures the connection to the broker and creates the exchange and
+#   queues.
 class EventPublisher
-
   attr_accessor :connection
-  attr_reader :channel, :exchange
-  attr_reader :dlx, :dlx_queue
+  attr_reader :channel, :exchange, :dlx, :dlx_queue
 
-  def initialize(config={})
-    @event_conn = config[:event_conn]
-    @queue_name = config[:queue_name]
+  def initialize(config = {})
+    @broker_host = config[:broker_host]
+    @broker_port = config[:broker_port]
+    @broker_username = config[:broker_username]
+    @broker_password = config[:broker_password]
+    @exchange_name = config[:exchange_name]
+    @warehouse_queue_name = config[:warehouse_queue_name]
+    @notification_queue_name = config[:notification_queue_name]
   end
 
   def create_connection
-    if !connected?
-      connect!
-    end
+    !connected? && connect!
   end
 
   def connect!
-    set_config
+    start_connection
+    create_exchanges_and_queues
     add_close_connection_handler
   end
 
@@ -27,12 +33,10 @@ class EventPublisher
   end
 
   def publish(message)
-    create_connection if !connected?
-    @exchange.publish(message.generate_json, routing_key: @queue.name)
+    create_connection unless connected?
+    @exchange.publish(message.generate_json)
     @channel.wait_for_confirms
-    if @channel.unconfirmed_set.count > 0
-      raise "There is an unconfirmed set"
-    end
+    raise 'There is an unconfirmed set.' if @channel.unconfirmed_set.count.positive?
   end
 
   def close
@@ -42,39 +46,57 @@ class EventPublisher
   private
 
   def add_close_connection_handler
-    at_exit {
-      puts 'RabbitMQ connection close'
+    at_exit do
+      puts 'RabbitMQ connection close.'
       close
       exit 0
-    }
+    end
   end
 
-  def set_config
-    # threaded is set to false because otherwise the connection creation is not working
-    @connection = Bunny.new(@event_conn, threaded: false)
+  def start_connection
+    # Threaded is set to false because otherwise the connection creation is not working
+    @connection = Bunny.new(
+      "amqp://#{@broker_username}:#{@broker_password}@#{@broker_host}:#{@broker_port}",
+      threaded: false
+    )
     @connection.start
+  end
 
-    dl_queue_name = @queue_name+'.deadletters'
+  def create_exchanges_and_queues
+    dl_exchange_name = @exchange_name + '.deadletters'
 
-    @channel   = @connection.create_channel
-    @exchange    = @channel.fanout(@queue_name)
+    @channel = @connection.create_channel
 
-    # Creates the dead letter exchange aker.events.deadletters
-    @dlx  = @channel.fanout(dl_queue_name)
+    # Create a fanout exchange which will send messages to all queues bound to the exchange and
+    #   make the exchange durable: Durable exchanges survive broker restart, transient exchanges
+    #   do not (http://rubybunny.info/articles/durability.html)
+    @exchange = @channel.fanout(@exchange_name, durable: true)
 
-    # Creates the queue aker.events with dead letter exchange defined aker.events.deadletters
-    # auto_delete false ensures that we dont destroy the queue when there are no messages and no
-    # consumers are running
-    @queue    = @channel.queue(@queue_name, :auto_delete => false,
-      :arguments => {
-      "x-dead-letter-exchange" => @dlx.name
-    }).bind(@exchange)
+    # Creates the dead letter exchange aker.events.deadletters (https://www.rabbitmq.com/dlx.html)
+    @dlx = @channel.fanout(dl_exchange_name, durable: true)
 
-    # dead letter queue
-    @dlx_queue  = @channel.queue(dl_queue_name).bind(@dlx)
+    # Creates the queues with dead letter exchange defined as aker.events.deadletters. We also
+    #   set `auto_delete` to false which ensures that we dont destroy the queue when there are
+    #   no messages and no consumers are running. Finally, we also bind the queue to the exchange.
+    # warehouse_queue
+    @channel.queue(@warehouse_queue_name,
+                   auto_delete: false,
+                   durable: true,
+                   arguments: {
+                     "x-dead-letter-exchange": @dlx.name
+                   }).bind(@exchange)
+    # notifications_queue
+    @channel.queue(@notification_queue_name,
+                   auto_delete: false,
+                   durable: true,
+                   arguments: {
+                     "x-dead-letter-exchange": @dlx.name
+                   }).bind(@exchange)
+    # Dead letter queues
+    dl_queue_name = @exchange_name + '.deadletters'
+    @channel.queue(dl_queue_name).bind(@dlx, durable: true)
 
     # To be able to wait_for_confirms in publish()
     @channel.confirm_select
   end
-
 end
