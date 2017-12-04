@@ -509,6 +509,7 @@ DEPENDENCIES
   pg
   pmb-client (= 0.1.0)!
   poltergeist
+  pry
   pry-rails (~> 0.3.6)
   psd_logger!
   puma (~> 3.0)

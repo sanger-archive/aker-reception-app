@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 # Force git gems to use secure HTTPS
 git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
   "https://github.com/#{repo_name}.git"
 end
 
@@ -26,6 +28,7 @@ gem 'jquery-rails'
 # Pure Ruby LDAP library. Read more: https://github.com/ruby-ldap/ruby-net-ldap
 gem 'net-ldap'
 gem 'pg'
+gem 'pry'
 # Use Puma as the app server
 gem 'puma', '~> 3.0'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
@@ -39,7 +42,7 @@ gem 'therubyracer', platforms: :ruby
 #   Read more: https://github.com/turbolinks/turbolinks
 gem 'turbolinks', '~> 5'
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 gem 'uuid'
@@ -85,7 +88,7 @@ group :test do
   # Code coverage for Ruby 1.9+ with a powerful configuration library and automatic merging of
   # coverage across test suites - https://github.com/colszowka/simplecov
   gem 'simplecov', require: false
-  # SimpleCov formatter to generate a simple index.html Rcov style
+  # SimpleCov formatter to generate a simple index.html Rcov style
   # https://github.com/fguillen/simplecov-rcov
   gem 'simplecov-rcov'
   gem 'timecop'
