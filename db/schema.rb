@@ -48,7 +48,6 @@ ActiveRecord::Schema.define(version: 20171110100334) do
     t.string   "description"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
-    t.boolean  "decapper"
     t.boolean  "uses_decapper", default: false, null: false
   end
 
@@ -85,9 +84,8 @@ ActiveRecord::Schema.define(version: 20171110100334) do
     t.uuid     "set_id"
     t.string   "material_submission_uuid"
     t.citext   "owner_email"
-    t.boolean  "supply_decapper"
-    t.boolean  "dispatched",               default: false
     t.boolean  "supply_decappers",         default: false, null: false
+    t.boolean  "dispatched",               default: false
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id", using: :btree
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id", using: :btree
     t.index ["owner_email"], name: "index_material_submissions_on_owner_email", using: :btree
