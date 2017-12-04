@@ -108,8 +108,6 @@ Rails.application.configure do
                               groups: ['world'] }
 
   config.auth_service_url = 'http://localhost:9010'
-  config.login_url = config.auth_service_url+'/login'
-  config.logout_url = config.auth_service_url+'/logout'
   config.login_url = config.auth_service_url + '/login'
   config.logout_url = config.auth_service_url + '/logout'
 
