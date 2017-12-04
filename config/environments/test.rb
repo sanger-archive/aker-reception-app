@@ -50,6 +50,8 @@ Rails.application.configure do
   config.study_url = 'http://localhost:3300/api/v1/'
   config.taxonomy_service_url = 'http://external-service/tax-id'
 
+  config.aker_deployment_default_proxy = {}
+
   config.ehmdmc_url = 'http://localhost:3501/validate'
 
   config.printing_disabled = true

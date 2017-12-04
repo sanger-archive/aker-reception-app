@@ -166,12 +166,26 @@ class MaterialSubmission < ApplicationRecord
 
   # Return the user who confirmed the HMDMC
   # We currently assume that all the contents of the labware are populated with the same hmdmc data
+  # TODO: this assumption is now incorrect, as each material can have it's own (potentially unique)
+  # HMDMC number
   def first_confirmed_no_hmdmc
     return nil if labwares.nil?
     labwares.each do |lw|
       h = lw.first_confirmed_no_hmdmc
       return h if h
     end
+    nil
+  end
+
+  # Returns an array of all unique HMDMC numbers in the submission
+  def hmdmc_list
+    return nil if labwares.nil?
+    hmdmc_list = Set.new()
+    labwares.each do |lw|
+      h = lw.hmdmc_list
+      hmdmc_list.merge(h) if h
+    end
+    return hmdmc_list.to_a unless hmdmc_list.empty?
     nil
   end
 
