@@ -99,17 +99,24 @@ Rails.application.configure do
 
   config.fake_ldap = true
 
-  config.action_mailer.default_url_options = { host: 'localhost', script_name: config.relative_url_root, only_path: false, port: Rails::Server.new.options[:Port] }
-  config.default_jwt_user = { email: ENV.fetch('USER', 'user')+'@sanger.ac.uk', groups: ['world'] }
+  config.action_mailer.default_url_options = { host: 'localhost',
+                                               script_name: config.relative_url_root,
+                                               only_path: false,
+                                               port: Rails::Server.new.options[:Port] }
+
+  config.default_jwt_user = { email: ENV.fetch('USER', 'user') + '@sanger.ac.uk',
+                              groups: ['world'] }
 
   config.auth_service_url = 'http://localhost:9010'
   config.login_url = config.auth_service_url+'/login'
   config.logout_url = config.auth_service_url+'/logout'
+  config.login_url = config.auth_service_url + '/login'
+  config.logout_url = config.auth_service_url + '/logout'
 
-  config.urls = { submission: "",
-                  permissions: "",
-                  sets: "",
-                  projects: "",
-                  work_orders: "" }
+  config.urls = { submission: '',
+                  permissions: '',
+                  sets: '',
+                  projects: '',
+                  work_orders: '' }
 
 end
