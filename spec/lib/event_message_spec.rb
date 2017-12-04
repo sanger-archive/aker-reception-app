@@ -34,24 +34,23 @@ RSpec.describe 'EventMessage' do
       Timecop.freeze do
         json = JSON.parse(message.generate_json)
 
-        expect(json["event_type"]).to eq "aker.events.submission.created"
-        expect(json["lims_id"]).to eq 'aker'
-        expect(json["uuid"]).to eq 'a_uuid'
-        expect(json["timestamp"]).to eq Time.now.utc.iso8601
-        expect(json["user_identifier"]).to eq submission.owner_email
-        expect(json["metadata"]["hmdmc_list"]).to eq '[12/000, 13/999]'
-        expect(json["metadata"]["sample_custodian"]).to eq submission.contact.email
-        expect(json["metadata"]["total_samples"]).to eq 12
-        expect(json["metadata"]["zipkin_trace_id"]).to eq 'a_trace_id'
-        expect(json["metadata"]["confirmed_no_hmdmc"]).to eq 'test@test.com'
+        expect(json['event_type']).to eq 'aker.events.submission.created'
+        expect(json['lims_id']).to eq 'aker'
+        expect(json['uuid']).to eq 'a_uuid'
+        expect(json['timestamp']).to eq Time.now.utc.iso8601
+        expect(json['user_identifier']).to eq submission.owner_email
+        expect(json['metadata']['hmdmc_list']).to eq '[12/000, 13/999]'
+        expect(json['metadata']['sample_custodian']).to eq submission.contact.email
+        expect(json['metadata']['total_samples']).to eq 12
+        expect(json['metadata']['zipkin_trace_id']).to eq 'a_trace_id'
+        expect(json['metadata']['confirmed_no_hmdmc']).to eq 'test@test.com'
       end
     end
 
     it 'for a reception' do
       material_submission = create(:material_submission, status: MaterialSubmission.PRINTED)
       labware = create(:labware_with_barcode_and_material_submission,
-                       material_submission: build(:material_submission,
-                                                  status: MaterialSubmission.PRINTED))
+                       material_submission: material_submission)
       reception = build(:material_reception, labware_id: labware.id)
 
       allow(material_submission).to receive(:id).and_return material_submission.id
