@@ -16,7 +16,6 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
-
   # Enable/disable caching. By default caching is disabled.
   if Rails.root.join('tmp/caching-dev.txt').exist?
     config.action_controller.perform_caching = true
@@ -72,10 +71,9 @@ Rails.application.configure do
 
   config.stamp_url = 'http://localhost:7000/api/v1/'
 
-  config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
-
   config.ehmdmc_url = 'http://localhost:3501/validate'
   config.ehmdmc_url_default_proxy = 'http://localhost:3501'
+  config.pmb_uri = ENV.fetch('PMB_URI', 'http://localhost:10000/v1')
 
   config.taxonomy_service_url = 'https://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/tax-id'
 
@@ -86,25 +84,35 @@ Rails.application.configure do
   config.jwt_exp_time = 2 * 60
   config.jwt_nbf_time = 1 * 60
 
-  config.enable_events_sending = false
-  config.events_queue_name = 'aker.events'
-  config.events_queue_connection = "amqp://guest:guest@localhost:5672"
+  config.events = {
+    enabled: false,
+    broker_host: 'localhost',
+    broker_port: '5672',
+    broker_username: 'guest',
+    broker_password: 'guest',
+    exchange_name: 'aker.events',
+    warehouse_queue_name: 'aker.events.warehouse',
+    notification_queue_name: 'aker.events.notifications'
+  }
 
   config.fake_ldap = true
 
-  config.aker_deployment_default_proxy = {}
+  config.action_mailer.default_url_options = { host: 'localhost',
+                                               script_name: config.relative_url_root,
+                                               only_path: false,
+                                               port: Rails::Server.new.options[:Port] }
 
-  config.action_mailer.default_url_options = { host: 'localhost', script_name: config.relative_url_root, only_path: false, port: Rails::Server.new.options[:Port] }
-  config.default_jwt_user = { email: ENV.fetch('USER', 'user')+'@sanger.ac.uk', groups: ['world'] }
+  config.default_jwt_user = { email: ENV.fetch('USER', 'user') + '@sanger.ac.uk',
+                              groups: ['world'] }
 
   config.auth_service_url = 'http://localhost:9010'
-  config.login_url = config.auth_service_url+'/login'
-  config.logout_url = config.auth_service_url+'/logout'
+  config.login_url = config.auth_service_url + '/login'
+  config.logout_url = config.auth_service_url + '/logout'
 
-  config.urls = { submission: "",
-                  permissions: "",
-                  sets: "",
-                  projects: "",
-                  work_orders: "" }
+  config.urls = { submission: '',
+                  permissions: '',
+                  sets: '',
+                  projects: '',
+                  work_orders: '' }
 
 end
