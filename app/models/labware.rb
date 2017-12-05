@@ -85,6 +85,18 @@ class Labware < ApplicationRecord
     nil
   end
 
+  # Returns an array of all of the unique HMDMC values for the labware
+  def hmdmc_list
+    return nil if contents.nil?
+    hmdmc_list = Set.new()
+    contents.each do |_k, v|
+      h = material_is_human?(v) && v['hmdmc']
+      hmdmc_list.add(h) if h
+    end
+    return hmdmc_list.to_a unless hmdmc_list.empty?
+    nil
+  end
+
   def confirmed_no_hmdmc?
     contents && contents.any? do |_k, v|
       material_is_human?(v) && v['hmdmc_not_required_confirmed_by'].present?

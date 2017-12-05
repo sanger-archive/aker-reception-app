@@ -57,7 +57,7 @@ class EventMessage
       ],
       "metadata": {
         "submission_id": @submission.id,
-        "hmdmc_number": @submission.first_hmdmc,
+        "hmdmc_list": @submission.hmdmc_list,
         "confirmed_no_hmdmc": @submission.first_confirmed_no_hmdmc,
         "sample_custodian": @submission.contact.email,
         "total_samples": @submission.total_samples,
@@ -85,6 +85,7 @@ class EventMessage
         },
       ],
       "metadata": {
+        "submission_id": submission.id,
         "barcode": @reception.barcode_value,
         "samples": @reception.labware.contents.length,
         "zipkin_trace_id": trace_id,
