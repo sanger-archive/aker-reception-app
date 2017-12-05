@@ -44,7 +44,7 @@ gem 'turbolinks', '~> 5'
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
 # Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 1.3.0'
+gem 'uglifier', '~> 3.2'
 gem 'uuid'
 gem 'wicked'
 gem 'zipkin-tracer'
