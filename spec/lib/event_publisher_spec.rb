@@ -40,7 +40,6 @@ RSpec.describe 'EventPublisher' do
     allow(@exchange).to receive(:name).and_return('exchange name')
 
     allow(@queue).to receive(:bind)
-    # allow(@queue).to receive(:name).and_return('queue name')
   end
 
   describe '#creating connections' do
