@@ -53,10 +53,6 @@ end
 
 contacts = [
   {
-    fullname: Forgery('name').full_name,
-    email: Forgery('internet').email_address,
-  },
-  {
     fullname: 'Dave',
     email: 'dr6@sanger.ac.uk',
   },
