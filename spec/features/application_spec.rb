@@ -6,7 +6,7 @@ RSpec.describe 'Application', type: :feature do
   describe 'login link' do
 
     context 'when sending a jwt' do
-      let(:jwt) { JWT.encode({ data: { 'email' => 'other@here.com', 'groups' => ['world'] } }, Rails.configuration.jwt_secret_key, 'HS256') }
+      let(:jwt) { JWT.encode({ data: { 'email' => 'other@here.com', 'groups' => ['world', 'team252'] } }, Rails.configuration.jwt_secret_key, 'HS256') }
 
       before do
         # Somehow headers get HTTP_ prefixed onto them before they reach the controller. Shrugs.

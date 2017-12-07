@@ -5,7 +5,7 @@ RSpec.describe CompletedSubmissionsController, type: :controller  do
 
   context 'when printing a submission' do
     setup do
-      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world', 'team252'])
       allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 
@@ -63,7 +63,7 @@ RSpec.describe CompletedSubmissionsController, type: :controller  do
 
   context 'when dispatching a submission' do
     setup do
-      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world', 'team252'])
       allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 
