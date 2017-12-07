@@ -2,6 +2,9 @@ class MaterialReceptionsController < ApplicationController
 
   before_action :set_labware, only: :create
 
+  # Only SSRs should be able to access these pages and services
+  before_action :check_ssr_membership
+
   def index
     @material_receptions = MaterialReception.all.sort_by(&:id).reverse
     @material_reception = MaterialReception.new
