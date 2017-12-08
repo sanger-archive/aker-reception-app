@@ -19,7 +19,6 @@ RSpec.feature "RestrictAccess", type: :feature do
 
       it 'allows access to the material receiption page' do
         visit material_receptions_path
-        save_and_open_page
         expect(page).to_not have_content("Permission Denied")
       end
     end
