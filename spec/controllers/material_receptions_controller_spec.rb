@@ -9,7 +9,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
 
   context 'when no JWT is included' do
     before do
-      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world', 'team252'])
+      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => %w[world team252])
       @submission = FactoryBot.create(:material_submission, owner_email: @user.email)
     end
     it 'redirects to the login page' do
@@ -20,7 +20,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
 
   context 'when JWT is included' do
     before do
-      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world', 'team252'])
+      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => %w[world team252])
       allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 

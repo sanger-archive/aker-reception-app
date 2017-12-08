@@ -115,7 +115,7 @@ Rails.application.configure do
                   projects: '',
                   work_orders: '' }
 
-  config.ssr_groups = ['team252', 'world']
+  config.ssr_groups = %w[team252 world]
 
 
 end
