@@ -84,4 +84,6 @@ Rails.application.configure do
                   projects: "",
                   work_orders: "" }
 
+  config.ssr_groups = %w[team252 pirates]
+
 end

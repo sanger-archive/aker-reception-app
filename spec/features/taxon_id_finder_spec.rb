@@ -7,7 +7,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
   include WaitForAjax
 
   describe 'TaxonomyIdControl' do
-    let(:user) { OpenStruct.new(:email => 'user@sanger.ac.uk', :groups => ['world']) }
+    let(:user) { OpenStruct.new(email: 'user@sanger.ac.uk', groups: ['world']) }
 
     before do
 

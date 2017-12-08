@@ -9,7 +9,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
 
   context 'when no JWT is included' do
     before do
-      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      @user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: %w[world team252])
       @submission = FactoryBot.create(:material_submission, owner_email: @user.email)
     end
     it 'redirects to the login page' do
@@ -20,7 +20,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
 
   context 'when JWT is included' do
     before do
-      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      @user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: %w[world team252])
       allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 
@@ -130,7 +130,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
         post :create, params: { :material_reception => {:barcode_value => @labware.barcode}}
         MaterialReception.all.reload
         expect(MaterialReception.all.count).to eq(count)
-      end      
+      end
 
       it "adds the barcode to the list if the barcode exists and has not been received yet" do
         material_double = instance_double("MatconClient::Material", update_attributes: true)

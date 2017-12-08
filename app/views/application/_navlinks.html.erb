@@ -2,10 +2,12 @@
   <li>
     <%= link_to 'Submissions', material_submissions_path, id: ("current-page-#{Rails.env.downcase}" if (params[:controller] == 'material_submissions' && params[:action] != 'show') || params[:controller] == 'submissions') %>
   </li>
+  <% if current_user.groups.any? { |group| group.in? Rails.configuration.ssr_groups } %>
   <li>
     <%= link_to 'Dispatch Labware', completed_submissions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'completed_submissions') %>
   </li>
   <li>
     <%= link_to 'Reception', material_receptions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'material_receptions') %>
   </li>
+  <% end %>
 </ul>
