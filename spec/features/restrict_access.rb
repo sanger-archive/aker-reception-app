@@ -10,7 +10,7 @@ RSpec.feature "RestrictAccess", type: :feature do
     end
 
     context 'as an SSR' do
-      let(:user) { OpenStruct.new(:email => 'ssr@sanger.ac.uk', :groups => ['team252']) }
+      let(:user) { OpenStruct.new(email: 'ssr@sanger.ac.uk', groups: ['team252']) }
 
       it 'allows access to the dispatch page' do
         visit completed_submissions_path
@@ -25,7 +25,7 @@ RSpec.feature "RestrictAccess", type: :feature do
     end
 
     context 'as someone who is not an SSR' do
-      let(:user) { OpenStruct.new(:email => 'user@sanger.ac.uk', :groups => ['world']) }
+      let(:user) { OpenStruct.new(email: 'user@sanger.ac.uk', groups: ['world']) }
 
       it 'denies access to the dispatch page' do
         visit completed_submissions_path

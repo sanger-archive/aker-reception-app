@@ -16,7 +16,7 @@ RSpec.describe MaterialSubmissionsController, type: :controller do
 
     context 'when JWT is included' do
       before do
-        user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+        user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: ['world'])
         allow(controller).to receive(:check_credentials)
         allow(controller).to receive(:current_user).and_return(user)
 
@@ -43,7 +43,7 @@ RSpec.describe MaterialSubmissionsController, type: :controller do
   describe "#destroy" do
 
     setup do
-      @user = OpenStruct.new(:email => 'other@sanger.ac.uk', :groups => ['world'])
+      @user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: ['world'])
       allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 
