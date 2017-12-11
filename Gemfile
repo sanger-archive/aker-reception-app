@@ -20,7 +20,6 @@ gem 'coffee-rails', '~> 4.2'
 gem 'devise_ldap_authenticatable', '~> 0.8.5'
 gem 'faraday-http-cache'
 gem 'font-awesome-sass'
-gem 'forgery'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
 # Use jquery as the JavaScript library
@@ -110,6 +109,7 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'sqlite3'
   gem 'webmock'
+  gem 'brakeman', :require => false
 end
 
 # Deployment group

@@ -1,5 +1,8 @@
 class CompletedSubmissionsController < ApplicationController
 
+  # Only SSRs should be able to access most pages and services
+  before_action :check_ssr_membership
+
 	def index
 		ms_ordered = MaterialSubmission.order(id: :desc)
 		@unprinted_submissions = ms_ordered.active
