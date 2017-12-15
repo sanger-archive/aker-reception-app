@@ -3,11 +3,16 @@
 FROM ruby:2.3.1
 
 # Update package list and install required packages
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev nodejs nodejs-legacy npm
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev
+
+# https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+RUN apt-get install -y nodejs
 
 # Install phantomjs - required for tests
 # https://www.npmjs.com/package/phantomjs-prebuilt
-RUN npm install -g phantomjs-prebuilt
+# Using --unsafe-perm because: https://github.com/Medium/phantomjs/issues/707
+RUN npm install -g phantomjs-prebuilt --unsafe-perm
 
 # Create the working directory
 # https://docs.docker.com/engine/reference/builder/#workdir
