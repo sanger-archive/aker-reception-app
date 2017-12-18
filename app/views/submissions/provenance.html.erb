@@ -150,14 +150,14 @@
                     <td data-psd-schema-validation-name="<%= col %>">
                       <div class="form-group">
                         <% if material_schema["properties"][col]['allowed'] %>
-                          <select class="form-control"
+                          <select class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
                                   name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
                                   id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]">
                             <option value=""></option>
                             <%= options_for_select(material_schema["properties"][col]['allowed'], (labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present?))%>
                           </select>
                         <% else %>
-                          <input class="form-control"
+                          <input class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
                                 type="<%= material_schema["properties"][col]["field_type"] || 'text' %>"
                                 name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
                                 id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]"
