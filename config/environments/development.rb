@@ -90,6 +90,7 @@ Rails.application.configure do
     broker_port: '5672',
     broker_username: 'guest',
     broker_password: 'guest',
+    broker_vhost: '/',
     exchange_name: 'aker.events',
     warehouse_queue_name: 'aker.events.warehouse',
     notification_queue_name: 'aker.events.notifications'

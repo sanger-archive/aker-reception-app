@@ -11,6 +11,7 @@ class EventPublisher
   def initialize(config = {})
     @broker_host = config[:broker_host]
     @broker_port = config[:broker_port]
+    @broker_vhost = config[:broker_vhost]
     @broker_username = config[:broker_username]
     @broker_password = config[:broker_password]
     @exchange_name = config[:exchange_name]
@@ -56,7 +57,11 @@ class EventPublisher
   def start_connection
     # Threaded is set to false because otherwise the connection creation is not working
     @connection = Bunny.new(
-      "amqp://#{@broker_username}:#{@broker_password}@#{@broker_host}:#{@broker_port}",
+      host: @broker_host,
+      port: @broker_port,
+      vhost: @broker_vhost,
+      user: @broker_username,
+      pass: @broker_password,
       threaded: false
     )
     @connection.start
