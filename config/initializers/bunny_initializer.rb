@@ -8,6 +8,7 @@ if Rails.configuration.events[:enabled]
   EventService = EventPublisher.new(
     broker_host: Rails.configuration.events[:broker_host],
     broker_port: Rails.configuration.events[:broker_port],
+    broker_vhost: Rails.configuration.events[:broker_vhost],
     broker_username: Rails.configuration.events[:broker_username],
     broker_password: Rails.configuration.events[:broker_password],
     exchange_name: Rails.configuration.events[:exchange_name],
