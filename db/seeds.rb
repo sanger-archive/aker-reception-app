@@ -125,7 +125,7 @@ printers.each do |args|
   end
 end
 
-['team117', 'sccp', 'psd_group', 'psg', 'cgp_transfer'].each do |name|
+['akerug', 'sccp', 'psd_group', 'psg', 'cgp_transfer'].each do |name|
   unless ContactGroup.find_by(name: name)
     ContactGroup.create(name: name)
   end
