@@ -4,11 +4,7 @@ $(document).on('turbolinks:load', function() {
     .DataTable({
       paging: false,
       searching: false,
-      ordering: false,
-      fixedHeader: {
-        header: true,
-        footer: false
-      }
+      ordering: false
     })
     .on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
       e.preventDefault();
