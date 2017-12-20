@@ -529,4 +529,14 @@ RSpec.describe MaterialSubmission, type: :model do
     end
   end
 
+  describe 'labware' do
+    it "shouldn't allow a value greater than 10" do
+      expect(build(:material_submission, status: 'labware', supply_labwares: false, no_of_labwares_required: 11)).to_not be_valid
+    end
+
+    it "shouldn't allow a value less than 1" do
+      expect(build(:material_submission, status: 'labware', supply_labwares: false, no_of_labwares_required: -2)).to_not be_valid
+    end
+  end
+
 end

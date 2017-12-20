@@ -19,7 +19,7 @@ class MaterialSubmission < ApplicationRecord
   has_many :labwares, dependent: :destroy
 
   validates :no_of_labwares_required,
-            numericality: { only_integer: true, greater_than_or_equal_to: 1 },
+            numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 10 },
             if: :labware_or_later?
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :labware_or_later?
