@@ -45,7 +45,7 @@ class Labware < ApplicationRecord
       y = (1..num_of_rows).map(&:to_s)
     end
 
-    y.product(x).map { |a,b| a + ':' + b }
+    x.product(y).map { |xi,yi| yi+':'+xi }
   end
 
   # Determine if there is any any human material in this labware

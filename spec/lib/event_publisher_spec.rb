@@ -26,8 +26,11 @@ RSpec.describe 'EventPublisher' do
     @queue = double('queue')
 
     allow(bunny).to receive(:new).with(
-      "amqp://#{params[:broker_username]}:#{params[:broker_password]}"\
-      "@#{params[:broker_host]}:#{params[:broker_port]}",
+      host: params[:broker_host],
+      port: params[:broker_port],
+      vhost: params[:broker_vhost],
+      user: params[:broker_username],
+      pass: params[:broker_password],
       threaded: false
     ).and_return(@connection)
     allow(@connection).to receive(:start)
