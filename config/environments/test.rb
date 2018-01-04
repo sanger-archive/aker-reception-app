@@ -39,13 +39,13 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
-  config.material_url = "http://localhost:5000"
+  config.material_url = 'http://localhost:5000'
   ENV['MATERIALS_URL'] = config.material_url
   config.set_url = 'http://localhost:1500/api/v1/'
   config.set_url_default_proxy = 'http://localhost:1500'
   config.ownership_url = 'http://localhost:4000/ownerships'
   config.ownership_url_default_proxy = 'http://localhost:4000'
-  config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
+  config.pmb_uri = ENV.fetch('PMB_URI', 'http://localhost:10000/v1')
   config.stamp_url = 'http://localhost:7000/api/v1/'
   config.study_url = 'http://localhost:3300/api/v1/'
   config.taxonomy_service_url = 'http://external-service/tax-id'
@@ -71,19 +71,15 @@ Rails.application.configure do
 
   config.fake_ldap = true
 
-  config.jwt_exp_time = 2 * 60
-  config.jwt_nbf_time = 1 * 60
-
   config.auth_service_url = 'http://auth'
-  config.login_url = config.auth_service_url+'/login'
-  config.logout_url = config.auth_service_url+'/logout'
+  config.login_url = config.auth_service_url + '/login'
+  config.logout_url = config.auth_service_url + '/logout'
 
-  config.urls = { submission: "",
-                  permissions: "",
-                  sets: "",
-                  projects: "",
-                  work_orders: "" }
+  config.urls = { submission: '',
+                  permissions: '',
+                  sets: '',
+                  projects: '',
+                  work_orders: '' }
 
   config.ssr_groups = %w[team252 pirates]
-
 end
