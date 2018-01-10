@@ -18,8 +18,8 @@ module SchemaValidators
           return 'Only human material are to have HMDMC numbers associated.'
         end
         # Check format validity
-        unless hmdmc_number.match(/^[0-9]{2}\/[0-9]{3}$/)
-          return 'The HMDMC number must be of the format ##/###.'
+        unless hmdmc_number.match(/^[0-9]{2}\/[0-9]{3,4}$/)
+          return 'The HMDMC number must be of the format ##/####.'
         end
         # Check the actual number with the HMDMC service
         unless EHMDMCClient.validate?(hmdmc_number)
