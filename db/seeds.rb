@@ -52,6 +52,7 @@ labware_types.each do |args|
 end
 
 contacts = [
+  # Dev Team
   {
     fullname: 'Dave',
     email: 'dr6@sanger.ac.uk',
@@ -79,6 +80,11 @@ contacts = [
   {
     fullname: 'Alex',
     email: 'ac42@sanger.ac.uk',
+  },
+  # CGaP
+  {
+    fullname: 'Rachel Nelson',
+    email: 'rn7@sanger.ac.uk',
   },
 ]
 
