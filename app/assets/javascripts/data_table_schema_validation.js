@@ -87,7 +87,7 @@
   proto.hmdmcCheck = function(fieldProperties, hmdmcField) {
     // Only validate the HMDMC number if there is one
     if (hmdmcField.value) {
-      var hmdmcPattern = new RegExp('^[0-9]{2}\/[0-9]{3}$');
+      var hmdmcPattern = new RegExp('^[0-9]{2}\/[0-9]{3,4}$');
 
       // First validate that the HMDMC field is in the correct format
       if (hmdmcPattern.test(hmdmcField.value)) {

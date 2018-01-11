@@ -115,7 +115,9 @@
               </div>
             </div>
           </div>
-          <p style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</p>
+          <% if Rails.configuration.show_hmdmc_warning %>
+            <p style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</p>
+          <% end %>
           <p><strong>Note:</strong> If necessary, the table can be scrolled horizontally to view all of the fields</p>
 
           <div style="overflow: scroll;">
