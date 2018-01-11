@@ -73,6 +73,7 @@ Rails.application.configure do
 
   config.ehmdmc_url = 'http://web-wwwtomcatdev-02.internal.sanger.ac.uk:8000/validateHMDMC'
   # For local fake hmdmc, use http://localhost:3501/validate
+  config.show_hmdmc_warning = true
 
   config.pmb_uri = ENV.fetch('PMB_URI', 'http://localhost:10000/v1')
 
