@@ -53,6 +53,7 @@ Rails.application.configure do
   config.aker_deployment_default_proxy = {}
 
   config.ehmdmc_url = 'http://localhost:3501/validate'
+  config.show_hmdmc_warning = false
 
   config.printing_disabled = true
 
