@@ -14,17 +14,11 @@ class ContactGroup < ApplicationRecord
     if Rails.configuration.fake_ldap
       return Contact.all.to_a
     end
-    contacts = ContactGroup.all.flat_map(&:members).uniq(&:email).map do |contact|
+    group_contacts = ContactGroup.all.flat_map(&:members).uniq(&:email).map do |contact|
       Contact.create_with(fullname: contact.fullname).find_or_create_by(email: contact.email)
     end
     # There are some groupless contacts that still need adding!
-    groupless_contacts = Contact.all.pluck(:email, :fullname) - contacts.pluck(:email, :fullname)
-    unless groupless_contacts.empty?
-      groupless_contacts.each do |contact|
-        contacts.push(Contact.create_with(fullname: contact[1]).find_or_create_by(email: contact[0]))
-      end
-    end
-    contacts
+    group_contacts + Contact.all.where.not(email: group_contacts.map(&:email))
   end
 
   def sanitise_name
