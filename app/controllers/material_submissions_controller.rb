@@ -8,7 +8,7 @@ class MaterialSubmissionsController < ApplicationController
 
   # Action to handle validating HMDMC from JavaScript
   def hmdmc_validate
-    render :json => EHMDMCClient.validate?(params[:hmdmc])
+    render :json => EHMDMCClient.validate_hmdmc(params[:hmdmc]).to_json
   end
 
   def index

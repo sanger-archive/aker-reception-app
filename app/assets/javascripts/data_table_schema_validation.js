@@ -80,6 +80,24 @@
     return false;
   };
 
+  proto.hmdmcAjaxSuccess = function(hmdmcField, hmdmcResponseJson) {
+    if (typeof hmdmcResponseJson.valid !== 'undefined') {
+      // We cache that the HMDMC number is valid, so next time we won't repeat the same request
+      this.verifiedHMDMC[hmdmcField.value] = hmdmcResponseJson.valid;
+    }
+    if (!!hmdmcResponseJson.valid) {
+      // If the service says its valid, we can apply the schema validation
+        $(hmdmcField.node).trigger('psd.schema.validation', {
+          node: hmdmcField.node,
+          name: hmdmcField.name,
+          value: hmdmcField.value
+        });      
+    } else {
+      // If it is not valid, we display the error sent back from the server
+      this.validationError(hmdmcField.node, hmdmcField.name, hmdmcResponseJson.error_message || 'Unspecified HDMMC problem');
+    }
+  };
+
   /**
    * Fails if the HMDMC number is invalid
    * Returns true if it fails.
@@ -105,18 +123,11 @@
             url: "/submission/hmdmc",
             method: "GET",
             data: { hmdmc: hmdmcField.value.replace("/", "_") },
-            success: $.proxy(function(validHMDMC) {
-              this.verifiedHMDMC[hmdmcField.value] = validHMDMC;
-              $(hmdmcField.node).trigger('psd.schema.validation', {
-                node: hmdmcField.node,
-                name: hmdmcField.name,
-                value: hmdmcField.value
-              });
-            }, this)
+            success: $.proxy(this.hmdmcAjaxSuccess, this, hmdmcField)
           });
         }
       } else {
-        var hmdmcFormatError = "The HMDMC number should be in the format ##/###."
+        var hmdmcFormatError = "The HMDMC number should be in the format ##/####."
         this.validationError(hmdmcField.node, hmdmcField.name, hmdmcFormatError);
         return true;
       }
