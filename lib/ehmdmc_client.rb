@@ -22,8 +22,8 @@ module EHMDMCClient
     end
 
     def reset
-      @validated = true
-      @valid = true      
+      @validated = false
+      @valid = false      
     end
 
     def is_validated?
@@ -39,8 +39,8 @@ module EHMDMCClient
     end
 
     def load_message(type_of_message, facility, text, validated)
-      not_validated_msg = "The HMDMC #{hmdmc} is considered as not valid by the HMDMC service"
-      unknown_validation_msg = 'We cannot validate with the HMDMC service at now. Please contact the administrators if the problem persists.'
+      not_validated_msg = "The HMDMC #{hmdmc} is considered invalid by the HMDMC service"
+      unknown_validation_msg = 'We cannot validate with the HMDMC service at this time. Please contact the administrators if the problem persists.'
 
       # Type of message loaded.
       # Valid values:
@@ -86,6 +86,34 @@ module EHMDMCClient
     def to_json
       {valid: @valid, error_message: @error_message}.reject{|k,v| v.nil?}.to_json
     end
+
+    def set_as_valid
+      @validated = true
+      @valid = true
+      self
+    end
+
+    def validate(response)
+      return load_message(:user_message, :info, 'Connection to HMDMC service failed', false) unless response
+      return load_message(:infrastructure_message, :error, "Attempting to validate HMDMC #{hmdmc} returned status code #{response.status}", true) unless response.status == 200
+
+      begin
+        data = JSON.parse(response.body)
+      rescue JSON::ParserError
+        return load_message(:infrastructure_message, :error, "Attempting to validate HMDMC #{hmdmc} produced invalid JSON: #{response.body}", false)
+      end
+
+      # Error codes, from Stephen Rice:
+      # 0: no error (valid)
+      # 1: system error
+      # 2: syntax error, i.e. malformed HMDMC number
+      # 3: number has correct syntax but does not exist in system
+      # 4: number does exist in system but is not approved
+      # 5: valid but failed to find any product classes
+      return load_message(:infrastructure_message, :info, "HMDMC rejected: #{hmdmc}, error code: #{data['errorcode']}", true) unless data['valid']
+
+      set_as_valid
+    end
   end
 
   def self.get_response_for_hmdmc(hmdmc)
@@ -98,27 +126,11 @@ module EHMDMCClient
   end
 
   def self.validate_hmdmc(hmdmc)
-    msg = Validation.new(hmdmc)
+    validator = Validation.new(hmdmc)
 
-    r = get_response_for_hmdmc(hmdmc)
-    return msg.load_message(:user_message, :info, 'Connection to HMDMC service failed', false) unless r
-    return msg.load_message(:infrastructure_message, :error, "Attempting to validate HMDMC #{hmdmc} returned status code #{r.status}", true) unless r.status == 200
+    response = get_response_for_hmdmc(hmdmc)
 
-    begin
-      data = JSON.parse(r.body)
-    rescue JSON::ParserError
-      return msg.load_message(:infrastructure_message, :error, "Attempting to validate HMDMC #{hmdmc} produced invalid JSON: #{r.body}", false)
-    end
-
-    # Error codes, from Stephen Rice:
-    # 0: no error (valid)
-    # 1: system error
-    # 2: syntax error, i.e. malformed HMDMC number
-    # 3: number has correct syntax but does not exist in system
-    # 4: number does exist in system but is not approved
-    # 5: valid but failed to find any product classes
-    return msg.load_message(:infrastructure_message, :info, "HMDMC rejected: #{hmdmc}, error code: #{data['errorcode']}", true) unless data['valid']
-    return msg
+    validator.validate(response)
   end
 
   def self.sanitise(hmdmc)

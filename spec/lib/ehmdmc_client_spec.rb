@@ -122,11 +122,20 @@ RSpec.describe 'EHMDMCClient' do
     let(:hmdmc) { '1234' }
     let(:obj) { EHMDMCClient::Validation.new(hmdmc) }
     let(:msg) { 'some text' }
-    let(:generic_msg) { "The HMDMC #{hmdmc} is considered as not valid by the HMDMC service" }
+    let(:generic_msg) { "The HMDMC #{hmdmc} is considered invalid by the HMDMC service" }
     before do
       Rails.logger = double('logger')
       allow(Rails.logger).to receive(:info)
       allow(Rails.logger).to receive(:error)
+    end
+
+    context '#initialize' do
+      it 'marks the message as invalid' do
+        expect(obj.valid?).to eq(false)
+      end
+      it 'identifies the message as not validated' do
+        expect(obj.is_validated?).to eq(false)
+      end                            
     end
 
     context '#to_json' do
@@ -192,49 +201,39 @@ RSpec.describe 'EHMDMCClient' do
       end
 
       context 'with argument: valid' do
-        context 'when no messages have been loaded' do
-          it 'marks the message as valid' do
-            expect(obj.valid?).to eq(true)
+        context 'when the loaded message is identified as not validated' do
+          before do
+            obj.load_message(:infrastructure_message, :info, nil, false)
           end
-          it 'identifies the message as validated' do
-            expect(obj.is_validated?).to eq(true)
-          end                      
+          it 'does not mark the message as valid' do
+            expect(obj.valid?).to eq(false)
+          end
+          it 'identifies the message as not validated' do
+            expect(obj.is_validated?).to eq(false)
+          end            
         end
-        context 'when a message has been previously loaded' do
-          context 'when the loaded message is identified as not validated' do
+        context 'when the loaded message is identified as validated' do
+          context 'when some text was added by the message' do
             before do
-              obj.load_message(:infrastructure_message, :info, nil, false)
+              obj.load_message(:infrastructure_message, :info, 'some error', true)
             end
-            it 'does not mark the message as valid' do
-              expect(obj.valid?).to eq(false)
+            it 'marks the message as invalid' do
+             expect(obj.valid?).to eq(false) 
             end
-            it 'identifies the message as not validated' do
-              expect(obj.is_validated?).to eq(false)
-            end            
+            it 'identifies the message as validated' do
+              expect(obj.is_validated?).to eq(true)
+            end              
           end
-          context 'when the loaded message is identified as validated' do
-            context 'when some text was added by the message' do
-              before do
-                obj.load_message(:infrastructure_message, :info, 'some error', true)
-              end
-              it 'marks the message as invalid' do
-               expect(obj.valid?).to eq(false) 
-              end
-              it 'identifies the message as validated' do
-                expect(obj.is_validated?).to eq(true)
-              end              
+          context 'when no text is stored' do
+            before do
+              obj.load_message(:infrastructure_message, :info, nil, true)
             end
-            context 'when no text is stored' do
-              before do
-                obj.load_message(:infrastructure_message, :info, nil, true)
-              end
-              it 'marks the message as valid ' do
-               expect(obj.valid?).to eq(true) 
-              end
-              it 'identifies the message as validated' do
-                expect(obj.is_validated?).to eq(true)
-              end              
+            it 'marks the message as valid ' do
+             expect(obj.valid?).to eq(true) 
             end
+            it 'identifies the message as validated' do
+              expect(obj.is_validated?).to eq(true)
+            end              
           end
         end
       end
