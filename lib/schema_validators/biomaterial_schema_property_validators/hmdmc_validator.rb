@@ -22,8 +22,9 @@ module SchemaValidators
           return 'The HMDMC number must be of the format ##/####.'
         end
         # Check the actual number with the HMDMC service
-        unless EHMDMCClient.validate?(hmdmc_number)
-          return "The HMDMC number #{hmdmc_number} could not be validated with the eHMDMC service."
+        validation = EHMDMCClient.validate_hmdmc(hmdmc_number)
+        unless validation.valid?
+          return validation.error_message
         end
       end
 
