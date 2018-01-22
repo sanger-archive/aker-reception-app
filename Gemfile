@@ -95,6 +95,7 @@ end
 
 # Development and test groups
 group :development, :test do
+  gem 'brakeman', require: false
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
   gem 'capybara'
@@ -109,7 +110,6 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'sqlite3'
   gem 'webmock'
-  gem 'brakeman', :require => false
 end
 
 # Deployment group
