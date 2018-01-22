@@ -71,7 +71,9 @@ RSpec.describe :create_materials_step do
       end
 
       it 'should create materials only when necessary' do
-        expect(MatconClient::Material).to have_received(:create)
+        expect(MatconClient::Material).to have_received(:create).with(
+          hash_including(owner_id: @submission.contact.email)
+        )
         expect(@materials.length).to eq 1
       end
 
@@ -91,7 +93,9 @@ RSpec.describe :create_materials_step do
       end
 
       it 'should create materials' do
-        expect(MatconClient::Material).to have_received(:create).thrice
+        expect(MatconClient::Material).to have_received(:create).with(
+          hash_including(owner_id: @submission.contact.email)
+        ).thrice
         expect(@materials.length).to eq 3
       end
 
@@ -101,6 +105,7 @@ RSpec.describe :create_materials_step do
           expect(contents['1']['id']).to eq @materials[0].id
           expect(contents['2']['id']).to eq @materials[1].id
         end
+
         expect(@submission.labwares[1]).to have_received(:update_attributes) do |data|
           contents = data[:contents]
           expect(contents['1']['id']).to eq @materials[2].id
@@ -149,12 +154,14 @@ RSpec.describe :create_materials_step do
           expect(contents['1']['id']).to be_nil
           expect(contents['2']['id']).to be_nil
         end
+
         expect(@submission.labwares[1]).to have_received(:update_attributes) do |data|
           contents = data[:contents]
           expect(contents['1']['id']).to be_nil
         end
       end
     end
+
     context 'when labwares contain some bio ids' do
       before do
         stub_matcon
