@@ -37,7 +37,10 @@ RSpec.describe :create_materials_step do
   def make_submission(labware_bio_ids)
     labwares = labware_bio_ids.map { |bio_ids| make_labware(bio_ids) }
     contact = double('contact', email: 'testing@email')
-    @submission = double(:material_submission, labwares: labwares, contact: contact)
+    owner = double('contact', email: 'contact@email')
+    @submission = double(:material_submission, labwares: labwares,
+                                               contact: contact,
+                                               owner_email: owner.email)
   end
 
   def make_step(labware_bio_ids)
@@ -72,7 +75,8 @@ RSpec.describe :create_materials_step do
 
       it 'should create materials only when necessary' do
         expect(MatconClient::Material).to have_received(:create).with(
-          hash_including(owner_id: @submission.contact.email)
+          hash_including(owner_id: @submission.contact.email,
+                         submitter_id: @submission.owner_email)
         )
         expect(@materials.length).to eq 1
       end

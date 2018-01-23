@@ -15,7 +15,8 @@ module DispatchSteps
         contents.each_value do |bio_data|
           next if bio_data['id']
           m = MatconClient::Material.create(bio_data.merge(
-                                              owner_id: @material_submission.contact.email
+                                              owner_id: @material_submission.contact.email,
+                                              submitter_id: @material_submission.owner_email
           ))
           bio_data['id'] = m.id
           changed = true
