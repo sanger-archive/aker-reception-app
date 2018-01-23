@@ -38,6 +38,9 @@ RSpec.describe :create_materials_step do
     labwares = labware_bio_ids.map { |bio_ids| make_labware(bio_ids) }
     contact = double('contact', email: 'testing@email')
     owner = double('contact', email: 'contact@email')
+    # The 'contact' for a siubmission has most recently been renamed to 'Sample Guardian' while the
+    # 'owner_email' refers to the owner of the submission. Within materials, the 'owner_email' is
+    # used as the 'submitter_id' indicating who submitted the materials.
     @submission = double(:material_submission, labwares: labwares,
                                                contact: contact,
                                                owner_email: owner.email)

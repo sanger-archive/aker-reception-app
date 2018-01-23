@@ -14,6 +14,10 @@ module DispatchSteps
         contents = labware.contents
         contents.each_value do |bio_data|
           next if bio_data['id']
+          # The 'contact' for a siubmission has most recently been renamed to 'Sample Guardian'
+          # while the 'owner_email' refers to the owner of the submission. Within materials, the
+          # 'owner_email' is used as the 'submitter_id' indicating who submitted the materials and
+          # the submission 'contact'/'Sample Guardian' is the 'owner' of the material(s).
           m = MatconClient::Material.create(bio_data.merge(
                                               owner_id: @material_submission.contact.email,
                                               submitter_id: @material_submission.owner_email
