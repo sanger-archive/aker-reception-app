@@ -63,12 +63,6 @@ Rails.application.configure do
   config.set_url = 'http://localhost:3000/api/v1/'
   config.set_url_default_proxy = 'http://localhost:3000'
 
-  config.study_url = 'http://localhost:3300/api/v1/'
-  config.study_url_default_proxy = 'http://localhost:3300'
-
-  config.ownership_url = 'http://localhost:4000/ownerships'
-  config.ownership_url_default_proxy = 'http://localhost:4000'
-
   config.stamp_url = 'http://localhost:7000/api/v1/'
 
   config.ehmdmc_url = 'http://localhost:3501/validate'
