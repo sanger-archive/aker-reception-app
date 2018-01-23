@@ -31,13 +31,9 @@
 
     this.cleanTooltips();
 
-    // var labware_name = $(e.target).attr('href').replace('#', '');
-    // $('form td:first-child').html(labware_name);
-
     this.inputs().each($.proxy(this.restoreInput, this, data));
 
     this.updateValidations();
-    //this.inputs().each($.proxy(this.updateErrorInput, this, data));
   };
 
   proto.updateErrorState = function(input, labwareIndex, address, fieldName) {
@@ -79,8 +75,6 @@
 
   proto.unsetErrorToTab = function(tab) {
     this.setErrorToTab(tab);
-//    $(tab).removeClass(this.params._cssErrorTabClass);
-
     this.updateTabContentPresenceStatus(tab);
   };
 
@@ -185,7 +179,7 @@
     return this.onReceive($(this.currentTab), data);
   };
 
-  proto.loadErrorsFromMsg = function(data) {
+  proto.loadErrorsFromMsg = function(data, clearErrors) {
     if (data && data.messages) {
 
       for (var key in data) {
@@ -193,7 +187,7 @@
           var message = data.messages[i];
           this.resetCellNameErrors(message.labwareIndex);
         }
-        this.resetMainAlertError();
+        if (clearErrors) this.resetMainAlertError();
 
         for (var i = 0; i<data.messages.length; i++) {
           var message = data.messages[i];
@@ -225,7 +219,7 @@
         this.cleanValidLabwares(data.labwares_indexes);
       }
     } else {
-      this.loadErrorsFromMsg(data);
+      this.loadErrorsFromMsg(data, true);
       this.setErrorToTab(currentTab[0]);
     }
     this.updateValidations();
@@ -375,18 +369,19 @@
   };
 
   proto.showAlert = function(data) {
-    $('.alert .alert-title').html(data.title);
-    $('.alert .alert-msg').html(data.body);
-    $('.alert').toggleClass('hidden', false);
+    $('#page-error-alert > .alert-title').html(data.title);
+    $('#page-error-alert > .alert-msg').html(data.body);
+    $('#page-error-alert').toggleClass('hidden', false);
   };
 
   proto.resetMainAlertError = function() {
-    $('.alert .alert-msg').html('');
+    $('#page-error-alert > .alert-msg').html('');
+    $('#page-error-alert').toggleClass('hidden', true);
   };
 
 
   proto.addErrorToMainAlertError = function(text) {
-    $('.alert .alert-msg').append(text);
+    $('#page-error-alert > .alert-msg').append(text);
   };
 
   proto.isEmptyErrorCells = function() {
@@ -411,7 +406,7 @@
           body: 'Please review and solve the validation problems before continuing'});
         this.setErrorToTab(this.currentTab);
         if (!data.update_successful) {
-          this.loadErrorsFromMsg(data);
+          this.loadErrorsFromMsg(data, false);
         }
         this.updateValidations();
       }
@@ -421,7 +416,8 @@
   proto.onError = function(e) {
     this.showAlert({
       title: 'Validation Error',
-      body: 'We could not save the current content due to an error'})
+      body: 'We could not save the current content due to an error'
+    });
   };
 
   proto.toNextStep = function(e) {
@@ -432,7 +428,6 @@
   proto.attachHandlers = function() {
     $('a[data-toggle="tab"]').on('hide.bs.tab', $.proxy(this.saveTab, this));
     $('a[data-toggle="tab"]').on('show.bs.tab', $.proxy(this.restoreTab, this));
-    //$('table tbody tr td input').on('blur', $.proxy(this.saveCurrentTab, this));
     $('table tbody tr td input').on('blur', $.proxy(function(e) {
       return this.validateInput(e.target);
     }, this));
