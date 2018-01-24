@@ -26,7 +26,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'jquery-rails'
 # Pure Ruby LDAP library. Read more: https://github.com/ruby-ldap/ruby-net-ldap
 gem 'net-ldap'
-gem 'pg'
+gem 'pg', '~> 0.18' # pg version 1.0.0 is not compatible with Rails 5.1.4
 gem 'pry'
 # Use Puma as the app server
 gem 'puma', '~> 3.0'
@@ -95,6 +95,7 @@ end
 
 # Development and test groups
 group :development, :test do
+  gem 'brakeman', require: false
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platform: :mri
   gem 'capybara'
@@ -109,7 +110,6 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'sqlite3'
   gem 'webmock'
-  gem 'brakeman', :require => false
 end
 
 # Deployment group
