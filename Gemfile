@@ -81,7 +81,6 @@ end
 
 # Test group
 group :test do
-  gem 'cucumber-rails', require: false
   gem 'rspec-json_expectations'
   gem 'rubycritic'
   # Code coverage for Ruby 1.9+ with a powerful configuration library and automatic merging of
