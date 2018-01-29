@@ -11,51 +11,63 @@
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= csrf_meta_tags %>
 
-
   </head>
   <body>
-    <nav class="navbar navbar-inverse">
-    <div class="container">
-    <div class="navbar-header">
-    <!-- Display the hamburger button if screen isn't wide enough -->
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navBar">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <ul class="nav navbar-nav">
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Aker <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li><%= link_to 'Submission', Rails.configuration.urls[:submission] %></li>
-          <li><%= link_to 'Permissions', Rails.configuration.urls[:permissions] %></li>
-          <li><%= link_to 'Sets', Rails.configuration.urls[:sets] %></li>
-          <li><%= link_to 'Projects', Rails.configuration.urls[:projects] %></li>
-          <li><%= link_to 'Work Orders', Rails.configuration.urls[:work_orders] %></li>
-        </ul>
-      </li>
-    </ul>
-    </div>
-    <div class="collapse navbar-collapse" id="navBar">
-    <%= render 'navlinks' %>
-    <ul class="nav navbar-nav navbar-right">
-        <% if jwt_provided? %>
-          <li><p class="navbar-text">Logged in as <%= current_user.email %></p></li>
-          <li><%= link_to 'Log out', Rails.configuration.logout_url, method: :delete if Rails.configuration.logout_url %></li>
-        <% else %>
-          <li><%= link_to 'Log in', Rails.configuration.login_url if Rails.configuration.login_url %></li>
-        <% end %>
-    </ul>
-    </div>
-    </div>
+    <nav class="navbar navbar-inverse" id="<%= Rails.env.downcase %>">
+      <div class="container">
+        <div class="navbar-header">
+          <!-- Display the hamburger button if screen isn't wide enough -->
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navBar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle navbar-brand" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Aker <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><%= link_to 'Submission', Rails.configuration.urls[:submission] %></li>
+                <li><%= link_to 'Permissions', Rails.configuration.urls[:permissions] %></li>
+                <li><%= link_to 'Sets', Rails.configuration.urls[:sets] %></li>
+                <li><%= link_to 'Projects', Rails.configuration.urls[:projects] %></li>
+                <li><%= link_to 'Work Orders', Rails.configuration.urls[:work_orders] %></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="collapse navbar-collapse" id="navBar">
+          <%= render 'navlinks' %>
+          <ul class="nav navbar-nav navbar-right">
+            <li class="navbar-text"><strong><%= Rails.env.upcase %></strong></li>
+            <% if jwt_provided? %>
+              <li><p class="navbar-text">Logged in as <%= current_user.email %></p></li>
+              <li><%= link_to 'Log out', Rails.configuration.logout_url, method: :delete if Rails.configuration.logout_url %></li>
+            <% else %>
+              <li><%= link_to 'Log in', Rails.configuration.login_url if Rails.configuration.login_url %></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
     </nav>
 
-  <div class="container" id="content">
-    <h1><%= yield(:main_title) %></h1>
-    <%= render "flashes" %>
-
-    <%= yield %>
-
-  </div>
+    <div class="container" id="content">
+      <div class="row">
+        <div class="col-md-8">
+          <h1>
+            <%= yield(:main_title) %>
+          </h1>
+        </div>
+        <div class="col-md-4">
+            <%= yield(:title_button) if content_for?(:title_button) %>
+        </div>
+      </div>
+      <%= render "flashes" %>
+      <%= yield %>
+    </div>
+    <footer style="text-align:center">
+      <% if Projects::Application::VERSION.present? %>
+        <%= 'Version: ' + Projects::Application::VERSION[0..6] %>
+      <% end %>
+    </footer>
   </body>
 </html>

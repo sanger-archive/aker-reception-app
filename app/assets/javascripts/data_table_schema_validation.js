@@ -1,15 +1,20 @@
 (function($, undefined) {
-	function DataTableSchemaValidation(node, params) {
+  function DataTableSchemaValidation(node, params) {
     this._node = $(node);
     this.params = params;
     this._loadedSchema = null;
+    /**
+     * An object of verified HMDMC numbers, e.g.:
+     * { '12/500': false, '12/200': true }
+     */
+    this.verifiedHMDMC = {};
     this.loadSchema().then($.proxy(this.attachHandlers, this));
-	}
+  }
 
-	var proto = DataTableSchemaValidation.prototype;
+  var proto = DataTableSchemaValidation.prototype;
 
   proto.loadSchema = function() {
-    return $.ajax({url: '/materials_schema',
+    return $.ajax({url: this.params.material_schema_url,
       success: $.proxy(function(json) {
         this._loadedSchema = json;
         return this._loadedSchema;
@@ -64,7 +69,7 @@
       }
       // True (fail) if the value is given but unmatched
       return (schema.enum.indexOfCaseInsensitive(v) < 0);
-    }
+    },
   };
 
   proto.failSchemaCheck = function(schema, msg, failFunct, textFunct) {
@@ -75,25 +80,100 @@
     return false;
   };
 
-  proto.validateSchemaField = function(e, msg) {
-    var schema = this._loadedSchema.properties[msg.name];
+  proto.hmdmcAjaxSuccess = function(hmdmcField, hmdmcResponseJson) {
+    if (typeof hmdmcResponseJson.valid !== 'undefined') {
+      // We cache that the HMDMC number is valid, so next time we won't repeat the same request
+      this.verifiedHMDMC[hmdmcField.value] = hmdmcResponseJson.valid;
+    }
+    if (!!hmdmcResponseJson.valid) {
+      // If the service says its valid, we can apply the schema validation
+        $(hmdmcField.node).trigger('psd.schema.validation', {
+          node: hmdmcField.node,
+          name: hmdmcField.name,
+          value: hmdmcField.value
+        });      
+    } else {
+      // If it is not valid, we display the error sent back from the server
+      this.validationError(hmdmcField.node, hmdmcField.name, hmdmcResponseJson.error_message || 'Unspecified HDMMC problem');
+    }
+  };
+
+  /**
+   * Fails if the HMDMC number is invalid
+   * Returns true if it fails.
+   */
+  proto.hmdmcCheck = function(fieldProperties, hmdmcField) {
+    // Only validate the HMDMC number if there is one
+    if (hmdmcField.value) {
+      var hmdmcPattern = new RegExp('^[0-9]{2}\/[0-9]{3,4}$');
+
+      // First validate that the HMDMC field is in the correct format
+      if (hmdmcPattern.test(hmdmcField.value)) {
+        var hmdmcNumberError = "The HMDMC number is invalid."
+        // If the HMDMC number has already been checked
+        if (hmdmcField.value in this.verifiedHMDMC) {
+          // ... and is verified
+          if (!this.verifiedHMDMC[hmdmcField.value]) {
+            this.validationError(hmdmcField.node, hmdmcField.name, hmdmcNumberError);
+            return true;
+          }
+        } else {
+          // We need to check the HMDMC number and store the result
+          return $.ajax({
+            url: "/submission/hmdmc",
+            method: "GET",
+            data: { hmdmc: hmdmcField.value.replace("/", "_") },
+            success: $.proxy(this.hmdmcAjaxSuccess, this, hmdmcField)
+          });
+        }
+      } else {
+        var hmdmcFormatError = "The HMDMC number should be in the format ##/####."
+        this.validationError(hmdmcField.node, hmdmcField.name, hmdmcFormatError);
+        return true;
+      }
+    }
+
+    // HMDMC is optional
+    return false;
+  }
+
+  /**
+   * Perform validation on the field and set the message if failed
+   */
+  proto.validateSchemaField = function(e, htmlField) {
+    // Get the properties of the field from the schema
+    if (this._loadedSchema.properties['hmdmc']) {
+      this._loadedSchema.properties['hmdmc']['required'] = false;
+    }
+    var fieldProperties = this._loadedSchema.properties[htmlField.name];
 
     var failed = false;
-    if (schema) {
+    if (fieldProperties) {
       failed = (
-            this.failSchemaCheck(schema, msg, this.schemaChecks.failsDataValueRequired, function(schema, msg) {
-              return 'The field '+msg.name+' is required'
-            }) ||
-            this.failSchemaCheck(schema, msg, this.schemaChecks.failsDataValueAllowed, function(schema, msg) {
-              return 'The field should have any of these values ['+schema.enum.join(',')+']';
-            }));
+        // HMDMC is not required but needs to validated if present
+        (htmlField.name == 'hmdmc' && this.hmdmcCheck(fieldProperties, htmlField))
+        // Check for required fields
+        || this.failSchemaCheck(fieldProperties,
+            htmlField,
+            this.schemaChecks.failsDataValueRequired,
+            function(fieldProperties, htmlField) {
+              return 'The field ' + htmlField.name + ' is required'
+            })
+        // Check that fields are allowed
+        || this.failSchemaCheck(fieldProperties,
+            htmlField,
+            this.schemaChecks.failsDataValueAllowed,
+            function(fieldProperties, htmlField) {
+              return 'This field should have any of these values ['
+                + fieldProperties.enum.join(',') + ']';
+            })
+      );
     }
 
     // If the schema checks fail, they will update the errorCells.
     // If they don't fail, we should update them in case they have out of date errors.
-
     if (!failed) {
-      var node = msg.node;
+      var node = htmlField.node;
 
       $(node).trigger('psd.schema.error', {
         node: node,

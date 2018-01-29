@@ -39,39 +39,48 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
-  config.material_url = "http://localhost:5000"
+  config.material_url = 'http://localhost:5000'
   ENV['MATERIALS_URL'] = config.material_url
   config.set_url = 'http://localhost:1500/api/v1/'
   config.set_url_default_proxy = 'http://localhost:1500'
   config.ownership_url = 'http://localhost:4000/ownerships'
   config.ownership_url_default_proxy = 'http://localhost:4000'
-  config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
+  config.pmb_uri = ENV.fetch('PMB_URI', 'http://localhost:10000/v1')
   config.stamp_url = 'http://localhost:7000/api/v1/'
   config.study_url = 'http://localhost:3300/api/v1/'
+  config.taxonomy_service_url = 'http://external-service/tax-id'
+
+  config.aker_deployment_default_proxy = {}
 
   config.ehmdmc_url = 'http://localhost:3501/validate'
+  config.show_hmdmc_warning = false
 
   config.printing_disabled = true
 
   config.jwt_secret_key = 'test'
 
-  config.enable_events_sending = false
-  config.events_queue_name = 'aker.events'
-  config.events_queue_connection = "amqp://guest:guest@localhost:5672"
+  config.events = {
+    enabled: false,
+    broker_host: 'localhost',
+    broker_port: '5672',
+    broker_username: 'guest',
+    broker_password: 'guest',
+    exchange_name: 'aker.events',
+    warehouse_queue_name: 'aker.events.warehouse',
+    notification_queue_name: 'aker.events.notifications'
+  }
 
   config.fake_ldap = true
 
-  config.jwt_exp_time = 2 * 60
-  config.jwt_nbf_time = 1 * 60
-
   config.auth_service_url = 'http://auth'
-  config.login_url = config.auth_service_url+'/login'
-  config.logout_url = config.auth_service_url+'/logout'
+  config.login_url = config.auth_service_url + '/login'
+  config.logout_url = config.auth_service_url + '/logout'
 
-  config.urls = { submission: "",
-                  permissions: "",
-                  sets: "",
-                  projects: "",
-                  work_orders: "" }
+  config.urls = { submission: '',
+                  permissions: '',
+                  sets: '',
+                  projects: '',
+                  work_orders: '' }
 
+  config.ssr_groups = %w[team252 pirates]
 end

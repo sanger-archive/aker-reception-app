@@ -63,43 +63,51 @@ Rails.application.configure do
   config.set_url = 'http://localhost:3000/api/v1/'
   config.set_url_default_proxy = 'http://localhost:3000'
 
-  config.study_url = 'http://localhost:3300/api/v1/'
-  config.study_url_default_proxy = 'http://localhost:3300'
-
-  config.ownership_url = 'http://localhost:4000/ownerships'
-  config.ownership_url_default_proxy = 'http://localhost:4000'
-
   config.stamp_url = 'http://localhost:7000/api/v1/'
 
-  config.pmb_uri = ENV.fetch('PMB_URI','http://localhost:10000/v1')
-
   config.ehmdmc_url = 'http://localhost:3501/validate'
-  config.ehmdmc_url_default_proxy = 'http://localhost:3501'
+  # The external test hmdmc is at http://web-wwwtomcatdev-02.internal.sanger.ac.uk:8000/validateHMDMC
+  config.show_hmdmc_warning = true
+
+  config.pmb_uri = ENV.fetch('PMB_URI', 'http://localhost:10000/v1')
+
+  config.taxonomy_service_url = 'https://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/tax-id'
 
   config.printing_disabled = true
 
   config.jwt_secret_key = 'development'
 
-  config.jwt_exp_time = 2 * 60
-  config.jwt_nbf_time = 1 * 60
-
-  config.enable_events_sending = false
-  config.events_queue_name = 'aker.events'
-  config.events_queue_connection = "amqp://guest:guest@localhost:5672"
+  config.events = {
+    enabled: false,
+    broker_host: 'localhost',
+    broker_port: '5672',
+    broker_username: 'guest',
+    broker_password: 'guest',
+    broker_vhost: '/',
+    exchange_name: 'aker.events',
+    warehouse_queue_name: 'aker.events.warehouse',
+    notification_queue_name: 'aker.events.notifications'
+  }
 
   config.fake_ldap = true
 
-  config.action_mailer.default_url_options = { host: 'localhost', script_name: config.relative_url_root, only_path: false, port: Rails::Server.new.options[:Port] }
-  config.default_jwt_user = { email: ENV.fetch('USER', 'user')+'@sanger.ac.uk', groups: ['world'] }
+  config.action_mailer.default_url_options = { host: 'localhost',
+                                               script_name: config.relative_url_root,
+                                               only_path: false,
+                                               port: Rails::Server.new.options[:Port] }
+
+  config.default_jwt_user = { email: ENV.fetch('USER', 'user') + '@sanger.ac.uk',
+                              groups: ['world'] }
 
   config.auth_service_url = 'http://localhost:9010'
-  config.login_url = config.auth_service_url+'/login'
-  config.logout_url = config.auth_service_url+'/logout'
+  config.login_url = config.auth_service_url + '/login'
+  config.logout_url = config.auth_service_url + '/logout'
 
-  config.urls = { submission: "",
-                  permissions: "",
-                  sets: "",
-                  projects: "",
-                  work_orders: "" }
+  config.urls = { submission: '',
+                  permissions: '',
+                  sets: '',
+                  projects: '',
+                  work_orders: '' }
 
+  config.ssr_groups = %w[team252 world]
 end

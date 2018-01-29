@@ -33,10 +33,11 @@ ActionController::Base.allow_rescue = false
 begin
   DatabaseCleaner.strategy = :transaction
 rescue NameError
-  raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
+  raise 'You need to add database_cleaner to your Gemfile (for :test group) if you wish to use it.'
 end
 
-# You may also want to configure DatabaseCleaner to use different strategies for certain features and scenarios.
+# You may also want to configure DatabaseCleaner to use different strategies for certain features
+#   and scenarios.
 # See the DatabaseCleaner documentation for details. Example:
 #
 #   Before('@no-txn,@selenium,@culerity,@celerity,@javascript') do
@@ -57,6 +58,8 @@ end
 Cucumber::Rails::Database.javascript_strategy = :truncation
 
 require 'capybara/poltergeist'
-Capybara.javascript_driver = :poltergeist
+Capybara.register_driver :poltergeist_debug do |app|
+  Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
+end
 
-
+Capybara.javascript_driver = :poltergeist_debug

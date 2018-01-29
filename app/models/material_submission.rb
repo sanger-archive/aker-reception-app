@@ -18,8 +18,9 @@ class MaterialSubmission < ApplicationRecord
 
   has_many :labwares, dependent: :destroy
 
-  validates :no_of_labwares_required, numericality: { only_integer: true, greater_than_or_equal_to: 1 },
-    if: :labware_or_later?
+  validates :no_of_labwares_required,
+            numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 10 },
+            if: :labware_or_later?
 
   validates :supply_labwares, inclusion: { in: [true, false] }, if: :labware_or_later?
   validates :labware_type_id, presence: true, if: :labware_or_later?
@@ -28,6 +29,9 @@ class MaterialSubmission < ApplicationRecord
   validate :each_labware_has_contents, if: :last_step?
   validates :material_submission_uuid, presence: true
   validates :owner_email, presence: true
+
+  before_validation :sanitise_owner
+  before_save :sanitise_owner
 
   before_save :create_labware, if: -> { labware_type_id_changed? || no_of_labwares_required_changed? }
   before_save :check_supply_decappers
@@ -96,7 +100,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def broken?
-    return status==MaterialSubmission.BROKEN
+    return status == MaterialSubmission.BROKEN
   end
 
   def broken!
@@ -129,13 +133,12 @@ class MaterialSubmission < ApplicationRecord
     labwares && labwares.any? { |lw| lw.any_human_material? }
   end
 
-  def ethical?
-    labwares && labwares.all? { |lw| lw.ethical? }
+  def any_human_material_no_hmdmc?
+    labwares && labwares.any? { |lw| lw.any_human_material_no_hmdmc? }
   end
 
-  def set_hmdmc(hmdmc, username)
-    return if labwares.nil?
-    labwares.each { |lw| lw.set_hmdmc(hmdmc, username) }
+  def ethical?
+    labwares && labwares.all? { |lw| lw.ethical? }
   end
 
   def set_hmdmc_not_required(username)
@@ -161,9 +164,10 @@ class MaterialSubmission < ApplicationRecord
     labwares && labwares.any? { |lw| lw.confirmed_no_hmdmc? }
   end
 
-  # return the user who confirmed the hmdmc
-  # we currently assume that all the contents of the labware are populated with
-  # the same hmdmc data
+  # Return the user who confirmed the HMDMC
+  # We currently assume that all the contents of the labware are populated with the same hmdmc data
+  # TODO: this assumption is now incorrect, as each material can have it's own (potentially unique)
+  # HMDMC number
   def first_confirmed_no_hmdmc
     return nil if labwares.nil?
     labwares.each do |lw|
@@ -173,10 +177,31 @@ class MaterialSubmission < ApplicationRecord
     nil
   end
 
+  # Returns an array of all unique HMDMC numbers in the submission
+  def hmdmc_list
+    return nil if labwares.nil?
+    hmdmc_list = Set.new()
+    labwares.each do |lw|
+      h = lw.hmdmc_list
+      hmdmc_list.merge(h) if h
+    end
+    return hmdmc_list.to_a unless hmdmc_list.empty?
+    nil
+  end
+
   # Get the total number of samples for this submission
   # Do not sum the size of the labware but the actual number (length) of contents
   def total_samples
     labwares.sum { |labware| labware.contents.length }
+  end
+
+  def sanitise_owner
+    if owner_email
+      sanitised = owner_email.strip.downcase
+      if sanitised != owner_email
+        self.owner_email = sanitised
+      end
+    end
   end
 
 private
@@ -203,5 +228,4 @@ private
       errors.add(:labwares, "must each have at least one Biomaterial")
     end
   end
-
 end

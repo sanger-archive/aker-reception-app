@@ -3,20 +3,21 @@
   <td><%= material_submission.no_of_labwares_required %></td>
   <td><%= supply_labwares_desc(material_submission) %></td>
   <td><%= localize(material_submission.updated_at, format: :terse) %></td>
-  <td>
+  <td align="right">
     <% if material_submission.active? %>
-
       <%= link_to 'View', material_submission_path(material_submission), class: 'btn btn-default' %>
-
     <% else %>
+      <%= link_to 'Continue',
+                  material_submission_build_path(id: material_submission.status || 'labware',
+                                                 material_submission_id: material_submission.id),
+                  style: 'margin-right: 10px;',
+                  class: 'btn btn-primary' %>
 
-      <%= link_to 'Continue', material_submission_build_path(id: material_submission.status || 'labware', material_submission_id: material_submission.id), style: 'margin-right: 15px;', class: 'btn btn-primary' %>
-
-      <%= link_to 'Cancel', material_submission,
-            method: :delete,
-            class: 'btn btn-danger',
-            data: { confirm: 'Are you sure you wish to cancel this submission?' } %>
-
+      <%= link_to 'Cancel',
+                  material_submission,
+                  method: :delete,
+                  class: 'btn btn-danger',
+                  data: { confirm: 'Are you sure you wish to cancel this submission?' } %>
     <% end %>
   </td>
 </tr>

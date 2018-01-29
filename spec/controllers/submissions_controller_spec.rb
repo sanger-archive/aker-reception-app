@@ -72,18 +72,18 @@ RSpec.describe SubmissionsController, type: :controller do
   end
 
   let(:labware_type) do
-    FactoryGirl.create :labware_type, {
+    FactoryBot.create :labware_type, {
       num_of_cols: 1,
       num_of_rows: 1,
       uses_decapper: true,
     }
   end
 
-  let(:contact) { FactoryGirl.create(:contact) }
+  let(:contact) { FactoryBot.create(:contact) }
 
   describe "Using the steps defined by wicked" do
     setup do
-      schema = %Q(
+      schema = 
         {
           "required":[
             "gender",
@@ -136,17 +136,15 @@ RSpec.describe SubmissionsController, type: :controller do
             }
           }
         }
-      )
+      
 
       request_headers = {'Content-Type'=>'application/json', 'Accept'=>'application/json'}
 
-      stub_request(:get, "http://localhost:5000/materials/json_schema").
-        with(headers: request_headers).
-        to_return(status: 200, body: schema, headers: {})
+      allow(MatconClient::Material).to receive(:schema).and_return(schema.as_json)
     end
 
     let(:user) { OpenStruct.new(email: 'other@sanger.ac.uk', groups: ['world']) }
-    let(:material_submission) { FactoryGirl.create(:material_submission, owner_email: user.email) }
+    let(:material_submission) { FactoryBot.create(:material_submission, owner_email: user.email) }
 
     context 'when user is not authenticated' do
       let(:login_url) { Rails.configuration.login_url+'?'+{redirect_url:request.original_url}.to_query }

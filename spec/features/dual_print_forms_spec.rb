@@ -4,7 +4,7 @@ require 'ostruct'
 RSpec.feature "DualPrintForms", type: :feature do
 
   describe "printer selection", js: true do
-    let(:user) { OpenStruct.new(:email => 'user@sanger.ac.uk', :groups => ['world']) }
+    let(:user) { OpenStruct.new(email: 'user@sanger.ac.uk', groups: %w[world team252]) }
     let(:printer_names) { ['Printer 1', 'Printer 2']}
     let(:contact) { create(:contact) }
     let!(:matsub) do

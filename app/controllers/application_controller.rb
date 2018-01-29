@@ -14,4 +14,10 @@ class ApplicationController < ActionController::Base
   helper_method :jwt_provided?
   helper_method :current_user
 
+  def check_ssr_membership
+    if !current_user.groups.any? { |group| group.in? Rails.configuration.ssr_groups }
+      render :permission_denied
+    end
+  end
+
 end

@@ -2,6 +2,9 @@ class MaterialReceptionsController < ApplicationController
 
   before_action :set_labware, only: :create
 
+  # Only SSRs should be able to access these pages and services
+  before_action :check_ssr_membership
+
   def index
     @material_receptions = MaterialReception.all.sort_by(&:id).reverse
     @material_reception = MaterialReception.new
@@ -12,8 +15,6 @@ class MaterialReceptionsController < ApplicationController
 
     if reception_service.process
       material_reception = reception_service.material_reception
-      ReceptionMailer.material_reception(material_reception).deliver_later
-
       # send message upon successful reception
       message = EventMessage.new(reception: material_reception)
       EventService.publish(message)

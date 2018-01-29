@@ -4,7 +4,11 @@ require 'webmock/rspec'
 RSpec.describe Labware, type: :model do
 
   def make_labware(num_of_rows, num_of_cols, row_is_alpha=false, col_is_alpha=false, attrs=nil)
-    labware_type = create(:labware_type, num_of_cols: num_of_cols, num_of_rows: num_of_rows, row_is_alpha: row_is_alpha, col_is_alpha: col_is_alpha)
+    labware_type = create(:labware_type,
+                          num_of_cols: num_of_cols,
+                          num_of_rows: num_of_rows,
+                          row_is_alpha: row_is_alpha,
+                          col_is_alpha: col_is_alpha)
     material_submission = create(:material_submission, labware_type: labware_type)
     lw_args = {
       material_submission: material_submission,
@@ -27,6 +31,7 @@ RSpec.describe Labware, type: :model do
     if options.has_key? :not_required
       c['hmdmc_not_required_confirmed_by'] = options[:not_required]
     end
+
     return c
   end
 
@@ -44,7 +49,6 @@ RSpec.describe Labware, type: :model do
       end
 
       it 'returns an array of numerical strings for its well names' do
-        expected = '1 2 3 4 5 6 7 8 9'.split
         expect(@labware.positions).to eq((1..9).map(&:to_s))
       end
     end
@@ -55,7 +59,7 @@ RSpec.describe Labware, type: :model do
       end
 
       it 'returns an array with letters for columns' do
-        expected = '1:A 1:B 2:A 2:B 3:A 3:B'.split
+        expected = '1:A 2:A 3:A 1:B 2:B 3:B'.split
         expect(@labware.positions).to eq(expected)
       end
     end
@@ -66,7 +70,7 @@ RSpec.describe Labware, type: :model do
       end
 
       it 'returns an array with letters for rows' do
-        expected = 'A:1 A:2 B:1 B:2 C:1 C:2'.split
+        expected = 'A:1 B:1 C:1 A:2 B:2 C:2'.split
         expect(@labware.positions).to eq(expected)
       end
     end
@@ -183,7 +187,11 @@ RSpec.describe Labware, type: :model do
     end
     context "when the labware has some human material" do
       before do
-        @lw = make_labware(1, 2, false, false, { contents: {"1" => make_contents(false), "2" => make_contents(true) }})
+        @lw = make_labware(1,
+                           2,
+                           false,
+                           false,
+                           { contents: {"1" => make_contents(false), "2" => make_contents(true) }})
       end
       it "should be any human material" do
         expect(@lw).to be_any_human_material
@@ -232,25 +240,31 @@ RSpec.describe Labware, type: :model do
         expect(@lw).not_to be_ethical
       end
     end
-    context "when the material has an HMDMC number and user" do
-      before do
-        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, hmdmc: '12/345', hmdmc_user: 'dirk') }})
-      end
-      it "should be ethical" do
-        expect(@lw).to be_ethical
-      end
-    end
+
     context "when the material is confirmed not to need an HMDMC" do
       before do
-        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, not_required: 'dirk') }})
+        @lw = make_labware(
+          1,
+          2,
+          false,
+          false,
+          { contents: { "1" => make_contents(true, not_required: 'dirk') }})
       end
       it "should be ethical" do
         expect(@lw).to be_ethical
       end
     end
+
     context "when there is conflicting HMDMC information" do
       before do
-        @lw = make_labware(1,2, false,false, { contents: { "1" => make_contents(true, not_required: 'dirk', hmdmc: '12/345', hmdmc_user: 'dirk') }})
+        @lw = make_labware(
+          1,
+          2,
+          false,
+          false,
+          { contents: {
+            "1" => make_contents(true, not_required: 'dirk', hmdmc: '12/345', hmdmc_user: 'dirk')
+          }})
       end
       it "should not be ethical" do
         expect(@lw).not_to be_ethical
@@ -274,57 +288,68 @@ RSpec.describe Labware, type: :model do
     end
   end
 
-  describe "#set_hmdmc" do
+  describe '#set_hmdmc_not_required' do
     before do
-      @lw = make_labware(1, 2, false, false, { contents: { "1" => make_contents(true, not_required: 'jeff'), "2" => make_contents(false, hmdmc: "99/999")}})
-
-      @lw.set_hmdmc('12/345', 'dirk')
-    end
-    it "should correct set the fields on the human material" do
-      expect(@lw.contents['1']).to eq({
-          'scientific_name' => 'Homo Sapiens',
-          'hmdmc' => '12/345',
-          'hmdmc_set_by' => 'dirk',
-        })
-    end
-    it "should correct set the fields on the nonhuman material" do
-      expect(@lw.contents['2']).to eq({
-          'scientific_name' => 'Mouse',
-        })
-    end
-  end
-
-  describe "#set_hmdmc_not_required" do
-    before do
-      @lw = make_labware(1, 2, false, false, { contents: { "1" => make_contents(true, hmdmc_user: 'jeff'), "2" => make_contents(false, hmdmc: "99/999")}})
+      @lw = make_labware(
+        1,
+        2,
+        false,
+        false,
+        { contents: {
+          '1' => make_contents(true, {hmdmc: '99/999'}),
+          '2' => make_contents(true, {hmdmc: ''}),
+          '3' => make_contents(true, {}),
+          '4' => make_contents(false, {})
+        }})
 
       @lw.set_hmdmc_not_required('dirk')
     end
-    it "should correct set the fields on the human material" do
+
+    it 'should not update fields with an HMDMC number already set' do
       expect(@lw.contents['1']).to eq({
           'scientific_name' => 'Homo Sapiens',
-          'hmdmc_not_required_confirmed_by' => 'dirk',
+          'hmdmc' => '99/999',
         })
     end
-    it "should correct set the fields on the nonhuman material" do
+    it 'should update fields with a blank HMDMC' do
       expect(@lw.contents['2']).to eq({
+          'scientific_name' => 'Homo Sapiens',
+          'hmdmc_not_required_confirmed_by' => 'dirk'
+        })
+    end
+    it 'should update fields without HMDMC' do
+      expect(@lw.contents['3']).to eq({
+          'scientific_name' => 'Homo Sapiens',
+          'hmdmc_not_required_confirmed_by' => 'dirk'
+        })
+    end
+    it 'should not update the fields on non-human material' do
+      expect(@lw.contents['4']).to eq({
           'scientific_name' => 'Mouse',
         })
     end
   end
 
-  describe "#clear_hmdmc" do
+  describe '#clear_hmdmc' do
     before do
-      @lw = make_labware(1, 2, false, false, { contents: { "1" => make_contents(true, hmdmc_user: 'jeff'), "2" => make_contents(false, hmdmc: "99/999")}})
+      @lw = make_labware(
+        1,
+        2,
+        false,
+        false,
+        { contents: {
+          '1' => make_contents(true, hmdmc_user: 'jeff'),
+          '2' => make_contents(false, hmdmc: '99/999')
+        }})
 
       @lw.clear_hmdmc
     end
-    it "should correct set the fields on the human material" do
+    it 'should correct set the fields on the human material' do
       expect(@lw.contents['1']).to eq({
           'scientific_name' => 'Homo Sapiens',
         })
     end
-    it "should correct set the fields on the nonhuman material" do
+    it 'should correct set the fields on the nonhuman material' do
       expect(@lw.contents['2']).to eq({
           'scientific_name' => 'Mouse',
         })

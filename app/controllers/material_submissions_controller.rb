@@ -1,7 +1,14 @@
+require 'ehmdmc_client'
+
 class MaterialSubmissionsController < ApplicationController
 
   def schema
     render :json => MatconClient::Material.schema
+  end
+
+  # Action to handle validating HMDMC from JavaScript
+  def hmdmc_validate
+    render :json => EHMDMCClient.validate_hmdmc(params[:hmdmc]).to_json
   end
 
   def index

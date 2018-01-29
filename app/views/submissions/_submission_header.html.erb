@@ -15,17 +15,24 @@
 <div class="row">
   <div class="col-md-12">
     <%= render "error_messages", target: material_submission %>
+    <div id="warning-messages" class="alert alert-warning hidden" role="alert">
+    </div>    
   </div>
 </div>
 
 <div class="row" id="progress-bar">
-  <% wizard_steps.each_with_index do |step, index| %>
+  <% wizard_steps.each_with_index do |wizard_step, index| %>
     <div class="col-xs-2 <%= "col-xs-offset-2" if index == 0 %> bs-wizard-step <%= step_classes(index) %>">
       <div class="text-center"><%= step_titles[index] %></div>
       <div class="progress">
         <div class="progress-bar"></div>
       </div>
-      <a href="#" class="step-indicator"></a>
+      <% unless wizard_step.to_s == "ethics" && step.to_s == "dispatch" && !material_submission&.any_human_material? %>
+      <%= link_to '', wizard_step.to_s, class: "step-indicator",
+            data: { confirm: 'Are you sure you wish to go back? You will lose unsaved progress on the curent step' } %>
+      <% else %>
+      <%= link_to '', '', class: "step-indicator skipped"%>
+      <% end %>
     </div>
   <% end %>
 </div>

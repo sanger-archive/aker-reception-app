@@ -10,23 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171017142510) do
+ActiveRecord::Schema.define(version: 20171206110335) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "citext"
 
   create_table "contact_groups", force: :cascade do |t|
-    t.string   "name",       null: false
+    t.citext   "name",       null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_contact_groups_on_name", unique: true, using: :btree
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.string   "fullname"
-    t.string   "email"
+    t.citext   "fullname",   null: false
+    t.citext   "email",      null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_contacts_on_email", unique: true, using: :btree
   end
 
   create_table "label_templates", force: :cascade do |t|
@@ -35,6 +37,7 @@ ActiveRecord::Schema.define(version: 20171017142510) do
     t.integer  "external_id",   null: false
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
+    t.index ["name"], name: "index_label_templates_on_name", unique: true, using: :btree
   end
 
   create_table "labware_types", force: :cascade do |t|
@@ -42,11 +45,12 @@ ActiveRecord::Schema.define(version: 20171017142510) do
     t.integer  "num_of_rows"
     t.boolean  "col_is_alpha"
     t.boolean  "row_is_alpha"
-    t.string   "name"
+    t.citext   "name",                          null: false
     t.string   "description"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
     t.boolean  "uses_decapper", default: false, null: false
+    t.index ["name"], name: "index_labware_types_on_name", unique: true, using: :btree
   end
 
   create_table "labwares", force: :cascade do |t|
@@ -81,7 +85,7 @@ ActiveRecord::Schema.define(version: 20171017142510) do
     t.integer  "contact_id"
     t.uuid     "set_id"
     t.string   "material_submission_uuid"
-    t.string   "owner_email"
+    t.citext   "owner_email"
     t.boolean  "dispatched",               default: false
     t.boolean  "supply_decappers",         default: false, null: false
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id", using: :btree
@@ -90,14 +94,14 @@ ActiveRecord::Schema.define(version: 20171017142510) do
   end
 
   create_table "printers", force: :cascade do |t|
-    t.string   "name"
+    t.citext   "name",       null: false
     t.string   "label_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_printers_on_name", unique: true, using: :btree
   end
 
-  add_foreign_key "labwares", "material_submissions"
+  add_foreign_key "labwares", "material_submissions", on_delete: :cascade
   add_foreign_key "material_receptions", "labwares"
   add_foreign_key "material_submissions", "contacts"
   add_foreign_key "material_submissions", "labware_types"

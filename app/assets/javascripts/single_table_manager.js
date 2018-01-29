@@ -31,13 +31,9 @@
 
     this.cleanTooltips();
 
-    // var labware_name = $(e.target).attr('href').replace('#', '');
-    // $('form td:first-child').html(labware_name);
-
     this.inputs().each($.proxy(this.restoreInput, this, data));
 
     this.updateValidations();
-    //this.inputs().each($.proxy(this.updateErrorInput, this, data));
   };
 
   proto.updateErrorState = function(input, labwareIndex, address, fieldName) {
@@ -79,8 +75,6 @@
 
   proto.unsetErrorToTab = function(tab) {
     this.setErrorToTab(tab);
-//    $(tab).removeClass(this.params._cssErrorTabClass);
-
     this.updateTabContentPresenceStatus(tab);
   };
 
@@ -120,10 +114,8 @@
   proto.isTabWithContent = function(tab) {
     var data = this.dataForTab(tab); // data is the labware for this tab
 
-    return (data["contents"]!=null);
+    return (data["contents"] != null);
     // TODO -- this needs to examine data more closely
-
-
 
     // if (data.content===null) {
     //   return false;
@@ -187,19 +179,26 @@
     return this.onReceive($(this.currentTab), data);
   };
 
-  proto.loadErrorsFromMsg = function(data) {
+  proto.loadErrorsFromMsg = function(data, clearErrors) {
     if (data && data.messages) {
 
       for (var key in data) {
-        for (var i=0; i<data.messages.length; i++) {
+        for (var i = 0; i < data.messages.length; i++) {
           var message = data.messages[i];
           this.resetCellNameErrors(message.labwareIndex);
         }
+        if (clearErrors) this.resetMainAlertError();
 
-        for (var i=0; i<data.messages.length; i++) {
+        for (var i = 0; i<data.messages.length; i++) {
           var message = data.messages[i];
           var address = message.address;
-          this.storeCellNameError(message.labwareIndex, address, message.errors);
+          if (address) {
+            this.storeCellNameError(message.labwareIndex, address, message.errors);
+          } else {
+            this.addErrorToMainAlertError('<li>Labware '+message.labwareIndex+', errors: '+Object.values(message.errors)[0]+"</li>");
+            var tab = document.getElementById("labware_tab["+message.labwareIndex+"]");
+            this.setErrorToTab(tab);
+          }
         }
       }
     }
@@ -220,7 +219,7 @@
         this.cleanValidLabwares(data.labwares_indexes);
       }
     } else {
-      this.loadErrorsFromMsg(data);
+      this.loadErrorsFromMsg(data, true);
       this.setErrorToTab(currentTab[0]);
     }
     this.updateValidations();
@@ -274,6 +273,9 @@
     });
   };
 
+  /**
+   * Returns the fields from the cell of the given ID
+   */
   proto.fieldsForId = function(id) {
     var matching = id.match(/labware\[([0-9]*)\]address\[([A-Z0-9:]*)\]fieldName\[(\w*)\]/);
     if (matching) {
@@ -287,19 +289,20 @@
   }
 
   proto.saveInput = function(data, pos, input) {
-    if (data==null) {
+    if (data == null) {
       return;
     }
 
     var id = $(input).attr('id');
     var info = this.fieldsForId(id);
 
-    if (info && data.labware_index==info.labwareIndex) {
+    if (info && data.labware_index == info.labwareIndex) {
 
+      // Get and santize the value of the input
       var v = $(input).val();
-      if (v!=null) {
+      if (v != null) {
         v = $.trim(v);
-        if (v=='') {
+        if (v == '') {
           v = null;
         }
       }
@@ -311,7 +314,7 @@
           data["contents"][info.address] = {}
         }
         data["contents"][info.address][info.fieldName] = v;
-      } else if (this.fieldData(data, info.address, info.fieldName)!=null) {
+      } else if (this.fieldData(data, info.address, info.fieldName) != null) {
         data["contents"][info.address][info.fieldName] = null;
       }
     }
@@ -345,7 +348,7 @@
   // This returns the labware object linked to the tab
   proto.dataForTab = function(tab) {
     for (var key in this.params) {
-      if ($(tab).attr('href') === ('#Labware'+this.params[key].labware_index)) {
+      if ($(tab).attr('href') === ('#Labware' + this.params[key].labware_index)) {
         return this.params[key];
       }
     }
@@ -366,9 +369,19 @@
   };
 
   proto.showAlert = function(data) {
-    $('.alert .alert-title').html(data.title);
-    $('.alert .alert-msg').html(data.body);
-    $('.alert').toggleClass('hidden', false);
+    $('#page-error-alert > .alert-title').html(data.title);
+    $('#page-error-alert > .alert-msg').html(data.body);
+    $('#page-error-alert').toggleClass('hidden', false);
+  };
+
+  proto.resetMainAlertError = function() {
+    $('#page-error-alert > .alert-msg').html('');
+    $('#page-error-alert').toggleClass('hidden', true);
+  };
+
+
+  proto.addErrorToMainAlertError = function(text) {
+    $('#page-error-alert > .alert-msg').append(text);
   };
 
   proto.isEmptyErrorCells = function() {
@@ -393,7 +406,7 @@
           body: 'Please review and solve the validation problems before continuing'});
         this.setErrorToTab(this.currentTab);
         if (!data.update_successful) {
-          this.loadErrorsFromMsg(data);
+          this.loadErrorsFromMsg(data, false);
         }
         this.updateValidations();
       }
@@ -403,7 +416,8 @@
   proto.onError = function(e) {
     this.showAlert({
       title: 'Validation Error',
-      body: 'We could not save the current content due to an error'})
+      body: 'We could not save the current content due to an error'
+    });
   };
 
   proto.toNextStep = function(e) {
@@ -414,7 +428,6 @@
   proto.attachHandlers = function() {
     $('a[data-toggle="tab"]').on('hide.bs.tab', $.proxy(this.saveTab, this));
     $('a[data-toggle="tab"]').on('show.bs.tab', $.proxy(this.restoreTab, this));
-    //$('table tbody tr td input').on('blur', $.proxy(this.saveCurrentTab, this));
     $('table tbody tr td input').on('blur', $.proxy(function(e) {
       return this.validateInput(e.target);
     }, this));

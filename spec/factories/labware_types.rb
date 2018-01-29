@@ -1,12 +1,16 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :labware_type do
     num_of_cols 12
     num_of_rows 8
     col_is_alpha false
     row_is_alpha false
-    name "Labware"
+    name { generate(:labware_type_names) }
     description "A piece of labware"
+  end
+
+  sequence :labware_type_names do |n|
+    "labware_type_#{n}"
   end
 
   factory :plate_labware_type, class: LabwareType do

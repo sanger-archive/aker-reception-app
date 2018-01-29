@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :contact_group do
     sequence(:name) { |n| "group#{n}" }
   end
