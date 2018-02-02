@@ -35,14 +35,9 @@ RSpec.describe 'EventPublisher' do
     ).and_return(@connection)
     allow(@connection).to receive(:start)
     allow(@connection).to receive(:create_channel).and_return(@channel)
-    allow(@channel).to receive(:queue).and_return(@queue)
-    allow(@channel).to receive(:default_exchange).and_return(@exchange)
     allow(@channel).to receive(:confirm_select)
     allow(@channel).to receive(:wait_for_confirms)
-    allow(@channel).to receive(:fanout).and_return(@exchange)
     allow(@exchange).to receive(:name).and_return('exchange name')
-
-    allow(@queue).to receive(:bind)
   end
 
   describe '#creating connections' do
