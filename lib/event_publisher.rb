@@ -25,7 +25,7 @@ class EventPublisher
 
   def connect!
     start_connection
-    create_exchanges_and_queues
+    # create_exchanges_and_queues
     add_close_connection_handler
   end
 
