@@ -99,7 +99,7 @@ class EventPublisher
                    }).bind(@exchange)
     # Dead letter queues
     dl_queue_name = @exchange_name + '.deadletters'
-    @channel.queue(dl_queue_name).bind(@dlx, durable: true)
+    @channel.queue(dl_queue_name, durable: true).bind(@dlx, durable: true)
 
     # To be able to wait_for_confirms in publish()
     @channel.confirm_select
