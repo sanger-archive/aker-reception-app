@@ -35,20 +35,28 @@ RSpec.describe 'EventPublisher' do
     ).and_return(@connection)
     allow(@connection).to receive(:start)
     allow(@connection).to receive(:create_channel).and_return(@channel)
+    allow(@channel).to receive(:queue).and_return(@queue)
+    allow(@channel).to receive(:default_exchange).and_return(@exchange)
     allow(@channel).to receive(:confirm_select)
     allow(@channel).to receive(:wait_for_confirms)
+    allow(@channel).to receive(:fanout).and_return(@exchange)
     allow(@exchange).to receive(:name).and_return('exchange name')
+
+    allow(@queue).to receive(:bind)
   end
 
   describe '#creating connections' do
     it 'initialize methods are called' do
       allow_any_instance_of(EventPublisher)
         .to receive(:start_connection).and_return true
+      allow_any_instance_of(EventPublisher)
+        .to receive(:create_exchanges_and_queues).and_return true
 
       ep = EventPublisher.new(@params)
       ep.create_connection
 
       expect(ep).to have_received(:start_connection)
+      expect(ep).to have_received(:create_exchanges_and_queues)
       expect(ep).to have_received(:add_close_connection_handler)
     end
 
@@ -58,10 +66,12 @@ RSpec.describe 'EventPublisher' do
 
       allow(ep).to receive(:connected?).and_return(true)
       allow(ep).to receive(:start_connection)
+      allow(ep).to receive(:create_exchanges_and_queues)
       allow(ep).to receive(:add_close_connection_handler)
       ep.create_connection
 
       expect(ep).not_to have_received(:start_connection)
+      expect(ep).not_to have_received(:create_exchanges_and_queues)
       expect(ep).not_to have_received(:add_close_connection_handler)
     end
   end
