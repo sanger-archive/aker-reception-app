@@ -15,7 +15,7 @@ module LDAPGroupReader
       group_type_filter = Net::LDAP::Filter.eq('objectclass', 'posixGroup')
       filter = group_name_filter & group_type_filter
       attrs = [member_attr]
-      group = connection.ldap.search(filter: filter, base: group_base, attributes: attrs).first
+      group = connection.search(filter: filter, base: group_base, attributes: attrs).first
       return [] unless group
       group.send(member_attr)
     end
@@ -33,7 +33,7 @@ module LDAPGroupReader
         filter &= active_people_filter
       end
       attrs = ['cn', 'mail']
-      results = connection.ldap.search(filter: filter, base: person_base, attributes: attrs)
+      results = connection.search(filter: filter, base: person_base, attributes: attrs)
       results.map { |r| Contact.new(fullname: r.cn.first, email: r.mail.first) }
     end
 
@@ -45,7 +45,7 @@ module LDAPGroupReader
     end
 
     def make_connection
-      Devise::LDAP::Adapter.ldap_connect('')
+      Net::LDAP.new(host: Rails.application.config.ldap['host'], port: Rails.application.config.ldap['port'])
     end
 
     def person_base

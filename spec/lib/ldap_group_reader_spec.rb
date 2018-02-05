@@ -3,7 +3,6 @@ require 'ldap_group_reader'
 
 RSpec.describe LDAPGroupReader do
   let(:ldap) { instance_double(Net::LDAP) }
-  let(:connection) { instance_double(Devise::LDAP::Connection, ldap: ldap) }
   let(:group_base) { 'ou=group,dc=sanger,dc=ac,dc=uk' }
   let(:person_base) { 'ou=people,dc=sanger,dc=ac,dc=uk' }
   let(:member_attr) { 'member' }
@@ -16,7 +15,7 @@ RSpec.describe LDAPGroupReader do
   end
 
   before do
-    allow(Devise::LDAP::Adapter).to receive(:ldap_connect).and_return(connection)
+    allow(Net::LDAP).to receive(:new).and_return(ldap)
     allow(Rails.application.config).to receive(:ldap).and_return(ldap_config)
   end
 
