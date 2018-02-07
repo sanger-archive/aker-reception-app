@@ -39,6 +39,7 @@ RSpec.describe 'EventPublisher' do
     allow(@channel).to receive(:default_exchange).and_return(@exchange)
     allow(@channel).to receive(:confirm_select)
     allow(@channel).to receive(:wait_for_confirms)
+    allow(@channel).to receive(:topic).and_return(@exchange)
     allow(@channel).to receive(:fanout).and_return(@exchange)
     allow(@exchange).to receive(:name).and_return('exchange name')
 

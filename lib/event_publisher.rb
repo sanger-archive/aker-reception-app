@@ -72,10 +72,10 @@ class EventPublisher
 
     @channel = @connection.create_channel
 
-    # Create a fanout exchange which will send messages to all queues bound to the exchange and
-    #   make the exchange durable: Durable exchanges survive broker restart, transient exchanges
-    #   do not (http://rubybunny.info/articles/durability.html)
-    @exchange = @channel.fanout(@exchange_name, durable: true)
+    # Create a topic exchange which will send messages to queues bound to the exchange using
+    #   specific routing keys and make the exchange durable: Durable exchanges survive broker
+    #   restart, transient exchanges do not (http://rubybunny.info/articles/durability.html)
+    @exchange = @channel.topic(@exchange_name, durable: true)
 
     # Creates the dead letter exchange aker.events.deadletters (https://www.rabbitmq.com/dlx.html)
     @dlx = @channel.fanout(dl_exchange_name, durable: true)
@@ -89,14 +89,14 @@ class EventPublisher
                    durable: true,
                    arguments: {
                      "x-dead-letter-exchange": @dlx.name
-                   }).bind(@exchange)
+                   }).bind(@exchange, routing_key: "#")
     # notifications_queue
     @channel.queue(@notification_queue_name,
                    auto_delete: false,
                    durable: true,
                    arguments: {
                      "x-dead-letter-exchange": @dlx.name
-                   }).bind(@exchange)
+                   }).bind(@exchange, routing_key: "#")
     # Dead letter queues
     dl_queue_name = @exchange_name + '.deadletters'
     @channel.queue(dl_queue_name, durable: true).bind(@dlx, durable: true)
