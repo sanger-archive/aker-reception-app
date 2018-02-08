@@ -35,7 +35,7 @@ class EventPublisher
 
   def publish(message)
     create_connection unless connected?
-    @exchange.publish(message.generate_json)
+    @exchange.publish(message.generate_json, routing_key: EventMessage::ROUTING_KEY)
     @channel.wait_for_confirms
     raise 'There is an unconfirmed set.' if @channel.unconfirmed_set.count.positive?
   end
@@ -89,14 +89,14 @@ class EventPublisher
                    durable: true,
                    arguments: {
                      "x-dead-letter-exchange": @dlx.name
-                   }).bind(@exchange, routing_key: "#")
+                   }).bind(@exchange, routing_key: '#')
     # notifications_queue
     @channel.queue(@notification_queue_name,
                    auto_delete: false,
                    durable: true,
                    arguments: {
                      "x-dead-letter-exchange": @dlx.name
-                   }).bind(@exchange, routing_key: "#")
+                   }).bind(@exchange, routing_key: '#')
     # Dead letter queues
     dl_queue_name = @exchange_name + '.deadletters'
     @channel.queue(dl_queue_name, durable: true).bind(@dlx, durable: true)
