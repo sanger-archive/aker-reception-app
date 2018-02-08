@@ -7,7 +7,7 @@ class EventMessage
   attr_reader :submission
   attr_reader :reception
 
-  ROUTING_KEY = 'aker.submission'
+  ROUTING_KEY = 'aker.events.submission'
 
   def initialize(params)
     @submission = params[:submission]
