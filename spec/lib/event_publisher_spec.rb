@@ -108,7 +108,7 @@ RSpec.describe 'EventPublisher' do
         allow(@channel).to receive(:unconfirmed_set).and_return(@unconfirmed_sets)
 
         ep = EventPublisher.new(@params)
-        expect(@exchange).to receive(:publish).with('message', routing_key: 'aker.submission')
+        expect(@exchange).to receive(:publish).with('message', routing_key: 'aker.events.submission')
         ep.publish(@event_message)
       end
     end
@@ -122,7 +122,7 @@ RSpec.describe 'EventPublisher' do
         allow(@channel).to receive(:unconfirmed_set).and_return(@unconfirmed_sets)
 
         ep = EventPublisher.new(@params)
-        expect(@exchange).to receive(:publish).with('message', routing_key: 'aker.submission')
+        expect(@exchange).to receive(:publish).with('message', routing_key: 'aker.events.submission')
         expect { ep.publish(@event_message) }.to raise_error(/unconfirmed/)
       end
     end
