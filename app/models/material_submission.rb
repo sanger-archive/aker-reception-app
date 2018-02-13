@@ -177,16 +177,14 @@ class MaterialSubmission < ApplicationRecord
     nil
   end
 
-  # Returns an array of all unique HMDMC numbers in the submission
-  def hmdmc_list
-    return nil if labwares.nil?
-    hmdmc_list = Set.new()
+  # Returns a set of all unique HMDMC numbers in the submission
+  def hmdmc_set
+    hmdmcs = Set.new()
+    return hmdmcs if labwares.nil?
     labwares.each do |lw|
-      h = lw.hmdmc_list
-      hmdmc_list.merge(h) if h
+      hmdmcs.merge(lw.hmdmc_set)
     end
-    return hmdmc_list.to_a unless hmdmc_list.empty?
-    nil
+    hmdmcs
   end
 
   # Get the total number of samples for this submission
