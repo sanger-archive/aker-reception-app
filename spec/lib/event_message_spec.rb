@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'set'
 
 RSpec.describe 'EventMessage' do
   describe '#initialize messages' do
@@ -22,7 +23,7 @@ RSpec.describe 'EventMessage' do
       submission = build(:material_submission, status: MaterialSubmission.ACTIVE)
 
       allow(SecureRandom).to receive(:uuid).and_return 'a_uuid'
-      allow(submission).to receive(:hmdmc_list).and_return '[12/000, 13/999]'
+      allow(submission).to receive(:hmdmc_set).and_return Set.new(['12/000', '13/999'])
       allow(submission).to receive(:total_samples).and_return 12
       allow(submission).to receive(:first_confirmed_no_hmdmc).and_return 'test@test.com'
 
@@ -39,7 +40,7 @@ RSpec.describe 'EventMessage' do
         expect(json['uuid']).to eq 'a_uuid'
         expect(json['timestamp']).to eq Time.now.utc.iso8601
         expect(json['user_identifier']).to eq submission.owner_email
-        expect(json['metadata']['hmdmc_list']).to eq '[12/000, 13/999]'
+        expect(json['metadata']['hmdmc']).to eq ['12/000', '13/999']
         expect(json['metadata']['sample_custodian']).to eq submission.contact.email
         expect(json['metadata']['total_samples']).to eq 12
         expect(json['metadata']['zipkin_trace_id']).to eq 'a_trace_id'
