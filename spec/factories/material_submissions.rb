@@ -1,6 +1,9 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :material_submission do
-    #supply_labware false
-    #no_of_specimins ""
+    labware_type {|lt| lt.association(:labware_type, num_of_cols: 1, num_of_rows: 1,
+      row_is_alpha: true, col_is_alpha: true)}
+    owner_email 'owner@sanger.ac.uk'
+    contact
+
   end
 end

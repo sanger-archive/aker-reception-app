@@ -1,0 +1,9 @@
+<tr>
+  <td><%= check_box_tag "completed_submission_ids[]", completed_submission.id %>
+  <td><%= completed_submission.id %></td>
+  <td><%= completed_submission.status %></td>
+  <td><%= completed_submission.owner_email %></td>
+  <td><%= localize(completed_submission.created_at, format: :terse) %></td>
+  <td><%= completed_submission.no_of_labwares_required %></td>
+  <td><%= completed_submission.supply_labware_type %></td>
+</tr>

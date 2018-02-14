@@ -1,0 +1,24 @@
+# https://rubocop.readthedocs.io/en/latest/configuration/
+# inherit_from: .rubocop_todo.yml
+
+AllCops:
+  Include:
+    - '**/Rakefile'
+    - '**/config.ru'
+    - '**/Gemfile'
+  Exclude:
+    - 'db/**/*'
+    # - 'config/**/*'
+    # - 'script/**/*'
+
+Rails:
+  Enabled: true
+
+Metrics/LineLength:
+  Max: 99
+
+Style/BlockLength:
+  Exclude:
+    # - 'Rakefile'
+    # - '**/*.rake'
+    - 'spec/**/*.rb'

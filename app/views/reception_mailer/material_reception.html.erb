@@ -1,0 +1,25 @@
+<p>Hi</p>
+<p>We've just received the following material mailed to you:</p>
+
+<table>
+  <tr>
+    <th>Submission </th>
+    <th>Barcode</th>
+    <th>Created at</th>
+  </tr>
+  <tr>
+    <td><%= @material_submission.id %></td>
+    <td><%= @labware.barcode %></td>
+    <td><%= localize(@material_submission.created_at, format: :terse) %></td>
+  </tr>
+
+</table>
+
+<% if @material_reception.all_received? %>
+
+<p>All labware for Submission <%= @material_submission.id %> has now arrived.</p>
+
+<% end %>
+
+<p>Regards,</p>
+<p>AKER</p>

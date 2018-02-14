@@ -1,0 +1,16 @@
+<% content_for :main_title do %>
+  Material Reception
+<% end %>
+<div class="row">
+  <div class="col-md-12">
+  </div>
+</div>
+
+<%= bootstrap_form_for @material_reception do |f| %>
+  <div class='input-group'>
+    <span class="input-group-addon glyphicon glyphicon-barcode" aria-hidden="true" style="top:0px;"></span>
+    <%= f.text_field :barcode_value, :placeholder => 'Scan a barcode', hide_label: true, autocomplete: 'off' %>
+    <span class="glyphicon glyphicon-refresh icon-login-refresh"
+      data-psd-component-class="LoadingIcon" data-psd-component-parameters="<%= { listenFormCssSelector: 'form'}.to_json %>"></div>
+  </div>
+<% end %>

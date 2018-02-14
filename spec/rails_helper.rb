@@ -10,6 +10,7 @@ require 'capybara/rails'
 require 'capybara/rspec'
 require 'capybara/poltergeist'
 
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -59,15 +60,14 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   Capybara.register_driver :poltergeist_debug do |app|
-    Capybara::Poltergeist::Driver.new(app, :inspector => true)
+    Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
   end
 
-  # Capybara.javascript_driver = :poltergeist
   Capybara.javascript_driver = :poltergeist_debug
 
   config.include Capybara::DSL
 
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
 
   config.include WaitForAjax
 
@@ -81,6 +81,9 @@ RSpec.configure do |config|
 
   config.before(:each, js: true) do
     DatabaseCleaner.strategy = :truncation
+
+    # https://robots.thoughtbot.com/speed-up-javascript-capybara-specs-by-blacklisting-urls
+    #page.driver.browser.url_blacklist = ["https://fonts.googleapis.com"]
   end
 
   config.before(:each) do
@@ -92,3 +95,5 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 end
+
+WebMock.disable_net_connect!(:allow_localhost => true)

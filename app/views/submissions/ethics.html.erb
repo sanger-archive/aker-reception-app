@@ -1,0 +1,25 @@
+<%= render partial: 'submission_header' %>
+<%= bootstrap_form_tag url: wizard_path, method: :put  do |f| %>
+  <p>
+    If you are using human material in research, you must either provide an HMDMC number or provide
+    consent that no HMDMC is required.
+  </p>
+
+  <p>Commercial cell line: no HMDMC required
+    <button type="button"
+            class="btn btn-link has-popover"
+            data-html="true"
+            data-toggle="popover"
+            title="What's this?"
+            data-content="<%= hmdmc_info %>">
+      <small>What's this?</small>
+    </button>
+  </p>
+
+  <%= f.check_box :confirm_hmdmc_not_required,
+                  label: 'I confirm that no HMDMC is required',
+                  checked: material_submission.confirmed_no_hmdmc? %>
+
+  <%= render 'buttons', material_submission: material_submission, f: f %>
+
+<% end %>

@@ -1,5 +1,9 @@
+require 'rails/commands/server'
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
+
+  # config.relative_url_root = '/submission'
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
@@ -51,4 +55,59 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  config.action_mailer.delivery_method = :sendmail
+
+  config.material_url = 'http://localhost:5000'
+
+  config.set_url = 'http://localhost:3000/api/v1/'
+  config.set_url_default_proxy = 'http://localhost:3000'
+
+  config.stamp_url = 'http://localhost:7000/api/v1/'
+
+  config.ehmdmc_url = 'http://localhost:3501/validate'
+  # The external test hmdmc is at http://web-wwwtomcatdev-02.internal.sanger.ac.uk:8000/validateHMDMC
+  config.show_hmdmc_warning = true
+
+  config.pmb_uri = ENV.fetch('PMB_URI', 'http://localhost:10000/v1')
+
+  config.taxonomy_service_url = 'https://www.ebi.ac.uk/ena/data/taxonomy/v1/taxon/tax-id'
+
+  config.printing_disabled = true
+
+  config.jwt_secret_key = 'development'
+
+  config.events = {
+    enabled: false,
+    broker_host: 'localhost',
+    broker_port: '5672',
+    broker_username: 'guest',
+    broker_password: 'guest',
+    broker_vhost: '/',
+    exchange_name: 'aker.events',
+    warehouse_queue_name: 'aker.events.warehouse',
+    notification_queue_name: 'aker.events.notifications'
+  }
+
+  config.fake_ldap = true
+
+  config.action_mailer.default_url_options = { host: 'localhost',
+                                               script_name: config.relative_url_root,
+                                               only_path: false,
+                                               port: Rails::Server.new.options[:Port] }
+
+  config.default_jwt_user = { email: ENV.fetch('USER', 'user') + '@sanger.ac.uk',
+                              groups: ['world'] }
+
+  config.auth_service_url = 'http://localhost:9010'
+  config.login_url = config.auth_service_url + '/login'
+  config.logout_url = config.auth_service_url + '/logout'
+
+  config.urls = { submission: '',
+                  permissions: '',
+                  sets: '',
+                  projects: '',
+                  work_orders: '' }
+
+  config.ssr_groups = %w[team252 world]
 end

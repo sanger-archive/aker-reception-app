@@ -20,4 +20,13 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
+  time:
+    formats:
+      terse: "%d %b %Y %H:%M"
   hello: "Hello world"
+  activerecord:
+    attributes:
+      material_submission:
+        id: 'Submission Identifier'
+        email: 'Collaborator email'
+        contact: 'Internal Contact'

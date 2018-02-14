@@ -21,13 +21,12 @@ module Submission
                        controller_specs: false,
                        request_specs: true
 
-      g.fixture_replacement :factory_girl, dir: 'spec/factories'
+      g.fixture_replacement :factory_bot, dir: 'spec/factories'
 
       g.assets false
 
     end
 
-    config.autoload_paths += %W(#{config.root}/lib #{config.root}/app/models/labwares)
-
+    config.ldap = config_for(:ldap)
   end
 end

@@ -19,3 +19,11 @@
 
 # Ignore Byebug command history file.
 .byebug_history
+
+# Ignore coverage
+coverage
+
+# public assets folder
+/public/assets/**
+
+.DS_Store

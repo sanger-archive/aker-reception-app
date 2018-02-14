@@ -1,0 +1,6 @@
+<% content_for :main_title do %>
+  Material Submission
+<% end %>
+<%= render :partial => 'form', :locals => { :material_submission => @material_submission, :readonly => true} %>
+
+<%= link_to 'Back', :back, class: 'btn btn-primary' %>

@@ -1,0 +1,27 @@
+<% content_for :main_title do %>
+Material Reception
+<% end %>
+
+<div class="alert alert-danger hidden" role="alert">
+  <p class='alert-msg'>&nbsp;</p>
+</div>
+
+<div data-psd-component-class="LoadingIcon" data-psd-component-parameters="<%= { listenFormCssSelector: 'form'}.to_json %>">
+  <div data-psd-component-class='BarcodeReader' data-psd-component-parameters="<%= @material_receptions.map(&:presenter).to_json %>">
+    <div class="row">
+      <%= bootstrap_form_for(@material_reception, remote: true) do |f| %>
+      <div class='input-group col-md-10 col-md-offset-1 col-xs-10 col-xs-offset-1'>
+        <span class="input-group-addon glyphicon glyphicon-barcode" aria-hidden="true"></span>
+        <%= f.text_field :barcode_value, :placeholder => 'Scan a barcode', hide_label: true, autocomplete: 'off', :style => 'padding-right:1em;' %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+        <h2>Received Material <span class="spinner"><span class="fa fa-refresh" /></span></h2>
+        <%= render "material_receptions", material_receptions: @material_receptions %>
+      </div>
+    </div>
+  </div>
+  <% end %>
+</div>
