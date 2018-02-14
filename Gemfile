@@ -16,8 +16,7 @@ gem 'bootstrap_form'
 gem 'bunny', '= 0.9.0.pre10'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
-# Devise Module for LDAP. Read more: https://github.com/cschiewek/devise_ldap_authenticatable
-gem 'devise_ldap_authenticatable', '~> 0.8.5'
+
 gem 'faraday-http-cache'
 gem 'font-awesome-sass'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -81,7 +80,6 @@ end
 
 # Test group
 group :test do
-  gem 'cucumber-rails', require: false
   gem 'rspec-json_expectations'
   gem 'rubycritic'
   # Code coverage for Ruby 1.9+ with a powerful configuration library and automatic merging of
