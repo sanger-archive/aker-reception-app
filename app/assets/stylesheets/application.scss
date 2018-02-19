@@ -9,6 +9,7 @@
 @import "select2-bootstrap";
 @import "rails_bootstrap_forms";
 @import "bootstrap-table";
+@import "navbar";
 
 textarea.halvsies { height: 150px; width: 33% }
 
@@ -40,10 +41,6 @@ textarea.halvsies { height: 150px; width: 33% }
 
 body {
   background-color: #f4f4f4;
-}
-
-.navbar {
-  border-radius: 0px;
 }
 
 .container#content {
@@ -154,116 +151,10 @@ h2 {
   width: 120px;
 }
 
-.navbar-text {
-  color: #b2dbfb !important;
-}
-
-
-// Align dropdown menu with "Aker" button when on desktop
-@media only screen and (min-width: 769px)  {
-  .dropdown-menu {
-    margin-left: -14px;
-  }
-}
-
 // Mobile optimisations
 @media only screen and (max-width: 768px)  {
-  .navbar-text {
-    // Add margin to Aker button so it isn't touch the edge of the display on mobile
-    margin: 10px 15px;
-  }
-  .nav {
-    margin: 0px;
-  }
-  .navbar-toggle {
-    margin: 10px 10px 0px;
-  }
-  .navbar-brand {
-    padding: 20px 15px 0px !important;
-  }
   .btn {
     margin-bottom: 5px;
     margin-right: 0px !important;
   }
-}
-
-// Make navbar text white
-.navbar-text, .navbar-inverse .navbar-nav > li > a {
-  color: white !important;
-}
-
-
-// LOCAL DEVELOPMENT environment
-$development: #441f84;
-// Set colour for Aker button background
-#development.navbar-inverse .navbar-nav > .open > a {
-  background-color: darken($development, 12.5%);
-  &:hover, &:focus {
-    background-color: darken($development, 12.5%);
-  }
-}
-// Navigation bar background colour
-#development {
-  background-color: $development;
-}
-#current-page-development {
-  background-color: darken($development, 12.5%);
-  font-weight: bold;
-}
-
-
-// STAGING environment
-$dev: #1f7a30;
-// Set colour for Aker button background
-#dev.navbar-inverse .navbar-nav > .open > a {
-  background-color: darken($dev, 12.5%);
-  &:hover, &:focus {
-    background-color: darken($dev, 12.5%);
-  }
-}
-// Navigation bar background colour
-#dev {
-  background-color: $dev;
-}
-#current-page-dev {
-  background-color: darken($dev, 12.5%);
-  font-weight: bold;
-}
-
-
-// UAT environment
-$uat: #2196F3;
-// Set colour for Aker button background
-#uat.navbar-inverse .navbar-nav > .open > a {
-  background-color: darken($uat, 12.5%);
-  &:hover, &:focus {
-    background-color: darken($uat, 12.5%);
-  }
-}
-// Navigation bar background colour
-#uat {
-  background-color: $uat;
-}
-#current-page-uat {
-  background-color: darken($uat, 12.5%);
-  font-weight: bold;
-}
-
-
-// PRODUCTION environment
-$production: #2196F3;
-// Set colour for Aker button background
-#production.navbar-inverse .navbar-nav > .open > a {
-  background-color: darken($production, 12.5%);
-  &:hover, &:focus {
-    background-color: darken($production, 12.5%);
-  }
-}
-// Navigation bar background colour
-#production {
-  background-color: $production;
-}
-#current-page-production {
-  background-color: darken($production, 12.5%);
-  font-weight: bold;
 }
