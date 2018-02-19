@@ -56,6 +56,7 @@ gem 'aker_permission_gem', github: 'sanger/aker-permission'
 gem 'aker-set-client', github: 'sanger/aker-set-client'
 gem 'aker_stamp_client', github: 'sanger/aker-stamp-client'
 gem 'aker-taxonomy-client', github: 'sanger/aker-taxonomy-client'
+gem 'aker_shared_navbar', github: 'sanger/aker-shared-navbar'
 # Official Sass port of Bootstrap 2 and 3. http://getbootstrap.com/css/#sass
 gem 'bootstrap-sass', '~> 3.3.6', github: 'sanger/bootstrap-sass'
 gem 'json_api_client', github: 'sanger/json_api_client'
