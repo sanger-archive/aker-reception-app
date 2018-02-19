@@ -32,6 +32,12 @@ GIT
     aker-set-client (0.2.0)
 
 GIT
+  remote: https://github.com/sanger/aker-shared-navbar.git
+  revision: aa0ef2eb81d4bea961d903f5e9e2cb8192a0f545
+  specs:
+    aker_shared_navbar (0.1.1)
+
+GIT
   remote: https://github.com/sanger/aker-stamp-client.git
   revision: 191401d450685e6e394c28b26a62c5448d9b7a54
   specs:
@@ -439,6 +445,7 @@ DEPENDENCIES
   aker-taxonomy-client!
   aker_credentials_gem!
   aker_permission_gem!
+  aker_shared_navbar!
   aker_stamp_client!
   bootstrap-sass (~> 3.3.6)!
   bootstrap-table-rails
