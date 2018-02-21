@@ -466,7 +466,7 @@ RSpec.describe MaterialSubmission, type: :model do
   describe "#supply_labware_type" do
     context "when the material submission does not need labware supplied" do
       before do
-        labware_type = create(:labware_type)
+        labware_type = create(:plate_labware_type)
         @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: false)
       end
       it "should return 'Label for labware type'" do
