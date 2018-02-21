@@ -116,7 +116,7 @@ class MaterialSubmission < ApplicationRecord
   end
 
   def supply_labware_type
-    return "Label only" unless supply_labwares
+    return "Label for #{labware_type.name}" unless supply_labwares
     return labware_type.name + " with decappers" if supply_decappers
     return labware_type.name
   end
