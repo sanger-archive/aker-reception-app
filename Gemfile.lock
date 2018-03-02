@@ -79,12 +79,6 @@ GIT
     pmb-client (0.1.0)
       json_api_client (~> 1.1)
 
-GIT
-  remote: https://github.com/sanger/psd_logger.git
-  revision: dd2d634114df75b1d8535715c169a7fc99521389
-  specs:
-    psd_logger (0.1.6)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -138,7 +132,7 @@ GEM
     amq-protocol (2.3.0)
     arel (7.1.4)
     ast (2.4.0)
-    autoprefixer-rails (7.2.5)
+    autoprefixer-rails (8.0.0)
       execjs
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
@@ -147,13 +141,13 @@ GEM
     bindex (0.5.0)
     bootstrap-table-rails (1.11.1.1)
     bootstrap_form (2.7.0)
-    brakeman (4.1.1)
+    brakeman (4.2.0)
     builder (3.2.3)
     bunny (0.9.0.pre10)
       amq-protocol (>= 1.4.0)
     byebug (10.0.0)
     cancancan (2.1.3)
-    capybara (2.17.0)
+    capybara (2.18.0)
       addressable
       mini_mime (>= 0.1.3)
       nokogiri (>= 1.3.3)
@@ -186,9 +180,6 @@ GEM
     docile (1.1.5)
     equalizer (0.0.11)
     erubis (2.7.0)
-    exception_notification (4.2.2)
-      actionmailer (>= 4.0, < 6)
-      activesupport (>= 4.0, < 6)
     execjs (2.7.0)
     factory_bot (4.8.2)
       activesupport (>= 3.0.0)
@@ -201,7 +192,7 @@ GEM
       faraday (~> 0.8)
     faraday_middleware (0.12.2)
       faraday (>= 0.7.4, < 1.0)
-    ffi (1.9.21)
+    ffi (1.9.23)
     finagle-thrift (1.4.2)
       thrift (~> 0.9.3)
     flay (2.10.0)
@@ -209,17 +200,16 @@ GEM
       path_expander (~> 1.0)
       ruby_parser (~> 3.0)
       sexp_processor (~> 4.0)
-    flog (4.6.1)
+    flog (4.6.2)
       path_expander (~> 1.0)
       ruby_parser (~> 3.1, > 3.1.0)
       sexp_processor (~> 4.8)
-    font-awesome-sass (4.7.0)
+    font-awesome-sass (5.0.6.2)
       sass (>= 3.2)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
-    gmetric (0.1.3)
     hashdiff (0.3.7)
-    i18n (0.9.3)
+    i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
     jbuilder (2.7.0)
@@ -237,7 +227,7 @@ GEM
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    loofah (2.1.1)
+    loofah (2.2.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     macaddr (1.7.1)
@@ -269,7 +259,7 @@ GEM
       method_source (~> 0.9.0)
     pry-rails (0.3.6)
       pry (>= 0.10.4)
-    public_suffix (3.0.1)
+    public_suffix (3.0.2)
     puma (3.11.2)
     rack (2.0.4)
     rack-test (0.6.3)
@@ -336,7 +326,7 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
     ruby-progressbar (1.9.0)
-    ruby_parser (3.10.1)
+    ruby_parser (3.11.0)
       sexp_processor (~> 4.9)
     rubycritic (3.3.0)
       flay (~> 2.8)
@@ -366,7 +356,7 @@ GEM
     selenium-webdriver (3.9.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2)
-    sexp_processor (4.10.0)
+    sexp_processor (4.10.1)
     simplecov (0.15.1)
       docile (~> 1.1.0)
       json (>= 1.8, < 3)
@@ -386,7 +376,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sqlite3 (1.3.13)
     sucker_punch (2.0.4)
       concurrent-ruby (~> 1.0.0)
     systemu (2.6.5)
@@ -430,7 +419,7 @@ GEM
       railties (>= 3.0.7)
     xpath (3.0.0)
       nokogiri (~> 1.8)
-    zipkin-tracer (0.27.1)
+    zipkin-tracer (0.27.2.1)
       faraday (~> 0.8)
       finagle-thrift (~> 1.4.2)
       rack (>= 1.0)
@@ -456,11 +445,9 @@ DEPENDENCIES
   capybara
   coffee-rails (~> 4.2)
   database_cleaner
-  exception_notification
   factory_bot_rails (~> 4.8)
   faraday-http-cache
   font-awesome-sass
-  gmetric (~> 0.1.3)
   jbuilder (~> 2.5)
   jquery-rails
   json_api_client!
@@ -473,7 +460,6 @@ DEPENDENCIES
   poltergeist
   pry
   pry-rails (~> 0.3.6)
-  psd_logger!
   puma (~> 3.0)
   rails (~> 5.0.0, >= 5.0.0.1)
   rspec-json_expectations
@@ -487,11 +473,9 @@ DEPENDENCIES
   simplecov-rcov
   spring
   spring-watcher-listen (~> 2.0.0)
-  sqlite3
   therubyracer
   timecop
   turbolinks (~> 5)
-  tzinfo-data
   uglifier (~> 3.2)
   uuid
   web-console
