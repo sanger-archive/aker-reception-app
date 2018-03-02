@@ -13,7 +13,7 @@ end
 gem 'activeresource', '~> 5.0' # Wrap your RESTful web app with Ruby classes
 gem 'bootstrap-table-rails'
 gem 'bootstrap_form'
-gem 'bunny', '= 0.9.0.pre10'
+gem 'bunny', '~> 2.9', '>= 2.9.2', require: false
 gem 'coffee-rails', '~> 4.2' # Use CoffeeScript for .coffee assets and views
 gem 'faraday-http-cache'
 gem 'font-awesome-sass'
