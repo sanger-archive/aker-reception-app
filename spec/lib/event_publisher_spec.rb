@@ -82,8 +82,6 @@ RSpec.describe 'EventPublisher' do
       mock_connection
       @event_message = instance_double('EventMessage')
       allow(@event_message).to receive(:generate_json).and_return('message')
-
-      # allow(@queue).to receive(:name).and_return(@params[:queue_name])
     end
 
     context 'unconfirmed set is empty' do
