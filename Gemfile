@@ -36,7 +36,6 @@ gem 'zipkin-tracer'
 ###
 # Sanger gems
 ###
-# Add simple support for print-my barcode)
 gem 'aker_credentials_gem', github: 'sanger/aker-credentials'
 gem 'aker_permission_gem', github: 'sanger/aker-permission'
 gem 'aker-set-client', github: 'sanger/aker-set-client'
@@ -51,9 +50,23 @@ gem 'pmb-client', '0.1.0', github: 'sanger/pmb-client'
 ###
 # Groups
 ###
+group :development, :test do
+  gem 'brakeman', require: false
+  gem 'byebug', platform: :mri
+  gem 'capybara'
+  gem 'database_cleaner' # database_cleaner is not required, but highly recommended
+  gem 'factory_bot_rails', '~> 4.8'
+  gem 'launchy'
+  gem 'poltergeist'
+  gem 'rspec-rails', '~> 3.4'
+  gem 'selenium-webdriver'
+  gem 'webmock'
+end
+
 group :development do
   gem 'listen', '~> 3.0.5'
   gem 'pry-rails', '~> 0.3.6' # An IRB alternative and runtime developer console
+  gem 'rubocop', '~> 0.51.0', require: false # A Ruby static code analyzer
   gem 'spring' # Spring speeds up development by keeping your application running in the background
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console' # Access an IRB console on exception pages or by using <%= console %> anywhere
@@ -65,18 +78,4 @@ group :test do
   gem 'simplecov', require: false # Code coverage for Ruby 1.9+
   gem 'simplecov-rcov'
   gem 'timecop'
-end
-
-group :development, :test do
-  gem 'brakeman', require: false
-  gem 'byebug', platform: :mri
-  gem 'capybara'
-  gem 'database_cleaner' # database_cleaner is not required, but highly recommended
-  gem 'factory_bot_rails', '~> 4.8'
-  gem 'launchy'
-  gem 'poltergeist'
-  gem 'rspec-rails', '~> 3.4'
-  gem 'rubocop', '~> 0.51.0', require: false # A Ruby static code analyzer
-  gem 'selenium-webdriver'
-  gem 'webmock'
 end
