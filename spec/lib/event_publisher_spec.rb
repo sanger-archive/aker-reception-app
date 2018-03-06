@@ -16,6 +16,7 @@ RSpec.describe 'EventPublisher' do
                 broker_password: 'broker_password',
                 vhost: 'vhost',
                 exchange_name: 'exchange_name' }
+
     allow(Rails.application.config).to receive(:events).and_return(@params)
   end
 
@@ -27,11 +28,9 @@ RSpec.describe 'EventPublisher' do
     allow(bunny).to receive(:new).and_return(@connection)
     allow(@connection).to receive(:start)
     allow(@connection).to receive(:create_channel).and_return(@channel)
-    allow(@channel).to receive(:default_exchange).and_return(@exchange)
     allow(@channel).to receive(:confirm_select)
     allow(@channel).to receive(:wait_for_confirms)
     allow(@channel).to receive(:topic).and_return(@exchange)
-    allow(@exchange).to receive(:name).and_return('exchange name')
   end
 
   describe '#creating connections' do

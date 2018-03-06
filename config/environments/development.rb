@@ -86,7 +86,7 @@ Rails.application.configure do
     broker_username: 'submission',
     broker_password: 'password',
     vhost: 'aker',
-    exchange: 'aker.events'
+    exchange: 'aker.events.tx'
   }
 
   config.fake_ldap = true
