@@ -68,7 +68,6 @@ function checkCSVFields(table, files) {
     requiredFields.push('position');
     fieldsOnForm.push('position');
   }
-  console.log("Required after manipulation: " + requiredFields);
 
   // Show the schema if we need to debug
   debug("schema:");
@@ -140,7 +139,6 @@ function checkCSVFields(table, files) {
 
         // Only show the modal dialog if there are un-matched fields or we have ignored fields from the CSV
         var fieldsIgnored = csvFieldsIgnored();
-        console.log("All required matched: " + allRequiredMatched());
         if (fieldsIgnored) $('#' + MODAL_ALERT_IGNORED_ID).show();
         if (!allRequiredMatched() || fieldsIgnored) {
           $('#' + MODAL_ID).modal('toggle');
@@ -165,7 +163,6 @@ function csvFieldsIgnored() {
 
 // Checks if all required fields have been matched
 function allRequiredMatched() {
-  console.log("Required fields: " + requiredFields);
   return requiredFields.every(function(val) {
     return Object.keys(matchedFields).indexOf(val) >= 0;
   })
