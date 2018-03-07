@@ -1,4 +1,4 @@
-# aker-submission-gui
+# aker-submission
 # Use ruby 2.3.1
 FROM ruby:2.3.1
 
@@ -26,9 +26,8 @@ ADD Gemfile.lock /code/Gemfile.lock
 # http://bundler.io/
 RUN gem install bundler
 
-# Install gems required by project
-# We do not need the gems of the deployment group
-RUN bundle install --without deployment
+# Install all gems in the Gemfile
+RUN bundle install
 
 # Add the wait-for-it file to utils
 ADD https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh /utils/wait-for-it.sh
