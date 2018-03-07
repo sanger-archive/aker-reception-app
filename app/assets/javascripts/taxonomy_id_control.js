@@ -38,10 +38,9 @@
   proto.showWarning = function() {
     var warningAlert = $('#warning-messages');
     warningAlert.html(
-        ["<div>The manifest should not provide a scientific name, as this value is obtained from the taxonomy id.</div>",
-        "<div><b><u>We will ignore the value of the scientific name from the manifest and will use the corresponding for the taxonomy id provided.</u></b> </div>", 
-        "<div>Please review the value of the scientific name in this view. If this is not what you expected please review the contents of the manifest and provide the appropiate ",
-        "taxonomy id</div>"].join('')
+        ["<strong>Duplicate Data</strong>",
+        "<p>The scientific name included in the manifest has been ignored, as this is determined by the Taxon ID.</p>",
+        "<p>If the scientific name is incorrect, please <a href='https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi' target='_blank' class='alert-link'>find the appropriate Taxon ID</a> and try again.</p>"].join('')
     );
     warningAlert.toggleClass('hidden', false);
   };
@@ -59,7 +58,7 @@
   };
 
   proto.manifestWithDifferentValueForScientificNameInputWarning = function() {
-    var previousValue = this.getScientificName();    
+    var previousValue = this.getScientificName();
     this.findTaxId(true);
     var actualValue = this.getScientificName();
     if ((previousValue.length > 0) && (previousValue != actualValue)) {
@@ -144,7 +143,7 @@
 
   proto.findTaxId = function(synchronous) {
     var taxId = this.getTaxonId();
-    this.setScientificName('');    
+    this.setScientificName('');
     if (this.validateTaxId(taxId)) {
       if (taxId.length == 0) {
         this.toggleMark('has-success', false);
@@ -162,7 +161,7 @@
         success: $.proxy(this.executeHandlerOnlyIfNewerCall, this, this.onSuccessFindTaxId, this.numAjaxCalls),
         error: $.proxy(this.executeHandlerOnlyIfNewerCall, this, this.onErrorFindTaxId, this.numAjaxCalls),
         async: !synchronous
-      });      
+      });
     } else {
       this.markInputsAs('has-error');
     }
