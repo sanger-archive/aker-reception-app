@@ -148,7 +148,6 @@ RSpec.describe 'EHMDMCClient' do
         end
         it 'generates a json with the valid field' do
           m = JSON.parse(obj.to_json).symbolize_keys
-          puts m
           expect(m[:valid]).to eq(false)
         end
       end

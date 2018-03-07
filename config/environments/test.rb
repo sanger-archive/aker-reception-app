@@ -60,14 +60,7 @@ Rails.application.configure do
   config.jwt_secret_key = 'test'
 
   config.events = {
-    enabled: false,
-    broker_host: 'localhost',
-    broker_port: '5672',
-    broker_username: 'guest',
-    broker_password: 'guest',
-    exchange_name: 'aker.events',
-    warehouse_queue_name: 'aker.events.warehouse',
-    notification_queue_name: 'aker.events.notifications'
+    enabled: false
   }
 
   config.fake_ldap = true

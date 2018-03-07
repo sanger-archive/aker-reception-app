@@ -10,6 +10,7 @@ Rails.application.config.after_initialize do
     # http://www.rubydoc.info/github/lostisland/faraday/Faraday/Connection
     connection.faraday.proxy {}
     connection.use JWTSerializer
+    connection.use RequestIdMiddleware
 
     if Rails.env.production? || Rails.env.staging?
       connection.use ZipkinTracer::FaradayHandler, "Matcon Service"
