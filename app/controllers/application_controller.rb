@@ -3,11 +3,11 @@ require 'event_message'
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
-  include JWTCredentials
-
   before_action do
     RequestStore.store[:request_id] = request.request_id
   end
+
+  include JWTCredentials
 
   rescue_from AkerPermissionGem::NotAuthorized do |e|
     respond_to do |format|
