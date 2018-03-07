@@ -5,6 +5,10 @@ class ApplicationController < ActionController::Base
 
   include JWTCredentials
 
+  before_action do
+    RequestStore.store[:request_id] = request.request_id
+  end
+
   rescue_from AkerPermissionGem::NotAuthorized do |e|
     respond_to do |format|
       format.html { redirect_to root_path, alert: e.message }

@@ -28,5 +28,7 @@ module Submission
     end
 
     config.ldap = config_for(:ldap)
+
+    config.autoload_paths << Rails.root.join('lib')
   end
 end
