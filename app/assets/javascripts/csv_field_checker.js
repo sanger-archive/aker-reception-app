@@ -42,6 +42,9 @@ function checkCSVFields(table, files) {
   fieldsOnForm = Array.prototype.slice.apply(materialSchema.show_on_form);
   requiredFields = Array.prototype.slice.apply(materialSchema.required);
 
+  // Reset any warnings (taxon ID/sci name duplication and human material without HMDMC)
+  SubmissionCSVWarnings.clearWarnings();
+
   // Remove "Scientific Name" from required fields, as it is populated based on taxon ID
   var sci_name_index = materialSchema.required.indexOf("scientific_name");
 
@@ -290,9 +293,17 @@ function fillInTableFromFile() {
           return false;
         };
 
+        // Check if human material without HMDMC is present, and warn if so
+        var taxon_id = (row[matchedFields['taxon_id']] || '').trim();
+        var hmdmc_number = (row[matchedFields['hmdmc']] || '').trim();
+        if (taxon_id == 9606 && hmdmc_number == '') {
+          SubmissionCSVWarnings.addWarning("hmdmc");
+        }
+
         // Fill in the actual row with the data
         $.each(matchedFields, function (formField, csvField) {
           var value = row[csvField].trim();
+
           if (schema[formField]["allowed"] === undefined) {
             // Text input fields
             tableRow.find('input[name*="' + formField + '"]').val(value);

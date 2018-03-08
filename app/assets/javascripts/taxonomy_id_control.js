@@ -35,25 +35,9 @@
     this.inputSciName.on('focus', $.proxy(this.focusToNextInput, this, this.inputSciName));
   };
 
-  proto.showWarning = function() {
-    var warningAlert = $('#warning-messages');
-    warningAlert.html(
-        ["<strong>Duplicate Data</strong>",
-        "<p>The scientific name included in the manifest has been ignored, as this is determined by the Taxon ID.</p>",
-        "<p>If the scientific name is incorrect, please <a href='https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi' target='_blank' class='alert-link'>find the appropriate Taxon ID</a> and try again.</p>"].join('')
-    );
-    warningAlert.toggleClass('hidden', false);
-  };
-
-  proto.hideWarning = function() {
-    var warningAlert = $('#warning-messages');
-    warningAlert.toggleClass('hidden', true);
-  };
-
   proto.manifestWithScientificNameWarning = function() {
-    this.hideWarning();
     if (this.getScientificName().length > 0) {
-      this.showWarning();
+      SubmissionCSVWarnings.addWarning("sciname-taxon");
     }
   };
 
