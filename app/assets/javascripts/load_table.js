@@ -20,6 +20,22 @@ $(document).on('turbolinks:load', function() {
       checkCSVFields($(this), e.originalEvent.dataTransfer.files);
     });
 
+  var csvBox = $('.csv-upload-box')
+    .on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    })
+    .on('dragover dragenter', function() {
+      $(this).addClass('is-dragover bg-info')
+    })
+    .on('dragleave dragend drop', function() {
+      $(this).removeClass('is-dragover bg-info')
+    })
+    .on('drop', function(e) {
+      var dataTable = $(this).siblings(".material-data-table").find('.dataTable');
+      checkCSVFields(dataTable, e.originalEvent.dataTransfer.files);
+    });
+
   $('select#material_submission_contact_id').select2({
     tags: true,
     minimumResultsForSearch: Infinity,

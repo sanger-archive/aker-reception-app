@@ -38,14 +38,23 @@ function checkCSVFields(table, files) {
   matchedFields = {};
 
   // Get the schema from the rails view
-  schema = materialSchema.properties;
-  fieldsOnForm = materialSchema.show_on_form;
-  requiredFields = materialSchema.required;
+  schema = Object.assign({}, materialSchema.properties);
+  fieldsOnForm = Array.prototype.slice.apply(materialSchema.show_on_form);
+  requiredFields = Array.prototype.slice.apply(materialSchema.required);
+
+  // Reset any warnings (taxon ID/sci name duplication and human material without HMDMC)
+  SubmissionCSVWarnings.clearWarnings();
 
   // Remove "Scientific Name" from required fields, as it is populated based on taxon ID
   var sci_name_index = materialSchema.required.indexOf("scientific_name");
-  requiredFields.splice(sci_name_index, 1);
-  materialSchema.properties.scientific_name.required = false;
+
+  // This if statement is necessary to prevent the last required field in the
+  // array being removed in the case that scientific_name isn't a required field
+  // which would cause the above assignment to return -1
+  if (sci_name_index >= 0) {
+    requiredFields.splice(sci_name_index, 1);
+    materialSchema.properties.scientific_name.required = false;
+  }
 
   // Check that we have received a schema
   if (Object.keys(schema).length < 1) {
@@ -59,8 +68,8 @@ function checkCSVFields(table, files) {
   // Add position field to schema, required list and show on form list
   if (!schema.position) {
     schema.position = POSITION_FIELD;
-    materialSchema.required.push('position');
-    materialSchema.show_on_form.push('position');
+    requiredFields.push('position');
+    fieldsOnForm.push('position');
   }
 
   // Show the schema if we need to debug
@@ -284,9 +293,17 @@ function fillInTableFromFile() {
           return false;
         };
 
+        // Check if human material without HMDMC is present, and warn if so
+        var taxon_id = (row[matchedFields['taxon_id']] || '').trim();
+        var hmdmc_number = (row[matchedFields['hmdmc']] || '').trim();
+        if (taxon_id == 9606 && hmdmc_number == '') {
+          SubmissionCSVWarnings.addWarning("hmdmc");
+        }
+
         // Fill in the actual row with the data
         $.each(matchedFields, function (formField, csvField) {
           var value = row[csvField].trim();
+
           if (schema[formField]["allowed"] === undefined) {
             // Text input fields
             tableRow.find('input[name*="' + formField + '"]').val(value);
@@ -312,7 +329,7 @@ function fillInTableFromFile() {
         return true;
       });
       debug("importing complete!");
-      dataTable.trigger('psd.update-table');      
+      dataTable.trigger('psd.update-table');
     },
   })
 }
