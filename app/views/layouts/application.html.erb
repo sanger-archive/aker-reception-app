@@ -16,6 +16,7 @@
     <%# navbar comes from aker_shared_navbar engine %>
     <%= render partial: "navbar" %>
 
+    <% unless params["id"] == "provenance" %>
     <div class="container" id="content">
       <div class="row">
         <div class="col-md-8">
@@ -30,6 +31,21 @@
       <%= render "flashes" %>
       <%= yield %>
     </div>
+    <% else %>
+    <div class="container-fluid" id="provenance">
+      <div class="row">
+        <div class="col-md-8">
+          <h1>
+            <%= yield(:main_title) %>
+          </h1>
+        </div>
+        <div class="col-md-4">
+            <%= yield(:title_button) if content_for?(:title_button) %>
+        </div>
+      </div>
+      <%= yield %>
+    </div>
+    <% end %>
     <footer style="text-align:center">
       <% if Projects::Application::VERSION.present? %>
         <%= 'Version: ' + Projects::Application::VERSION[0..6] %>
