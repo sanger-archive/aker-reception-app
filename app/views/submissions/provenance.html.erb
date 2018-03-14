@@ -132,7 +132,7 @@
               <tr>
                 <th></th>
                 <% for header in schema['show_on_form'] %>
-                  <th> <%= schema['properties'][header]['friendly_name'] || header %> </th>
+                  <th style="white-space: nowrap"><%= schema['properties'][header]['friendly_name'] || header %><%= "*" if schema['required'].include? header %></th>
                 <% end %>
               </tr>
             </thead>
