@@ -169,3 +169,8 @@ h2 {
 .material-data-table {
   height: 100vh;
 }
+
+.has-error input:not([type=checkbox]), .has-error .form-control {
+  background-color: red;
+  color: white;
+}
