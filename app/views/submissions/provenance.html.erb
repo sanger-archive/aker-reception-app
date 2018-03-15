@@ -121,8 +121,7 @@
               </div>
             </div>
           </div>
-
-          <div style="overflow-x: scroll;" class="material-data-table">
+          <div style="overflow: scroll;" class="material-data-table">
 
           <table data-behavior="datatable"
                  class="table table-condensed table-striped"
@@ -132,7 +131,9 @@
               <tr>
                 <th></th>
                 <% for header in schema['show_on_form'] %>
-                  <th> <%= schema['properties'][header]['friendly_name'] || header %> </th>
+                  <th style="white-space: nowrap">
+                    <%= schema['properties'][header]['friendly_name'] || header %><% if schema['required'].include? header %><span style="color: red">*</span><% end %>
+                  </th>
                 <% end %>
               </tr>
             </thead>
