@@ -12,6 +12,8 @@ class MaterialSubmission < ApplicationRecord
     'broken'
   end
 
+  attr_accessor :dispatched_date
+
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true
@@ -40,6 +42,7 @@ class MaterialSubmission < ApplicationRecord
 
   scope :dispatched, -> { where(dispatched: true) }
   scope :not_dispatched, -> { where(dispatched: false) }
+  scope :awaiting_receipt, -> { dispatched.left_outer_joins(labwares: :material_reception).where(material_receptions: { labware_id: nil }).distinct }
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
   scope :printed, -> { where(status: MaterialSubmission.PRINTED) }
@@ -85,11 +88,11 @@ class MaterialSubmission < ApplicationRecord
 
   def active_or_printed?
     return false if status.nil?
-    active? || status==MaterialSubmission.PRINTED
+    active? || status == MaterialSubmission.PRINTED
   end
 
   def after_provenance?
-    return false unless labwares.present?
+    return false if labwares.blank?
     return false unless status
     return false if ['labware', 'provenance'].include?(status)
     return labwares.all? { |labware| labware.contents.present? }
@@ -117,12 +120,12 @@ class MaterialSubmission < ApplicationRecord
 
   def supply_labware_type
     return "Label for #{labware_type.name}" unless supply_labwares
-    return labware_type.name + " with decappers" if supply_decappers
+    return labware_type.name + ' with decappers' if supply_decappers
     return labware_type.name
   end
 
   def update(params)
-    if !params[:last_step].nil?
+    unless params[:last_step].nil?
       @last_step = params[:last_step]
       params.delete(:last_step)
     end
@@ -202,7 +205,7 @@ class MaterialSubmission < ApplicationRecord
     end
   end
 
-private
+  private
 
   # Make sure supply_decappers is false unless other fields are appropriate
   def check_supply_decappers
@@ -217,13 +220,11 @@ private
     labwares.clear unless labwares.empty?
 
     (1..no_of_labwares_required).each do |i|
-      self.labwares.create(labware_index: i)
+      labwares.create(labware_index: i)
     end
   end
 
   def each_labware_has_contents
-    unless labwares.all? { |labware| labware.contents.present? }
-      errors.add(:labwares, "must each have at least one Biomaterial")
-    end
+    errors.add(:labwares, 'must each have at least one Biomaterial') unless labwares.all? { |labware| labware.contents.present? }
   end
 end
