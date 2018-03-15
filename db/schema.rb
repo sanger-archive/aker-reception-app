@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171206110335) do
+ActiveRecord::Schema.define(version: 20180315143014) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(version: 20171206110335) do
     t.citext   "owner_email"
     t.boolean  "dispatched",               default: false
     t.boolean  "supply_decappers",         default: false, null: false
+    t.datetime "dispatch_date"
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id", using: :btree
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id", using: :btree
     t.index ["owner_email"], name: "index_material_submissions_on_owner_email", using: :btree
