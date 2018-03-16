@@ -7,7 +7,10 @@
     <%= link_to 'Dispatch Labware', completed_submissions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'completed_submissions') %>
   </li>
   <li>
-    <%= link_to 'Reception', material_receptions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'material_receptions') %>
+    <%= link_to 'Reception', material_receptions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'material_receptions' && params[:action] != 'pending_receptions') %>
+  </li>
+  <li>
+    <%= link_to 'Awaiting Reception', material_receptions_waiting_path, id: ("current-page-#{Rails.env.downcase}" if (params[:action] == 'pending_receptions')) %>
   </li>
   <% end %>
 </ul>

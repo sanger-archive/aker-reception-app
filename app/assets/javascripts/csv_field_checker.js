@@ -284,14 +284,34 @@ function fillInTableFromFile() {
 
       // Write each row to the datatable
       results.data.every(function(row, index) {
-        // Get the row for of the well we would like to fill data
-        var tableRow = $('tr[data-address="' + row[matchedFields.position] + '"]', dataTable);
+        var wellPosition = row[matchedFields.position];
 
-        // No position, no data
-        if (!row[matchedFields.position] || tableRow.length == 0) {
+        // No position, throw error
+        if (!wellPosition) {
           displayError('This manifest does not have a valid position field for the wells of row: ' + index);
           return false;
         };
+
+        // Attempt to get the row for which we would like to fill in data
+        var tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable);
+        if (tableRow.length == 0) {
+          // Attempt to map positions that don't match A:1 format (i.e A1 or A-1)
+          if (/^([a-zA-Z]([0-9]+))$/.test(wellPosition)) {
+            // A1 format
+            wellPosition = wellPosition.split('')
+            wellPosition.splice(1, 0, ':')
+          } else if (/^([a-zA-Z]-([0-9]+))$/.test(wellPosition)) {
+            // A-1 format
+            wellPosition = wellPosition.split('')
+            wellPosition.splice(1, 1, ':')
+          } else {
+            displayError('This manifest does not have a valid position field for the wells of row: ' + index);
+            return false;
+          }
+          wellPosition = wellPosition.join('')
+          // Data is now in the correct format, so get the row
+          tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable)
+        }
 
         // Check if human material without HMDMC is present, and warn if so
         var taxon_id = (row[matchedFields['taxon_id']] || '').trim();

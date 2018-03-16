@@ -1,4 +1,5 @@
 <tr>
+  <td><%= material_submission.id %></td>
   <td><%= material_submission.labware_type&.name || '(Not selected)' %></td>
   <td><%= material_submission.no_of_labwares_required %></td>
   <td><%= supply_labwares_desc(material_submission) %></td>

@@ -165,3 +165,13 @@ h2 {
     margin-right: 0px !important;
   }
 }
+
+.material-data-table {
+  height: 100vh;
+}
+
+.has-error input:not([type=checkbox]), .has-error .form-control {
+  border-bottom: none;
+  -webkit-box-shadow: inset 0 -2px 0 red;
+  box-shadow: inset 0 -5px 0 red;
+}
