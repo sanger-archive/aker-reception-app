@@ -35,31 +35,14 @@
     this.inputSciName.on('focus', $.proxy(this.focusToNextInput, this, this.inputSciName));
   };
 
-  proto.showWarning = function() {
-    var warningAlert = $('#warning-messages');
-    warningAlert.html(
-        ["<div>The manifest should not provide a scientific name, as this value is obtained from the taxonomy id.</div>",
-        "<div><b><u>We will ignore the value of the scientific name from the manifest and will use the corresponding for the taxonomy id provided.</u></b> </div>", 
-        "<div>Please review the value of the scientific name in this view. If this is not what you expected please review the contents of the manifest and provide the appropiate ",
-        "taxonomy id</div>"].join('')
-    );
-    warningAlert.toggleClass('hidden', false);
-  };
-
-  proto.hideWarning = function() {
-    var warningAlert = $('#warning-messages');
-    warningAlert.toggleClass('hidden', true);
-  };
-
   proto.manifestWithScientificNameWarning = function() {
-    this.hideWarning();
     if (this.getScientificName().length > 0) {
-      this.showWarning();
+      SubmissionCSVWarnings.addWarning("sciname-taxon");
     }
   };
 
   proto.manifestWithDifferentValueForScientificNameInputWarning = function() {
-    var previousValue = this.getScientificName();    
+    var previousValue = this.getScientificName();
     this.findTaxId(true);
     var actualValue = this.getScientificName();
     if ((previousValue.length > 0) && (previousValue != actualValue)) {
@@ -144,7 +127,7 @@
 
   proto.findTaxId = function(synchronous) {
     var taxId = this.getTaxonId();
-    this.setScientificName('');    
+    this.setScientificName('');
     if (this.validateTaxId(taxId)) {
       if (taxId.length == 0) {
         this.toggleMark('has-success', false);
@@ -162,7 +145,7 @@
         success: $.proxy(this.executeHandlerOnlyIfNewerCall, this, this.onSuccessFindTaxId, this.numAjaxCalls),
         error: $.proxy(this.executeHandlerOnlyIfNewerCall, this, this.onErrorFindTaxId, this.numAjaxCalls),
         async: !synchronous
-      });      
+      });
     } else {
       this.markInputsAs('has-error');
     }
