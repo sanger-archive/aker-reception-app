@@ -19,7 +19,13 @@ FactoryBot.define do
   end
 
   factory :labware_with_barcode_and_material_submission, class: :labware do
-    material_submission {|l| l.association(:material_submission)}
+    material_submission { |l| l.association(:material_submission) }
+    sequence(:labware_index)
+    barcode { generate(:labware_barcode) }
+    contents { { "1": { 'id': 1, 'scientific_name': 'Homo Sapiens' } } }
+  end
+
+  factory :labware_with_barcode, class: :labware do
     sequence(:labware_index)
     barcode { generate(:labware_barcode) }
     contents { { "1": { 'id': 1, 'scientific_name': 'Homo Sapiens' } } }
