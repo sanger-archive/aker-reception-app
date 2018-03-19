@@ -84,13 +84,18 @@
   };
 
   proto.setErrorToInput = function(input, msg) {
-    var tooltip = $(input).parent().tooltip({
-      title: msg,
-      container: 'body'
-    });
-    $(input).parent().tooltip('show');
+    // If the error has been generated from a user interaction, it will display a tooltip
+    if ($(input).data('fromUserInteraction') === true) {
+      var tooltip = $(input).parent().tooltip({
+        title: msg,
+        container: 'body'
+      });
+      $(input).parent().tooltip('show');
+      this.tooltipInputs.push($(input).parent());
+    }
+
+    $(input).data('fromUserInteraction', false);
     $(input).parent().addClass('has-error');
-    this.tooltipInputs.push($(input).parent());
   };
 
   proto.cleanTooltips = function() {
@@ -131,8 +136,12 @@
     // });
   };
 
-  proto.validateInput = function(input) {
+  proto.validateInput = function(input, fromUserInteraction) {
     var name = $(input).parents('td').data('psd-schema-validation-name');
+    $(input).parent().removeClass('has-error');
+    // It will store in the input that we are interacting with the input, so we can take 
+    // decissions in future about how to display the potential errors
+    $(input).data('fromUserInteraction', fromUserInteraction);
     if (name) {
       $(input).trigger('psd.schema.validation', {
         node: input,
@@ -429,7 +438,8 @@
     $('a[data-toggle="tab"]').on('hide.bs.tab', $.proxy(this.saveTab, this));
     $('a[data-toggle="tab"]').on('show.bs.tab', $.proxy(this.restoreTab, this));
     $('table tbody tr td input').on('blur', $.proxy(function(e) {
-      return this.validateInput(e.target);
+      // This is a validation triggered by a user interaction, so we want to display a tooltip for it
+      return this.validateInput(e.target, true);
     }, this));
     $('form').on('submit.rails', $.proxy(this.saveTab, this));
 
