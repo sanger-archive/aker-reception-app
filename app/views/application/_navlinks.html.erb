@@ -2,15 +2,13 @@
   <li>
     <%= link_to 'Submissions', material_submissions_path, id: ("current-page-#{Rails.env.downcase}" if (params[:controller] == 'material_submissions' && params[:action] != 'show') || params[:controller] == 'submissions') %>
   </li>
-  <% if current_user.groups.any? { |group| group.in? Rails.configuration.ssr_groups } %>
   <li>
-    <%= link_to 'Dispatch Labware', completed_submissions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'completed_submissions') %>
+    <%= link_to 'Dispatch Labware', completed_submissions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'completed_submissions') if user_is_ssr %>
   </li>
   <li>
-    <%= link_to 'Reception', material_receptions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'material_receptions' && params[:action] != 'pending_receptions') %>
+    <%= link_to 'Awaiting Reception', material_receptions_waiting_path, id: ("current-page-#{Rails.env.downcase}" if (params[:action] == 'pending_receptions'))  %>
   </li>
   <li>
-    <%= link_to 'Awaiting Reception', material_receptions_waiting_path, id: ("current-page-#{Rails.env.downcase}" if (params[:action] == 'pending_receptions')) %>
+    <%= link_to 'Reception', material_receptions_path, id: ("current-page-#{Rails.env.downcase}" if params[:controller] == 'material_receptions' && params[:action] != 'pending_receptions') if user_is_ssr %>
   </li>
-  <% end %>
 </ul>
