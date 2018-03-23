@@ -77,17 +77,6 @@
       $(this).val(null);
     });
 
-    // Mirrors dropdown selection between both dropdown menus on the Completed
-    // Submissions page
-    $('.printer_select').change(function (event) {
-      var value = $(event.target).val();
-      var id = event.target.id;
-      $('.printer_select').each(function(pos, node) {
-        if (node.id!==id) {
-          $(node).val(value);
-        }
-      })
-    });
   }
   
 
