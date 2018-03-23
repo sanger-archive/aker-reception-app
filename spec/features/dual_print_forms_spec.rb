@@ -38,7 +38,7 @@ RSpec.feature "DualPrintForms", type: :feature do
         expect(page).to have_select("printer_name_top", selected: printer_options[0])
         select printer_options[1], from: "printer_name_top"
         wait_for_ajax
-        expect(page).to have_select("printer_name_bottom", selected: printer_options[1])
+        expect(page).to have_select("printer_name_bottom", selected: printer_options[1], wait: 5)
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.feature "DualPrintForms", type: :feature do
         expect(page).to have_select("printer_name_bottom", selected: printer_options[0])
         select printer_options[1], from: "printer_name_bottom"
         wait_for_ajax
-        expect(page).to have_select("printer_name_top", selected: printer_options[1])
+        expect(page).to have_select("printer_name_top", selected: printer_options[1], wait: 5)
       end
     end
 
@@ -57,7 +57,7 @@ RSpec.feature "DualPrintForms", type: :feature do
         select printer_options[1], from: "printer_name_bottom"
         wait_for_ajax
         click_button("print_button_top")
-        expect(page).to have_content("Print issued to #{printer_names[1]}")
+        expect(page).to have_content("Print issued to #{printer_names[1]}", wait: 5)
       end
     end
 
@@ -67,7 +67,7 @@ RSpec.feature "DualPrintForms", type: :feature do
         select printer_options[1], from: "printer_name_top"
         wait_for_ajax
         click_button("print_button_bottom")
-        expect(page).to have_content("Print issued to #{printer_names[1]}")
+        expect(page).to have_content("Print issued to #{printer_names[1]}", wait: 5)
       end
     end
 
