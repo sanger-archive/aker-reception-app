@@ -4,6 +4,8 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   # config.relative_url_root = '/submission'
+  # Set the default logging level
+  config.log_level = :debug
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
@@ -81,12 +83,10 @@ Rails.application.configure do
     enabled: false,
     broker_host: 'localhost',
     broker_port: '5672',
-    broker_username: 'guest',
-    broker_password: 'guest',
-    broker_vhost: '/',
-    exchange_name: 'aker.events',
-    warehouse_queue_name: 'aker.events.warehouse',
-    notification_queue_name: 'aker.events.notifications'
+    broker_username: 'submission',
+    broker_password: 'password',
+    vhost: 'aker',
+    exchange: 'aker.events.tx'
   }
 
   config.fake_ldap = true

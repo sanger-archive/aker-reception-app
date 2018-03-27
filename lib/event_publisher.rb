@@ -1,22 +1,16 @@
 # frozen_string_literal: true
 
+require 'bunny'
 require 'event_message'
+require 'ostruct'
 
-# The EventPublisher configures the connection to the broker and creates the exchange and
-#   queues.
+# The EventPublisher configures the connection to the broker
 class EventPublisher
   attr_accessor :connection
   attr_reader :channel, :exchange, :dlx, :dlx_queue
 
-  def initialize(config = {})
-    @broker_host = config[:broker_host]
-    @broker_port = config[:broker_port]
-    @broker_vhost = config[:broker_vhost]
-    @broker_username = config[:broker_username]
-    @broker_password = config[:broker_password]
-    @exchange_name = config[:exchange_name]
-    @warehouse_queue_name = config[:warehouse_queue_name]
-    @notification_queue_name = config[:notification_queue_name]
+  def initialize
+    @events_config = OpenStruct.new(Rails.configuration.events)
   end
 
   def create_connection
@@ -25,7 +19,7 @@ class EventPublisher
 
   def connect!
     start_connection
-    create_exchanges_and_queues
+    exchange_handler
     add_close_connection_handler
   end
 
@@ -48,58 +42,26 @@ class EventPublisher
 
   def add_close_connection_handler
     at_exit do
-      puts 'RabbitMQ connection close.'
+      Rails.logger.info 'RabbitMQ connection closed.'
       close
-      exit 0
     end
   end
 
   def start_connection
-    # Threaded is set to false because otherwise the connection creation is not working
-    @connection = Bunny.new(
-      host: @broker_host,
-      port: @broker_port,
-      vhost: @broker_vhost,
-      user: @broker_username,
-      pass: @broker_password,
-      threaded: false
-    )
+    @connection = Bunny.new host: @events_config.broker_host,
+                            port: @events_config.broker_port,
+                            username: @events_config.broker_username,
+                            password: @events_config.broker_password,
+                            vhost: @events_config.vhost
     @connection.start
   end
 
-  def create_exchanges_and_queues
-    dl_exchange_name = @exchange_name + '.deadletters'
-
+  def exchange_handler
     @channel = @connection.create_channel
 
-    # Create a topic exchange which will send messages to queues bound to the exchange using
-    #   specific routing keys and make the exchange durable: Durable exchanges survive broker
-    #   restart, transient exchanges do not (http://rubybunny.info/articles/durability.html)
-    @exchange = @channel.topic(@exchange_name, durable: true)
-
-    # Creates the dead letter exchange aker.events.deadletters (https://www.rabbitmq.com/dlx.html)
-    @dlx = @channel.fanout(dl_exchange_name, durable: true)
-
-    # Creates the queues with dead letter exchange defined as aker.events.deadletters. We also
-    #   set `auto_delete` to false which ensures that we dont destroy the queue when there are
-    #   no messages and no consumers are running. Finally, we also bind the queue to the exchange.
-    # warehouse_queue
-    @channel.queue(@warehouse_queue_name,
-                   auto_delete: false,
-                   durable: true,
-                   arguments: {
-                     "x-dead-letter-exchange": @dlx.name
-                   }).bind(@exchange, routing_key: '#')
-    # notifications_queue
-    @channel.queue(@notification_queue_name,
-                   auto_delete: false,
-                   durable: true,
-                   arguments: {
-                     "x-dead-letter-exchange": @dlx.name
-                   }).bind(@exchange, routing_key: '#')
-    # Dead letter queues
-    dl_queue_name = @exchange_name + '.deadletters'
-    @channel.queue(dl_queue_name, durable: true).bind(@dlx, durable: true)
+    # Get a handle to the topic exchange which will send messages to queues bound to the exchange
+    #   using specific routing keys
+    @exchange = @channel.topic(@events_config.exchange, passive: true)
 
     # To be able to wait_for_confirms in publish()
     @channel.confirm_select

@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   get '/materials_schema', to: 'material_submissions#schema'
   get '/hmdmc', to: 'material_submissions#hmdmc_validate'
 
+  get '/material_receptions/waiting', to: 'material_receptions#pending_receptions'
+    
   resources :material_receptions
   resources :material_submissions do
     resources :build, controller: 'submissions'

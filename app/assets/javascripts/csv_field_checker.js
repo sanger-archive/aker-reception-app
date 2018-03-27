@@ -38,14 +38,23 @@ function checkCSVFields(table, files) {
   matchedFields = {};
 
   // Get the schema from the rails view
-  schema = materialSchema.properties;
-  fieldsOnForm = materialSchema.show_on_form;
-  requiredFields = materialSchema.required;
+  schema = Object.assign({}, materialSchema.properties);
+  fieldsOnForm = Array.prototype.slice.apply(materialSchema.show_on_form);
+  requiredFields = Array.prototype.slice.apply(materialSchema.required);
+
+  // Reset any warnings (taxon ID/sci name duplication and human material without HMDMC)
+  SubmissionCSVWarnings.clearWarnings();
 
   // Remove "Scientific Name" from required fields, as it is populated based on taxon ID
   var sci_name_index = materialSchema.required.indexOf("scientific_name");
-  requiredFields.splice(sci_name_index, 1);
-  materialSchema.properties.scientific_name.required = false;
+
+  // This if statement is necessary to prevent the last required field in the
+  // array being removed in the case that scientific_name isn't a required field
+  // which would cause the above assignment to return -1
+  if (sci_name_index >= 0) {
+    requiredFields.splice(sci_name_index, 1);
+    materialSchema.properties.scientific_name.required = false;
+  }
 
   // Check that we have received a schema
   if (Object.keys(schema).length < 1) {
@@ -59,8 +68,8 @@ function checkCSVFields(table, files) {
   // Add position field to schema, required list and show on form list
   if (!schema.position) {
     schema.position = POSITION_FIELD;
-    materialSchema.required.push('position');
-    materialSchema.show_on_form.push('position');
+    requiredFields.push('position');
+    fieldsOnForm.push('position');
   }
 
   // Show the schema if we need to debug
@@ -275,18 +284,46 @@ function fillInTableFromFile() {
 
       // Write each row to the datatable
       results.data.every(function(row, index) {
-        // Get the row for of the well we would like to fill data
-        var tableRow = $('tr[data-address="' + row[matchedFields.position] + '"]', dataTable);
+        var wellPosition = row[matchedFields.position];
 
-        // No position, no data
-        if (!row[matchedFields.position] || tableRow.length == 0) {
+        // No position, throw error
+        if (!wellPosition) {
           displayError('This manifest does not have a valid position field for the wells of row: ' + index);
           return false;
         };
 
+        // Attempt to get the row for which we would like to fill in data
+        var tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable);
+        if (tableRow.length == 0) {
+          // Attempt to map positions that don't match A:1 format (i.e A1 or A-1)
+          if (/^([a-zA-Z]([0-9]+))$/.test(wellPosition)) {
+            // A1 format
+            wellPosition = wellPosition.split('')
+            wellPosition.splice(1, 0, ':')
+          } else if (/^([a-zA-Z]-([0-9]+))$/.test(wellPosition)) {
+            // A-1 format
+            wellPosition = wellPosition.split('')
+            wellPosition.splice(1, 1, ':')
+          } else {
+            displayError('This manifest does not have a valid position field for the wells of row: ' + index);
+            return false;
+          }
+          wellPosition = wellPosition.join('')
+          // Data is now in the correct format, so get the row
+          tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable)
+        }
+
+        // Check if human material without HMDMC is present, and warn if so
+        var taxon_id = (row[matchedFields['taxon_id']] || '').trim();
+        var hmdmc_number = (row[matchedFields['hmdmc']] || '').trim();
+        if (taxon_id == 9606 && hmdmc_number == '') {
+          SubmissionCSVWarnings.addWarning("hmdmc");
+        }
+
         // Fill in the actual row with the data
         $.each(matchedFields, function (formField, csvField) {
           var value = row[csvField].trim();
+
           if (schema[formField]["allowed"] === undefined) {
             // Text input fields
             tableRow.find('input[name*="' + formField + '"]').val(value);
@@ -312,7 +349,7 @@ function fillInTableFromFile() {
         return true;
       });
       debug("importing complete!");
-      dataTable.trigger('psd.update-table');      
+      dataTable.trigger('psd.update-table');
     },
   })
 }

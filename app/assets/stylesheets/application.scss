@@ -45,10 +45,17 @@ body {
 
 .container#content {
   margin-top: 20px;
-  padding-bottom: 10px;
-  background-color: white;
   margin-bottom: 20px;
+}
+
+.container-fluid#provenance {
+  margin: 20px 20px 20px 20px;
+}
+
+.container#content, .container-fluid#provenance {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  background-color: white;
+  padding-bottom: 10px;
 }
 
 .bg-info {
@@ -157,4 +164,14 @@ h2 {
     margin-bottom: 5px;
     margin-right: 0px !important;
   }
+}
+
+.material-data-table {
+  height: 100vh;
+}
+
+.has-error input:not([type=checkbox]), .has-error .form-control {
+  border-bottom: none;
+  -webkit-box-shadow: inset 0 -2px 0 red;
+  box-shadow: inset 0 -5px 0 red;
 }

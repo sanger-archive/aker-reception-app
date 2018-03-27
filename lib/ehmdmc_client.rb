@@ -3,7 +3,7 @@ require 'faraday'
 module EHMDMCClient
 
   class Validation
-    # This class will store the message for the error produced by the HMDMC service provider, 
+    # This class will store the message for the error produced by the HMDMC service provider,
     # depending on the type of error it will generate a different content. Its purpose is to solve
     # the following problems:
     # - Publish the error message to the Logging facility to be able to track the problem
@@ -23,7 +23,7 @@ module EHMDMCClient
 
     def reset
       @validated = false
-      @valid = false      
+      @valid = false
     end
 
     def is_validated?
@@ -38,7 +38,7 @@ module EHMDMCClient
       Rails.logger.send(@facility, @text) unless @text.nil?
     end
 
-    def load_message(type_of_message, facility, text, validated)
+    def load_message(options)
       not_validated_msg = "The HMDMC #{hmdmc} is considered invalid by the HMDMC service"
       unknown_validation_msg = 'We cannot validate with the HMDMC service at this time. Please contact the administrators if the problem persists.'
 
@@ -47,32 +47,32 @@ module EHMDMCClient
       # - :user_message means that the message can be displayed to the user
       # - :infrastructure_message means that the message describes some internal information that
       #      is not relevant for the user, although it is for the logging.
-      @type_of_message = type_of_message 
+      @type_of_message = options[:type_of_message]
 
       # Level of logging where the message will be emitted
       # Valid values: Any facility understood by Rails.logger like :info, :error, ...
-      @facility = facility
+      @facility = options[:facility]
 
       # Text with the content of the message
-      @text = text
+      @text = options[:text]
 
       # Indicates if this error message means that a validation process has been completed
       # Some errors (like connection failed) do not mean that the validation happened
-      @validated = validated
+      @validated = options[:validated]
 
       # This field 'valid' will indicate if the HMDMC has been considered valid or invalid by the service
       # If the service could not give an answer about it, it won't be marked as valid or invalid by the message (for example, when
       # we query the service but at that moment is down, we cannot consider it as not valid)
-      @valid = @validated ?  @text.nil? : nil
+      @valid = @validated ? @text.nil? : nil
 
-      # This field 'error_message' will give as the error message that we can display to the user. 
-      # There are some errors that are infrastructure-specific (json invalid, error codes, etc...) not 
-      # relevant for the user. In these cases, a generic message will be provided, instead of the 
+      # This field 'error_message' will give as the error message that we can display to the user.
+      # There are some errors that are infrastructure-specific (json invalid, error codes, etc...) not
+      # relevant for the user. In these cases, a generic message will be provided, instead of the
       # message loaded.
       unless @text.nil?
-        if (@type_of_message == :infrastructure_message)
+        if @type_of_message == :infrastructure_message
           @error_message = @validated ? not_validated_msg : unknown_validation_msg
-        elsif (@type_of_message == :user_message)
+        elsif @type_of_message == :user_message
           @error_message = @text
         end
       end
@@ -84,7 +84,7 @@ module EHMDMCClient
     end
 
     def to_json
-      {valid: @valid, error_message: @error_message}.reject{|k,v| v.nil?}.to_json
+      { valid: @valid, error_message: @error_message }.reject{ |_k, v| v.nil? }.to_json
     end
 
     def set_as_valid
@@ -94,13 +94,27 @@ module EHMDMCClient
     end
 
     def validate(response)
-      return load_message(:user_message, :info, 'Connection to HMDMC service failed', false) unless response
-      return load_message(:infrastructure_message, :error, "Attempting to validate HMDMC #{hmdmc} returned status code #{response.status}", true) unless response.status == 200
+      unless response
+        return load_message(type_of_message: :user_message,
+                            facility: :info,
+                            text: 'Connection to HMDMC service failed',
+                            validated: false)
+      end
+
+      unless response.status == 200
+        return load_message(type_of_message: :infrastructure_message,
+                            facility: :error,
+                            text: "Attempting to validate HMDMC #{hmdmc} returned status code #{response.status}",
+                            validated: false)
+      end
 
       begin
         data = JSON.parse(response.body)
       rescue JSON::ParserError
-        return load_message(:infrastructure_message, :error, "Attempting to validate HMDMC #{hmdmc} produced invalid JSON: #{response.body}", false)
+        return load_message(type_of_message: :infrastructure_message,
+                            facility: :error,
+                            text: "Attempting to validate HMDMC #{hmdmc} produced invalid JSON: #{response.body}",
+                            validated: false)
       end
 
       # Error codes, from Stephen Rice:
@@ -110,7 +124,12 @@ module EHMDMCClient
       # 3: number has correct syntax but does not exist in system
       # 4: number does exist in system but is not approved
       # 5: valid but failed to find any product classes
-      return load_message(:infrastructure_message, :info, "HMDMC rejected: #{hmdmc}, error code: #{data['errorcode']}", true) unless data['valid']
+      unless data['valid']
+        return load_message(type_of_message: :infrastructure_message,
+                            facility: :info,
+                            text: "HMDMC rejected: #{hmdmc}, error code: #{data['errorcode']}",
+                            validated: true)
+      end
 
       set_as_valid
     end
@@ -134,7 +153,7 @@ module EHMDMCClient
   end
 
   def self.sanitise(hmdmc)
-    hmdmc.sub('/','_')
+    hmdmc.sub('/', '_')
   end
 
   def self.connection

@@ -103,24 +103,25 @@
 
         <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware<%= labware.labware_index %>">
 
-           <div style="margin-top: 10px" class="well">
+           <div style="margin-top: 10px" class="well csv-upload-box">
             <div class="row">
-              <div class="venter col-md-8">
-                Please enter material provenance, or drag &amp; drop CSV file
+              <div class="venter col-md-10">
+                Please drop a CSV for the current labware onto this box, or the table.
+                Alternatively, you can manually enter material provenance for the current
+                labware in the table below. Use the tabs above this message to switch
+                labware. If necessary, the table can be scrolled horizontally to view all of the fields.
+                <% if Rails.configuration.show_hmdmc_warning %>
+                  <br><span style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</span>
+                <% end %>
               </div>
-              <div class="vcenter col-md-4">
+              <div class="vcenter col-md-2">
                 <label style="float: right" class="btn btn-primary">
-                    Upload CSV <input type="file" class="upload-button" style="display: none;">
+                    Browse for CSV <input type="file" class="upload-button" accept=".csv, text/csv" style="display: none;">
                 </label>
               </div>
             </div>
           </div>
-          <% if Rails.configuration.show_hmdmc_warning %>
-            <p style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</p>
-          <% end %>
-          <p><strong>Note:</strong> If necessary, the table can be scrolled horizontally to view all of the fields</p>
-
-          <div style="overflow: scroll;">
+          <div style="overflow: scroll;" class="material-data-table">
 
           <table data-behavior="datatable"
                  class="table table-condensed table-striped"
@@ -130,14 +131,16 @@
               <tr>
                 <th></th>
                 <% for header in schema['show_on_form'] %>
-                  <th> <%= schema['properties'][header]['friendly_name'] || header %> </th>
+                  <th style="white-space: nowrap">
+                    <%= schema['properties'][header]['friendly_name'] || header %><% if schema['required'].include? header %><span style="color: red">*</span><% end %>
+                  </th>
                 <% end %>
               </tr>
             </thead>
 
             <tbody>
               <% for address in labware.positions %>
-                <tr 
+                <tr
                   data-psd-component-class='TaxonomyIdControl'
                   data-psd-component-parameters="<%=
                     {
