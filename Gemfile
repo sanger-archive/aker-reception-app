@@ -40,16 +40,17 @@ gem 'request_store'
 ###
 # Sanger gems
 ###
-gem 'aker_credentials_gem', github: 'sanger/aker-credentials'
-gem 'aker_permission_gem', github: 'sanger/aker-permission'
-gem 'aker-set-client', github: 'sanger/aker-set-client'
-gem 'aker_stamp_client', github: 'sanger/aker-stamp-client'
-gem 'aker-taxonomy-client', github: 'sanger/aker-taxonomy-client'
-gem 'aker_shared_navbar', github: 'sanger/aker-shared-navbar'
-gem 'bootstrap-sass', '~> 3.3.6', github: 'sanger/bootstrap-sass'
-gem 'json_api_client', github: 'sanger/json_api_client'
-gem 'matcon_client', github: 'sanger/aker-matcon-client'
+gem 'aker_credentials', github: 'sanger/aker-credentials-gem'
+gem 'aker_sets_client', github: 'sanger/aker-sets-client-gem'
+gem 'aker_permissions_client', github: 'sanger/aker-permissions-client-gem'
+gem 'aker_taxonomy_client', github: 'sanger/aker-taxonomy-client-gem'
+gem 'aker_navbar', github: 'sanger/aker-navbar-gem'
+gem 'aker_materials_client', github: 'sanger/aker-materials-client-gem'
+
 gem 'pmb-client', '0.1.0', github: 'sanger/pmb-client'
+gem 'aker_permission_gem', github: 'sanger/aker-permission'
+gem 'json_api_client', github: 'sanger/json_api_client'
+gem 'bootstrap-sass', '~> 3.3.6', github: 'sanger/bootstrap-sass'
 
 ###
 # Groups
