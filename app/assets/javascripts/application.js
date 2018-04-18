@@ -20,6 +20,7 @@
 //= require barcode_reader
 //= require bootstrap-table
 //= require csv_field_checker
+//= require sync_select_value
 //= require load_table
 //= require_tree .
 
