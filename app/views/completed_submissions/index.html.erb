@@ -3,7 +3,9 @@
 <% end %>
 <%= form_tag(controller: "completed_submissions", action: "print", method: "post") do %>
 
-<div class="row">
+<div class="row" 
+      data-psd-component-class="SyncSelectValue" 
+      data-psd-component-parameters="<%= { cssSyncSelect: '.printer_select' }.to_json %>">
   <div class="col-md-offset-8 col-md-4 text-right">
     <b>Printer:</b>
     <%= collection_select(:printer, :name, @printers, :name, :printer_description, {},

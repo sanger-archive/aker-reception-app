@@ -123,10 +123,9 @@
           </div>
           <div style="overflow: scroll;" class="material-data-table">
 
-          <table data-behavior="datatable"
-                 class="table table-condensed table-striped"
-                 data-psd-component-class='DataTableSchemaValidation'
-                 data-psd-component-parameters="<%= {material_schema_url: materials_schema_url}.to_json %>">
+          <table class="table table-condensed table-striped"
+                 data-psd-component-class="<%= ['LoadTable', 'DataTableSchemaValidation'].to_json %>"
+                 data-psd-component-parameters="<%= [{}, {material_schema_url: materials_schema_url}].to_json %>">
             <thead>
               <tr>
                 <th></th>
