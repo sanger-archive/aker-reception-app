@@ -37,38 +37,42 @@ RSpec.feature "DualPrintForms", type: :feature do
     context "when choosing from the top dropdown" do
       it "mirrors the option to the bottom dropdown" do
         expect(page).to have_select("printer_name_top", selected: printer_options[0])
-        select printer_options[1], from: "printer_name_top"
-        wait_for_ajax
-        expect(page).to have_select("printer_name_bottom", selected: printer_options[1])
+        page.document.synchronize do
+          select printer_options[1], from: "printer_name_top"
+          expect(page).to have_select("printer_name_bottom", selected: printer_options[1])
+        end
       end
     end
 
     context "when choosing from the bottom dropdown" do
       it "mirrors the option to the top dropdown" do
         expect(page).to have_select("printer_name_bottom", selected: printer_options[0])
-        select printer_options[1], from: "printer_name_bottom"
-        wait_for_ajax
-        expect(page).to have_select("printer_name_top", selected: printer_options[1])
+        page.document.synchronize do
+          select printer_options[1], from: "printer_name_bottom"
+          expect(page).to have_select("printer_name_top", selected: printer_options[1])
+        end
       end
     end
 
     context "when clicking the top print button" do
       it "prints to the selected printer" do
         check('completed_submission_ids_')
-        select printer_options[1], from: "printer_name_bottom"
-        wait_for_ajax
-        click_button("print_button_top")
-        expect(page).to have_content("Print issued to #{printer_names[1]}")
+        page.document.synchronize do
+          select printer_options[1], from: "printer_name_bottom"
+          click_button("print_button_top")
+          expect(page).to have_content("Print issued to #{printer_names[1]}")
+        end
       end
     end
 
     context "when clicking the bottom print button" do
       it "prints to the selected printer" do
         check('completed_submission_ids_')
-        select printer_options[1], from: "printer_name_top"
-        wait_for_ajax
-        click_button("print_button_bottom")
-        expect(page).to have_content("Print issued to #{printer_names[1]}")
+        page.document.synchronize do
+          select printer_options[1], from: "printer_name_top"
+          click_button("print_button_bottom")
+          expect(page).to have_content("Print issued to #{printer_names[1]}")
+        end
       end
     end
 
