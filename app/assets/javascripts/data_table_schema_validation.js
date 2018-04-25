@@ -91,7 +91,7 @@
           node: hmdmcField.node,
           name: hmdmcField.name,
           value: hmdmcField.value
-        });      
+        });
     } else {
       // If it is not valid, we display the error sent back from the server
       this.validationError(hmdmcField.node, hmdmcField.name, hmdmcResponseJson.error_message || 'Unspecified HDMMC problem');
@@ -120,7 +120,7 @@
         } else {
           // We need to check the HMDMC number and store the result
           return $.ajax({
-            url: "/submission/hmdmc",
+            url: "/reception/hmdmc",
             method: "GET",
             data: { hmdmc: hmdmcField.value.replace("/", "_") },
             success: $.proxy(this.hmdmcAjaxSuccess, this, hmdmcField)
