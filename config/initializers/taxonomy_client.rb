@@ -10,10 +10,6 @@ Rails.application.config.after_initialize do
 
     # Enable HTTP cache
     connection.use Faraday::HttpCache, store: Rails.cache
-
-    if !Rails.env.development?
-      connection.use ZipkinTracer::FaradayHandler, "Taxonomy Service"
-    end
   end
 
   # Use Sanger proxy everywhere except local 'development'
