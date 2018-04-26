@@ -12,7 +12,7 @@ Rails.application.config.after_initialize do
   end
 
   # Use Sanger proxy everywhere except local 'development' and new OpenStack 'wip' environment
-  if !(Rails.env.development? || !Rails.env.wip?)
+  if !(Rails.env.development? || Rails.env.wip?)
     TaxonomyClient::Taxonomy.connection.faraday.proxy = Rails.configuration.aker_deployment_default_proxy
   end
 end
