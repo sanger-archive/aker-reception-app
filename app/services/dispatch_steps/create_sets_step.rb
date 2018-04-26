@@ -8,12 +8,14 @@ module DispatchSteps
     def up
       unless @material_submission.set_id
         set = SetClient::Set.create(name: "Submission #{@material_submission.id}")
+        puts "Set created"
         @material_submission.update_attributes(set_id: set.id)
 
         # Adding materials to set
         # set_materials takes an array of uuids
         uuids = @material_submission.labwares.flat_map { |lw| lw.contents.values }.flat_map { |c| c['id'] }
-
+        puts "******** Set: #{set}\n"
+        puts "******** UUIDs: #{uuids}\n"
         set.set_materials(uuids)
 
         # IMPORTANT!!
