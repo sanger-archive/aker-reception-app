@@ -5,7 +5,7 @@ class MaterialReceptionsController < ApplicationController
   before_action :check_ssr_membership, except: :pending_receptions
 
   def index
-    @material_receptions = MaterialReception.all.sort_by(&:id).reverse
+    @material_receptions = MaterialReception.order(created_at: :desc)
     @material_reception = MaterialReception.new
   end
 
