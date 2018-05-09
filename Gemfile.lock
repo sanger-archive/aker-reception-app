@@ -32,6 +32,12 @@ GIT
     aker-set-client (0.2.1)
 
 GIT
+  remote: https://github.com/sanger/aker-shared-navbar.git
+  revision: 3311f7fc9f0920300614b6a77ab64cdf9b6ab5a2
+  specs:
+    aker_shared_navbar (0.1.3)
+
+GIT
   remote: https://github.com/sanger/aker-stamp-client.git
   revision: dc52d4417249b38293b7a2ab4901a84ee4fc34af
   specs:
@@ -72,11 +78,6 @@ GIT
   specs:
     pmb-client (0.1.0)
       json_api_client (~> 1.1)
-
-PATH
-  remote: ../aker-navbar-gem
-  specs:
-    aker_shared_navbar (0.1.3)
 
 GEM
   remote: https://rubygems.org/
