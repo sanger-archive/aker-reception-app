@@ -77,6 +77,7 @@ group :development do
 end
 
 group :test do
+  gem "chromedriver-helper"
   gem 'rspec-json_expectations'
   gem 'rubycritic'
   gem 'simplecov', require: false # Code coverage for Ruby 1.9+
