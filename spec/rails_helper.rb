@@ -66,6 +66,27 @@ RSpec.configure do |config|
 
   config.include WaitForAjax
 
+  Capybara.register_driver :poltergeist_debug do |app|
+    Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
+  end
+
+  Capybara.register_driver :chrome do |app|
+    Capybara::Selenium::Driver.new(app, browser: :chrome)
+  end
+
+  Capybara.register_driver :headless_chrome do |app|
+    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+      chromeOptions: { args: %w(headless disable-gpu) }
+    )
+
+    Capybara::Selenium::Driver.new app,
+      browser: :chrome,
+      desired_capabilities: capabilities
+  end
+
+  Capybara.javascript_driver = :headless_chrome
+  
+
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
   end
@@ -91,25 +112,6 @@ RSpec.configure do |config|
   end
 end
 
-Capybara.register_driver :poltergeist_debug do |app|
-  Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
-end
-
-Capybara.register_driver :chrome do |app|
-  Capybara::Selenium::Driver.new(app, browser: :chrome)
-end
-
-Capybara.register_driver :headless_chrome do |app|
-  capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
-    chromeOptions: { args: %w(headless disable-gpu) }
-  )
-
-  Capybara::Selenium::Driver.new app,
-    browser: :chrome,
-    desired_capabilities: capabilities
-end
-
-Capybara.javascript_driver = :headless_chrome
 
 
 WebMock.disable_net_connect!(:allow_localhost => true)
