@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'ostruct'
 
 RSpec.feature 'AwaitingBarcodes', type: :feature do
-  describe "when visiting the 'Submissions Awaiting Receipt' page" do
+  describe "when visiting the 'Manifests Awaiting Receipt' page" do
     let(:user) { OpenStruct.new(email: 'user@sanger.ac.uk', groups: ['world, pirates']) }
 
     before do
