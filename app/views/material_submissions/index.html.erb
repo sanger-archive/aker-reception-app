@@ -1,22 +1,30 @@
 <% content_for :main_title do %>
-  Material Submission
+  My Manifests
 <% end %>
 <% content_for :title_button do %>
-  <%= link_to 'Create New Submission', new_material_submission_path,
+  <%= link_to 'Create New Manifest', new_material_submission_path,
         class: 'btn btn-success pull-right',
         style: "margin-top: 23px" %>
 <% end %>
 
 <div class="row">
   <div class="col-md-12">
-    <h2>Incomplete Submissions</h2>
-    <%= render "material_submission_table", material_submissions: @pending_material_submissions %>
+    <h4>Incomplete Manifests</h4>
+    <% if @pending_material_submissions.length == 0 %>
+      <p>You don't have any incomplete manifests.</p>
+    <% else %>
+      <%= render "material_submission_table", material_submissions: @pending_material_submissions %>
+    <% end %>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-12">
-    <h2>Completed Submissions</h2>
-    <%= render "material_submission_table", material_submissions: @active_material_submissions %>
+    <h4>Submitted Manifests <small>Awaiting processing by Sample Management</small></h4>
+    <% if @active_material_submissions.length == 0 %>
+      <p>None of your submitted manifests are awaiting processing.</p>
+    <% else %>
+      <%= render "material_submission_table", material_submissions: @active_material_submissions %>
+    <% end %>
   </div>
 </div>

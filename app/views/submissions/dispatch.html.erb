@@ -3,31 +3,20 @@
 <%= bootstrap_form_for material_submission, url: wizard_path, method: :put  do |f| %>
 
   <div class="row">
-
-    <div class="col-md-6 col-xs-12">
-      <h2>Dispatch request #<%= material_submission.id %></h2>
-
-      <p><%= pluralize(material_submission.no_of_labwares_required, 'barcode') %> will be printed and dispatched to you in the next 5 working days. A copy of the material manifest will be mailed to your email address.</p>
-
-    </div>
-
-    <div class="col-md-6 col-xs-12">
-      <h2>Sanger Sample Guardian</h2>
-
-      <p>The following contact will be notified when the materials arrive at Sanger Institute:</p>
-
+    <div class="col-md-12 col-xs-12">
+      <h1>Submission <%= material_submission.id %></h1>
+      <p><%= pluralize(material_submission.no_of_labwares_required, 'barcode') %> will be printed and dispatched to you in the next 5 working days. A copy of the material manifest will be sent to your email address.</p>
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-6 col-xs-12">
-      <%= f.text_area :address, label: "Address to send barcodes (and any required labware) to:", placeholder: "Recipient Name and Address", control_class: 'form-control halvsies', style: 'resize: none; width: 100%;' %>
+      <h4>Address<span style="color: red">*</span></h4>
+      <%= f.text_area :address, label: "Barcodes and any requested labware will be sent here", placeholder: "Recipient Name and Address", control_class: 'form-control halvsies', style: 'resize: none; width: 100%;' %>
     </div>
-
     <div class="col-md-6 col-xs-12">
-        <%= f.collection_select :contact_id, (ContactGroup.all_contacts.sort_by &:fullname), :id, :fullname_and_email, { label: "Sanger Sample Guardian" }, { class: "form-control contact" } %>
-        <div><b>Your submission is</b></div>
-       <span><h1>Submission <%= material_submission.id %></h1></span>
+      <h4>Sanger Sample Guardian<span style="color: red">*</span></h4>
+      <%= f.collection_select :contact_id, (ContactGroup.all_contacts.sort_by &:fullname), :id, :fullname_and_email, { label: "The following contact will be notified when the materials arrive at Sanger Institute:", include_blank: true }, { class: "form-control contact" } %>
     </div>
   </div>
 
