@@ -41,12 +41,12 @@ class SubmissionsController < ApplicationController
     end
 
     unless @status_success
-      return error_render 'The material submission could not be updated.'
+      return error_render 'The manifest could not be updated.'
     end
 
     if last_step?
       if material_submission.status!='dispatch'
-        return error_render "Submission not ready: please check previous steps"
+        return error_render "Manifest not ready: please check previous steps"
       end
       unless material_submission.ethical?
         return error_render "Please go back and check the ethics step before proceeding."
