@@ -216,7 +216,7 @@ RSpec.describe SubmissionsController, type: :controller do
         put :update, step_params(material_submission, :dispatch)
         material_submission.reload
 
-        expect(flash[:notice]).to match('Your submission has been created')
+        expect(flash[:notice]).to match('Your manifest has been created')
         expect(material_submission.status).to eq('active')
       end
 

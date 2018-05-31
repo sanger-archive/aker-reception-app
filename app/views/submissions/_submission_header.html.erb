@@ -1,13 +1,11 @@
 <% content_for :main_title do %>
-  Material Submission
+  Create Manifest
 <% end %>
 
 <div class="row">
   <div class="col-md-12">
     <p style="padding: 15px; margin: 15px 0" class="bg-info">
-      Please read submission guidance before submitting your material.
-      <br /><br />
-      <%= link_to "Submission guidance (vx.x)", "#" %>
+      Please read <%= link_to "submission guidance (vx.x)", "#" %> before submitting your material.
     </p>
   </div>
 </div>
@@ -16,7 +14,7 @@
   <div class="col-md-12">
     <%= render "error_messages", target: material_submission %>
     <div id="warning-messages" class="alert alert-warning hidden" role="alert">
-    </div>    
+    </div>
   </div>
 </div>
 

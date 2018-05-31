@@ -75,7 +75,7 @@ class SubmissionsController < ApplicationController
       end
 
       if success
-        flash[:notice] = 'Your submission has been created'
+        flash[:notice] = 'Your manifest has been created'
       elsif cleanup
         flash[:error] = "The submission could not be created"
       else
