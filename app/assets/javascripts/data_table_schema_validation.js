@@ -120,7 +120,7 @@
         } else {
           // We need to check the HMDMC number and store the result
           return $.ajax({
-            url: "/reception/hmdmc",
+            url: "/submission/hmdmc",
             method: "GET",
             data: { hmdmc: hmdmcField.value.replace("/", "_") },
             success: $.proxy(this.hmdmcAjaxSuccess, this, hmdmcField)
