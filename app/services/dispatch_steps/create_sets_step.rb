@@ -7,7 +7,7 @@ module DispatchSteps
     # If you're trying to be safe, you need to make sure errors from this method are caught.
     def up
       unless @material_submission.set_id
-        set = SetClient::Set.create(name: "Submission #{@material_submission.id}")
+        set = SetClient::Set.create(name: "Manifest #{@material_submission.id}")
         @material_submission.update_attributes(set_id: set.id)
 
         # Adding materials to set

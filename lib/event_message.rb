@@ -54,7 +54,7 @@ class EventMessage
         {
           "role_type": 'submission',
           "subject_type": 'submission',
-          "subject_friendly_name": "Submission #{@submission.id}",
+          "subject_friendly_name": "Manifest #{@submission.id}",
           "subject_uuid": @submission.material_submission_uuid
         }
       ],
@@ -83,7 +83,7 @@ class EventMessage
         {
           "role_type": 'submission',
           "subject_type": 'submission',
-          "subject_friendly_name": "Submission #{submission.id}",
+          "subject_friendly_name": "Manifest #{submission.id}",
           "subject_uuid": submission.material_submission_uuid
         }
       ],
