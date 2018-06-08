@@ -1,6 +1,5 @@
 require 'rails_helper'
 require 'support/stub_helper'
-require 'support/wait_for_ajax'
 
 RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
   include StubHelper
@@ -70,9 +69,9 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           visit material_submission_build_path(material_submission_id: matsub.id, id: 'provenance')
         end
         context 'when writing a taxonomy id in a single input' do
-          it 'uses the taxonomy service and searches for the id provided', js: true  do
+          it 'uses the taxonomy service and searches for the id provided'  do
             fill_in('labware[1]address[A:1]fieldName[taxon_id]', with: '3')
-            wait_for_ajax
+
             expect(page).to have_selector(".has-success")
             expect(find_by_id('labware[1]address[A:1]fieldName[scientific_name]').value.length>0).to eq(true)
           end
@@ -96,7 +95,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
               fill_in("labware[1]address[B:#{i+1}]fieldName[donor_id]", with: '4')
               fill_in("labware[1]address[B:#{i+1}]fieldName[gender]", with: 'female')
               fill_in("labware[1]address[B:#{i+1}]fieldName[phenotype]", with: '4')
-              wait_for_ajax
+
               within(first('form > .row > .col-md-12')) { click_on('Next') }
               expect(page).not_to have_selector(".has-error")
             end

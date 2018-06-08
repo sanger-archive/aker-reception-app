@@ -9,6 +9,7 @@ require 'rspec/rails'
 require 'capybara/rails'
 require 'capybara/rspec'
 require 'capybara/poltergeist'
+require 'selenium-webdriver'
 
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -59,17 +60,32 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 
-  Capybara.register_driver :poltergeist_debug do |app|
-    Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
-  end
-
-  Capybara.javascript_driver = :poltergeist_debug
-
   config.include Capybara::DSL
 
   config.include FactoryBot::Syntax::Methods
 
   config.include WaitForAjax
+
+  Capybara.register_driver :poltergeist_debug do |app|
+    Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
+  end
+
+  Capybara.register_driver :chrome do |app|
+    Capybara::Selenium::Driver.new(app, browser: :chrome)
+  end
+
+  Capybara.register_driver :headless_chrome do |app|
+    capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
+      chromeOptions: { args: %w(headless disable-gpu) }
+    )
+
+    Capybara::Selenium::Driver.new app,
+      browser: :chrome,
+      desired_capabilities: capabilities
+  end
+
+  Capybara.javascript_driver = :headless_chrome
+  
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
@@ -95,5 +111,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 end
+
+
 
 WebMock.disable_net_connect!(:allow_localhost => true)
