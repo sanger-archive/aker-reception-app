@@ -1,2 +1,6 @@
 language: ruby
 cache: bundler
+services:
+  - postgresql
+before_script:
+  - psql -c 'create database submission_service_test;' -U postgres
