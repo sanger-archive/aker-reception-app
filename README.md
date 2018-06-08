@@ -1,4 +1,6 @@
-# Aker - Submission GUI
+# Aker - Reception app
+
+[![Build Status](https://travis-ci.org/sanger/aker-reception-app.svg?branch=devel)](https://travis-ci.org/sanger/aker-reception-app)
 
 An application for enabling provenance and receipt of Biomaterial.
 

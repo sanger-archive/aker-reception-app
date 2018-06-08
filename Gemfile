@@ -19,11 +19,15 @@ gem 'faraday-http-cache'
 gem 'font-awesome-sass'
 gem 'jbuilder', '~> 2.5' # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jquery-rails' # Use jquery as the JavaScript library
+gem 'lograge'
+gem 'logstash-event'
+gem 'logstash-logger'
 gem 'net-ldap' # Pure Ruby LDAP library. Read more: https://github.com/ruby-ldap/ruby-net-ldap
 gem 'pg', '~> 0.18' # pg version 1.0.0 is not compatible with Rails 5.1.4
 gem 'pry'
 gem 'puma', '~> 3.0' # Use Puma as the app server
 gem 'rails', '~> 5.0.0', '>= 5.0.0.1'
+gem 'request_store'
 gem 'sass-rails', '~> 5.0' # Use SCSS for stylesheets
 gem 'select2-rails'
 gem 'therubyracer', platforms: :ruby # See https://github.com/rails/execjs#readme for more runtimes
@@ -32,10 +36,6 @@ gem 'uglifier', '~> 3.2' # Use Uglifier as compressor for JavaScript assets
 gem 'uuid'
 gem 'wicked'
 gem 'zipkin-tracer'
-gem 'lograge'
-gem 'logstash-event'
-gem 'logstash-logger'
-gem 'request_store'
 
 ###
 # Sanger gems
@@ -77,6 +77,7 @@ group :development do
 end
 
 group :test do
+  gem 'rake'
   gem 'rspec-json_expectations'
   gem 'rubycritic'
   gem 'simplecov', require: false # Code coverage for Ruby 1.9+

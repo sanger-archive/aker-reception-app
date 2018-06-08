@@ -1,0 +1,8 @@
+language: ruby
+git:
+  depth: false
+cache: bundler
+services:
+  - postgresql
+before_script:
+  - psql -c 'create database reception_app_test;' -U postgres
