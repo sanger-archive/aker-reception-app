@@ -477,6 +477,7 @@ DEPENDENCIES
   pry-rails (~> 0.3.6)
   puma (~> 3.0)
   rails (~> 5.0.0, >= 5.0.0.1)
+  rake
   request_store
   rspec-json_expectations
   rspec-rails (~> 3.4)
