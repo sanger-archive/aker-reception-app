@@ -1,4 +1,4 @@
-# Aker - Receptions app
+# Aker - Reception app
 
 [![Build Status](https://travis-ci.org/sanger/aker-reception-app.svg?branch=devel)](https://travis-ci.org/sanger/aker-reception-app)
 
