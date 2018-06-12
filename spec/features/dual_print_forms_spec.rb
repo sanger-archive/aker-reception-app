@@ -19,6 +19,7 @@ RSpec.feature "DualPrintForms", type: :feature do
       allow_any_instance_of(JWTCredentials).to receive(:check_credentials)
       allow_any_instance_of(JWTCredentials).to receive(:current_user).and_return(user)
       visit completed_submissions_path
+      expect(page).to have_content("Submissions")
     end
 
     context "when the page is loaded" do
@@ -34,40 +35,40 @@ RSpec.feature "DualPrintForms", type: :feature do
     end
 
     context "when choosing from the top dropdown" do
-      xit "mirrors the option to the bottom dropdown" do
+      it "mirrors the option to the bottom dropdown" do
         expect(page).to have_select("printer_name_top", selected: printer_options[0])
+        
         select printer_options[1], from: "printer_name_top"
-        wait_for_ajax
-        expect(page).to have_select("printer_name_bottom", selected: printer_options[1], wait: 5)
+        expect(page).to have_select("printer_name_bottom", selected: printer_options[1], wait: 10)
       end
     end
 
     context "when choosing from the bottom dropdown" do
-      xit "mirrors the option to the top dropdown" do
+      it "mirrors the option to the top dropdown" do
         expect(page).to have_select("printer_name_bottom", selected: printer_options[0])
+        
         select printer_options[1], from: "printer_name_bottom"
-        wait_for_ajax
-        expect(page).to have_select("printer_name_top", selected: printer_options[1], wait: 5)
+        expect(page).to have_select("printer_name_top", selected: printer_options[1], wait: 10)
       end
     end
 
     context "when clicking the top print button" do
-      xit "prints to the selected printer" do
+      it "prints to the selected printer" do
         check('completed_submission_ids_')
+        
         select printer_options[1], from: "printer_name_bottom"
-        wait_for_ajax
         click_button("print_button_top")
-        expect(page).to have_content("Print issued to #{printer_names[1]}", wait: 5)
+        expect(page).to have_content("Print issued to #{printer_names[1]}", wait: 10)
       end
     end
 
     context "when clicking the bottom print button" do
-      xit "prints to the selected printer" do
+      it "prints to the selected printer" do
         check('completed_submission_ids_')
+        
         select printer_options[1], from: "printer_name_top"
-        wait_for_ajax
         click_button("print_button_bottom")
-        expect(page).to have_content("Print issued to #{printer_names[1]}", wait: 5)
+        expect(page).to have_content("Print issued to #{printer_names[1]}", wait: 10)
       end
     end
 
