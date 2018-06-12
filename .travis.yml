@@ -5,7 +5,7 @@ git:
 cache: bundler
 env:
   global:
-    - CC_TEST_REPORTER_ID=b07859ceb064fed550f1ce8eb913053ad9b99271a9a0837bf94491262516214e
+    - CC_TEST_REPORTER_ID=71b495d9f5d19cba66a3d80a3934f7306e12ede5c137809034040c991a8045c6
 services:
   - postgresql
 install:
