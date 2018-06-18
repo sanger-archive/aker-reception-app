@@ -17,7 +17,7 @@ Rails:
 Metrics/LineLength:
   Max: 99
 
-Style/BlockLength:
+Metrics/BlockLength:
   Exclude:
     # - 'Rakefile'
     # - '**/*.rake'
