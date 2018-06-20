@@ -6,23 +6,6 @@
     this.attachHandlers();
   }
 
-  function displayError(msg) {
-    const PAGE_ERROR_ALERT_ID = "#page-error-alert";
-    $(PAGE_ERROR_ALERT_ID).html(msg);
-    $(PAGE_ERROR_ALERT_ID).toggleClass('invisible', false);
-    $(PAGE_ERROR_ALERT_ID).toggleClass('hidden', false);
-  }
-
-  function csvErrorToText(list) {
-    var nodes = [];
-    for (var i=0; i<list.length; i++) {
-      var li = document.createElement('li')
-      $(li).html(["<b>", list[i].code, "</b>:", list[i].row ? "At row " + list[i].row : '', list[i].message].join(' '));
-      nodes.push(li);
-    }
-    return nodes;
-  }
-
   var proto = LoadTable.prototype;
 
   proto.attachHandlers = function() {

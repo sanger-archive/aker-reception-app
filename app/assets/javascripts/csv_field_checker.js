@@ -22,6 +22,23 @@ var requiredFields = [];
 var file = null;
 var dataTable = null;
 
+function displayError(msg) {
+  const PAGE_ERROR_ALERT_ID = "#page-error-alert";
+  $(PAGE_ERROR_ALERT_ID).html(msg);
+  $(PAGE_ERROR_ALERT_ID).toggleClass('invisible', false);
+  $(PAGE_ERROR_ALERT_ID).toggleClass('hidden', false);
+}
+
+function csvErrorToText(list) {
+  var nodes = [];
+  for (var i=0; i<list.length; i++) {
+    var li = document.createElement('li')
+    $(li).html(["<b>", list[i].code, "</b>:", list[i].row ? "At row " + list[i].row : '', list[i].message].join(' '));
+    nodes.push(li);
+  }
+  return nodes;
+}
+
 // Checks the header fields from the CSV against the fields required for the material service
 // TODO: refactor into class
 function checkCSVFields(table, files) {
@@ -284,6 +301,11 @@ function fillInTableFromFile() {
 
       // Write each row to the datatable
       results.data.every(function(row, index) {
+        if (Object.values(row).every(function(val) { 
+          return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13))); 
+        })) {
+          return true;
+        }
         var wellPosition = row[matchedFields.position];
 
         // No position, throw error
@@ -304,11 +326,16 @@ function fillInTableFromFile() {
             // A-1 format
             wellPosition = wellPosition.split('')
             wellPosition.splice(1, 1, ':')
+          } else if (/^([a-zA-Z]([0-9]+))$/.test(wellPosition)) {
+            // A-1 format
+            wellPosition = wellPosition.split('')
+            wellPosition.splice(1, 1, ':')            
           } else {
             displayError('This manifest does not have a valid position field for the wells of row: ' + index);
             return false;
           }
           wellPosition = wellPosition.join('')
+          wellPosition = wellPosition.replace(/:0/, ':')
           // Data is now in the correct format, so get the row
           tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable)
         }
