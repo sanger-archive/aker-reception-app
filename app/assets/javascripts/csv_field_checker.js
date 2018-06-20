@@ -326,10 +326,6 @@ function fillInTableFromFile() {
             // A-1 format
             wellPosition = wellPosition.split('')
             wellPosition.splice(1, 1, ':')
-          } else if (/^([a-zA-Z]([0-9]+))$/.test(wellPosition)) {
-            // A-1 format
-            wellPosition = wellPosition.split('')
-            wellPosition.splice(1, 1, ':')            
           } else {
             displayError('This manifest does not have a valid position field for the wells of row: ' + index);
             return false;
