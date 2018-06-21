@@ -209,6 +209,8 @@ GEM
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     hashdiff (0.3.7)
+    health_check (3.0.0)
+      railties (>= 5.0)
     i18n (1.0.1)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
@@ -460,6 +462,7 @@ DEPENDENCIES
   factory_bot_rails (~> 4.8)
   faraday-http-cache
   font-awesome-sass
+  health_check
   jbuilder (~> 2.5)
   jquery-rails
   json_api_client!

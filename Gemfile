@@ -36,6 +36,7 @@ gem 'uglifier', '~> 3.2' # Use Uglifier as compressor for JavaScript assets
 gem 'uuid'
 gem 'wicked'
 gem 'zipkin-tracer'
+gem 'health_check'
 
 ###
 # Sanger gems
