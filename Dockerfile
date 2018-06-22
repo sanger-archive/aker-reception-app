@@ -1,5 +1,4 @@
-# aker-submission
-# Use ruby 2.3.1
+# aker-reception-app
 FROM ruby:2.3.1
 
 # Update package list and install required packages
