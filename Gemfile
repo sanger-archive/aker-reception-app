@@ -36,6 +36,7 @@ gem 'therubyracer', platforms: :ruby # See https://github.com/rails/execjs#readm
 gem 'turbolinks', '~> 5' # Turbolinks makes navigating your web application faster
 gem 'uglifier', '~> 3.2' # Use Uglifier as compressor for JavaScript assets
 gem 'uuid'
+gem 'webpacker', '~> 3.5', '>= 3.5.3'
 gem 'wicked'
 
 ###
