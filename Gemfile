@@ -11,6 +11,7 @@ end
 # All the gems not in a group will always be installed:
 #   http://bundler.io/v1.6/groups.html#grouping-your-dependencies
 gem 'activeresource', '~> 5.0' # Wrap your RESTful web app with Ruby classes
+gem 'bootsnap', '~> 1.3'
 gem 'bootstrap-table-rails'
 gem 'bootstrap_form'
 gem 'bunny', '~> 2.9', '>= 2.9.2', require: false
