@@ -9,12 +9,13 @@ Bundler.require(*Rails.groups)
 module Submission
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.1
+    config.load_defaults 5.2
+
+    # Application configuration can go into files in config/initializers
+    # -- all .rb files in that directory are automatically loaded after loading
+    # the framework and any gems in your application.
 
     # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration should go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded.
-
     config.generators do |g|
       g.test_framework :rspec,
                        fixtures: true,
@@ -27,7 +28,6 @@ module Submission
       g.fixture_replacement :factory_bot, dir: 'spec/factories'
 
       g.assets false
-
     end
 
     config.ldap = config_for(:ldap)
