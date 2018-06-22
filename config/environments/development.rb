@@ -92,7 +92,7 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'localhost',
                                                script_name: config.relative_url_root,
                                                only_path: false,
-                                               port: Rails::Server.new.options[:Port] }
+                                               port: Rack::Server.new.options[:Port] }
 
   config.default_jwt_user = { email: ENV.fetch('USER', 'user') + '@sanger.ac.uk',
                               groups: ['world'] }
