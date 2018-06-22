@@ -27,7 +27,7 @@ gem 'net-ldap' # Pure Ruby LDAP library. Read more: https://github.com/ruby-ldap
 gem 'pg', '~> 0.18' # pg version 1.0.0 is not compatible with Rails 5.1.4
 gem 'pry'
 gem 'puma', '~> 3.0' # Use Puma as the app server
-gem 'rails', '~> 5.1.0'
+gem 'rails', '~> 5.2.0'
 gem 'request_store'
 gem 'sass-rails', '~> 5.0' # Use SCSS for stylesheets
 gem 'select2-rails'
