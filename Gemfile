@@ -17,6 +17,7 @@ gem 'bunny', '~> 2.9', '>= 2.9.2', require: false
 gem 'coffee-rails', '~> 4.2' # Use CoffeeScript for .coffee assets and views
 gem 'faraday-http-cache'
 gem 'font-awesome-sass'
+gem 'health_check'
 gem 'jbuilder', '~> 2.5' # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jquery-rails' # Use jquery as the JavaScript library
 gem 'lograge'
@@ -26,7 +27,7 @@ gem 'net-ldap' # Pure Ruby LDAP library. Read more: https://github.com/ruby-ldap
 gem 'pg', '~> 0.18' # pg version 1.0.0 is not compatible with Rails 5.1.4
 gem 'pry'
 gem 'puma', '~> 3.0' # Use Puma as the app server
-gem 'rails', '~> 5.0.0', '>= 5.0.0.1'
+gem 'rails', '~> 5.1.0'
 gem 'request_store'
 gem 'sass-rails', '~> 5.0' # Use SCSS for stylesheets
 gem 'select2-rails'
@@ -35,8 +36,6 @@ gem 'turbolinks', '~> 5' # Turbolinks makes navigating your web application fast
 gem 'uglifier', '~> 3.2' # Use Uglifier as compressor for JavaScript assets
 gem 'uuid'
 gem 'wicked'
-gem 'zipkin-tracer'
-gem 'health_check'
 
 ###
 # Sanger gems
@@ -45,8 +44,8 @@ gem 'aker_credentials_gem', github: 'sanger/aker-credentials'
 gem 'aker_permission_gem', github: 'sanger/aker-permission'
 gem 'aker-set-client', github: 'sanger/aker-set-client'
 gem 'aker_stamp_client', github: 'sanger/aker-stamp-client'
-gem 'aker-taxonomy-client', github: 'sanger/aker-taxonomy-client'
 gem 'aker_shared_navbar', github: 'sanger/aker-shared-navbar'
+gem 'aker-taxonomy-client', github: 'sanger/aker-taxonomy-client'
 gem 'bootstrap-sass', '~> 3.3.6', github: 'sanger/bootstrap-sass'
 gem 'json_api_client', github: 'sanger/json_api_client'
 gem 'matcon_client', github: 'sanger/aker-matcon-client'
