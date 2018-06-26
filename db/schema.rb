@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180315143014) do
+ActiveRecord::Schema.define(version: 2018_03_15_143014) do
 
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
   enable_extension "citext"
+  enable_extension "plpgsql"
 
   create_table "contact_groups", id: :serial, force: :cascade do |t|
     t.citext "name", null: false

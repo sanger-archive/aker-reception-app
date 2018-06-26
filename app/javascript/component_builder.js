@@ -58,7 +58,7 @@
 
     // This should be enough but...
     $(document).ready(function() {
-      $(window).load(function() {
+      $(window).on('load', function() {
         builderProcess();
       });
     });

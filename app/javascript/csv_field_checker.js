@@ -1,3 +1,5 @@
+window.CSVFieldChecker = {};
+
 const MODAL_ID = 'myModal';
 const FORM_FIELD_SELECT_ID = 'form-fields';
 const CSV_SELECT_ID = 'fields-from-csv';
@@ -22,14 +24,14 @@ var requiredFields = [];
 var file = null;
 var dataTable = null;
 
-function displayError(msg) {
+CSVFieldChecker.displayError = function(msg) {
   const PAGE_ERROR_ALERT_ID = "#page-error-alert";
   $(PAGE_ERROR_ALERT_ID).html(msg);
   $(PAGE_ERROR_ALERT_ID).toggleClass('invisible', false);
   $(PAGE_ERROR_ALERT_ID).toggleClass('hidden', false);
 }
 
-function csvErrorToText(list) {
+CSVFieldChecker.csvErrorToText = function(list) {
   var nodes = [];
   for (var i=0; i<list.length; i++) {
     var li = document.createElement('li')
@@ -301,8 +303,8 @@ function fillInTableFromFile() {
 
       // Write each row to the datatable
       results.data.every(function(row, index) {
-        if (Object.values(row).every(function(val) { 
-          return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13))); 
+        if (Object.values(row).every(function(val) {
+          return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13)));
         })) {
           return true;
         }

@@ -1,4 +1,5 @@
 (function($,undefined) {
+
   function LoadTable(node, params) {
     this.node = $(node)
     this.params = params;
@@ -9,7 +10,6 @@
   var proto = LoadTable.prototype;
 
   proto.attachHandlers = function() {
-
     var table = this.node.DataTable({
       paging: false,
       searching: false,
@@ -54,14 +54,13 @@
     $('input:file.upload-button').on('change', function() {
       var sample_table = $(this).closest('.well').siblings().find('table.dataTable');
 
-      checkCSVFields(sample_table, $(this)[0].files);
+      CSVFieldChecker.checkCSVFields(sample_table, $(this)[0].files);
 
       // Clearing the input allows the change event to fire again
       $(this).val(null);
     });
 
   }
-  
 
   $(document).ready(function() {
     $(document).trigger('registerComponent.builder', {'LoadTable': LoadTable});
