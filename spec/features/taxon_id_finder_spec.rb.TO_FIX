@@ -19,12 +19,12 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           'donor_id' => {'type': 'string', 'required' => true, 'friendly_name' => 'Donor Id', 'field_name_regex' => "^donor[-_\s]*(id)?$"},
           'gender' => {'type': 'string', 'required' => true, 'friendly_name' => 'Gender','field_name_regex' => "^gender$"},
           'phenotype' => {'type': 'string', 'required' => true, 'friendly_name' => 'Phenotype','field_name_regex' => "^phenotype$"},
-          'taxon_id' => {'type': 'string', 
+          'taxon_id' => {'type': 'string',
             'required' => true,
             'friendly_name' => "Tax Id",
             'field_name_regex' => "^tax[-_\s]*(id)?$",
           },
-          'scientific_name' => {'type': 'string', 
+          'scientific_name' => {'type': 'string',
             'required' => true,
             'field_name_regex' => "^scientific[-_\s]*(name)?$",
             'friendly_name' => "Scientific name"
@@ -41,7 +41,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
         matsub = create(:material_submission, #no_of_labwares_required: 1,
           supply_labwares: false,
           owner_email: user.email)
-        lt=create(:labware_type, 
+        lt=create(:labware_type,
               name: 'Some lt',
               description: 'lt',
               num_of_cols: 12,
@@ -72,6 +72,8 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
         context 'when writing a taxonomy id in a single input' do
           it 'uses the taxonomy service and searches for the id provided', js: true  do
             fill_in('labware[1]address[A:1]fieldName[taxon_id]', with: '3')
+            puts current_url
+            binding.pry
             wait_for_ajax
             expect(page).to have_selector(".has-success")
             expect(find_by_id('labware[1]address[A:1]fieldName[scientific_name]').value.length>0).to eq(true)
@@ -83,7 +85,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           context 'when writing a taxonomy id in different inputs' do
 
             it 'uses the taxonomy service and searches for the id provided once for each different tax id', js: true  do
-              
+
               i=0
               fill_in("labware[1]address[A:#{i+1}]fieldName[taxon_id]", with: '3')
               fill_in("labware[1]address[A:#{i+1}]fieldName[supplier_name]", with: '3')
@@ -100,7 +102,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
               within(first('form > .row > .col-md-12')) { click_on('Next') }
               expect(page).not_to have_selector(".has-error")
             end
-          end        
+          end
         end
       end
     end
