@@ -20,7 +20,6 @@ gem 'faraday-http-cache'
 gem 'font-awesome-sass'
 gem 'health_check'
 gem 'jbuilder', '~> 2.5' # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jquery-rails' # Use jquery as the JavaScript library
 gem 'lograge'
 gem 'logstash-event'
 gem 'logstash-logger'
