@@ -7,6 +7,10 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
+// [PJ] import the package for jquery-ujs to be initialized
+import $ from 'jquery'
+import {} from 'jquery-ujs'
+
 // we need to include bootstrap's JS for things like the modal: https://getbootstrap.com/docs/3.3/javascript/
 require( 'bootstrap/dist/js/bootstrap');
 
