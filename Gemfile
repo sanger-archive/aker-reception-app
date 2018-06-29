@@ -11,7 +11,7 @@ end
 # All the gems not in a group will always be installed:
 #   http://bundler.io/v1.6/groups.html#grouping-your-dependencies
 gem 'activeresource', '~> 5.0' # Wrap your RESTful web app with Ruby classes
-gem 'bootsnap', '~> 1.3'
+gem 'bootsnap', '~> 1.3', require: false # Reduces boot times through caching; required in config/boot.rb
 gem 'bootstrap-table-rails'
 gem 'bootstrap_form'
 gem 'bunny', '~> 2.9', '>= 2.9.2', require: false
@@ -58,13 +58,10 @@ gem 'pmb-client', '0.1.0', github: 'sanger/pmb-client'
 group :development, :test do
   gem 'brakeman', require: false
   gem 'byebug', platform: :mri
-  gem 'capybara'
   gem 'database_cleaner' # database_cleaner is not required, but highly recommended
   gem 'factory_bot_rails', '~> 4.8'
   gem 'launchy'
-  gem 'poltergeist'
   gem 'rspec-rails', '~> 3.4'
-  gem 'selenium-webdriver'
   gem 'webmock'
 end
 
@@ -78,9 +75,13 @@ group :development do
 end
 
 group :test do
+  gem 'capybara', '>= 2.15', '< 4.0'
+  gem 'chromedriver-helper'
+  gem 'poltergeist'
   gem 'rake'
   gem 'rspec-json_expectations'
   gem 'rubycritic'
+  gem 'selenium-webdriver'
   gem 'simplecov', require: false # Code coverage for Ruby 1.9+
   gem 'simplecov-rcov'
   gem 'timecop'
