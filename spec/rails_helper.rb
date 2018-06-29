@@ -69,8 +69,6 @@ RSpec.configure do |config|
 
   config.include FactoryBot::Syntax::Methods
 
-  config.include WaitForAjax
-
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
   end
