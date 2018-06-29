@@ -1,10 +1,10 @@
 require 'rails_helper'
 require 'support/stub_helper'
-require 'support/wait_for_ajax'
+# require 'support/wait_for_ajax'
 
 RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
   include StubHelper
-  include WaitForAjax
+  # include WaitForAjax
 
   describe 'TaxonomyIdControl' do
     let(:user) { OpenStruct.new(email: 'user@sanger.ac.uk', groups: ['world']) }
@@ -73,8 +73,8 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           it 'uses the taxonomy service and searches for the id provided', js: true  do
             fill_in('labware[1]address[A:1]fieldName[taxon_id]', with: '3')
             puts current_url
-            binding.pry
-            wait_for_ajax
+            # binding.pry
+            # wait_for_ajax
             expect(page).to have_selector(".has-success")
             expect(find_by_id('labware[1]address[A:1]fieldName[scientific_name]').value.length>0).to eq(true)
           end
@@ -98,7 +98,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
               fill_in("labware[1]address[B:#{i+1}]fieldName[donor_id]", with: '4')
               fill_in("labware[1]address[B:#{i+1}]fieldName[gender]", with: 'female')
               fill_in("labware[1]address[B:#{i+1}]fieldName[phenotype]", with: '4')
-              wait_for_ajax
+              # wait_for_ajax
               within(first('form > .row > .col-md-12')) { click_on('Next') }
               expect(page).not_to have_selector(".has-error")
             end

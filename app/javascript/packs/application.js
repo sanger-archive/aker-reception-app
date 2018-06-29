@@ -22,6 +22,7 @@ import dt from 'datatables.net';
 require('select2')
 require('csv_field_checker')
 require('component_builder')
+require('data_table_initialization')
 require('data_table_schema_validation')
 require('taxonomy_id_control')
 require('single_table_manager')

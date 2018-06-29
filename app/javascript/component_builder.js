@@ -58,9 +58,7 @@
 
     // This should be enough but...
     $(document).ready(function() {
-      $(window).on('load', function() {
-        builderProcess();
-      });
+      builderProcess();
     });
 
     // ... TurboLinks support
