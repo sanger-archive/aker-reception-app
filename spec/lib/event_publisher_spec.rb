@@ -94,7 +94,7 @@ RSpec.describe 'EventPublisher' do
 
         ep = EventPublisher.new
         expect(@exchange).to receive(:publish).with('message',
-                                                    routing_key: 'aker.events.submission')
+                                                    routing_key: 'aker.events.manifest')
         ep.publish(@event_message)
       end
     end
@@ -109,7 +109,7 @@ RSpec.describe 'EventPublisher' do
 
         ep = EventPublisher.new
         expect(@exchange).to receive(:publish).with('message',
-                                                    routing_key: 'aker.events.submission')
+                                                    routing_key: 'aker.events.manifest')
         expect { ep.publish(@event_message) }.to raise_error(/unconfirmed/)
       end
     end
