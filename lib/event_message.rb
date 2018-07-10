@@ -7,7 +7,7 @@ class EventMessage
   attr_reader :submission
   attr_reader :reception
 
-  ROUTING_KEY = 'aker.events.submission'
+  ROUTING_KEY = 'aker.events.manifest'
 
   def initialize(params)
     @submission = params[:submission]
@@ -45,7 +45,7 @@ class EventMessage
   # generate the JSON message specific to a submission
   def generate_submission_json
     {
-      "event_type": 'aker.events.submission.created',
+      "event_type": 'aker.events.manifest.created',
       "lims_id": 'aker',
       "uuid": SecureRandom.uuid,
       "timestamp": Time.now.utc.iso8601,
@@ -59,7 +59,7 @@ class EventMessage
         }
       ],
       "metadata": {
-        "submission_id": @submission.id,
+        "manifest_id": @submission.id,
         "hmdmc": @submission.hmdmc_set.to_a,
         "confirmed_no_hmdmc": @submission.first_confirmed_no_hmdmc,
         "sample_custodian": @submission.contact.email,
@@ -74,7 +74,7 @@ class EventMessage
   def generate_reception_json
     submission = @reception.labware.material_submission
     {
-      "event_type": 'aker.events.submission.received',
+      "event_type": 'aker.events.manifest.received',
       "lims_id": 'aker',
       "uuid": SecureRandom.uuid,
       "timestamp": Time.now.utc.iso8601,
@@ -88,7 +88,7 @@ class EventMessage
         }
       ],
       "metadata": {
-        "submission_id": submission.id,
+        "manifest_id": submission.id,
         "barcode": @reception.barcode_value,
         "samples": @reception.labware.contents.length,
         "zipkin_trace_id": trace_id,
