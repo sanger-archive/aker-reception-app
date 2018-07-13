@@ -26,6 +26,7 @@
   proto.readInput = function(e) {
     if ((e.keyCode === 9) || (e.keyCode == 13)) {
       e.preventDefault();
+      this.inputReader[1].value = this.inputReader[1].value.trim();
       $(this.form).submit();
       $(this.inputReader).val('');
     }
