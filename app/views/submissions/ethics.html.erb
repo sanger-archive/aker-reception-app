@@ -1,19 +1,19 @@
 <%= render partial: 'submission_header' %>
 <%= bootstrap_form_tag url: wizard_path, method: :put  do |f| %>
+  <h5>When is an HMDMC number required?</h5>
   <p>
-    If you are using human material in research, you must either provide an HMDMC number or provide
-    consent that no HMDMC is required.
+    All human cell lines, except for commercially available cell lines, require
+    an HMDMC form.
+    Commercially available human cell lines are defined as human cells that have
+    been cultured and have divided outside the body, and have been purchased
+    from a recognised commercial supplier. In the case of commercially available
+    cell lines no HMDMC form is required.
+    This definition does not include, for example, cell lines obtained from a
+    collaborating academic institution.
   </p>
-
-  <p>Commercial cell line: no HMDMC required
-    <button type="button"
-            class="btn btn-link has-popover"
-            data-html="true"
-            data-toggle="popover"
-            title="What's this?"
-            data-content="<%= hmdmc_info %>">
-      <small>What's this?</small>
-    </button>
+  <p>
+    If you are using human material in research, you must either provide an
+    HMDMC number or provide consent that no HMDMC is required.
   </p>
 
   <%= f.check_box :confirm_hmdmc_not_required,
