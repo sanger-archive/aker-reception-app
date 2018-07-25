@@ -55,7 +55,7 @@ RSpec.describe :create_sets_step do
 
       it "should create a set" do
         expect(SetClient::Set).to have_received(:create).with(
-          name: "Submission #{@submission.id}"
+          name: "Manifest #{@submission.id}"
         )
         expect(@sets.length).to eq 1
       end

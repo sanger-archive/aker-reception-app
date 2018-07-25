@@ -103,11 +103,11 @@ Rails.application.configure do
   config.login_url = config.auth_service_url + '/login'
   config.logout_url = config.auth_service_url + '/logout'
 
-  config.urls = { submission: '',
+  config.urls = { reception: '',
                   permissions: '',
                   sets: '',
                   projects: '',
-                  work_orders: '' }
+                  work: '' }
 
   config.ssr_groups = %w[team252 world]
 end

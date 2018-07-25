@@ -34,10 +34,10 @@ class MaterialSubmissionsController < ApplicationController
     @material_submission = MaterialSubmission.find(params[:id])
 
     if @material_submission.pending? && @material_submission.destroy
-      flash[:notice] = "Submission Cancelled"
+      flash[:notice] = "Your manifest has been cancelled"
       redirect_to material_submissions_path
     else
-      flash[:error] = "Submission could not be cancelled"
+      flash[:error] = "Manifest could not be cancelled"
       redirect_to material_submission_build_path material_submission_id: @material_submission.id
     end
   end

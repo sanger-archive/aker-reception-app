@@ -1,0 +1,27 @@
+language: ruby
+git:
+  depth: false
+  submodules: false
+cache: bundler
+env:
+  global:
+    - CC_TEST_REPORTER_ID=71b495d9f5d19cba66a3d80a3934f7306e12ede5c137809034040c991a8045c6
+services:
+  - postgresql
+install:
+  - bundle install --jobs=3 --retry=3
+before_script:
+  - psql -c 'create database reception_app_test;' -U postgres
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+script:
+  - bundle exec rspec
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+branches:
+  only:
+  - devel
+  - wip
+  - uat
+  - master
