@@ -11,8 +11,9 @@ Rails.application.config.after_initialize do
     connection.use Faraday::HttpCache, store: Rails.cache
   end
 
-  # Use Sanger proxy everywhere except local 'development' and new OpenStack 'wip' environment
-  if !(Rails.env.development? || Rails.env.wip? || Rails.env.uat2?)
+  # Only use Sanger proxy when on system's infrastructure
+  # TODO: remove if production is on OpenStack
+  if Rails.env.production?
     TaxonomyClient::Taxonomy.connection.faraday.proxy = Rails.configuration.aker_deployment_default_proxy
   end
 end
