@@ -25,6 +25,10 @@ coverage
 
 # public assets folder
 /public/assets/**
+/public/packs*
+
+# node
+/node_modules
 
 .DS_Store
 /public/packs
