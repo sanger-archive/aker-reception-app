@@ -278,6 +278,7 @@ function fillInTableFromFile() {
     header: true,
     skipEmptyLines: true,
     complete: function(results) {
+      var accessionedPositions = [];
       debug("results from parse:");
       debug(results);
 
@@ -332,8 +333,17 @@ function fillInTableFromFile() {
           }
           wellPosition = wellPosition.join('')
           wellPosition = wellPosition.replace(/:0/, ':')
+
+
           // Data is now in the correct format, so get the row
           tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable)
+        }
+
+        if (accessionedPositions.indexOf(wellPosition)>=0) {
+          displayError('The position at '+wellPosition+' is duplicated in the uploaded manifest.')
+          return false
+        } else {
+          accessionedPositions.push(wellPosition);
         }
 
         // Check if human material without HMDMC is present, and warn if so
