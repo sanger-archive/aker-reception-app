@@ -7,22 +7,22 @@ RSpec.describe SchemaValidators::BiomaterialSchemaPropertyValidators::UniqueValu
 
   context 'self.is_applicable' do
 
-    context 'when the property \'unique\' is set to true' do
-      let(:prop_data) { { 'description': '', 'unique': true }.as_json }
+    context 'when the property \'unique_value\' is set to true' do
+      let(:prop_data) { { 'description': '', 'unique_value': true }.as_json }
 
       it 'is applicable' do
         expect(class_name.is_applicable?(prop_name, prop_data)).to eq(true)
       end
     end
-    context 'when the property \'unique\' is set to false' do
-      let(:prop_data) { { 'description': '', 'unique': false }.as_json }
+    context 'when the property \'unique_value\' is set to false' do
+      let(:prop_data) { { 'description': '', 'unique_value': false }.as_json }
 
       it 'is not applicable' do
         expect(class_name.is_applicable?(prop_name, prop_data)).to eq(false)
       end
     end
 
-    context 'when the property \'unique\' is not defined' do
+    context 'when the property \'unique_value\' is not defined' do
       let(:prop_data) { { 'description': '' }.as_json }
 
       it 'is not applicable' do
@@ -41,7 +41,7 @@ RSpec.describe SchemaValidators::BiomaterialSchemaPropertyValidators::UniqueValu
       allow(prop_validator).to receive(:add_error)
     end
 
-    let(:prop_data) { { 'description': '', 'unique': true }.as_json }
+    let(:prop_data) { { 'description': '', 'unique_value': true }.as_json }
     context 'when there are duplicate values in the same labware' do
       it 'returns true in the first validation (no dupicated found yet)' do
         expect(prop_validator.validate(1, 'A:1', bio_data)).to eq(true)

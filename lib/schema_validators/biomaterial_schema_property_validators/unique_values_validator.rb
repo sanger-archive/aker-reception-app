@@ -3,7 +3,7 @@ module SchemaValidators
     class UniqueValuesValidator < BiomaterialSchemaPropertyValidator
 
       def self.is_applicable?(property_name, property_data)
-        property_data['unique'] == true
+        property_data['unique_value'] == true
       end
 
       def validate(labware_index, address, bio_data)
