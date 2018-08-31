@@ -52,9 +52,9 @@ RSpec.describe SchemaValidators::BiomaterialSchemaPropertyValidators::UniqueValu
       end
     end
     context 'when there are duplicate values but they are not in the same labware' do
-      it 'returns true' do
+      it 'returns false' do
         expect(prop_validator.validate(1, 'A:1', bio_data)).to eq(true)
-        expect(prop_validator.validate(2, 'B:1', bio_data)).to eq(true)
+        expect(prop_validator.validate(2, 'B:1', bio_data)).to eq(false)
       end        
     end
     context 'when there are no duplicates' do
