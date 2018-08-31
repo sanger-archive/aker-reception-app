@@ -5,5 +5,6 @@ module SchemaValidators
     require_relative 'biomaterial_schema_property_validators/required_field_validator'
     require_relative 'biomaterial_schema_property_validators/taxon_id_validator'    
     require_relative 'biomaterial_schema_property_validators/hmdmc_validator'    
+    require_relative 'biomaterial_schema_property_validators/unique_values_validator'    
   end
 end
