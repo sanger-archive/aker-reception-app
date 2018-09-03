@@ -272,15 +272,31 @@ function finishCSVCheck() {
   }
 }
 
+function validateCorrectPositions(results) {
+  var accessionedPositions = [];
+  return results.data.every(function(row, index) {
+    var wellPosition = row[matchedFields.position];
+    if (accessionedPositions.indexOf(wellPosition)>=0) {
+      displayError('The position at '+wellPosition+' is duplicated in the uploaded manifest.');
+      return false;
+    } else {
+      accessionedPositions.push(wellPosition);
+    }
+    return true;
+  })    
+}
+
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile() {
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
     complete: function(results) {
-      var accessionedPositions = [];
       debug("results from parse:");
       debug(results);
+      if (!validateCorrectPositions(results)) {
+        return false;
+      }
 
       // Show any errors to the users
       if (results.errors.length > 0) {
@@ -339,12 +355,6 @@ function fillInTableFromFile() {
           tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable)
         }
 
-        if (accessionedPositions.indexOf(wellPosition)>=0) {
-          displayError('The position at '+wellPosition+' is duplicated in the uploaded manifest.')
-          return false
-        } else {
-          accessionedPositions.push(wellPosition);
-        }
 
         // Check if human material without HMDMC is present, and warn if so
         var taxon_id = (row[matchedFields['taxon_id']] || '').trim();
