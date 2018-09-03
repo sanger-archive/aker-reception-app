@@ -34,7 +34,9 @@ RSpec.describe :create_sets_step do
   def make_submission(set_id)
     labwares = [make_labware, make_labware]
     contact = double('contact', email: 'jeff')
-    @submission = double(:material_submission, id: 537, labwares: labwares, set_id: set_id, contact: contact)
+    owner = double('owner', email: 'contact@email')
+    @submission = double(:material_submission, id: 537, labwares: labwares, set_id: set_id, 
+      contact: contact, owner_email: owner.email)
     allow(@submission).to receive(:set_id=)
     allow(@submission).to receive(:update_attributes)
     @submission
@@ -73,7 +75,7 @@ RSpec.describe :create_sets_step do
       end
       it "should lock the set" do
         expect(@sets.first).to have_received(:update_attributes).with({
-          locked: true, owner_id: @submission.contact.email})
+          locked: true, owner_id: @submission.owner_email})
       end
     end
 
