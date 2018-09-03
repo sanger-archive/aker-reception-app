@@ -19,7 +19,7 @@ module DispatchSteps
         # IMPORTANT!!
         # A Set cannot be updated or removed anymore if you are not the owner of it, so
         # after giving an owner to the set, I won't be able to destroy it
-        set.update_attributes(locked: true, owner_id: @material_submission.contact.email)
+        set.update_attributes(locked: true, owner_id: @material_submission.owner_email)
       end
     end
 
