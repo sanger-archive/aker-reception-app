@@ -29,7 +29,7 @@ gem 'pry'
 gem 'puma', '~> 3.0' # Use Puma as the app server
 gem 'rails', '~> 5.2.0'
 gem 'request_store'
-gem 'sass-rails', '~> 5.0' # Use SCSS for stylesheets
+gem 'sassc-rails', '~> 1.3'
 gem 'select2-rails'
 gem 'therubyracer', platforms: :ruby # See https://github.com/rails/execjs#readme for more runtimes
 gem 'turbolinks', '~> 5' # Turbolinks makes navigating your web application faster
