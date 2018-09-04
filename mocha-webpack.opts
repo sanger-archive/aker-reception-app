@@ -1,0 +1,4 @@
+--colors
+--require babel-core/register
+--require jsdom-global/register
+--webpack-config config/webpack/test.js

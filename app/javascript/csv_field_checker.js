@@ -1,4 +1,4 @@
-window.CSVFieldChecker = {};
+CSVFieldChecker = {}
 
 const MODAL_ID = 'myModal';
 const FORM_FIELD_SELECT_ID = 'form-fields';
@@ -24,12 +24,14 @@ var requiredFields = [];
 var file = null;
 var dataTable = null;
 
-CSVFieldChecker.displayError = function(msg) {
+function displayError(msg) {
   const PAGE_ERROR_ALERT_ID = "#page-error-alert";
   $(PAGE_ERROR_ALERT_ID).html(msg);
   $(PAGE_ERROR_ALERT_ID).toggleClass('invisible', false);
   $(PAGE_ERROR_ALERT_ID).toggleClass('hidden', false);
 }
+
+CSVFieldChecker.displayError = displayError;
 
 CSVFieldChecker.csvErrorToText = function(list) {
   var nodes = [];
@@ -277,7 +279,7 @@ function finishCSVCheck() {
 function validateCorrectPositions(results) {
   var accessionedPositions = [];
   return results.data.every(function(row, index) {
-    var wellPosition = row[matchedFields.position];
+    var wellPosition = row[0];
     if (accessionedPositions.indexOf(wellPosition)>=0) {
       displayError('The position at '+wellPosition+' is duplicated in the uploaded manifest.');
       return false;
@@ -287,6 +289,8 @@ function validateCorrectPositions(results) {
     return true;
   })    
 }
+
+CSVFieldChecker.validateCorrectPositions = validateCorrectPositions;
 
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile() {
