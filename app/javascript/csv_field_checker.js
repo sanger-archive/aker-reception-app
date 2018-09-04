@@ -1,4 +1,3 @@
-CSVFieldChecker = {}
 
 const MODAL_ID = 'myModal';
 const FORM_FIELD_SELECT_ID = 'form-fields';
@@ -31,9 +30,7 @@ function displayError(msg) {
   $(PAGE_ERROR_ALERT_ID).toggleClass('hidden', false);
 }
 
-CSVFieldChecker.displayError = displayError;
-
-CSVFieldChecker.csvErrorToText = function(list) {
+function csvErrorToText(list) {
   var nodes = [];
   for (var i=0; i<list.length; i++) {
     var li = document.createElement('li')
@@ -276,10 +273,10 @@ function finishCSVCheck() {
   }
 }
 
-function validateCorrectPositions(results) {
+function validateCorrectPositions(results, positionField) {
   var accessionedPositions = [];
   return results.data.every(function(row, index) {
-    var wellPosition = row[0];
+    var wellPosition = row[positionField];
     if (accessionedPositions.indexOf(wellPosition)>=0) {
       displayError('The position at '+wellPosition+' is duplicated in the uploaded manifest.');
       return false;
@@ -290,8 +287,6 @@ function validateCorrectPositions(results) {
   })    
 }
 
-CSVFieldChecker.validateCorrectPositions = validateCorrectPositions;
-
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile() {
   Papa.parse(file, {
@@ -300,7 +295,7 @@ function fillInTableFromFile() {
     complete: function(results) {
       debug("results from parse:");
       debug(results);
-      if (!validateCorrectPositions(results)) {
+      if (!validateCorrectPositions(results, matchedFields.position)) {
         return false;
       }
 
@@ -315,9 +310,9 @@ function fillInTableFromFile() {
 
       // Clear the table from previous import
       $('#' + dataTable.attr('id') + ' > tbody > tr').each(function() {
-        $this = $(this);
+        var $this = $(this);
         $this.children().each (function(cell) {
-          $cell = $(this);
+          var $cell = $(this);
           $cell.find('input').val('');
         });
       });
@@ -424,3 +419,6 @@ function debug(toLog) {
 function getURLParameter(name) {
   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
+
+
+export { checkCSVFields, validateCorrectPositions }

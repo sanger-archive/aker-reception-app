@@ -1,18 +1,19 @@
 import sinon from 'sinon'
 import {assert} from 'chai'
-import 'csv_field_checker.js'
+import {validateCorrectPositions } from 'csv_field_checker'
 
 describe('CSVFieldChecker', () => {
   context('#validateCorrectPositions', () => {
     it('validates when the positions are not repeated', () => {
-      assert.isOk(CSVFieldChecker.validateCorrectPositions({
-        data: [['A:1', 'Some data'],['B:1', 'some other data']]
-      }))
+      assert.isOk(validateCorrectPositions({
+        data: [{position: 'A:1', name: 'Some data'},{position: 'B:1', name: 'some other data'}]
+      }, 'position'))
     })  
     it('does not validate when it has positions that are repeated', () => {
-      assert.isNotOk(CSVFieldChecker.validateCorrectPositions({
-        data: [['A:1', 'Some data'],['B:1', 'some other data'], ['A:1', 'Some data']]
-      }))
+      assert.isNotOk(validateCorrectPositions({
+        data: [{position: 'A:1', name: 'Some data'},{position: 'B:1', name: 'some other data'}, 
+        {position: 'A:1', name: 'Some data'}]
+      }, 'position'))
     })
   })
 })

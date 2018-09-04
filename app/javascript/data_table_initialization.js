@@ -1,4 +1,4 @@
-(function() {
+(function($, undefined) {
 
   function DataTableInitialization(node, params) {
     this.node = $(node);

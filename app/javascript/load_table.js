@@ -1,3 +1,5 @@
+import { checkCSVFields } from 'csv_field_checker'
+
 (function($,undefined) {
 
   function LoadTable(node, params) {
@@ -54,7 +56,7 @@
     $('input:file.upload-button').on('change', function() {
       var sample_table = $(this).closest('.well').siblings().find('table.dataTable');
 
-      CSVFieldChecker.checkCSVFields(sample_table, $(this)[0].files);
+      checkCSVFields(sample_table, $(this)[0].files);
 
       // Clearing the input allows the change event to fire again
       $(this).val(null);
