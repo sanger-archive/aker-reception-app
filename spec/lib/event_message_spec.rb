@@ -50,7 +50,7 @@ RSpec.describe 'EventMessage' do
 
     it 'for a reception' do
       material_submission = create(:material_submission, status: MaterialSubmission.PRINTED)
-      labware = create(:labware_with_barcode_and_material_submission,
+      labware = create(:printed_with_contents_labware,
                        material_submission: material_submission)
       reception = build(:material_reception, labware_id: labware.id)
 

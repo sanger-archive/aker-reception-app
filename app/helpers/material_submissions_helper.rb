@@ -45,4 +45,11 @@ module MaterialSubmissionsHelper
     return 'Yes' unless submission.supply_decappers
     return 'Yes with decappers'
   end
+
+  def supply_labware_type(submission)
+    return "Label for #{submission.labware_type.name}" unless submission.supply_labwares?
+    return submission.labware_type.name + ' with decappers' if submission.supply_decappers?
+    return submission.labware_type.name
+  end
+
 end
