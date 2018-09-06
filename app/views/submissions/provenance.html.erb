@@ -152,7 +152,7 @@
                   <td><%= address %></td>
                   <% for col in schema['show_on_form'] %>
                     <td data-psd-schema-validation-name="<%= col %>">
-                      <div class="form-group">
+                      <div class="form-group" style="position: relative;">
                         <% if material_schema["properties"][col]['allowed'] %>
                           <select class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
                                   name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
