@@ -69,7 +69,8 @@ private
   end
 
   def success_notice
-    "Labels for labware from Submissions #{material_submission_ids.join(", ")} sent to #{printer.name}."
+    "Labels for labware from #{'Submission'.pluralize(selected_material_submissions.count)} " \
+    "#{material_submission_ids.join(", ")} sent to #{printer.name}."
   end
 
   def material_submission_ids
