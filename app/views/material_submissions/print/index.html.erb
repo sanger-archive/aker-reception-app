@@ -45,7 +45,9 @@
 
     <div class="row">
       <div class="col-md-8">
-        <% if !show_printed? %>
+        <% if show_printed? %>
+          <%= link_to 'Back', material_submissions_print_index_path, class: 'btn btn-primary' %>
+        <% else %>
           <%= link_to 'Previously Printed Submissions', material_submissions_print_index_path(status: "printed"), class: 'btn btn-primary' %>
         <% end %>
       </div>

@@ -28,6 +28,11 @@ RSpec.feature "ShowDispatchedSubmissions", type: :feature do
       expect(page).not_to have_link("Previously Dispatched Submissions")
     end
 
+    it 'shows a "Back" button' do
+      visit_dispatched_submissions
+      expect(page).to have_link("Back")
+    end
+
     context 'when there are previously dispatched Submissions' do
 
       before do

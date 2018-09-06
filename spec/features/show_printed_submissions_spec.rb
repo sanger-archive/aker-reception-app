@@ -28,6 +28,11 @@ RSpec.feature "ShowPrintedSubmissions", type: :feature do
       expect(page).not_to have_link("Previously Printed Submissions")
     end
 
+    it 'shows a "Back" button' do
+      visit_printed_submissions
+      expect(page).to have_link("Back")
+    end
+
     context 'when there are previously printed Submissions' do
 
       before do
