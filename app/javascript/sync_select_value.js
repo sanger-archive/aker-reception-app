@@ -29,7 +29,6 @@
 
   $(document).ready(function() {
     $(document).trigger('registerComponent.builder', {'SyncSelectValue': SyncSelectValue});
-  });  
+  });
 
 })(jQuery);
-

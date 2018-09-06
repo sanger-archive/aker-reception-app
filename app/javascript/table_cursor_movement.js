@@ -57,5 +57,4 @@
     $(document).trigger('registerComponent.builder', {'TableCursorMovement': TableCursorMovement});
   });
 
-
 }(jQuery));

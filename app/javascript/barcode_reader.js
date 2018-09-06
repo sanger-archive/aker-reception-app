@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 (function($, undefined) {
   /**
   * This component works with 3 elements:

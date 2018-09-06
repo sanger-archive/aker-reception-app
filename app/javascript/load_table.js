@@ -1,4 +1,7 @@
+import { checkCSVFields } from 'csv_field_checker'
+
 (function($,undefined) {
+
   function LoadTable(node, params) {
     this.node = $(node)
     this.params = params;
@@ -9,7 +12,6 @@
   var proto = LoadTable.prototype;
 
   proto.attachHandlers = function() {
-
     var table = this.node.DataTable({
       paging: false,
       searching: false,
@@ -61,7 +63,6 @@
     });
 
   }
-  
 
   $(document).ready(function() {
     $(document).trigger('registerComponent.builder', {'LoadTable': LoadTable});

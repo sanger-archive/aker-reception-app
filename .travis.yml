@@ -2,13 +2,24 @@ language: ruby
 git:
   depth: false
   submodules: false
-cache: bundler
+branches:
+  only:
+    - devel
+    - wip
+    - uat
+    - master
+cache:
+  bundler: true
+  yarn: true
+  directories:
+    - node_modules
 env:
   global:
     - CC_TEST_REPORTER_ID=71b495d9f5d19cba66a3d80a3934f7306e12ede5c137809034040c991a8045c6
 services:
   - postgresql
 install:
+  - yarn install
   - bundle install --jobs=3 --retry=3
 before_script:
   - psql -c 'create database reception_app_test;' -U postgres
@@ -17,11 +28,6 @@ before_script:
   - ./cc-test-reporter before-build
 script:
   - bundle exec rspec
+  - yarn test
 after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-branches:
-  only:
-  - devel
-  - wip
-  - uat
-  - master
+  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi

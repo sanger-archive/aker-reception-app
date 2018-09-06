@@ -139,7 +139,7 @@
   proto.validateInput = function(input, fromUserInteraction) {
     var name = $(input).parents('td').data('psd-schema-validation-name');
     $(input).parent().removeClass('has-error');
-    // It will store in the input that we are interacting with the input, so we can take 
+    // It will store in the input that we are interacting with the input, so we can take
     // decissions in future about how to display the potential errors
     $(input).data('fromUserInteraction', fromUserInteraction);
     if (name) {
@@ -454,6 +454,5 @@
   $(document).ready(function() {
     $(document).trigger('registerComponent.builder', {'SingleTableManager': SingleTableManager});
   });
-
 
 }(jQuery))

@@ -10,24 +10,4 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require jquery
-//= require jquery_ujs
-//= require turbolinks
-//= require bootstrap-sprockets
-//= require select2
-//= require component_builder
-//= require single_table_manager
-//= require barcode_reader
-//= require bootstrap-table
-//= require csv_field_checker
-//= require sync_select_value
-//= require load_table
 //= require_tree .
-
-$(document).on("turbolinks:load", function() {
-  $('.has-tooltip').tooltip();
-  $('.has-popover').popover({
-    trigger: 'hover'
-  });
-});
-

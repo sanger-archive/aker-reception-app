@@ -1,3 +1,4 @@
+
 const MODAL_ID = 'myModal';
 const FORM_FIELD_SELECT_ID = 'form-fields';
 const CSV_SELECT_ID = 'fields-from-csv';
@@ -272,6 +273,20 @@ function finishCSVCheck() {
   }
 }
 
+function validateCorrectPositions(results, positionField) {
+  var accessionedPositions = [];
+  return results.data.every(function(row, index) {
+    var wellPosition = row[positionField];
+    if (accessionedPositions.indexOf(wellPosition)>=0) {
+      displayError('The position at '+wellPosition+' is duplicated in the uploaded manifest.');
+      return false;
+    } else {
+      accessionedPositions.push(wellPosition);
+    }
+    return true;
+  })    
+}
+
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile() {
   Papa.parse(file, {
@@ -280,6 +295,9 @@ function fillInTableFromFile() {
     complete: function(results) {
       debug("results from parse:");
       debug(results);
+      if (!validateCorrectPositions(results, matchedFields.position)) {
+        return false;
+      }
 
       // Show any errors to the users
       if (results.errors.length > 0) {
@@ -292,17 +310,17 @@ function fillInTableFromFile() {
 
       // Clear the table from previous import
       $('#' + dataTable.attr('id') + ' > tbody > tr').each(function() {
-        $this = $(this);
+        var $this = $(this);
         $this.children().each (function(cell) {
-          $cell = $(this);
+          var $cell = $(this);
           $cell.find('input').val('');
         });
       });
 
       // Write each row to the datatable
       results.data.every(function(row, index) {
-        if (Object.values(row).every(function(val) { 
-          return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13))); 
+        if (Object.values(row).every(function(val) {
+          return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13)));
         })) {
           return true;
         }
@@ -332,9 +350,12 @@ function fillInTableFromFile() {
           }
           wellPosition = wellPosition.join('')
           wellPosition = wellPosition.replace(/:0/, ':')
+
+
           // Data is now in the correct format, so get the row
           tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable)
         }
+
 
         // Check if human material without HMDMC is present, and warn if so
         var taxon_id = (row[matchedFields['taxon_id']] || '').trim();
@@ -398,3 +419,6 @@ function debug(toLog) {
 function getURLParameter(name) {
   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
+
+
+export { checkCSVFields, validateCorrectPositions }
