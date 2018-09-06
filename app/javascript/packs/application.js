@@ -34,6 +34,7 @@ require('loading_icon')
 
 $(document).on("turbolinks:load", function() {
   $('.has-tooltip').tooltip({trigger: 'click'});
+
   $('.has-popover').popover({
     trigger: 'hover'
   });
