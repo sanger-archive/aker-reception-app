@@ -1,3 +1,5 @@
+import Reception from './routes'
+
 function attachCollapseEvent($node, path) {
   $node.one('show.bs.collapse', function() {
     $.ajax(path, {
@@ -15,6 +17,6 @@ function attachCollapseEvent($node, path) {
 };
 
 $(document).ready(function() {
-  attachCollapseEvent($('#previouslyDispatched'), '/material_submissions/dispatch.js?status=dispatched')
-  attachCollapseEvent($('#previouslyPrinted'), '/material_submissions/print.js?status=printed')
+  attachCollapseEvent($('#previouslyPrinted'), Reception.material_submissions_print_index_path({ format: 'js', status: 'printed' }))
+  attachCollapseEvent($('#previouslyDispatched'), Reception.material_submissions_dispatch_index_path({ format: 'js', status: 'dispatched' }))
 });

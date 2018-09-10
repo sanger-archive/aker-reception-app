@@ -228,6 +228,9 @@ GEM
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
+    js-routes (1.4.4)
+      railties (>= 3.2)
+      sprockets-rails
     json (2.1.0)
     jwt (2.1.0)
     launchy (2.4.3)
@@ -476,6 +479,7 @@ DEPENDENCIES
   font-awesome-sass
   health_check
   jbuilder (~> 2.5)
+  js-routes
   json_api_client!
   launchy
   listen (~> 3.0.5)
@@ -515,4 +519,4 @@ DEPENDENCIES
   wicked
 
 BUNDLED WITH
-   1.16.2
+   1.16.4
