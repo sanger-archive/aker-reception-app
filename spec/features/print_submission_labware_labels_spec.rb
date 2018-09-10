@@ -18,9 +18,9 @@ RSpec.feature "PrintSubmissionLabwareLabels", type: :feature do
       expect(page).to have_text("These Submissions need labels printing")
     end
 
-    it 'shows a link to Previously Printed Submissions' do
+    it 'shows a button "Show Previously Printed Submissions"' do
       visit material_submissions_print_index_path
-      expect(page).to have_link("Previously Printed Submissions")
+      expect(page).to have_button("View Previously Printed Submissions")
     end
 
     context 'when there are no Submissions that need printing' do

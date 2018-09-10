@@ -6,6 +6,10 @@ class MaterialSubmissions::PrintController < ApplicationController
 
   # GET /material_submissions/print
   def index
+    respond_to do |format|
+      format.html
+      format.js { render template: "material_submissions/print/_form" }
+    end
   end
 
   # POST /material_submissions/print
@@ -23,7 +27,8 @@ class MaterialSubmissions::PrintController < ApplicationController
 private
 
   def material_submissions
-    @material_submissions = show_printed? ? MaterialSubmission.printed : MaterialSubmission.active
+    material_submissions = MaterialSubmission.includes(:labware_type)
+    @material_submissions = show_printed? ? material_submissions.printed : material_submissions.active
   end
 
   def show_printed?

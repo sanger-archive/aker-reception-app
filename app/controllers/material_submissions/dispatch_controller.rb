@@ -4,6 +4,10 @@ class MaterialSubmissions::DispatchController < ApplicationController
   before_action :check_ssr_membership, :material_submissions
 
   def index
+    respond_to do |format|
+      format.html
+      format.js { render template: "material_submissions/dispatch/_form" }
+    end
   end
 
   def create
@@ -21,9 +25,9 @@ private
 
   def material_submissions
     @material_submissions ||= if show_dispatched?
-        MaterialSubmission.dispatched.order(dispatch_date: :desc)
+        MaterialSubmission.includes(:labware_type).dispatched.order(dispatch_date: :desc)
       else
-        MaterialSubmission.printed.not_dispatched
+        MaterialSubmission.includes(:labware_type).printed.not_dispatched
       end
   end
 

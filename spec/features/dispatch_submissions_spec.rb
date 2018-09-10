@@ -20,7 +20,7 @@ RSpec.feature "DispatchSubmissions", type: :feature do
 
     it 'shows a link to Previously Dispatched Submissions' do
       visit material_submissions_dispatch_index_path
-      expect(page).to have_link("Previously Dispatched Submissions")
+      expect(page).to have_button("View Previously Dispatched Submissions")
     end
 
     context 'when there are no Submissions that need dispatching' do
