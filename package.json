@@ -11,6 +11,7 @@
     "jquery-ujs": "^1.2.2",
     "moment": "^2.22.2",
     "papaparse": "^4.5.0",
+    "rails-erb-loader": "^5.5.0",
     "select2": "^4.0.6-rc.1",
     "selectize": "^0.12.4"
   },

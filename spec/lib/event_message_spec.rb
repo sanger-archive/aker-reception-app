@@ -29,7 +29,6 @@ RSpec.describe 'EventMessage' do
 
       message = EventMessage.new(submission: submission)
 
-      allow(message).to receive(:trace_id).and_return 'a_trace_id'
       allow(message).to receive(:deputies).and_return %w[ab1 group1]
 
       Timecop.freeze do
@@ -43,14 +42,13 @@ RSpec.describe 'EventMessage' do
         expect(json['metadata']['hmdmc']).to eq ['12/000', '13/999']
         expect(json['metadata']['sample_custodian']).to eq submission.contact.email
         expect(json['metadata']['total_samples']).to eq 12
-        expect(json['metadata']['zipkin_trace_id']).to eq 'a_trace_id'
         expect(json['metadata']['confirmed_no_hmdmc']).to eq 'test@test.com'
       end
     end
 
     it 'for a reception' do
       material_submission = create(:material_submission, status: MaterialSubmission.PRINTED)
-      labware = create(:labware_with_barcode_and_material_submission,
+      labware = create(:printed_with_contents_labware,
                        material_submission: material_submission)
       reception = build(:material_reception, labware_id: labware.id)
 
@@ -62,7 +60,6 @@ RSpec.describe 'EventMessage' do
 
       message = EventMessage.new(reception: reception)
 
-      allow(message).to receive(:trace_id).and_return 'a_trace_id'
       allow(message).to receive(:deputies).and_return %w[ab1 group1]
 
       Timecop.freeze do
@@ -76,7 +73,6 @@ RSpec.describe 'EventMessage' do
         expect(json['metadata']['manifest_id']).to eq material_submission.id
         expect(json['metadata']['barcode']).to eq 'AKER-1'
         expect(json['metadata']['samples']).to eq reception.labware.contents.length
-        expect(json['metadata']['zipkin_trace_id']).to eq 'a_trace_id'
         expect(json['metadata']['created_at']).to eq Time.now.utc.iso8601
         expect(json['metadata']['sample_custodian']).to eq material_submission.contact.email
         expect(json['metadata']['all_received']).to eq true

@@ -38,5 +38,5 @@ en:
     attributes:
       material_submission:
         id: 'Submission Identifier'
-        email: 'Collaborator email'
+        email: 'Sample Guardian email'
         contact: 'Internal Contact'

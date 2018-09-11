@@ -1,0 +1,73 @@
+<%= form_tag(controller: "material_submissions/dispatch", action: "create") do %>
+  <div class="row">
+    <div class="col-md-12">
+
+      <br />
+
+      <div class="panel panel-default">
+
+        <div class="panel-heading">
+          <% if show_dispatched? %>
+            These Submissions have been dispatched
+          <% else %>
+            These customers are expecting labels or barcoded labware
+          <% end %>
+        </div>
+        <div class="panel-body">
+
+          <table class="table table-striped"
+            data-psd-component-class="DataTableInitialization"
+            data-psd-component-parameters="<%= { ordering: false }.to_json %>">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Customer Address</th>
+                <th>Submission ID</th>
+                <% if !show_dispatched? %>
+                  <th>Status</th>
+                <% end %>
+                <th><%= I18n.translate "activerecord.attributes.material_submission.email" %></th>
+                <th><%= show_dispatched? ? "Date Dispatched" : "Date Created" %></th>
+                <th>Number of labware</th>
+                <th>Supply labware type</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <%= render partial: "material_submissions/dispatch/material_submission", collection: @material_submissions, locals: { show_dispatched: show_dispatched? } %>
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <% if !show_dispatched? %>
+        <button id="showPreviouslyDispatched" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#previouslyDispatched" aria-expanded="false" aria-controls="previouslyDispatched">
+          View Previously Dispatched Submissions (<%= dispatched_count %>)
+        </button>
+      <% end %>
+    </div>
+    <div class="col-md-4 text-right">
+      <% if !show_dispatched? %>
+        <%= submit_tag("Dispatch", class: 'btn btn-primary', style: 'margin-left: 10px;', disabled: @material_submissions.empty?) %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if !show_dispatched? %>
+    <div class="collapse" id="previouslyDispatched">
+      <div class="row">
+        <div class="col-md-12">
+          Loading...
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+<% end %>

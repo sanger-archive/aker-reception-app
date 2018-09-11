@@ -31,6 +31,7 @@ require('sync_select_value')
 require('load_table')
 require('submission_csv_warnings')
 require('loading_icon')
+require('show_previous_in_datatable')
 
 $(document).on("turbolinks:load", function() {
   $('.has-tooltip').tooltip();
