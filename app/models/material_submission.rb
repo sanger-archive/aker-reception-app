@@ -29,6 +29,7 @@ class MaterialSubmission < ApplicationRecord
   validate :each_labware_has_contents, if: :last_step?
   validates :material_submission_uuid, presence: true
   validates :owner_email, presence: true
+  validates :status, inclusion: { in: %w(printed) }, if: :dispatch_date_changed?
 
   before_validation :sanitise_owner
   before_save :sanitise_owner
@@ -38,8 +39,8 @@ class MaterialSubmission < ApplicationRecord
 
   after_initialize :create_uuid
 
-  scope :dispatched, -> { where(dispatched: true) }
-  scope :not_dispatched, -> { where(dispatched: false) }
+  scope :dispatched, -> { where.not(dispatch_date: nil) }
+  scope :not_dispatched, -> { where(dispatch_date: nil) }
   scope :awaiting_receipt, -> { dispatched.left_outer_joins(labwares: :material_reception).where(material_receptions: { labware_id: nil }).distinct }
 
   scope :active, -> { where(status: MaterialSubmission.ACTIVE) }
@@ -50,10 +51,6 @@ class MaterialSubmission < ApplicationRecord
 
   def create_uuid
     self.material_submission_uuid ||= SecureRandom.uuid
-  end
-
-  def dispatched?
-    dispatched
   end
 
   def active?
@@ -114,12 +111,6 @@ class MaterialSubmission < ApplicationRecord
 
   def invalid_labwares
     labwares.select(&:invalid?)
-  end
-
-  def supply_labware_type
-    return "Label for #{labware_type.name}" unless supply_labwares
-    return labware_type.name + ' with decappers' if supply_decappers
-    return labware_type.name
   end
 
   def update(params)
@@ -201,6 +192,14 @@ class MaterialSubmission < ApplicationRecord
         self.owner_email = sanitised
       end
     end
+  end
+
+  def dispatched?
+    dispatch_date?
+  end
+
+  def dispatch!
+    update_attributes!(dispatch_date: DateTime.now)
   end
 
   private

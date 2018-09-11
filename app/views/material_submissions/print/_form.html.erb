@@ -1,0 +1,70 @@
+<%= form_tag(controller: "material_submissions/print", action: "create") do %>
+  <div class="row">
+    <div class="col-md-12">
+
+      <br />
+
+      <div class="panel panel-default">
+
+        <div class="panel-heading">
+          <% if show_printed? %>
+            These Submissions have had labels printed
+          <% else %>
+            These Submissions need labels printing
+          <% end %>
+        </div>
+        <div class="panel-body">
+
+          <table class="table table-striped"
+            data-psd-component-class="DataTableInitialization"
+            data-psd-component-parameters="<%= { ordering: false }.to_json %>">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Submission ID</th>
+                <th>Status</th>
+                <th><%= I18n.translate "activerecord.attributes.material_submission.email" %></th>
+                <th>Date Created</th>
+                <th>Number of labware</th>
+                <th>Supply labware type</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <%= render partial: 'material_submissions/print/material_submission', collection: @material_submissions %>
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <% if !show_printed? %>
+        <button id="showPreviouslyPrinted" class="btn btn-primary" type="button" data-toggle="collapse" data-target="#previouslyPrinted" aria-expanded="false" aria-controls="previouslyPrinted">
+          View Previously Printed Submissions (<%= printed_count %>)
+        </button>
+      <% end %>
+    </div>
+    <div class="col-md-4 text-right">
+      <b>Printer:</b>
+      <%= collection_select(:printer, :name, @printers, :name, :printer_description) %>
+      <%= submit_tag("Print", class: 'btn btn-primary', style: 'margin-left: 10px;', disabled: @material_submissions.empty?) %>
+    </div>
+  </div>
+
+  <% if !show_printed? %>
+    <div class="collapse" id="previouslyPrinted">
+      <div class="row">
+        <div class="col-md-12">
+          Loading...
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+<% end %>

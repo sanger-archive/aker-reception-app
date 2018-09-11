@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :printer do
-    name "MyString"
+    sequence(:name) { |n| "Printer #{n}" }
     label_type "MyString"
   end
 end
