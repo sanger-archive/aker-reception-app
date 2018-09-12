@@ -132,7 +132,6 @@
         return true;
       }
     }
-
     // HMDMC is optional
     return false;
   }
@@ -172,14 +171,9 @@
 
     // If the schema checks fail, they will update the errorCells.
     // If they don't fail, we should update them in case they have out of date errors.
+    var node = htmlField.node;
     if (!failed) {
-      var node = htmlField.node;
-
-      $(node).trigger('psd.schema.error', {
-        node: node,
-        update_successful: false,
-        messages: [ $.extend(this.dataForNode(node), { update_successful: false }) ]
-      });
+      $(node).trigger('psd.schema.success', { node: node })
     }
   };
 

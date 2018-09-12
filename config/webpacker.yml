@@ -16,6 +16,7 @@ default: &default
   extensions:
     - .erb
     - .js
+    - .es6
     - .js.erb
     - .sass
     - .scss
