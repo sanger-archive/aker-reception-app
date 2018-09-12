@@ -40,7 +40,7 @@
             </div>
             <div class="col-md-2">
               <div class="form-group">
-                <button id="match-fields-button" type="button" class="btn btn-primary" onclick="matchFields();">Match</button>
+                <button id="match-fields-button" type="button" class="btn btn-primary" onclick="CSVFieldChecker.matchFields();">Match</button>
               </div>
             </div>
           </div>
@@ -60,7 +60,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="complete-csv-matching" type="button" class="btn btn-primary" onclick="finishCSVCheck();">Continue</button>
+          <button id="complete-csv-matching" type="button" class="btn btn-primary" onclick="CSVFieldChecker.finishCSVCheck();">Continue</button>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -152,7 +152,7 @@
                   <td><%= address %></td>
                   <% for col in schema['show_on_form'] %>
                     <td data-psd-schema-validation-name="<%= col %>">
-                      <div class="form-group">
+                      <div class="form-group" style="position: relative;">
                         <% if material_schema["properties"][col]['allowed'] %>
                           <select class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
                                   name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"

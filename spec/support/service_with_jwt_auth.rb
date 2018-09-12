@@ -1,23 +1,26 @@
-shared_examples_for 'service that validates credentials' do |actions|
+# frozen_string_literal: true
 
+shared_examples_for 'service that validates credentials' do |actions|
   context 'checking controller actions' do
     HTTP_VERB ||= {
       create: :post,
       update: :put,
-      destroy: :delete,
-    }
+      destroy: :delete
+    }.freeze
     [actions].flatten.compact.each do |action|
       context "for #{action}" do
         context 'when no credentials are included' do
           it 'redirects to the login page' do
-            send (HTTP_VERB[action]||:get), action
+            send (HTTP_VERB[action] || :get), action
             expect(response).to have_http_status(:redirect)
           end
         end
 
         context 'when credentials are wrong' do
           it 'redirects to the login page' do
-            send (HTTP_VERB[action]||:get), action, params: { headers: { HTTP_X_AUTHORISATION: 'wrong' } }
+            send (HTTP_VERB[action] || :get),
+                 action,
+                 params: { headers: { HTTP_X_AUTHORISATION: 'wrong' } }
             expect(response).to have_http_status(:redirect)
           end
         end
@@ -28,7 +31,7 @@ shared_examples_for 'service that validates credentials' do |actions|
             allow(controller).to receive(:check_credentials)
             allow(controller).to receive(:current_user).and_return(@user)
 
-            send (HTTP_VERB[action]||:get), action
+            send (HTTP_VERB[action] || :get), action
             expect(response).to have_http_status(:success)
           end
         end
