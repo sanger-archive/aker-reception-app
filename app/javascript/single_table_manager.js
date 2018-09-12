@@ -115,7 +115,8 @@
 
 
   proto.cleanTooltip = function(input) {
-    var index = this.tooltipsConfig.filter($.proxy(function(e){return e}, this)).findIndex($.proxy(function(config) { return (config.input === input) }, this));
+    var compacted = this.tooltipsConfig.filter($.proxy(function(e){return e}, this));
+    var index = compacted.findIndex($.proxy(function(config) { return (config.input === input) }, this));
     if (index >= 0) {
       const config = this.tooltipsConfig.splice(index, 1)[0];
 
