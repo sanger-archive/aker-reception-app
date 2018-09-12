@@ -9,7 +9,7 @@
     this.params._cssErrorTabClass = this.params._cssErrorTabClass || 'bg-danger';
 
     this.errorCells = {};
-    this.tooltipInputs = [];
+    this.tooltipsConfig = [];
 
     this.form = $('form');
     $(this.form).data('remote', true);
@@ -83,33 +83,63 @@
     $(tab).toggleClass(this.params._cssEmptyTabClass, this.isTabEmpty(tab));
   };
 
+  proto.buildTooltip = function(input, msg) {
+    var container = $(input).parent();
+    var tooltip = container.tooltip({
+      title: msg,
+      trigger: 'manual',
+      placement: 'bottom',
+      container: container
+    });
+    container.data('bs.tooltip').options.title = msg;
+    var onClickInput = $.proxy(function() { this.tooltip('show'); }, container);
+    var onBlurInput = $.proxy(function() { this.tooltip('hide'); }, container);
+
+    $(input).on('click.tooltip', onClickInput);
+    $(input).on('blur.tooltip', onBlurInput);
+
+    this.tooltipsConfig.push({ container, input });
+  };
+
   proto.setErrorToInput = function(input, msg) {
+    
     // If the error has been generated from a user interaction, it will display a tooltip
-    if ($(input).data('fromUserInteraction') === true) {
-      var tooltip = $(input).parent().tooltip({
-        title: msg,
-        container: 'body'
-      });
-      $(input).parent().tooltip('show');
-      this.tooltipInputs.push($(input).parent());
-    }
+    //if ($(input).data('fromUserInteraction') === true) {
+      this.cleanTooltip(input);
+      this.buildTooltip(input, msg);
+    //}
 
     $(input).data('fromUserInteraction', false);
     $(input).parent().addClass('has-error');
   };
 
-  proto.cleanTooltips = function() {
-    for (var i=0; i<this.tooltipInputs.length; i++) {
-      $(this.tooltipInputs[i]).tooltip('hide');
-      $(this.tooltipInputs[i]).tooltip('disable');
-      $(this.tooltipInputs[i]).tooltip('destroy');
-      setTimeout($.proxy(function() {
-        $(this.tooltipInputs[i]).tooltip('destroy');
-      }, this), 0);
-      $(this.tooltipInputs[i]).removeClass('has-error');
+  proto.findTooltipIndexForInput = function(input) {
+    var index;
+    this.tooltipsConfig.some($.proxy(function(config, pos) { 
+      index = pos; 
+      return (config.input === input);
+    }, this));
+    return index;
+  };
 
+
+  proto.cleanTooltip = function(input) {
+    var index = this.findTooltipIndexForInput(input);
+    if (index >= 0) {
+      const config = this.tooltipsConfig.splice(index, 1)[0];
+
+      config.container.tooltip('hide');
+
+      $(config.input).off('click.tooltip');
+      $(config.input).off('blur.tooltip');
     }
-    this.tooltipInputs=[];
+  };
+
+  proto.cleanTooltips = function() {
+    for (var i=0; i<this.tooltipsConfig.length; i++) {
+      this.cleanTooltip(this.tooltipsConfig[i]);
+    }
+    this.tooltipsConfig=[];
   };
 
   proto.isTabEmpty = function(tab) {
@@ -138,7 +168,8 @@
 
   proto.validateInput = function(input, fromUserInteraction) {
     var name = $(input).parents('td').data('psd-schema-validation-name');
-    $(input).parent().removeClass('has-error');
+    //$(input).parent().removeClass('has-error');
+
     // It will store in the input that we are interacting with the input, so we can take
     // decissions in future about how to display the potential errors
     $(input).data('fromUserInteraction', fromUserInteraction);
@@ -151,17 +182,6 @@
     }
   };
 
-  proto.validateNotEmptyInputs = function(tab) {
-    this.notEmptyInputs().each($.proxy(function(pos, input) {
-      return this.validateInput(input);
-    }, this));
-  };
-
-  proto.validateTab = function(tab) {
-    this.inputs().each($.proxy(function(pos, input) {
-      return this.validateInput(input);
-    }, this));
-  };
 
   proto.saveTab = function(e, leaving) {
     var currentTab = $(e.target);
@@ -182,6 +202,11 @@
      changeTabField.remove();
     }
     return promise;
+  };
+
+  proto.onSchemaSuccess = function(e, data) {
+    $(data.node).parent().removeClass('has-error');
+    this.cleanTooltip(data.node);
   };
 
   proto.onSchemaError = function(e, data) {
@@ -236,7 +261,7 @@
   };
 
   proto.updateValidations = function() {
-    this.cleanTooltips();
+    //this.cleanTooltips();
     setTimeout($.proxy(function() {
       this.inputs().each($.proxy(this.updateErrorInput, this, this.dataForTab(this.currentTab)));
     }, this), 500);
@@ -446,6 +471,7 @@
     // If you have one
     var button = $('.save');
     button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));
+    $(this.node).on('psd.schema.success', $.proxy(this.onSchemaSuccess, this));
     $(this.node).on('psd.schema.error', $.proxy(this.onSchemaError, this));
 
     $('input[type=submit]').on('click', $.proxy(this.toNextStep, this));
