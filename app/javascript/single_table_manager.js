@@ -113,10 +113,18 @@
     $(input).parent().addClass('has-error');
   };
 
+  proto.findTooltipIndexForInput = function(input) {
+    var index;
+    this.tooltipsConfig.some($.proxy(function(config, pos) { 
+      index = pos; 
+      return (config.input === input);
+    }, this));
+    return index;
+  };
+
 
   proto.cleanTooltip = function(input) {
-    var compacted = this.tooltipsConfig.filter($.proxy(function(e){return e}, this));
-    var index = compacted.findIndex($.proxy(function(config) { return (config.input === input) }, this));
+    var index = this.findTooltipIndexForInput(input);
     if (index >= 0) {
       const config = this.tooltipsConfig.splice(index, 1)[0];
 
