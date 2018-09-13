@@ -92,8 +92,12 @@
       container: container
     });
     container.data('bs.tooltip').options.title = msg;
-    var onClickInput = $.proxy(function() { this.tooltip('show'); }, container);
-    var onBlurInput = $.proxy(function() { this.tooltip('hide'); }, container);
+    var onClickInput = $.proxy(function() {
+      this.tooltip('show'); 
+    }, container);
+    var onBlurInput = $.proxy(function() { 
+      this.tooltip('hide'); 
+    }, container);
 
     $(input).on('click.tooltip', onClickInput);
     $(input).on('blur.tooltip', onBlurInput);
@@ -114,10 +118,14 @@
   };
 
   proto.findTooltipIndexForInput = function(input) {
-    var index;
+    // This is intented to be equivalent to:
+    // this.tooltipsConfig.findIndex((config) => { return (config.input === input) })
+    var index = -1;
     this.tooltipsConfig.some($.proxy(function(config, pos) { 
-      index = pos; 
-      return (config.input === input);
+      if (config.input === input) {
+        index = pos;
+        return true;
+      }
     }, this));
     return index;
   };
@@ -127,8 +135,6 @@
     var index = this.findTooltipIndexForInput(input);
     if (index >= 0) {
       const config = this.tooltipsConfig.splice(index, 1)[0];
-
-      config.container.tooltip('hide');
 
       $(config.input).off('click.tooltip');
       $(config.input).off('blur.tooltip');
@@ -206,8 +212,27 @@
 
   proto.onSchemaSuccess = function(e, data) {
     $(data.node).parent().removeClass('has-error');
+    $(data.node).parent().removeClass('has-warning');
     this.cleanTooltip(data.node);
   };
+
+  proto.onSchemaWarning = function(e, data) {
+
+    //this.updateValidations();
+
+    var msg = Object.values(data.messages[0].errors)[0];
+
+    setTimeout($.proxy(function() {
+      $(data.node).parent().removeClass('has-error');
+      this.cleanTooltip(data.node);
+      this.buildTooltip(data.node, msg);
+
+      $(data.node).data('fromUserInteraction', false);
+      $(data.node).parent().addClass('has-warning');
+    }, this), 500)
+
+  };
+
 
   proto.onSchemaError = function(e, data) {
     return this.onReceive($(this.currentTab), data);
@@ -473,6 +498,7 @@
     button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button));
     $(this.node).on('psd.schema.success', $.proxy(this.onSchemaSuccess, this));
     $(this.node).on('psd.schema.error', $.proxy(this.onSchemaError, this));
+    $(this.node).on('psd.schema.warning', $.proxy(this.onSchemaWarning, this));
 
     $('input[type=submit]').on('click', $.proxy(this.toNextStep, this));
   };

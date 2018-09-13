@@ -34,7 +34,7 @@ require('loading_icon')
 require('show_previous_in_datatable')
 
 $(document).on("turbolinks:load", function() {
-  $('.has-tooltip').tooltip({trigger: 'click'});
+  //$('.has-tooltip').tooltip({trigger: 'click'});
   $('.has-popover').popover({
     trigger: 'hover'
   });

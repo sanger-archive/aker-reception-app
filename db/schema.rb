@@ -89,7 +89,7 @@ ActiveRecord::Schema.define(version: 2018_09_05_093717) do
     t.boolean "supply_decappers", default: false, null: false
     t.datetime "dispatch_date"
     t.index ["contact_id"], name: "index_material_submissions_on_contact_id"
-    t.index ["dispatch_date"], name: "index_material_submissions_on_dispatch_date", using: :btree
+    t.index ["dispatch_date"], name: "index_material_submissions_on_dispatch_date"
     t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id"
     t.index ["owner_email"], name: "index_material_submissions_on_owner_email"
   end

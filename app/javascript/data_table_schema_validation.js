@@ -29,6 +29,19 @@
     };
   };
 
+  proto.validationWarning = function(node, attr, msg) {
+    var data = this.dataForNode(node);
+    if (attr) {
+      data.errors[attr] = msg;
+    }
+    $(node).trigger('psd.schema.warning', {
+      node: node,
+      messages: [ data ]
+    });
+  };
+
+
+
   proto.validationError = function(node, attr, msg) {
     var data = this.dataForNode(node);
     if (attr) {
@@ -50,7 +63,49 @@
     return -1;
   }
 
+  proto.column = function(labwareId, fieldName) {
+    return $('input').filter((pos, input) => { 
+      var id = $(input).attr('id');
+      return (id && id.match("fieldName\\["+fieldName+"\\]") && 
+        id.match("labware\\["+labwareId+"\\]"));
+    }).toArray().reduce($.proxy(function(memo, input) {
+      var data = this.positionDataForInput(input)
+      memo[data.address] = input
+      return memo
+    }, this), {});
+  };
+
+  proto.positionDataForInput = function(input) {
+    var id = $(input).attr('id')
+    return {
+      id: id,
+      labwareId: id.match(/^labware\[(\d*)\]/)[1],
+      address: id.match(/address\[([\w:]*)\]/)[1],
+      fieldName: id.match(/fieldName\[(\w*)\]/)[1]
+    };
+  };
+
   proto.schemaChecks = {
+    failsDataValueDuplicatedSamePlate: function(schema, msg) {
+      if (!schema.unique_value || !(msg.value && msg.value.trim())) {
+        return false;
+      }
+
+      var data = this.positionDataForInput(msg.node)
+      var column = this.column(data.labwareId, data.fieldName)
+
+      delete column[data.address]
+
+      var keys = Object.keys(column)
+      var values = Object.values(column).map((input, pos) => { return $(input).val()})
+      var value = $(msg.node).val()
+      var pos = $.inArray(value, values)
+      if (pos >= 0) {
+        msg.duplicatedAddress = keys[pos]
+        return true
+      }
+      return false
+    },
     // Fails if the field is required and the msg value is missing or all whitespace.
     // Returns true if it fails.
     failsDataValueRequired: function(schema, msg) {
@@ -71,6 +126,15 @@
       return (schema.enum.indexOfCaseInsensitive(v) < 0);
     },
   };
+
+  proto.warnSchemaCheck = function(schema, msg, failFunct, textFunct) {
+    // 
+    if (failFunct.call(this, schema, msg)) {
+      this.validationWarning(msg.node, msg.name, textFunct(schema, msg));
+      return true;
+    }
+    return false;
+  };  
 
   proto.failSchemaCheck = function(schema, msg, failFunct, textFunct) {
     if (failFunct(schema, msg)) {
@@ -148,6 +212,13 @@
 
     var failed = false;
     if (fieldProperties) {
+      warned = this.warnSchemaCheck(fieldProperties,
+        htmlField,
+        this.schemaChecks.failsDataValueDuplicatedSamePlate,
+        function(fieldProperties, htmlField) {
+          return 'The field ' + htmlField.name + ' has a value duplicated within the same plate at address ' + htmlField.duplicatedAddress
+        });
+
       failed = (
         // HMDMC is not required but needs to validated if present
         (htmlField.name == 'hmdmc' && this.hmdmcCheck(fieldProperties, htmlField))
