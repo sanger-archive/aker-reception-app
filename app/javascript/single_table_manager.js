@@ -1,3 +1,5 @@
+import TooltipsManager from 'tooltips_manager'
+
 (function($, undefined) {
 
   function SingleTableManager(node, params) {
@@ -8,8 +10,7 @@
     this.params._cssEmptyTabClass = this.params._cssEmptyTabClass || 'bg-warning';
     this.params._cssErrorTabClass = this.params._cssErrorTabClass || 'bg-danger';
 
-    this.errorCells = {};
-    this.tooltipsConfig = [];
+    //this.errorCells = {};
 
     this.form = $('form');
     $(this.form).data('remote', true);
@@ -20,6 +21,8 @@
       this.updateTabContentPresenceStatus(tab);
     }, this));
 
+    this.tooltipsManager = new TooltipsManager(this.inputs())
+
     this.attachHandlers();
   }
 
@@ -29,25 +32,18 @@
     var currentTab = this.currentTab = $(e.target);
     var data = this.dataForTab(currentTab);
 
-    this.cleanTooltips();
+    //this.cleanTooltips();
 
     this.inputs().each($.proxy(this.restoreInput, this, data));
 
     this.updateValidations();
   };
 
-  proto.updateErrorState = function(input, labwareIndex, address, fieldName) {
-    if (this.errorCells[labwareIndex] && this.errorCells[labwareIndex][address]
-        && this.errorCells[labwareIndex][address][fieldName]) {
-      this.setErrorToInput(input, this.errorCells[labwareIndex][address][fieldName]);
-    }
-  };
-
   proto.tabLabwareIndex = function(tab) {
     var id = tab.attr('id');
     var matching = id.match(/labware_tab\[([0-9]+)\]/);
     return matching ? matching[1] : null;
-  }
+  };
 
   proto.setErrorToTab = function(tab) {
     var labwareIndex = this.tabLabwareIndex($(tab));
@@ -83,70 +79,6 @@
     $(tab).toggleClass(this.params._cssEmptyTabClass, this.isTabEmpty(tab));
   };
 
-  proto.buildTooltip = function(input, msg) {
-    var container = $(input).parent();
-    var tooltip = container.tooltip({
-      title: msg,
-      trigger: 'manual',
-      placement: 'bottom',
-      container: container
-    });
-    container.data('bs.tooltip').options.title = msg;
-    var onClickInput = $.proxy(function() {
-      this.tooltip('show'); 
-    }, container);
-    var onBlurInput = $.proxy(function() { 
-      this.tooltip('hide'); 
-    }, container);
-
-    $(input).on('click.tooltip', onClickInput);
-    $(input).on('blur.tooltip', onBlurInput);
-
-    this.tooltipsConfig.push({ container, input });
-  };
-
-  proto.setErrorToInput = function(input, msg) {
-    
-    // If the error has been generated from a user interaction, it will display a tooltip
-    //if ($(input).data('fromUserInteraction') === true) {
-      this.cleanTooltip(input);
-      this.buildTooltip(input, msg);
-    //}
-
-    $(input).data('fromUserInteraction', false);
-    $(input).parent().addClass('has-error');
-  };
-
-  proto.findTooltipIndexForInput = function(input) {
-    // This is intented to be equivalent to:
-    // this.tooltipsConfig.findIndex((config) => { return (config.input === input) })
-    var index = -1;
-    this.tooltipsConfig.some($.proxy(function(config, pos) { 
-      if (config.input === input) {
-        index = pos;
-        return true;
-      }
-    }, this));
-    return index;
-  };
-
-
-  proto.cleanTooltip = function(input) {
-    var index = this.findTooltipIndexForInput(input);
-    if (index >= 0) {
-      const config = this.tooltipsConfig.splice(index, 1)[0];
-
-      $(config.input).off('click.tooltip');
-      $(config.input).off('blur.tooltip');
-    }
-  };
-
-  proto.cleanTooltips = function() {
-    for (var i=0; i<this.tooltipsConfig.length; i++) {
-      this.cleanTooltip(this.tooltipsConfig[i]);
-    }
-    this.tooltipsConfig=[];
-  };
 
   proto.isTabEmpty = function(tab) {
     return !this.isTabWithContent(tab);
@@ -213,24 +145,12 @@
   proto.onSchemaSuccess = function(e, data) {
     $(data.node).parent().removeClass('has-error');
     $(data.node).parent().removeClass('has-warning');
-    this.cleanTooltip(data.node);
+    this.tooltipsManager.cleanTooltip(data.node);
   };
 
   proto.onSchemaWarning = function(e, data) {
-
-    //this.updateValidations();
-
-    var msg = Object.values(data.messages[0].errors)[0];
-
-    setTimeout($.proxy(function() {
-      $(data.node).parent().removeClass('has-error');
-      this.cleanTooltip(data.node);
-      this.buildTooltip(data.node, msg);
-
-      $(data.node).data('fromUserInteraction', false);
-      $(data.node).parent().addClass('has-warning');
-    }, this), 500)
-
+    this.tooltipsManager.loadMessages(data)
+    this.tooltipsManager.updateValidations()
   };
 
 
@@ -238,30 +158,6 @@
     return this.onReceive($(this.currentTab), data);
   };
 
-  proto.loadErrorsFromMsg = function(data, clearErrors) {
-    if (data && data.messages) {
-
-      for (var key in data) {
-        for (var i = 0; i < data.messages.length; i++) {
-          var message = data.messages[i];
-          this.resetCellNameErrors(message.labwareIndex);
-        }
-        if (clearErrors) this.resetMainAlertError();
-
-        for (var i = 0; i<data.messages.length; i++) {
-          var message = data.messages[i];
-          var address = message.address;
-          if (address) {
-            this.storeCellNameError(message.labwareIndex, address, message.errors);
-          } else {
-            this.addErrorToMainAlertError('<li>Labware '+message.labwareIndex+', errors: '+Object.values(message.errors)[0]+"</li>");
-            var tab = document.getElementById("labware_tab["+message.labwareIndex+"]");
-            this.setErrorToTab(tab);
-          }
-        }
-      }
-    }
-  };
 
   proto.cleanValidLabwares = function(labwareIndexes) {
     if (typeof this.errorCells !== 'undefined') {
@@ -278,47 +174,23 @@
         this.cleanValidLabwares(data.labwares_indexes);
       }
     } else {
-      this.loadErrorsFromMsg(data, true);
+      this.resetMainAlertError();
+
+      this.tooltipsManager.loadMessages(data);
       this.setErrorToTab(currentTab[0]);
     }
-    this.updateValidations();
+    this.tooltipsManager.updateValidations();
     return data;
   };
 
   proto.updateValidations = function() {
     //this.cleanTooltips();
-    setTimeout($.proxy(function() {
-      this.inputs().each($.proxy(this.updateErrorInput, this, this.dataForTab(this.currentTab)));
-    }, this), 500);
+    var data = this.dataForTab(this.currentTab)
+
+    this._errorMessagesStore.updateValidations(this.inputs(), data)
+    this._warningMessagesStore.updateValidations(this.inputs(), data)
   };
 
-  proto.storeCellNameError = function(labwareIndex, address, errors) {
-    if (!this.errorCells[labwareIndex]) {
-      this.resetCellNameErrors(labwareIndex);
-    }
-    if (!this.errorCells[labwareIndex][address]) {
-      this.errorCells[labwareIndex][address]={};
-    }
-    if (errors.schema) {
-      /** Json schema error message from the server json-schema gem */
-      for (var i=0; i<errors.schema[0].length; i++) {
-        var obj = errors.schema[0][i].message;
-        var fieldName = obj.fragment.replace(/#\//, '')
-        var text = obj.message;
-        this.errorCells[labwareIndex][address][fieldName] = text;
-      }
-    } else {
-      /** Json Schema error message from the JS client */
-      for (var key in errors) {
-        var fieldName = key.replace(/.*\./, '');
-        this.errorCells[labwareIndex][address][fieldName] = errors[key];
-      }
-    }
-  };
-
-  proto.resetCellNameErrors = function(labwareIndex) {
-    this.errorCells[labwareIndex]={};
-  };
 
   proto.inputs = function() {
     return $('form input').filter(function(pos, input) {
@@ -332,20 +204,6 @@
     });
   };
 
-  /**
-   * Returns the fields from the cell of the given ID
-   */
-  proto.fieldsForId = function(id) {
-    var matching = id.match(/labware\[([0-9]*)\]address\[([A-Z0-9:]*)\]fieldName\[(\w*)\]/);
-    if (matching) {
-      return {
-        "labwareIndex": matching[1],
-        "address": matching[2],
-        "fieldName": matching[3]
-      };
-    }
-    return null;
-  }
 
   proto.saveInput = function(data, pos, input) {
     if (data == null) {
@@ -379,14 +237,6 @@
     }
   };
 
-  proto.updateErrorInput = function(data, pos, input) {
-    var id = $(input).attr('id');
-    var info = this.fieldsForId(id);
-
-    if (info) {
-      this.updateErrorState(input, info.labwareIndex, info.address, info.fieldName);
-    }
-  };
 
   proto.fieldData = function(data, address, fieldName) {
     if (data && data["contents"] && address && data["contents"][address] && fieldName) {
@@ -465,7 +315,8 @@
           body: 'Please review and solve the validation problems before continuing'});
         this.setErrorToTab(this.currentTab);
         if (!data.update_successful) {
-          this.loadErrorsFromMsg(data, false);
+          this.tooltipsManager.loadMessages(data)
+          //this.loadErrorsFromMsg(data, false);
         }
         this.updateValidations();
       }

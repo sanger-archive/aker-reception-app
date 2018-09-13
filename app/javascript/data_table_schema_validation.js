@@ -32,7 +32,10 @@
   proto.validationWarning = function(node, attr, msg) {
     var data = this.dataForNode(node);
     if (attr) {
-      data.errors[attr] = msg;
+      if (!data.warnings) {
+        data.warnings = {}
+      }
+      data.warnings[attr] = msg;
     }
     $(node).trigger('psd.schema.warning', {
       node: node,
