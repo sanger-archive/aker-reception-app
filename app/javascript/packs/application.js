@@ -18,6 +18,8 @@ const moment = require('moment')
 
 // [PJ] need to import datatables in this way to get it working
 import dt from 'datatables.net';
+import 'datatables.net-bs/js/dataTables.bootstrap.js';
+import 'src/application.scss';
 
 require('select2')
 require('csv_field_checker')
