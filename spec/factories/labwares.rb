@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :labware do
     sequence(:labware_index) { |n| n }
-    material_submission
+    manifest
     print_count 0
     barcode nil
     container_id nil
@@ -20,7 +20,7 @@ FactoryBot.define do
     end
 
     trait :dispatched do
-      association :material_submission, factory: :dispatched_material_submission
+      association :manifest, factory: :dispatched_manifest
     end
 
     trait :received do

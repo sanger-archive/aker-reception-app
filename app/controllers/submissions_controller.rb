@@ -10,7 +10,7 @@ class SubmissionsController < ApplicationController
   end
 
   def update
-    sub_service = UpdateSubmissionService.new(material_submission, flash)
+    sub_service = UpdateManifestService.new(manifest, flash)
     unless sub_service.ready_for_step(params[:id])
       render_wizard
       return
@@ -21,21 +21,21 @@ class SubmissionsController < ApplicationController
     end
 
     if params[:id] == "provenance"
-      labware_params = params["material_submission"]["labware"]
+      labware_params = params["manifest"]["labware"]
       service = ProvenanceService.new(material_schema)
 
-      @status_success, @invalid_data = service.set_biomaterial_data(material_submission,
+      @status_success, @invalid_data = service.set_biomaterial_data(manifest,
                                                                     labware_params)
       # Return here so we don't advance to the next step if we're just changing tabs
-      if params["material_submission"]["change_tab"]
+      if params["manifest"]["change_tab"]
         render_wizard
         return
       end
       if @status_success
-        @status_success = material_submission.update(material_submission_params)
+        @status_success = manifest.update(manifest_params)
       end
     else
-      @status_success = material_submission.update(material_submission_params.merge(
+      @status_success = manifest.update(manifest_params.merge(
         status: step.to_s,
         last_step: last_step?))
     end
@@ -45,10 +45,10 @@ class SubmissionsController < ApplicationController
     end
 
     if last_step?
-      if material_submission.status!='dispatch'
+      if manifest.status!='dispatch'
         return error_render "Manifest not ready: please check previous steps"
       end
-      unless material_submission.ethical?
+      unless manifest.ethical?
         return error_render "Please go back and check the ethics step before proceeding."
       end
 
@@ -56,9 +56,9 @@ class SubmissionsController < ApplicationController
       cleanup = false
       begin
         success = DispatchService.new.process([
-          DispatchSteps::CreateMaterialsStep.new(material_submission),
-          DispatchSteps::CreateContainersStep.new(material_submission),
-          DispatchSteps::CreateSetsStep.new(material_submission),
+          DispatchSteps::CreateMaterialsStep.new(manifest),
+          DispatchSteps::CreateContainersStep.new(manifest),
+          DispatchSteps::CreateSetsStep.new(manifest),
           # CreateSetsStep should be last, because it is the least cleanupable
         ])
 
@@ -70,16 +70,16 @@ class SubmissionsController < ApplicationController
         logger.error e.backtrace
       ensure
         if !success && !cleanup
-          @material_submission.broken!
+          @manifest.broken!
         end
       end
 
       if success
         flash[:notice] = 'Your manifest has been created'
       elsif cleanup
-        flash[:error] = "The submission could not be created"
+        flash[:error] = "The Manifest could not be created"
       else
-        flash[:error] = "There has been a problem with the submission. Please contact support."
+        flash[:error] = "There has been a problem with the Manifest. Please contact support."
       end
 
       unless success
@@ -87,43 +87,43 @@ class SubmissionsController < ApplicationController
         return
       end
 
-      # upon successful submission, send an event for the warehouse to pickup
-      message = EventMessage.new(submission: @material_submission)
+      # upon successful Manifest, send an event for the warehouse to pickup
+      message = EventMessage.new(manifest: @manifest)
       EventService.publish(message)
     end
 
-    material_submission.update_attributes(status: get_next_status) if material_submission.valid?
-    render_wizard material_submission
+    manifest.update_attributes(status: get_next_status) if manifest.valid?
+    render_wizard manifest
   end
 
   # Receive biomaterial data, validate it and save it in the labware's 'contents' column (JSON)
   def biomaterial_data
     # Make sure we don't let anyone update the data after the wizard has completed
-    raise "This submission cannot be updated." unless material_submission.pending?
+    raise "This Manifest cannot be updated." unless manifest.pending?
 
-    labware_params = params["material_submission"]["labware"]
+    labware_params = params["manifest"]["labware"]
     service = ProvenanceService.new(material_schema)
-    @update_successful, @invalid_data = service.set_biomaterial_data(material_submission,
+    @update_successful, @invalid_data = service.set_biomaterial_data(manifest,
                                                                      labware_params,
                                                                      current_user)
 
-    if @update_successful && !params["material_submission"]["change_tab"]
-      @update_successful = material_submission.update_attributes(
+    if @update_successful && !params["manifest"]["change_tab"]
+      @update_successful = manifest.update_attributes(
         status: (any_human_material_no_hmdmc? ? 'ethics' : 'dispatch'))
     end
 
     if !@update_successful &&
-        (material_submission.status == 'dispatch' || material_submission.status == 'ethics')
+        (manifest.status == 'dispatch' || manifest.status == 'ethics')
       # If the given provenance is incomplete or wrong, make sure they're not in a later step
       #   (because they could have gone back and incorrected the material data).
-      material_submission.update_attributes(status: :provenance)
+      manifest.update_attributes(status: :provenance)
     end
   end
 
   def ethics_update
-    service = EthicsService.new(material_submission, flash)
+    service = EthicsService.new(manifest, flash)
     if service.update(ethics_params, current_user.email)
-      render_wizard material_submission
+      render_wizard manifest
     else
       render_wizard
     end
@@ -152,8 +152,8 @@ class SubmissionsController < ApplicationController
 
 protected
 
-  def material_submission
-    @material_submission ||= MaterialSubmission.find(params[:material_submission_id])
+  def manifest
+    @manifest ||= Manifest.find(params[:manifest_id])
   end
 
   def last_step?
@@ -164,12 +164,12 @@ protected
     step == steps.first
   end
 
-  helper_method :material_submission, :last_step?, :first_step?, :material_schema, :labware_at_index
+  helper_method :manifest, :last_step?, :first_step?, :material_schema, :labware_at_index
 
 private
 
-  def material_submission_params
-    params.require(:material_submission).permit(:supply_labwares,
+  def manifest_params
+    params.require(:manifest).permit(:supply_labwares,
                                                 :supply_decappers,
                                                 :no_of_labwares_required,
                                                 :status,
@@ -185,20 +185,20 @@ private
 
   def get_next_status
     return 'dispatch' if step==:provenance && !any_human_material?
-    return last_step? ? MaterialSubmission.ACTIVE : next_step.to_s
+    return last_step? ? Manifest.ACTIVE : next_step.to_s
   end
 
   def any_human_material?
-    material_submission&.any_human_material?
+    manifest&.any_human_material?
   end
 
-  # Check whether there is human material without HMDMC numbers in this submission
+  # Check whether there is human material without HMDMC numbers in this manifest
   def any_human_material_no_hmdmc?
-    material_submission&.any_human_material_no_hmdmc?
+    manifest&.any_human_material_no_hmdmc?
   end
 
   def labware_at_index(index)
-    material_submission.labwares.select { |lw| lw.labware_index == index }.first
+    manifest.labwares.select { |lw| lw.labware_index == index }.first
   end
 
   def finish_wizard_path

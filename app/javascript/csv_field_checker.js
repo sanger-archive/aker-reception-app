@@ -61,7 +61,7 @@ function checkCSVFields(table, files) {
   requiredFields = Array.prototype.slice.apply(materialSchema.required);
 
   // Reset any warnings (taxon ID/sci name duplication and human material without HMDMC)
-  SubmissionCSVWarnings.clearWarnings();
+  ManifestCSVWarnings.clearWarnings();
 
   // Remove "Scientific Name" from required fields, as it is populated based on taxon ID
   var sci_name_index = materialSchema.required.indexOf("scientific_name");
@@ -284,7 +284,7 @@ function validateCorrectPositions(results, positionField) {
       accessionedPositions.push(wellPosition);
     }
     return true;
-  })    
+  })
 }
 
 // Complete the data table using the mapped fields and CSV
@@ -361,7 +361,7 @@ function fillInTableFromFile() {
         var taxon_id = (row[matchedFields['taxon_id']] || '').trim();
         var hmdmc_number = (row[matchedFields['hmdmc']] || '').trim();
         if (taxon_id == 9606 && hmdmc_number == '') {
-          SubmissionCSVWarnings.addWarning("hmdmc");
+          ManifestCSVWarnings.addWarning("hmdmc");
         }
 
         // Fill in the actual row with the data

@@ -14,9 +14,9 @@ class Printer < ApplicationRecord
     "aker_code128_1dtube"
   end
 
-  def print_submissions(submissions)
+  def print_manifests(manifests)
     return true if Rails.configuration.printing_disabled
-    print_printables(submissions.flat_map { |submission| submission_to_printables(submission) })
+    print_printables(manifests.flat_map { |manifest| manifest_to_printables(manifest) })
   end
 
   def print_printables(printables)
@@ -41,16 +41,16 @@ class Printer < ApplicationRecord
   end
 
 private
-  def submission_to_printables(submission)
-    submission.labwares.map.with_index(1) do |lw,i|
+  def manifest_to_printables(manifest)
+    manifest.labwares.map.with_index(1) do |lw,i|
       {
         barcode: lw.barcode,
         sanger_human_barcode: lw.barcode,
         date: Date.today.to_s,
-        collaborator_email: submission.owner_email,
-        sub_id: submission.id,
+        collaborator_email: manifest.owner_email,
+        sub_id: manifest.id,
         number: i,
-        total_number: submission.labwares.length,
+        total_number: manifest.labwares.length,
         num_prints: lw.print_count+1,
       }
     end

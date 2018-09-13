@@ -29,7 +29,7 @@ require('single_table_manager')
 require('barcode_reader')
 require('sync_select_value')
 require('load_table')
-require('submission_csv_warnings')
+require('manifest_csv_warnings')
 require('loading_icon')
 require('show_previous_in_datatable')
 

@@ -47,7 +47,7 @@ import { checkCSVFields } from 'csv_field_checker'
         checkCSVFields(dataTable, e.originalEvent.dataTransfer.files);
       });
 
-    $('select#material_submission_contact_id').select2({
+    $('select#manifest_contact_id').select2({
       tags: true,
       minimumResultsForSearch: Infinity,
       tokenSeparators: [',', ' ']

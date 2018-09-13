@@ -21,9 +21,9 @@ class MaterialReception < ApplicationRecord
     end
   end
 
-  # Returns true if there are receptions for every labware in the submission
+  # Returns true if there are receptions for every labware in the manifest
   def all_received?
-    labware.material_submission.labwares.all?(&:received?)
+    labware.manifest.labwares.all?(&:received?)
   end
 
 private
@@ -41,7 +41,7 @@ private
 
     if not labware.barcode_dispatched?
       errors.add(:labware, "barcode has not been dispatched prior reception. Please contact the administrator.")
-    end    
+    end
   end
 
 end

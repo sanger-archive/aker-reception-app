@@ -47,7 +47,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
 
     context 'when creating a new submission' do
       let(:matsub) do
-        matsub = create(:material_submission,
+        matsub = create(:manifest,
                         supply_labwares: false,
                         owner_email: user.email)
         lt = create(:labware_type,
@@ -76,7 +76,7 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           allow(TaxonomyClient::Taxonomy).to receive(:find).with('3').and_return(tax_info)
           allow(TaxonomyClient::Taxonomy).to receive(:find).with('4').and_return(tax_info2)
 
-          visit material_submission_build_path(material_submission_id: matsub.id, id: 'provenance')
+          visit manifest_build_path(manifest_id: matsub.id, id: 'provenance')
         end
         context 'when writing a taxonomy id in a single input' do
           it 'uses the taxonomy service and searches for the id provided', js: true do

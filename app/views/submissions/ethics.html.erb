@@ -18,8 +18,8 @@
 
   <%= f.check_box :confirm_hmdmc_not_required,
                   label: 'I confirm that no HMDMC is required',
-                  checked: material_submission.confirmed_no_hmdmc? %>
+                  checked: manifest.confirmed_no_hmdmc? %>
 
-  <%= render 'buttons', material_submission: material_submission, f: f %>
+  <%= render 'buttons', manifest: manifest, f: f %>
 
 <% end %>
