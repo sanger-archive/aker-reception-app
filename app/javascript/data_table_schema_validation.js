@@ -246,7 +246,7 @@
     // If the schema checks fail, they will update the errorCells.
     // If they don't fail, we should update them in case they have out of date errors.
     var node = htmlField.node;
-    if (!failed) {
+    if (!failed && !warned) {
       $(node).trigger('psd.schema.success', { node: node })
     }
   };

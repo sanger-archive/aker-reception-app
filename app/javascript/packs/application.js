@@ -18,7 +18,7 @@ const moment = require('moment')
 
 // [PJ] need to import datatables in this way to get it working
 import dt from 'datatables.net';
-
+//require('table_cell_message_store')
 require('select2')
 require('csv_field_checker')
 require('component_builder')
@@ -32,6 +32,7 @@ require('load_table')
 require('submission_csv_warnings')
 require('loading_icon')
 require('show_previous_in_datatable')
+
 
 $(document).on("turbolinks:load", function() {
   //$('.has-tooltip').tooltip({trigger: 'click'});
