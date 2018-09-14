@@ -66,10 +66,8 @@ RSpec.configure do |config|
   Capybara.javascript_driver = :poltergeist_debug
 
   config.include Capybara::DSL
-
   config.include FactoryBot::Syntax::Methods
-
-  config.include WaitForAjax
+  config.include AuthenticationHelper
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)

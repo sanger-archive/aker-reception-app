@@ -463,37 +463,6 @@ RSpec.describe MaterialSubmission, type: :model do
     end
   end
 
-  describe "#supply_labware_type" do
-    context "when the material submission does not need labware supplied" do
-      before do
-        labware_type = create(:plate_labware_type)
-        @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: false)
-      end
-      it "should return 'Label for labware type'" do
-        expect(@material_submission.supply_labware_type).to eq 'Label for Plate'
-      end
-    end
-    context "when the material submission does need labware supplied" do
-      before do
-        labware_type = create(:plate_labware_type)
-        @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: true)
-      end
-      it "should return the labware type name" do
-        expect(@material_submission.supply_labware_type).to eq 'Plate'
-      end
-    end
-
-    context "when the submission needs decappers" do
-      before do
-        labware_type = create(:rack_labware_type)
-        @material_submission = create(:material_submission, labware_type: labware_type, supply_labwares: true, supply_decappers: true)
-      end
-      it "should return the labware type name with decappers" do
-        expect(@material_submission.supply_labware_type).to eq 'Rack with decappers'
-      end
-    end
-  end
-
   describe '#supply_decappers' do
     # supply_decappers cannot be true unless the labware type supports it, and supply_labwares is true.
 
@@ -537,6 +506,69 @@ RSpec.describe MaterialSubmission, type: :model do
     it "shouldn't allow a value less than 1" do
       expect(build(:material_submission, status: 'labware', supply_labwares: false, no_of_labwares_required: -2)).to_not be_valid
     end
+  end
+
+  describe '#dispatched?' do
+
+    context 'when dispatch_date is set' do
+      it 'is true' do
+        expect(build(:printed_material_submission, dispatch_date: Time.now).dispatched?).to be true
+      end
+    end
+
+    context 'when dispatch_date is nil' do
+      it 'is false' do
+        expect(build(:printed_material_submission).dispatched?).to be false
+      end
+    end
+
+  end
+
+  describe 'dispatch_date validation' do
+
+    context 'when status is not "printed"' do
+
+      it 'does not allow changing "dispatch_date"' do
+        expect(build(:active_material_submission, dispatch_date: Time.now)).to_not be_valid
+      end
+
+    end
+
+    context 'when status is "printed"' do
+
+      it 'does allow changing "dispatch_date"' do
+        expect(build(:printed_material_submission, dispatch_date: Time.now)).to be_valid
+      end
+    end
+
+  end
+
+  describe '#dispatch!' do
+
+    context 'when status is "printed"' do
+
+      before do
+        @material_submission = create(:printed_material_submission)
+      end
+
+      it 'sets the dispatch_date' do
+        expect { @material_submission.dispatch! }.to change { @material_submission.dispatch_date }
+      end
+
+    end
+
+    context 'when status is not "printed"' do
+
+      before do
+        @material_submission = create(:active_material_submission)
+      end
+
+      it 'raises an Error' do
+        expect { @material_submission.dispatch! }.to raise_error ActiveRecord::RecordInvalid
+      end
+
+    end
+
   end
 
 end
