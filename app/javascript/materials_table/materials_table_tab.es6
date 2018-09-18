@@ -11,6 +11,9 @@ class MaterialsTableTab {
       return new MaterialsTableInput(this.inputDataFor(input), tab, this.tableStore, this.messageStore)
     }, this))
 
+    this.form = $('form')
+    $(this.form).data('remote', true)
+
     this._cssNotEmptyTabClass = 'bg-info'
     this._cssEmptyTabClass = 'bg-warning'
     this._cssErrorTabClass = 'bg-danger'
@@ -19,17 +22,30 @@ class MaterialsTableTab {
   }
 
   update() {
+
+    if (this.tableStore.currentTab() === this) {
+      if (this.messageStore.anyErrorsForLabwareIndex(this.tabLabwareIndex())) {
+        this.renderError()
+      } else {
+        this.hideAlert()
+      }
+    }
+
     if (this.messageStore.anyErrorsForLabwareIndex(this.tabLabwareIndex())) {
-      $(this.tab).addClass(this._cssErrorTabClass);
-      $(this.tab).removeClass(this._cssNotEmptyTabClass);      
+      if (this.tableStore.currentTab() === this) {
+        this.renderError()
+      }
+      $(this.tab).parent().addClass(this._cssErrorTabClass);
+      $(this.tab).parent().removeClass(this._cssNotEmptyTabClass);      
     } else {
-      $(this.tab).removeClass(this._cssErrorTabClass);
+      $(this.tab).parent().removeClass(this._cssErrorTabClass);
     }
     this.inputTooltips.each((pos, tooltip) => { tooltip.update() })
   }
 
   save() {
     this.inputTooltips.each((pos, tooltip) => { tooltip.save() })
+
     let promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
       $.proxy(this.onReceive, this),
       $.proxy(this.onError, this)
@@ -37,8 +53,24 @@ class MaterialsTableTab {
     return promise
   }
 
+  saveWithoutLeaving() {
+    // If we are not leaving, we set up an input to tell the server we don't want to go to the next step
+    let changeTabField = $("<input name='manifest[change_tab]' value='true' type='hidden' />")
+    $(this.form).append(changeTabField)
+
+    let promise = this.save()
+
+    // We remove the previous setting
+    changeTabField.remove()  
+
+    return promise
+  }
+
   restore() {
-    this.inputTooltips.each((pos, tooltip) => { tooltip.restore() })
+    this.inputTooltips.each((pos, tooltip) => { 
+      tooltip.restore() 
+    })
+    return $.Deferred().resolve(true)
   }
 
   node() {
@@ -76,7 +108,42 @@ class MaterialsTableTab {
       address: id.match(/address\[([\w:]*)\]/)[1],
       fieldName: id.match(/fieldName\[([\w_]*)\]/)[1]
     }
-  }  
+  }
+
+  /**
+  * Saves the received data into the table store, so it will update the table
+  **/
+  onReceive(data) {
+    this.messageStore.loadMessages(data)
+    this.update()
+    return data
+  }
+
+  onError(e) {
+    this.showAlert({
+      title: 'Validation Error',
+      body: 'We could not save the current content due to an error'
+    })
+  }
+
+  showAlert(data) {
+    $('#page-error-alert > .alert-title').html(data.title)
+    $('#page-error-alert > .alert-msg').html(data.body)
+    $('#page-error-alert').toggleClass('hidden', false)
+    $('#page-error-alert > .alert-msg').html('')
+  }
+
+  hideAlert() {
+    $('#page-error-alert').toggleClass('hidden', true)
+  }
+
+  renderError() {
+    this.showAlert({
+      title: 'Validation problems',
+      body: 'Please review and solve the validation problems before continuing'})
+    let text = this.messageStore.errorsForLabware(this.tabLabwareIndex()).map((error, pos) => { return '<li>' + error + '</li>'})
+    $('#page-error-alert > .alert-msg').append(text)
+  }
 
   /**
   * DOM input nodes for the table. Only nodes related with the material information are returned

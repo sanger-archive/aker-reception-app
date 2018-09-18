@@ -4,6 +4,13 @@ class MaterialsTableInput {
     this.inputData = inputData
     this.tableStore = tableStore
     this.messageStore = messageStore
+
+    this.validate()
+    this.attachHandlers()
+  }
+
+  attachHandlers() {
+    $(this.inputData.input).on('blur', $.proxy(this.validate, this))    
   }
 
   update() {
@@ -64,6 +71,23 @@ class MaterialsTableInput {
     }
     this._hasTooltip = false
   }
+
+  /**
+  * Triggers a schema validation request to the DataTableSchemaValidation manager
+  **/
+  validate() {
+    this.messageStore.clearInput(this.inputData)
+    let input = this.inputData.input
+    let name = $(input).parents('td').data('psd-schema-validation-name')
+    if (name) {
+      $(input).trigger('psd.schema.validation', {
+        node: input,
+        name: name,
+        value: $(input).val()
+      })
+    }
+  }
+
 
 
 }

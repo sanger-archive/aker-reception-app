@@ -3,6 +3,14 @@ class MaterialsTableStore {
     this.store = store
   }
 
+  setCurrentTab(tab) {
+    this._currentTab = tab
+  }
+
+  currentTab() {
+    return this._currentTab
+  }  
+
   dataForTab(tab) {
     // This returns the labware object linked to the tab
     for (var key in this.store) {

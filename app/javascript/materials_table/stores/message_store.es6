@@ -12,6 +12,9 @@ class MessageStore {
         this.storeCellMessage(message.labwareIndex, message.address, message)
       }, this))
     }
+    if (data.update_successful) {
+      this.messageStore = {}
+    }
     return true
   }
 
@@ -21,6 +24,14 @@ class MessageStore {
       return this.messageStore[inputData.labwareIndex][inputData.address][inputData.fieldName]
     }
     return null
+  }
+
+  errorsForLabware(labwareIndex) {
+    let errors = []
+    for (var fieldName in this.messageStore[labwareIndex][null]) {
+      errors = errors.concat(this.messageStore[labwareIndex][null][fieldName].errors)
+    }
+    return errors
   }
 
   isEmpty() {
@@ -72,7 +83,9 @@ class MessageStore {
         if (!this.messageStore[labwareIndex][address][fieldName][facility]) {
           this.messageStore[labwareIndex][address][fieldName][facility] = []
         }
-        this.messageStore[labwareIndex][address][fieldName][facility].push(message[facility][fieldName])
+        if (!this.messageStore[labwareIndex][address][fieldName][facility].includes(message[facility][fieldName])) {
+          this.messageStore[labwareIndex][address][fieldName][facility].push(message[facility][fieldName])
+        }
       }
     }
   }
