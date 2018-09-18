@@ -6,26 +6,26 @@ Materials Awaiting Receipt
   data-psd-component-class="DataTableInitialization"
   data-psd-component-parameters="<%= { ordering: false }.to_json %>">
   <thead>
-    <th>Submission No.</th>
+    <th>Manifest No.</th>
     <th>Submitter</th>
     <th>Dispatched</th>
     <th>Missing Barcodes</th>
     <th></th>
   </thead>
   <tbody>
-    <% MaterialSubmission.awaiting_receipt.includes(:labwares).each do |submission| %>
+    <% Manifest.awaiting_receipt.includes(:labwares).each do |manifest| %>
       <% barcodes = [] %>
       <tr>
-        <td style="width: 110px"><%= submission.id %></td>
-        <td><%= submission.owner_email %></td>
-        <td><%= time_ago_in_words(submission.dispatch_date) + " ago" if submission.dispatch_date %></td>
+        <td style="width: 110px"><%= manifest.id %></td>
+        <td><%= manifest.owner_email %></td>
+        <td><%= time_ago_in_words(manifest.dispatch_date) + " ago" if manifest.dispatch_date %></td>
         <td>
-          <% submission.labwares.each do |lw| %>
+          <% manifest.labwares.each do |lw| %>
             <% barcodes.push(lw.barcode) unless lw.received? %>
           <% end %>
           <%= barcodes.join(', ') %>
         </td>
-        <td><%= link_to 'View', material_submission_path(submission), class: 'btn btn-default pull-right' %></td>
+        <td><%= link_to 'View', manifest_path(manifest), class: 'btn btn-default pull-right' %></td>
       </tr>
     <% end %>
   </tbody>

@@ -13,7 +13,7 @@
 
   proto.attachHandlers = function() {
     // Mirrors dropdown selection between both dropdown menus on the Completed
-    // Submissions page
+    // Manifests page
     this.selectNodes.change($.proxy(this.onChange, this));
   };
 

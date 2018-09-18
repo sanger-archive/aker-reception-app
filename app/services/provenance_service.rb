@@ -32,19 +32,19 @@ class ProvenanceService
     end
   end
 
-  # Process request to set the json data for labware in a given submission.
+  # Process request to set the json data for labware in a given manifest.
   # Returns a success boolean and an array of errors.
   # The data will be saved even if the validation failed, because it might be in-progress.
   # - [true, []] - nothing went wrong
   # - [false, [error1, error2, ...]] - some stuff went wrong; here is the information
   # - [false, []] - something unexpected went wrong
-  def set_biomaterial_data(material_submission, labware_params, current_user)
+  def set_biomaterial_data(manifest, labware_params, current_user)
     all_errors = []
 
     success = true
 
     # remove null or empty data from the params
-    material_submission.labwares.each do |labware|
+    manifest.labwares.each do |labware|
       labware_index = labware.labware_index
       labware_data = labware_params[labware_index.to_s]
       filtered_data = {}

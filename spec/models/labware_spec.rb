@@ -9,9 +9,9 @@ RSpec.describe Labware, type: :model do
                           num_of_rows: num_of_rows,
                           row_is_alpha: row_is_alpha,
                           col_is_alpha: col_is_alpha)
-    material_submission = create(:material_submission, labware_type: labware_type)
+    manifest = create(:manifest, labware_type: labware_type)
     lw_args = {
-      material_submission: material_submission,
+      manifest: manifest,
       labware_index: 1,
     }
     if attrs
