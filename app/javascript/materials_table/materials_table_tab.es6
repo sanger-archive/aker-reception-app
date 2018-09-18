@@ -30,6 +30,11 @@ class MaterialsTableTab {
 
   save() {
     this.inputTooltips.each((pos, tooltip) => { tooltip.save() })
+    let promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
+      $.proxy(this.onReceive, this),
+      $.proxy(this.onError, this)
+    )
+    return promise
   }
 
   restore() {

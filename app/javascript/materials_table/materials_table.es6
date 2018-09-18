@@ -17,7 +17,7 @@ class MaterialsTable {
 
     this.form = $('form')
     $(this.form).data('remote', true)
-    this.currentTab = this.tabs()[0]
+    this.currentTab = this.tabComponents[0]
 
     this.attachHandlers()
   }
@@ -81,23 +81,52 @@ class MaterialsTable {
     this.currentTab = this.findTabForNode(e.target)[0]
     this.currentTab.save()
 
-    let changeTabField = null
-
-    // If we are not leaving, we set up an input to tell the server we don't want to go to the next step
-    if (!leaving) {
-      changeTabField = $("<input name='material_submission[change_tab]' value='true' type='hidden' />")
-      $(this.form).append(changeTabField)
-    }
     let promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
       $.proxy(this.onReceive, this),
       $.proxy(this.onError, this)
     )
-    // We remove the previous setting
-    if (!leaving) {
-     changeTabField.remove()
-    }
     return promise
   }
+
+  /**
+  * Before going to the next page, it waits for the result of the saveTab operation. If the
+  * saving was correct it let us go to the next step. Otherwise it will display the error
+  * message and remain in this tab.
+  **/
+  saveCurrentTabBeforeLeaving(button, e) {
+    debugger
+    e.stopPropagation()
+    e.preventDefault()
+
+    // If we are not leaving, we set up an input to tell the server we don't want to go to the next step
+    let changeTabField = $("<input name='manifest[change_tab]' value='true' type='hidden' />")
+    $(this.form).append(changeTabField)
+
+    //this.saveTab({target: this.currentTab})
+    let promise = this.saveTab({target: this.currentTab.node()})
+
+    // We remove the previous setting
+    changeTabField.remove()
+
+    if (promise === null) {
+      return
+    }
+    promise.then($.proxy(function(data) {
+      if (data.update_successful && (this.tableStore.isEmpty())) {
+        window.location.href = $(button).attr('href')
+      } else {
+        this.currentTab.update()
+        /*this.showAlert({
+          title: 'Validation problems',
+          body: 'Please review and solve the validation problems before continuing'})
+        if (!data.update_successful) {
+          this.messageStore.loadMessages(data)
+        }
+        this.currentTab.update()*/
+      }
+    }, this), $.proxy(this.onError, this))
+  }
+
 
   /**
   * Saves the received data into the table store, so it will update the table
@@ -105,6 +134,7 @@ class MaterialsTable {
   onReceive(data) {
     this.messageStore.loadMessages(data)
     this.update()
+    return data
   }
 
   onError(e) {
@@ -139,37 +169,6 @@ class MaterialsTable {
 
   addErrorToMainAlertError(text) {
     $('#page-error-alert > .alert-msg').append(text)
-  }
-
-  /**
-  * Before going to the next page, it waits for the result of the saveTab operation. If the
-  * saving was correct it let us go to the next step. Otherwise it will display the error
-  * message and remain in this tab.
-  **/
-  saveCurrentTabBeforeLeaving(button, e) {
-    e.stopPropagation()
-    e.preventDefault()
-
-    this.currentTab = this.findTabForNode(e.target)[0]
-
-    //this.saveTab({target: this.currentTab})
-    let promise = this.currentTab.save()
-    if (promise === null) {
-      return
-    }
-    promise.then($.proxy(function(data) {
-      if (data.update_successful && (this.tableStore.isEmpty())) {
-        window.location.href = $(button).attr('href')
-      } else {
-        this.showAlert({
-          title: 'Validation problems',
-          body: 'Please review and solve the validation problems before continuing'})
-        if (!data.update_successful) {
-          this.messageStore.loadMessages(data)
-        }
-        this.currentTab.update()
-      }
-    }, this), $.proxy(this.onError, this))
   }
 
   /**

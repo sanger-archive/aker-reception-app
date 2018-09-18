@@ -1,9 +1,9 @@
 <ul class="nav navbar-nav">
   <li>
-    <%= link_to 'Manifests', material_submissions_path, id: ("current-page-#{Rails.env.downcase}" if (params[:controller] == 'material_submissions' && params[:action] != 'show') || params[:controller] == 'submissions') %>
+    <%= link_to 'Manifests', manifests_path, id: ("current-page-#{Rails.env.downcase}" if (params[:controller] == 'manifests' && params[:action] != 'show') || params[:controller] == 'manifests') %>
   </li>
   <li>
-    <%= link_to('Dispatch Labware', material_submissions_print_index_path, id: ("current-page-#{Rails.env.downcase}" if current_page?(controller: 'material_submissions/print') || current_page?(controller: 'material_submissions/dispatch'))) if user_is_ssr %>
+    <%= link_to('Dispatch Labware', manifests_print_index_path, id: ("current-page-#{Rails.env.downcase}" if current_page?(controller: 'manifests/print') || current_page?(controller: 'manifests/dispatch'))) if user_is_ssr %>
   </li>
   <li>
     <%= link_to 'Awaiting Reception', material_receptions_waiting_path, id: ("current-page-#{Rails.env.downcase}" if (params[:action] == 'pending_receptions'))  %>

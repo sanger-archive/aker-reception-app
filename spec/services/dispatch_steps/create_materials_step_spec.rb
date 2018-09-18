@@ -41,7 +41,7 @@ RSpec.describe :create_materials_step do
     # The 'contact' for a submission has most recently been renamed to 'Sample Guardian' while the
     # 'owner_email' refers to the creator of the submission. Within materials, the 'owner_email' is
     # used as the 'submitter_id' indicating who submitted the materials.
-    @submission = double(:material_submission, labwares: labwares,
+    @submission = double(:manifest, labwares: labwares,
                                                contact: contact,
                                                owner_email: owner.email)
   end

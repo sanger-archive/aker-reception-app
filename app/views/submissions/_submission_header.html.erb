@@ -5,14 +5,14 @@
 <div class="row">
   <div class="col-md-12">
     <p style="padding: 15px; margin: 15px 0" class="bg-info">
-      Please read <%= link_to "submission guidance (v9.1)", "#{Rails.application.config.relative_url_root}/SM_GDL_0006 Guidelines for Sample Submission v9.1.pdf" %> before submitting your material.
+      Please read <%= link_to "manifest guidance (v9.1)", "#{Rails.application.config.relative_url_root}/SM_GDL_0006 Guidelines for Sample Manifest v9.1.pdf" %> before submitting your material.
     </p>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-12">
-    <%= render "error_messages", target: material_submission %>
+    <%= render "error_messages", target: manifest %>
     <div id="warning-messages" class="alert alert-warning hidden" role="alert">
     </div>
   </div>
@@ -25,7 +25,7 @@
       <div class="progress">
         <div class="progress-bar"></div>
       </div>
-      <% unless wizard_step.to_s == "ethics" && step.to_s == "dispatch" && !material_submission&.any_human_material? %>
+      <% unless wizard_step.to_s == "ethics" && step.to_s == "dispatch" && !manifest&.any_human_material? %>
       <%= link_to '', wizard_step.to_s, class: "step-indicator",
             data: { confirm: 'Are you sure you wish to go back? You will lose unsaved progress on the curent step' } %>
       <% else %>

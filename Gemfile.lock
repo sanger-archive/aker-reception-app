@@ -33,9 +33,9 @@ GIT
 
 GIT
   remote: https://github.com/sanger/aker-shared-navbar.git
-  revision: 799969a1cebd2d27da912c03249b80b631a66061
+  revision: 9de67316a9671508b3fb78d4e31f3311407fbbca
   specs:
-    aker_shared_navbar (0.1.9)
+    aker_shared_navbar (0.1.10)
 
 GIT
   remote: https://github.com/sanger/aker-stamp-client.git

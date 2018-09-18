@@ -1,9 +1,0 @@
-<tr>
-  <td><%= check_box_tag "material_submission_ids[]", material_submission.id %>
-  <td><%= material_submission.id %></td>
-  <td><%= material_submission.status %></td>
-  <td><%= material_submission.owner_email %></td>
-  <td><%= localize(material_submission.created_at, format: :terse) %></td>
-  <td><%= material_submission.no_of_labwares_required %></td>
-  <td><%= supply_labware_type(material_submission) %></td>
-</tr>

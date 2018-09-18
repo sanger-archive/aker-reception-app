@@ -1,5 +1,5 @@
 class Contact < ApplicationRecord
-  has_many :material_submissions
+  has_many :manifests
 
   before_validation :sanitise_fullname, :sanitise_email
   before_save :sanitise_fullname, :sanitise_email

@@ -1,0 +1,7 @@
+<% content_for :main_title do %>
+  Edit Manifest
+<% end %>
+
+<%= render :partial => 'form', :locals => { :manifest => @manifest, :readonly => false} %>
+
+<%= link_to 'Back', :back, class: 'btn btn-primary' %>
