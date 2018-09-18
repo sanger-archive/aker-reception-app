@@ -27,6 +27,12 @@ class MessageStore {
     return (Object.keys(this.messageStore).length == 0)
   }
 
+  clearInput(inputData) {
+    if (this.messageFor(inputData)!=null) {
+      this.messageStore[inputData.labwareIndex][inputData.address][inputData.fieldName]=null
+    }
+  }
+
   /**
   * Private methods
   **/
@@ -34,7 +40,7 @@ class MessageStore {
     if (labwareIndex && this.messageStore) {
       let lwe = this.messageStore[labwareIndex]
       if (lwe) {
-        for (let i of lwe) {
+        for (let i in lwe) {
           if (lwe[i] && !$.isEmptyObject(lwe[i])) {
             return true
           }

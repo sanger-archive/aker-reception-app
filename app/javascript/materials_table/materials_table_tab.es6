@@ -8,7 +8,7 @@ class MaterialsTableTab {
     this.messageStore = messageStore
 
     this.inputTooltips = this.inputs().map($.proxy((pos, input) => { 
-      new MaterialsTableInput(input, tab, this.tableStore, this.messageStore)
+      return new MaterialsTableInput(this.inputDataFor(input), tab, this.tableStore, this.messageStore)
     }, this))
 
     this._cssNotEmptyTabClass = 'bg-info'
@@ -20,24 +20,28 @@ class MaterialsTableTab {
 
   update() {
     if (this.messageStore.anyErrorsForLabwareIndex(this.tabLabwareIndex())) {
-      $(tab).addClass(this._cssErrorTabClass);
-      $(tab).removeClass(this._cssNotEmptyTabClass);      
+      $(this.tab).addClass(this._cssErrorTabClass);
+      $(this.tab).removeClass(this._cssNotEmptyTabClass);      
     } else {
-      $(tab).removeClass(this._cssErrorTabClass);
+      $(this.tab).removeClass(this._cssErrorTabClass);
     }
     this.inputTooltips.each((pos, tooltip) => { tooltip.update() })
   }
 
   save() {
-    this.inputTooltips.each($.proxy(this.save, this, data));
+    this.inputTooltips.each((pos, tooltip) => { tooltip.save() })
   }
 
   restore() {
-    this.inputTooltips.each($.proxy(this.restore, this, data));
+    this.inputTooltips.each((pos, tooltip) => { tooltip.restore() })
+  }
+
+  node() {
+    return this.tab
   }
 
   tabLabwareIndex() {
-    var id = this.tab.attr('id');
+    var id = $(this.tab).attr('id');
     var matching = id.match(/labware_tab\[([0-9]+)\]/);
     return matching ? matching[1] : null;
   }
@@ -55,20 +59,35 @@ class MaterialsTableTab {
   }
 
   /**
+   * Returns the fields from the cell of the given ID
+   */
+  inputDataFor(input) {
+    var id = $(input).attr('id')
+    return {
+      id: id,
+      input: input,
+      tab: this.tab,
+      labwareIndex: id.match(/^labware\[(\d*)\]/)[1],
+      address: id.match(/address\[([\w:]*)\]/)[1],
+      fieldName: id.match(/fieldName\[([\w_]*)\]/)[1]
+    }
+  }  
+
+  /**
   * DOM input nodes for the table. Only nodes related with the material information are returned
   **/
   inputs() {
     if (!this._inputs) {
       let idx = this.labwareIndex()
       this._inputs = $('form input').filter(function(pos, input) {
-        return($(input).attr('id') && $(input).attr('id').search("labware["+idx+"]")>=0)
+        return($(input).attr('id') && $(input).attr('id').search("labware\\["+idx+"\\]")>=0)
       })
     }
     return this._inputs
   }
 
   labwareIndex() {
-    $(this.tab).attr('href').match(/#Labware([\d]*)/)[1]
+    return $(this.tab).attr('href').match(/#Labware([\d]*)/)[1]
   }
 
 }

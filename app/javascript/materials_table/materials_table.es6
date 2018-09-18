@@ -12,7 +12,7 @@ class MaterialsTable {
 
 
     this.tabComponents = this.tabs().map($.proxy((pos, tab) => {
-      new MaterialsTableTab(tab, this.tableStore, this.messageStore)
+      return new MaterialsTableTab(tab, this.tableStore, this.messageStore)
     }, this))
 
     this.form = $('form')
@@ -20,6 +20,10 @@ class MaterialsTable {
     this.currentTab = this.tabs()[0]
 
     this.attachHandlers()
+  }
+
+  update() {
+    this.tabComponents.each((pos, tab) => { tab.update()})
   }
 
   attachHandlers() {
@@ -31,9 +35,9 @@ class MaterialsTable {
     // If you have one
     let button = $('.save')
     button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button))
-    $(this.node).on('psd.schema.success', $.proxy(this.onReceive, this))
-    $(this.node).on('psd.schema.error', $.proxy(this.onReceive, this))
-    $(this.node).on('psd.schema.warning', $.proxy(this.onReceive, this))
+    $(this.node).on('psd.schema.success', $.proxy(this.onValidation, this))
+    $(this.node).on('psd.schema.error', $.proxy(this.onValidation, this))
+    $(this.node).on('psd.schema.warning', $.proxy(this.onValidation, this))
 
     $('input[type=submit]').on('click', $.proxy(this.toNextStep, this))
   }
@@ -41,13 +45,17 @@ class MaterialsTable {
   /**
   * Triggers a schema validation request to the DataTableSchemaValidation manager
   **/
-  validateInput(e, fromUserInteraction) {
+  validateInput(fromUserInteraction, e) {
     let input = e.target
     let name = $(input).parents('td').data('psd-schema-validation-name')
     //$(input).parent().removeClass('has-error')
 
     // It will store in the input that we are interacting with the input, so we can take
     // decissions in future about how to display the potential errors
+    let tabForInput = this.findTabForInput(input)[0]
+    let inputData = tabForInput.inputDataFor(input)
+    this.messageStore.clearInput(inputData)
+
     $(input).data('fromUserInteraction', fromUserInteraction)
     if (name) {
       $(input).trigger('psd.schema.validation', {
@@ -63,7 +71,7 @@ class MaterialsTable {
   **/
   restoreTab(e) {
     this.currentTab = this.findTabForNode(e.target)[0]
-    this.currentTab().restore()
+    this.currentTab.restore()
   }
 
   /**
@@ -73,9 +81,11 @@ class MaterialsTable {
     this.currentTab = this.findTabForNode(e.target)[0]
     this.currentTab.save()
 
+    let changeTabField = null
+
     // If we are not leaving, we set up an input to tell the server we don't want to go to the next step
     if (!leaving) {
-      let changeTabField = $("<input name='material_submission[change_tab]' value='true' type='hidden' />")
+      changeTabField = $("<input name='material_submission[change_tab]' value='true' type='hidden' />")
       $(this.form).append(changeTabField)
     }
     let promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(
@@ -92,8 +102,9 @@ class MaterialsTable {
   /**
   * Saves the received data into the table store, so it will update the table
   **/
-  onReceive(e,data) {
-    return this.tableStore.loadMessages(data)
+  onReceive(data) {
+    this.messageStore.loadMessages(data)
+    this.update()
   }
 
   onError(e) {
@@ -101,7 +112,11 @@ class MaterialsTable {
       title: 'Validation Error',
       body: 'We could not save the current content due to an error'
     })
-  }  
+  }
+
+  onValidation(e,data) {
+    return this.onReceive(data)
+  }
 
   showAlert(data) {
     $('#page-error-alert > .alert-title').html(data.title)
@@ -188,16 +203,21 @@ class MaterialsTable {
   * Finds the tab component that has control over a DOM node
   **/
   findTabForNode(node) {
-    return this.tabComponents.filter($.proxy(function(tab) { 
+    return this.tabComponents.filter($.proxy(function(pos, tab) { 
       return (tab.node() === node)
+    }, this))
+  }
+
+  findTabForInput(input) {
+    return this.tabComponents.filter($.proxy(function(pos, tab) { 
+      return (tab.inputs().toArray().includes(input))
     }, this))
   }
 
 }
 
   $(document).ready(function() {
-    debugger;
-    $(document).trigger('registerComponent.builder', {'SingleTableManager': MaterialsTableTab});
+    $(document).trigger('registerComponent.builder', {'SingleTableManager': MaterialsTable});
   });
 
 export default MaterialsTable

@@ -50,7 +50,7 @@ class MaterialsTableStore {
           data["contents"][info.address] = {}
         }
         data["contents"][info.address][info.fieldName] = v
-      } else if (this.fieldData(data, info.address, info.fieldName) != null) {
+      } else if (this.getValueForInput(info) != null) {
         data["contents"][info.address][info.fieldName] = null
       }
     }    

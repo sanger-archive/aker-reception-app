@@ -1,16 +1,16 @@
 class MaterialsTableInput {
-  constructor(input, tab, tableStore, messageStore) {
+  constructor(inputData, tab, tableStore, messageStore) {
     this.tab = tab
-    this.inputData = this.inputDataFor(input)
+    this.inputData = inputData
     this.tableStore = tableStore
     this.messageStore = messageStore
   }
 
   update() {
+    this.cleanMessage()
     var msg = this.messageStore.messageFor(this.inputData)
     if (msg) {
-      this.cleanMessage()
-      this.showMessage(msg)
+      setTimeout($.proxy(() => { this.showMessage(msg)}, this), 0)
     }
   }
 
@@ -24,21 +24,6 @@ class MaterialsTableInput {
 
   save() {
     this.tableStore.setValueForInput(this.inputData)
-  }
-
-  /**
-   * Returns the fields from the cell of the given ID
-   */
-  inputDataFor(input) {
-    var id = $(input).attr('id')
-    return {
-      id: id,
-      input: input,
-      tab: this.tab,
-      labwareIndex: id.match(/^labware\[(\d*)\]/)[1],
-      address: id.match(/address\[([\w:]*)\]/)[1],
-      fieldName: id.match(/fieldName\[([\w_]*)\]/)[1]
-    }
   }
 
   showMessage(msg) {
@@ -66,12 +51,18 @@ class MaterialsTableInput {
     $(input).on('blur.tooltip', onBlurInput);
     $(input).data('fromUserInteraction', false)
     $(input).parent().addClass(cssClass)
+    this._hasTooltip = true
   }
 
 
   cleanMessage() {
-    $(this.inputData.input).off('click.tooltip')
-    $(this.inputData.input).off('blur.tooltip')
+    if (this._hasTooltip) {
+      $(this.inputData.input).parent().removeClass('has-error')
+      $(this.inputData.input).parent().removeClass('has-warning')
+      $(this.inputData.input).off('click.tooltip')
+      $(this.inputData.input).off('blur.tooltip')
+    }
+    this._hasTooltip = false
   }
 
 
