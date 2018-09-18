@@ -1,19 +1,21 @@
-import SingleTableInput from 'single_table_input'
+import MaterialsTableInput from 'materials_table/materials_table_input'
 
-class SingleTableTab {
+class MaterialsTableTab {
 
   constructor(tab, tableStore, messageStore) {
     this.tab = tab
     this.tableStore = tableStore
     this.messageStore = messageStore
 
-    this.inputTooltips = inputs().map($.proxy((pos, input) => { 
-      new SingleTableInput(input, tab, this.tableStore, this.messageStore)
+    this.inputTooltips = this.inputs().map($.proxy((pos, input) => { 
+      new MaterialsTableInput(input, tab, this.tableStore, this.messageStore)
     }, this))
 
     this._cssNotEmptyTabClass = 'bg-info'
     this._cssEmptyTabClass = 'bg-warning'
     this._cssErrorTabClass = 'bg-danger'
+
+    this.updateTabContentPresenceStatus()
   }
 
   update() {
@@ -29,7 +31,6 @@ class SingleTableTab {
   save() {
     this.inputTooltips.each($.proxy(this.save, this, data));
   }
-
 
   restore() {
     this.inputTooltips.each($.proxy(this.restore, this, data));
@@ -50,9 +51,27 @@ class SingleTableTab {
   isTabWithContent() {
     var data = this.tableStore.dataForTab(this.tab); // data is the labware for this tab
 
-    return (data["contents"] != null);
+    return (data && (data["contents"] != null));
+  }
+
+  /**
+  * DOM input nodes for the table. Only nodes related with the material information are returned
+  **/
+  inputs() {
+    if (!this._inputs) {
+      let idx = this.labwareIndex()
+      this._inputs = $('form input').filter(function(pos, input) {
+        return($(input).attr('id') && $(input).attr('id').search("labware["+idx+"]")>=0)
+      })
+    }
+    return this._inputs
+  }
+
+  labwareIndex() {
+    $(this.tab).attr('href').match(/#Labware([\d]*)/)[1]
   }
 
 }
 
-export default SingleTableTab
+
+export default MaterialsTableTab

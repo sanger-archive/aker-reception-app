@@ -1,4 +1,4 @@
-class SingleTableInput {
+class MaterialsTableInput {
   constructor(input, tab, tableStore, messageStore) {
     this.tab = tab
     this.inputData = this.inputDataFor(input)
@@ -15,7 +15,7 @@ class SingleTableInput {
   }
 
   restore() {
-    var value = this.tableStore.getDataForInput(this.inputData)
+    var value = this.tableStore.getValueForInput(this.inputData)
     if (value) {
       $(this.inputData.input).val(value)
       this.update()
@@ -23,7 +23,7 @@ class SingleTableInput {
   }
 
   save() {
-    this.tableStore.setDataForInput(this.inputData)
+    this.tableStore.setValueForInput(this.inputData)
   }
 
   /**
@@ -77,4 +77,4 @@ class SingleTableInput {
 
 }
 
-export default SingleTableInput
+export default MaterialsTableInput
