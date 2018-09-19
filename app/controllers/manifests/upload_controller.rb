@@ -1,6 +1,6 @@
 class Manifests::UploadController < ApplicationController
 
-  # POST /manifests/create
+  # POST /manifests/upload
   def create
     render transformed_response.response
   end
@@ -19,6 +19,7 @@ private
     manifest.path
   end
 
+  # manifest is an uploaded file. Will be an instance of ruby IO class (probably File).
   def manifest
     params[:manifest]
   end
