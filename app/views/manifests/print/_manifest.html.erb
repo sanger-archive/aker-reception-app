@@ -1,0 +1,9 @@
+<tr>
+  <td><%= check_box_tag "manifest_ids[]", manifest.id %>
+  <td><%= manifest.id %></td>
+  <td><%= manifest.status %></td>
+  <td><%= manifest.owner_email %></td>
+  <td><%= localize(manifest.created_at, format: :terse) %></td>
+  <td><%= manifest.no_of_labwares_required %></td>
+  <td><%= supply_labware_type(manifest) %></td>
+</tr>

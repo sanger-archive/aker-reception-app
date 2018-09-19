@@ -1,0 +1,30 @@
+<% content_for :main_title do %>
+  My Manifests
+<% end %>
+<% content_for :title_button do %>
+  <%= link_to 'Create New Manifest', new_manifest_path,
+        class: 'btn btn-success pull-right',
+        style: "margin-top: 23px" %>
+<% end %>
+
+<div class="row">
+  <div class="col-md-12">
+    <h4>Incomplete Manifests</h4>
+    <% if @pending_manifests.length == 0 %>
+      <p>You don't have any incomplete manifests.</p>
+    <% else %>
+      <%= render "manifest_table", manifests: @pending_manifests %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <h4>Submitted Manifests <small>Awaiting processing by Sample Management</small></h4>
+    <% if @active_manifests.length == 0 %>
+      <p>None of your submitted manifests are awaiting processing.</p>
+    <% else %>
+      <%= render "manifest_table", manifests: @active_manifests %>
+    <% end %>
+  </div>
+</div>

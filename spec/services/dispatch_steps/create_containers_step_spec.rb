@@ -54,7 +54,7 @@ RSpec.describe :create_containers_step do
 
   def make_submission
     labwares = (1..2).map { |i| make_labware(i) }
-    @submission = double(:material_submission, labwares: labwares)
+    @submission = double(:manifest, labwares: labwares)
   end
 
   def make_step

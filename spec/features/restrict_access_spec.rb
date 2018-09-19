@@ -12,12 +12,12 @@ RSpec.feature 'RestrictAccess', type: :feature do
       let(:user) { OpenStruct.new(email: 'ssr@sanger.ac.uk', groups: ['team252']) }
 
       it 'allows access to the print page' do
-        visit material_submissions_print_index_path
+        visit manifests_print_index_path
         expect(page).to_not have_content('Permission Denied')
       end
 
       it 'allows access to the dispatch page' do
-        visit material_submissions_dispatch_index_path
+        visit manifests_dispatch_index_path
         expect(page).to_not have_content('Permission Denied')
       end
 
@@ -31,12 +31,12 @@ RSpec.feature 'RestrictAccess', type: :feature do
       let(:user) { OpenStruct.new(email: 'user@sanger.ac.uk', groups: ['world']) }
 
       it 'denies access to the print page' do
-        visit material_submissions_print_index_path
+        visit manifests_print_index_path
         expect(page).to have_content('Permission Denied')
       end
 
       it 'denies access to the dispatch page' do
-        visit material_submissions_dispatch_index_path
+        visit manifests_dispatch_index_path
         expect(page).to have_content('Permission Denied')
       end
 

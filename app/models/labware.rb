@@ -1,11 +1,11 @@
 class Labware < ApplicationRecord
-  belongs_to :material_submission
+  belongs_to :manifest
   has_one :material_reception
 
   delegate :num_of_rows, :num_of_cols, :col_is_alpha, :row_is_alpha, to: :labware_type
 
   def labware_type
-    material_submission.labware_type
+    manifest.labware_type
   end
 
   def increment_print_count!
@@ -21,7 +21,7 @@ class Labware < ApplicationRecord
   end
 
   def barcode_dispatched?
-    material_submission && material_submission.dispatched?
+    manifest && manifest.dispatched?
   end
 
   def received?

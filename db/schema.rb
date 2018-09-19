@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_05_093717) do
+ActiveRecord::Schema.define(version: 2018_09_13_103721) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -54,7 +54,7 @@ ActiveRecord::Schema.define(version: 2018_09_05_093717) do
   end
 
   create_table "labwares", id: :serial, force: :cascade do |t|
-    t.integer "material_submission_id", null: false
+    t.integer "manifest_id", null: false
     t.integer "labware_index", null: false
     t.integer "print_count", default: 0, null: false
     t.json "contents"
@@ -64,17 +64,10 @@ ActiveRecord::Schema.define(version: 2018_09_05_093717) do
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_labwares_on_barcode", unique: true
     t.index ["container_id"], name: "index_labwares_on_container_id", unique: true
-    t.index ["material_submission_id", "labware_index"], name: "index_labwares_on_material_submission_id_and_labware_index", unique: true
+    t.index ["manifest_id", "labware_index"], name: "index_labwares_on_manifest_id_and_labware_index", unique: true
   end
 
-  create_table "material_receptions", id: :serial, force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "labware_id", null: false
-    t.index ["labware_id"], name: "index_material_receptions_on_labware_id", unique: true
-  end
-
-  create_table "material_submissions", id: :serial, force: :cascade do |t|
+  create_table "manifests", id: :serial, force: :cascade do |t|
     t.integer "no_of_labwares_required"
     t.boolean "supply_labwares"
     t.integer "labware_type_id"
@@ -84,14 +77,21 @@ ActiveRecord::Schema.define(version: 2018_09_05_093717) do
     t.text "address"
     t.integer "contact_id"
     t.uuid "set_id"
-    t.string "material_submission_uuid"
+    t.string "manifest_uuid"
     t.citext "owner_email"
     t.boolean "supply_decappers", default: false, null: false
     t.datetime "dispatch_date"
-    t.index ["contact_id"], name: "index_material_submissions_on_contact_id"
-    t.index ["dispatch_date"], name: "index_material_submissions_on_dispatch_date", using: :btree
-    t.index ["labware_type_id"], name: "index_material_submissions_on_labware_type_id"
-    t.index ["owner_email"], name: "index_material_submissions_on_owner_email"
+    t.index ["contact_id"], name: "index_manifests_on_contact_id"
+    t.index ["dispatch_date"], name: "index_manifests_on_dispatch_date"
+    t.index ["labware_type_id"], name: "index_manifests_on_labware_type_id"
+    t.index ["owner_email"], name: "index_manifests_on_owner_email"
+  end
+
+  create_table "material_receptions", id: :serial, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "labware_id", null: false
+    t.index ["labware_id"], name: "index_material_receptions_on_labware_id", unique: true
   end
 
   create_table "printers", id: :serial, force: :cascade do |t|
@@ -102,8 +102,8 @@ ActiveRecord::Schema.define(version: 2018_09_05_093717) do
     t.index ["name"], name: "index_printers_on_name", unique: true
   end
 
-  add_foreign_key "labwares", "material_submissions", on_delete: :cascade
+  add_foreign_key "labwares", "manifests", on_delete: :cascade
+  add_foreign_key "manifests", "contacts"
+  add_foreign_key "manifests", "labware_types"
   add_foreign_key "material_receptions", "labwares"
-  add_foreign_key "material_submissions", "contacts"
-  add_foreign_key "material_submissions", "labware_types"
 end

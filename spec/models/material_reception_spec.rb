@@ -113,7 +113,7 @@ RSpec.describe MaterialReception, type: :model do
 
   describe "#all_received?" do
     before do
-      @labware2 = create(:dispatched_labware, labware_index: 2, barcode: 'AKER-43', material_submission: @labware.material_submission)
+      @labware2 = create(:dispatched_labware, labware_index: 2, barcode: 'AKER-43', manifest: @labware.manifest)
       # A piece of labware from another submission:
       @labware_x = create(:labware, barcode: 'AKER-616')
     end

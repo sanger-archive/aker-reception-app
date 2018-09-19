@@ -1,0 +1,44 @@
+<%= bootstrap_form_for(manifest) do |f| %>
+
+  <div class="field">
+    <%= f.text_field :id, readonly: true %>
+  </div>
+
+  <div class="field">
+    <%= f.text_field :no_of_labwares_required, readonly: readonly %>
+  </div>
+
+  <div class="field">
+    <%= f.text_field :supply_labwares, value: supply_labwares_desc(manifest), readonly: readonly %>
+  </div>
+
+  <div class="field">
+    <%= f.select :labware_type, available_labware_types_select_options, {selected: manifest.labware_type_id}, {disabled: readonly } %>
+  </div>
+
+  <div class="field">
+    <%= f.text_field :status, readonly: readonly %>
+  </div>
+
+  <div class="field">
+    <%= f.text_field :owner_email, readonly: readonly %>
+  </div>
+
+  <div class="field">
+    <%= f.text_area :address, style: 'resize: none; width: 100%; height: 10em;', disabled: readonly %>
+  </div>
+
+  <div class="field">
+    <%= f.select :contact, available_contacts_select_options, {selected: manifest.contact_id}, {disabled: readonly }%>
+  </div>
+
+  <% if manifest.labwares.any? { |lw| lw.barcode } %>
+    <div class="labwares">
+      <label>Labware</label>
+      <%= render partial: 'labware', locals: { labwares: manifest.labwares } %>
+    </div>
+  <% end %>
+
+  <br>
+
+<% end %>

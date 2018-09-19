@@ -1,0 +1,24 @@
+<tr>
+  <td><%= manifest.id %></td>
+  <td><%= manifest.labware_type&.name || '(Not selected)' %></td>
+  <td><%= manifest.no_of_labwares_required %></td>
+  <td><%= supply_labwares_desc(manifest) %></td>
+  <td><%= localize(manifest.updated_at, format: :terse) %></td>
+  <td align="right">
+    <% if manifest.active? %>
+      <%= link_to 'View', manifest_path(manifest), class: 'btn btn-default' %>
+    <% else %>
+      <%= link_to 'Continue',
+                  manifest_build_path(id: manifest.status || 'labware',
+                                                 manifest_id: manifest.id),
+                  style: 'margin-right: 10px;',
+                  class: 'btn btn-primary' %>
+
+      <%= link_to 'Cancel',
+                  manifest,
+                  method: :delete,
+                  class: 'btn btn-danger',
+                  data: { confirm: 'Are you sure you wish to cancel this manifest?' } %>
+    <% end %>
+  </td>
+</tr>

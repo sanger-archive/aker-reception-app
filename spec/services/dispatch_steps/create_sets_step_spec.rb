@@ -35,7 +35,7 @@ RSpec.describe :create_sets_step do
     labwares = [make_labware, make_labware]
     contact = double('contact', email: 'jeff')
     owner = double('owner', email: 'contact@email')
-    @submission = double(:material_submission, id: 537, labwares: labwares, set_id: set_id, 
+    @submission = double(:manifest, id: 537, labwares: labwares, set_id: set_id,
       contact: contact, owner_email: owner.email)
     allow(@submission).to receive(:set_id=)
     allow(@submission).to receive(:update_attributes)
