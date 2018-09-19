@@ -42,10 +42,10 @@ function csvErrorToText(list) {
 
 // Checks the header fields from the CSV against the fields required for the material service
 // TODO: refactor into class
-function checkCSVFields(table, data) {
+function checkCSVFields(table, csvData) {
   // Get the table and file
   dataTable = table;
-  file = data;
+  file = csvData;
 
   // Clear the matched fields
   matchedFields = {};
