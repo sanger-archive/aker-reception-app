@@ -1,4 +1,4 @@
-# Transformers convert content from a file from form to another e.g. Excel Spreadsheet --> CSV
+# Transformers convert content from a file from one form to another e.g. Excel Spreadsheet --> CSV
 #
 # It has one primary method: #transform, which performs the actual transformation
 #
