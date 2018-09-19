@@ -65,6 +65,13 @@ import Reception from './routes';
 
   }
 
+  // Send the manifest to the server, convert it to CSV, and then have the front end
+  // do all the validation and produce all those helpful warnings.
+  //
+  // It used to be that only CSV was supported (still as it is done now with all the processing
+  // taking place in the front end). The reason Excel spreadsheets are sent up and come back
+  // as CSVs (although in a JSON attribute) are so that this logic didn't have to be rewritten
+  // for server-side.
   function uploadManifest(dataTable, manifest) {
     let formData = new FormData();
     formData.append('manifest', manifest);
