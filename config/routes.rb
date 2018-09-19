@@ -3,7 +3,6 @@ Rails.application.routes.draw do
 
   root 'manifests#index'
 
-
   health_check_routes
 
   get '/materials_schema', to: 'manifests#schema'
@@ -16,6 +15,7 @@ Rails.application.routes.draw do
   namespace :manifests do
     resources :print, only: [:index, :create]
     resources :dispatch, only: [:index, :create]
+    resources :upload, only: [:create]
   end
 
   resources :manifests do

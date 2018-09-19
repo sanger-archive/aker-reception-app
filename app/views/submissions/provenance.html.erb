@@ -4,7 +4,7 @@
      data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
 
   <div id="page-error-alert" class="alert alert-danger hidden" role="alert">
-    <h4 class='alert-title'>Error!</h4>
+    <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     <p class='alert-msg'>&nbsp;</p>
   </div>
 
@@ -106,7 +106,7 @@
            <div style="margin-top: 10px" class="well csv-upload-box">
             <div class="row">
               <div class="venter col-md-10">
-                Please drop a CSV for the current labware onto this box, or the table.
+                Please drop a Manifest for the current labware onto this box, or the table.
                 Alternatively, you can manually enter material provenance for the current
                 labware in the table below. Use the tabs above this message to switch
                 labware. If necessary, the table can be scrolled horizontally to view all of the fields.
@@ -116,7 +116,7 @@
               </div>
               <div class="vcenter col-md-2">
                 <label style="float: right" class="btn btn-primary">
-                    Browse for CSV <input type="file" class="upload-button" accept=".csv, text/csv" style="display: none;">
+                    Browse for Manifest <input type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
                 </label>
               </div>
             </div>
