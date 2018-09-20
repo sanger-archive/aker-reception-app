@@ -25,9 +25,9 @@ var dataTable = null;
 
 function displayError(msg) {
   const PAGE_ERROR_ALERT_ID = "#page-error-alert";
-  $(PAGE_ERROR_ALERT_ID).html(msg);
-  $(PAGE_ERROR_ALERT_ID).toggleClass('invisible', false);
+  $('.alert-msg', PAGE_ERROR_ALERT_ID).html(msg);
   $(PAGE_ERROR_ALERT_ID).toggleClass('hidden', false);
+  $('.close', PAGE_ERROR_ALERT_ID).on('click', () => { $(PAGE_ERROR_ALERT_ID).toggleClass('hidden', true) })
 }
 
 function csvErrorToText(list) {
@@ -42,15 +42,10 @@ function csvErrorToText(list) {
 
 // Checks the header fields from the CSV against the fields required for the material service
 // TODO: refactor into class
-function checkCSVFields(table, files) {
-  // If we have not received any files, return
-  if (files.length != 1) {
-    return false
-  }
-
+function checkCSVFields(table, csvData) {
   // Get the table and file
   dataTable = table;
-  file = files[0];
+  file = csvData;
 
   // Clear the matched fields
   matchedFields = {};
@@ -421,4 +416,4 @@ function getURLParameter(name) {
 }
 
 
-export { checkCSVFields, validateCorrectPositions }
+export { displayError, checkCSVFields, validateCorrectPositions }

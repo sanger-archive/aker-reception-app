@@ -1,0 +1,97 @@
+Well Position,supplier_name,donor_id,gender,scientific_name,phenotype,tumour,tissue_type,taxon_id
+A:1,334455,3,male,Homo Sapiens,6,normal,blood,9606
+A:2,334456,4,male,Homo Sapiens,6,normal,blood,9606
+A:3,334457,5,female,Homo Sapiens,6,normal,blood,9606
+A:4,334458,6,female,Homo Sapiens,6,normal,blood,9606
+A:5,334459,7,male,Homo Sapiens,6,normal,blood,9606
+A:6,334460,8,male,Homo Sapiens,6,normal,blood,9606
+A:7,334461,9,male,Homo Sapiens,6,normal,blood,9606
+A:8,334462,10,male,Homo Sapiens,6,normal,blood,9606
+A:9,334463,11,male,Homo Sapiens,6,normal,blood,9606
+A:10,334464,12,male,Homo Sapiens,6,normal,blood,9606
+A:11,334465,13,male,Homo Sapiens,6,normal,blood,9606
+A:12,334466,14,male,Homo Sapiens,6,normal,blood,9606
+B:1,334467,15,male,Homo Sapiens,6,normal,blood,9606
+B:2,334468,16,male,Homo Sapiens,6,normal,blood,9606
+B:3,334469,17,male,Homo Sapiens,6,normal,blood,9606
+B:4,334470,18,male,Homo Sapiens,6,normal,blood,9606
+B:5,334471,19,male,Homo Sapiens,6,normal,blood,9606
+B:6,334472,20,male,Homo Sapiens,6,normal,blood,9606
+B:7,334473,21,female,Homo Sapiens,6,normal,blood,9606
+B:8,334474,22,female,Homo Sapiens,6,normal,blood,9606
+B:9,334475,23,female,Homo Sapiens,6,normal,blood,9606
+B:10,334476,24,female,Homo Sapiens,6,normal,blood,9606
+B:11,334477,25,female,Homo Sapiens,6,normal,blood,9606
+B:12,334478,26,female,Homo Sapiens,6,normal,blood,9606
+C:1,334479,27,female,Homo Sapiens,6,normal,cells,9606
+C:2,334480,28,female,Homo Sapiens,6,normal,cells,9606
+C:3,334481,29,female,Homo Sapiens,6,normal,cells,9606
+C:4,334482,30,female,Homo Sapiens,6,normal,cells,9606
+C:5,334483,31,female,Homo Sapiens,6,normal,cells,9606
+C:6,334484,32,female,Homo Sapiens,6,normal,cells,9606
+C:7,334485,33,female,Homo Sapiens,6,normal,cells,9606
+C:8,334486,34,female,Homo Sapiens,6,normal,cells,9606
+C:9,334487,35,female,Homo Sapiens,6,normal,cells,9606
+C:10,334488,36,female,Homo Sapiens,6,normal,cells,9606
+C:11,334489,37,female,Homo Sapiens,6,normal,cells,9606
+C:12,334490,38,female,Homo Sapiens,6,normal,cells,9606
+D:1,334491,39,female,Homo Sapiens,6,normal,cells,9606
+D:2,334492,40,female,Homo Sapiens,6,normal,cells,9606
+D:3,334493,41,female,Homo Sapiens,6,normal,cells,9606
+D:4,334494,42,female,Homo Sapiens,6,normal,cells,9606
+D:5,334495,43,female,Homo Sapiens,6,normal,cells,9606
+D:6,334496,44,female,Homo Sapiens,6,normal,cells,9606
+D:7,334497,45,female,Homo Sapiens,6,normal,cells,9606
+D:8,334498,46,female,Homo Sapiens,6,normal,cells,9606
+D:9,334499,47,female,Homo Sapiens,6,normal,cells,9606
+D:10,334500,48,female,Homo Sapiens,6,normal,cells,9606
+D:11,334501,49,female,Homo Sapiens,6,normal,cells,9606
+D:12,334502,50,female,Homo Sapiens,6,normal,cells,9606
+E:1,334503,51,female,Homo Sapiens,6,tumour,tissue,9606
+E:2,334504,52,female,Homo Sapiens,6,tumour,tissue,9606
+E:3,334505,53,female,Homo Sapiens,6,tumour,tissue,9606
+E:4,334506,54,female,Homo Sapiens,6,tumour,tissue,9606
+E:5,334507,55,male,Homo Sapiens,6,tumour,tissue,9606
+E:6,334508,56,male,Homo Sapiens,6,tumour,tissue,9606
+E:7,334509,57,male,Homo Sapiens,6,tumour,tissue,9606
+E:8,334510,58,male,Homo Sapiens,6,tumour,tissue,9606
+E:9,334511,59,male,Homo Sapiens,6,tumour,tissue,9606
+E:10,334512,60,male,Homo Sapiens,6,tumour,tissue,9606
+E:11,334513,61,male,Homo Sapiens,6,tumour,tissue,9606
+E:12,334514,62,male,Homo Sapiens,6,tumour,tissue,9606
+F:1,334515,63,male,Homo Sapiens,6,tumour,tissue,9606
+F:2,334516,64,male,Homo Sapiens,6,tumour,tissue,9606
+F:3,334517,65,male,Homo Sapiens,6,tumour,tissue,9606
+F:4,334518,66,male,Homo Sapiens,6,tumour,tissue,9606
+F:5,334519,67,male,Homo Sapiens,6,tumour,tissue,9606
+F:6,334520,68,male,Homo Sapiens,6,tumour,tissue,9606
+F:7,334521,69,male,Homo Sapiens,6,tumour,tissue,9606
+F:8,334522,70,male,Homo Sapiens,6,tumour,tissue,9606
+F:9,334523,71,male,Homo Sapiens,6,tumour,tissue,9606
+F:10,334524,72,male,Homo Sapiens,6,tumour,tissue,9606
+F:11,334525,73,male,Homo Sapiens,6,tumour,tissue,9606
+F:12,334526,74,male,Homo Sapiens,6,tumour,tissue,9606
+G:1,334527,75,male,Homo Sapiens,6,tumour,tissue,9606
+G:2,334528,76,male,Homo Sapiens,6,tumour,tissue,9606
+G:3,334529,77,male,Homo Sapiens,6,tumour,tissue,9606
+G:4,334530,78,male,Homo Sapiens,6,tumour,tissue,9606
+G:5,334531,79,male,Homo Sapiens,6,tumour,tissue,9606
+G:6,334532,80,male,Homo Sapiens,6,tumour,tissue,9606
+G:7,334533,81,male,Homo Sapiens,6,tumour,tissue,9606
+G:8,334534,82,male,Homo Sapiens,6,tumour,tissue,9606
+G:9,334535,83,male,Homo Sapiens,6,tumour,tissue,9606
+G:10,334536,84,male,Homo Sapiens,6,tumour,tissue,9606
+G:11,334537,85,male,Homo Sapiens,6,tumour,lysed cells,9606
+G:12,334538,86,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:1,334539,87,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:2,334540,88,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:3,334541,89,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:4,334542,90,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:5,334543,91,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:6,334544,92,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:7,334545,93,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:8,334546,94,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:9,334547,95,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:10,334548,96,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:11,334549,97,male,Homo Sapiens,6,tumour,lysed cells,9606
+H:12,334550,98,male,Homo Sapiens,6,tumour,lysed cells,9606
