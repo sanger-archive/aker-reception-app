@@ -34,16 +34,4 @@ describe('MaterialsTableInput', function() {
     this.tableInput = new MaterialsTableInput(this.input, this.tab, tableStore, messageStore)
   })
 
-  context('#inputDataFor', function() {
-    it('generates the data for the input provided', function() {
-      let data = this.tableInput.inputDataFor(this.input)
-
-      assert.equal(data.id, this.input.id)
-      assert.equal(data.input, this.input)
-      assert.equal(data.tab, this.tab)
-      assert.equal(data.labwareIndex, '1')
-      assert.equal(data.address, 'A:1')
-      assert.equal(data.fieldName, 'common_name')
-    })
-  })
 })

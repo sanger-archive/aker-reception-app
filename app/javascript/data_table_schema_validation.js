@@ -265,7 +265,6 @@
     }, {})
     for (var key in reducedEvents) {
       $(dataEvents[0].node).trigger(key, reducedEvents[key])
-      console.log('trigger');
     }
     //return dataEvents.forEach((dataEvent, pos) => { $(dataEvent.node).trigger(dataEvent.eventName, dataEvent.data) })
   };

@@ -34,7 +34,6 @@ class MaterialsTableInput {
   }
 
   showMessage(msg) {
-    console.log(msg)
     var cssClass = msg.errors ? 'has-error' : 'has-warning'
     var text = Object.values(msg.errors ? msg.errors : msg.warnings)[0]
 
@@ -46,7 +45,6 @@ class MaterialsTableInput {
       placement: 'bottom',
       container: container
     });
-    console.log(text)
     container.data('bs.tooltip').options.title = text;
 
     var onClickInput = $.proxy(function() {

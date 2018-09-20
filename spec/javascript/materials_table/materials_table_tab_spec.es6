@@ -28,6 +28,7 @@ describe('MaterialsTableTab', function() {
 
   beforeEach(function() {
     this.tab = document.querySelector('a.test1')
+    this.input = document.querySelector('input')
     this.tableStore = new MaterialsTableStore(obj)
     this.messageStore = new MessageStore()
     this.tableTab = new MaterialsTableTab(this.tab, this.tableStore, this.messageStore)
@@ -41,6 +42,18 @@ describe('MaterialsTableTab', function() {
       let tab2 = document.querySelector('a.test2')
       let anotherTableTab = new MaterialsTableTab(tab2, this.tableStore, this.messageStore)
       assert.isNotOk(anotherTableTab.isTabWithContent())
+    })
+  })
+  context('#inputDataFor', function() {
+    it('generates the data for the input provided', function() {
+      let data = this.tableTab.inputDataFor(this.input)
+
+      assert.equal(data.id, this.input.id)
+      assert.equal(data.input, this.input)
+      assert.equal(data.tab, this.tab)
+      assert.equal(data.labwareIndex, '1')
+      assert.equal(data.address, 'A:1')
+      assert.equal(data.fieldName, 'common_name')
     })
   })  
 })
