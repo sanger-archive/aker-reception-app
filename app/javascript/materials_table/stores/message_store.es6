@@ -24,7 +24,7 @@ class MessageStore {
     if (data.update_successful) {
       this.cleanErrors()
     }
-    return true    
+    return true
   }
 
   messageFor(inputData) {
@@ -78,9 +78,9 @@ class MessageStore {
     if (!this.messageStore[labwareIndex]) {
       return false
     }
-    return Object.values(this.messageStore[labwareIndex]).map((obj) => { 
+    return Object.values(this.messageStore[labwareIndex]).map((obj) => {
       return Object.values(obj)
-    }).flat().some((dataError) => { 
+    }).flat().some((dataError) => {
       return ((!!dataError) && (!!dataError[facility])) ? (dataError[facility].length>0) : false
     })
   }
@@ -132,7 +132,7 @@ class MessageStore {
     for (var labwareIndex in this.messageStore) {
       var labware = this.messageStore[labwareIndex]
       delete labware[null]
-    }    
+    }
   }
 
   hasErrors() {

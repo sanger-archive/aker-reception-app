@@ -12,7 +12,7 @@ private
   end
 
   def transformer
-    @transformer ||= Transformers::ExcelToCsv.new(path: manifest_path)
+    @transformer ||= Transformers::ExcelToArray.new(path: manifest_path)
   end
 
   def manifest_path

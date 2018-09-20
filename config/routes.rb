@@ -18,7 +18,7 @@ Rails.application.routes.draw do
     resources :upload, only: [:create]
   end
 
-  resources :manifests do
+  resources :manifests, only: [:index, :new, :destroy, :show] do
     resources :build, controller: 'submissions'
     put :biomaterial_data, controller: 'submissions'
   end

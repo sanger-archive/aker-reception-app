@@ -63,16 +63,14 @@ RSpec.configure do |config|
     Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
   end
 
-Capybara.register_driver :chrome do |app|
-  options = Selenium::WebDriver::Chrome::Options.new(
-    args: %w[headless disable-gpu no-sandbox]
-  )
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
-end
+  Capybara.register_driver :chrome do |app|
+    options = Selenium::WebDriver::Chrome::Options.new(
+      args: %w[headless disable-gpu no-sandbox]
+    )
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  end
 
-Capybara.javascript_driver = :chrome
-
-  #Capybara.javascript_driver = :selenium_chrome_headless
+  Capybara.javascript_driver = :chrome
 
   config.include Capybara::DSL
   config.include FactoryBot::Syntax::Methods

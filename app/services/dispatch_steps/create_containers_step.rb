@@ -13,6 +13,7 @@ module DispatchSteps
             row_is_alpha: lw.row_is_alpha,
             col_is_alpha: lw.col_is_alpha,
             print_count: 0,
+            supplier_plate_name: lw.supplier_plate_name
           )
           lw.update_attributes(barcode: container.barcode, container_id: container.id)
 

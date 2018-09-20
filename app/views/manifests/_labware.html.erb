@@ -1,16 +1,25 @@
 <table class="table">
   <% keys = list_contents_keys(labwares).delete("id") %>
   <% if keys.empty? %>
-    <thead><tr><th>barcode</th></tr></thead>
+    <thead>
+      <tr>
+        <th>barcode</th>
+        <th>supplier plate name</th>
+      </tr>
+    </thead>
     <tbody>
       <% labwares.each do |labware| %>
-        <tr><td><%= labware.barcode %></td></tr>
+        <tr>
+          <td><%= labware.barcode %></td>
+          <td><%= labware.supplier_plate_name %></td>
+        </tr>
       <% end %>
     </tbody>
   <% else %>
     <thead>
       <tr>
         <th>barcode</th>
+        <th>supplier plate name</th>
         <th>address</th>
         <% keys.each do |key| %>
           <th><%= key %> </th>
@@ -21,11 +30,15 @@
     <tbody>
       <% labwares.each do |labware| %>
         <% if labware.contents.nil? %>
-          <tr><td><%= labware.barcode %></td></tr>
+          <tr>
+            <td><%= labware.barcode %></td>
+            <td><%= labware.supplier_plate_name %></td>
+          </tr>
         <% else %>
           <% labware.contents.each do |address, bio_data| %>
             <tr>
               <td><%= labware.barcode %></td>
+              <td><%= labware.supplier_plate_name %></td>
               <td><%= address %></td>
               <% keys.each do |key| %>
                 <td>
