@@ -13,7 +13,7 @@ class MessageStore {
       }, this))
     }
     if (data.update_successful) {
-      this.messageStore = {}
+      //this.messageStore = {}
     }
     return true
   }
@@ -40,7 +40,7 @@ class MessageStore {
 
   clearInput(inputData) {
     if (this.messageFor(inputData)!=null) {
-      this.messageStore[inputData.labwareIndex][inputData.address][inputData.fieldName]=null
+      delete this.messageStore[inputData.labwareIndex][inputData.address][inputData.fieldName]
     }
   }
 
@@ -48,18 +48,25 @@ class MessageStore {
   * Private methods
   **/
   anyErrorsForLabwareIndex(labwareIndex) {
-    if (labwareIndex && this.messageStore) {
-      let lwe = this.messageStore[labwareIndex]
-      if (lwe) {
-        for (let i in lwe) {
-          if (lwe[i] && !$.isEmptyObject(lwe[i])) {
-            return true
-          }
-        }
-      }
-    }
-    return false
+    return this.anyMessageForLabwareIndex(labwareIndex, 'errors')
   }
+
+
+  anyWarningsForLabwareIndex(labwareIndex) {
+    return this.anyMessageForLabwareIndex(labwareIndex, 'warnings')
+  }
+
+  anyMessageForLabwareIndex(labwareIndex, facility) {
+    if (!this.messageStore[labwareIndex]) {
+      return false
+    }
+    return Object.values(this.messageStore[labwareIndex]).map((obj) => { 
+      return Object.values(obj)
+    }).flat().some((dataError) => { 
+      return ((!!dataError) && (!!dataError[facility])) ? (dataError[facility].length>0) : false
+    })
+  }
+
 
   storeCellMessage(labwareIndex, address, message) {
     if (!this.messageStore[labwareIndex]) {

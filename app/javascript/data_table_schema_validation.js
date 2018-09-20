@@ -37,10 +37,10 @@
       }
       data.warnings[attr] = msg;
     }
-    $(node).trigger('psd.schema.warning', {
+    this.defer.resolve({eventName: 'psd.schema.warning', node: node, data: {
       node: node,
       messages: [ data ]
-    });
+    }});
   };
 
 
@@ -50,10 +50,10 @@
     if (attr) {
       data.errors[attr] = msg;
     }
-    $(node).trigger('psd.schema.error', {
+    this.defer.resolve({eventName: 'psd.schema.error', node: node, data: {
       node: node,
       messages: [ data ]
-    });
+    }});
   };
 
   Array.prototype.indexOfCaseInsensitive = function(item) {
@@ -206,7 +206,8 @@
   /**
    * Perform validation on the field and set the message if failed
    */
-  proto.validateSchemaField = function(e, htmlField) {
+  proto.validate = function(e, htmlField) {
+    this.defer = new $.Deferred();
     // Get the properties of the field from the schema
     if (this._loadedSchema.properties['hmdmc']) {
       this._loadedSchema.properties['hmdmc']['required'] = false;
@@ -247,12 +248,39 @@
     // If they don't fail, we should update them in case they have out of date errors.
     var node = htmlField.node;
     if (!failed && !warned) {
-      $(node).trigger('psd.schema.success', { node: node })
+      this.defer.resolve({ eventName: 'psd.schema.success', node: node, data: { node: node } });
     }
+
+    return this.defer;
+  };
+
+  proto.triggerEvents = function() {
+    var dataEvents = Array.from(arguments);
+    var reducedEvents = dataEvents.reduce((memo, dataEvent) => { 
+      if (!memo[dataEvent.eventName]) {
+        memo[dataEvent.eventName] = [];
+      }
+      memo[dataEvent.eventName].push(dataEvent.data);
+      return memo;
+    }, {})
+    for (var key in reducedEvents) {
+      $(dataEvents[0].node).trigger(key, reducedEvents[key])
+      console.log('trigger');
+    }
+    //return dataEvents.forEach((dataEvent, pos) => { $(dataEvent.node).trigger(dataEvent.eventName, dataEvent.data) })
+  };
+
+  proto.validateSchemaField = function(e, htmlField) {
+    return this.validate(e, htmlField).then($.proxy(this.triggerEvents, this));
+  };
+
+  proto.validateSchemaFields = function(e, obj) {
+    return $.when.apply(this, obj.data.map($.proxy((htmlField) => { return this.validate(e, htmlField)}, this))).then($.proxy(this.triggerEvents, this));
   };
 
   proto.attachHandlers = function() {
     $(this._node).on('psd.schema.validation', $.proxy(this.validateSchemaField, this));
+    $(this._node).on('psd.schema.validations', $.proxy(this.validateSchemaFields, this));
   };
 
   $(document).ready(function() {

@@ -21,7 +21,7 @@ class MaterialsTable {
   }
 
   update() {
-    this.tabComponents.each((pos, tab) => { tab.update() })
+    this.tabComponents.each((pos, tab) => { setTimeout($.proxy(tab.update, tab), 500) })
   }
 
   attachHandlers() {
@@ -39,7 +39,6 @@ class MaterialsTable {
 
     $('input[type=submit]').on('click', $.proxy(this.toNextStep, this))
   }
-
 
   /**
   * Loads the data of all the materials for the tab from the receptions app
@@ -74,8 +73,16 @@ class MaterialsTable {
     return promise
   }
 
-  onValidation(e,data) {
-    this.messageStore.loadMessages(data)
+  onValidation(e, ...others) {
+    let data
+    if (others.length>=0) {
+      data = others
+    } else {
+      data = [others]
+    }
+    data.forEach($.proxy((datum, pos) => {
+      this.messageStore.loadMessages(datum)
+    }, this))
     return this.update()
   }
 
@@ -95,29 +102,11 @@ class MaterialsTable {
   }
 
   /**
-  * DOM input nodes for the table. Only nodes related with the material information are returned
-  **/
-  inputs() {
-    if (!this._inputs) {
-      this._inputs = $('form input').filter(function(pos, input) {
-        return($(input).attr('id') && $(input).attr('id').search(/labware/)>=0)
-      })
-    }
-    return this._inputs
-  }
-
-  /**
   * Finds the tab component that has control over a DOM node
   **/
   findTabForNode(node) {
     return this.tabComponents.filter($.proxy(function(pos, tab) { 
       return (tab.node() === node)
-    }, this))
-  }
-
-  findTabForInput(input) {
-    return this.tabComponents.filter($.proxy(function(pos, tab) { 
-      return (tab.inputs().toArray().includes(input))
     }, this))
   }
 

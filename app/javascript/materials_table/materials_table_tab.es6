@@ -17,30 +17,23 @@ class MaterialsTableTab {
     this._cssNotEmptyTabClass = 'bg-info'
     this._cssEmptyTabClass = 'bg-warning'
     this._cssErrorTabClass = 'bg-danger'
+    this._cssWarningTabClass = 'bg-warning'
 
     this.updateTabContentPresenceStatus()
   }
 
   update() {
+    let isCurrentTab = (this.tableStore.currentTab() === this) 
+    let hasWarning = (this.messageStore.anyWarningsForLabwareIndex(this.tabLabwareIndex()))
+    let hasError = (this.messageStore.anyErrorsForLabwareIndex(this.tabLabwareIndex()))
 
-    if (this.tableStore.currentTab() === this) {
-      if (this.messageStore.anyErrorsForLabwareIndex(this.tabLabwareIndex())) {
-        this.renderError()
-      } else {
-        this.hideAlert()
-      }
-    }
+    if (isCurrentTab && hasWarning) { this.showWarning() } else { this.hideWarning() }
+    if (isCurrentTab && hasError) { this.showError() } else { this.hideError() }
 
-    if (this.messageStore.anyErrorsForLabwareIndex(this.tabLabwareIndex())) {
-      if (this.tableStore.currentTab() === this) {
-        this.renderError()
-      }
-      $(this.tab).parent().addClass(this._cssErrorTabClass);
-      $(this.tab).parent().removeClass(this._cssNotEmptyTabClass);      
-    } else {
-      $(this.tab).parent().removeClass(this._cssErrorTabClass);
-    }
-    this.inputTooltips.each((pos, tooltip) => { tooltip.update() })
+    if (hasWarning) { $(this.tab).addClass(this._cssWarningTabClass) } else { $(this.tab).removeClass(this._cssWarningTabClass) }
+    if (hasError) { $(this.tab).addClass(this._cssErrorTabClass) } else { $(this.tab).removeClass(this._cssErrorTabClass) }
+
+    this.inputsForValidation().forEach((tooltip) => { tooltip.update() })
   }
 
   save() {
@@ -70,7 +63,11 @@ class MaterialsTableTab {
     this.inputTooltips.each((pos, tooltip) => { 
       tooltip.restore() 
     })
-    return $.Deferred().resolve(true)
+
+    //this.validate()
+
+    let defer = new $.Deferred()
+    return defer.resolve(true)
   }
 
   node() {
@@ -126,23 +123,37 @@ class MaterialsTableTab {
     })
   }
 
-  showAlert(data) {
-    $('#page-error-alert > .alert-title').html(data.title)
-    $('#page-error-alert > .alert-msg').html(data.body)
-    $('#page-error-alert').toggleClass('hidden', false)
-    $('#page-error-alert > .alert-msg').html('')
+  showAlert(data, node) {
+    $('.alert-title', node).html(data.title)
+    $('.alert-msg', node).html(data.body)
+    $(node).toggleClass('hidden', false)
   }
 
-  hideAlert() {
+  hideError() {
     $('#page-error-alert').toggleClass('hidden', true)
   }
 
-  renderError() {
+  hideWarning() {
+    $('#page-warning-alert').toggleClass('hidden', true)
+  }
+
+  showError() {
     this.showAlert({
-      title: 'Validation problems',
-      body: 'Please review and solve the validation problems before continuing'})
-    let text = this.messageStore.errorsForLabware(this.tabLabwareIndex()).map((error, pos) => { return '<li>' + error + '</li>'})
-    $('#page-error-alert > .alert-msg').append(text)
+      title: 'Validation errors',
+      body: 'Please review and solve the validation errors before continuing'}, $('#page-error-alert'))
+  }
+
+  showWarning() {
+    this.showAlert({
+      title: 'Validation warnings',
+      body: 'Please check the validation warnings in case it was not what you expected '}, $('#page-warning-alert'))
+  }
+
+
+  validate() {
+    $('table').trigger('psd.schema.validations', {data: this.inputsForValidation().map((input,pos) => { 
+      return input.dataForValidation() 
+    })})
   }
 
   /**
@@ -151,11 +162,32 @@ class MaterialsTableTab {
   inputs() {
     if (!this._inputs) {
       let idx = this.labwareIndex()
-      this._inputs = $('form input').filter(function(pos, input) {
+      this._inputs = $('form input,select').filter(function(pos, input) {
         return($(input).attr('id') && $(input).attr('id').search("labware\\["+idx+"\\]")>=0)
       })
     }
     return this._inputs
+  }
+
+  inputsByAddress() {
+    return this.inputTooltips.toArray().reduce((memo, tooltip) => {
+      if (!memo[tooltip.inputData.address]) {
+        memo[tooltip.inputData.address] = []
+      }
+      memo[tooltip.inputData.address].push(tooltip)
+      return memo
+    }, {})
+  }
+
+  inputsForValidation() {
+    let obj = this.inputsByAddress()
+    let list = []
+    for (let key in obj) {
+      if (obj[key].some((tooltip) => { return ($(tooltip.inputData.input).val().length >0) })) {
+        list=list.concat(obj[key])
+      }
+    }
+    return list
   }
 
   labwareIndex() {
