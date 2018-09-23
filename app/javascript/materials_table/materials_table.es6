@@ -21,7 +21,7 @@ class MaterialsTable {
   }
 
   update() {
-    this.tabComponents.each((pos, tab) => { setTimeout($.proxy(tab.update, tab), 500) })
+    this.tableStore.currentTab().update()
   }
 
   attachHandlers() {
@@ -37,23 +37,38 @@ class MaterialsTable {
     $(this.node).on('psd.schema.error', $.proxy(this.onValidation, this))
     $(this.node).on('psd.schema.warning', $.proxy(this.onValidation, this))
 
+    //debugger;
+    //$($('table', this.node)[1]).on('psd.update-table', $.proxy(this.onUploadedFile, this));
+    $('table', this.node).on('psd.update-table', $.proxy(this.onUploadedFile, this));
+
     $('input[type=submit]').on('click', $.proxy(this.toNextStep, this))
+  }
+
+  onUploadedFile() {
+    this.tableStore.currentTab().validate()
   }
 
   /**
   * Loads the data of all the materials for the tab from the receptions app
   **/
   restoreTab(e) {
-    this.tableStore.setCurrentTab(this.findTabForNode(e.target)[0])
-    return this.tableStore.currentTab().restore().then($.proxy(this.update, this))
+    let tab = this.findTabForNode(e.target)[0]
+    let promise = tab.restore().then($.proxy(this.tableStore.setCurrentTab, this.tableStore, tab))
+    if (this.tableStore.hasVisitedBefore(tab)) {
+      promise = promise.then($.proxy(this.update, this))
+    }
+    return promise
   }
 
   /**
   * Saves the data for the tab into the receptions app
   **/
   saveTab(e) {
-    this.tableStore.setCurrentTab(this.findTabForNode(e.target)[0])
-    return this.tableStore.currentTab().save().then($.proxy(this.update, this))
+    let tab = this.findTabForNode(e.target)[0]
+    //return tab.save().then($.proxy(tab.update, tab))
+    //this.tableStore.setCurrentTab(this.findTabForNode(e.target)[0])
+
+    return tab.save().then($.proxy(tab.update, tab))
   }
 
   /**
@@ -65,12 +80,16 @@ class MaterialsTable {
     e.stopPropagation()
     e.preventDefault()
     let promise = this.tableStore.currentTab().saveWithoutLeaving().then($.proxy((data) => {
-      if (this.messageStore.isEmpty()) {
+      if (data.update_successful) {
         window.location.href = $(button).attr('href')
       }
       return data
-    }, this)).then($.proxy(this.update, this))
+    }, this)).then($.proxy(this.updateAllTabs, this))
     return promise
+  }
+
+  updateAllTabs() {
+    this.tabComponents.each((tab) => {tab.update()})
   }
 
   onValidation(e, ...others) {
@@ -81,7 +100,7 @@ class MaterialsTable {
       data = [others]
     }
     data.forEach($.proxy((datum, pos) => {
-      this.messageStore.loadMessages(datum)
+      this.messageStore.addMessages(datum)
     }, this))
     return this.update()
   }

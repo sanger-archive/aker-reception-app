@@ -19,7 +19,7 @@ class MaterialsTableTab {
     this._cssErrorTabClass = 'bg-danger'
     this._cssWarningTabClass = 'bg-warning'
 
-    this.updateTabContentPresenceStatus()
+    //this.updateTabContentPresenceStatus()
   }
 
   update() {
@@ -27,9 +27,10 @@ class MaterialsTableTab {
     let hasWarning = (this.messageStore.anyWarningsForLabwareIndex(this.tabLabwareIndex()))
     let hasError = (this.messageStore.anyErrorsForLabwareIndex(this.tabLabwareIndex()))
 
-    if (isCurrentTab && hasWarning) { this.showWarning() } else { this.hideWarning() }
-    if (isCurrentTab && hasError) { this.showError() } else { this.hideError() }
-
+    if (isCurrentTab) {
+      if (hasWarning) { this.showWarning() } else { this.hideWarning() }
+      if (hasError) { this.showError() } else { this.hideError() } 
+    }
     if (hasWarning) { $(this.tab).addClass(this._cssWarningTabClass) } else { $(this.tab).removeClass(this._cssWarningTabClass) }
     if (hasError) { $(this.tab).addClass(this._cssErrorTabClass) } else { $(this.tab).removeClass(this._cssErrorTabClass) }
 
@@ -112,7 +113,6 @@ class MaterialsTableTab {
   **/
   onReceive(data) {
     this.messageStore.loadMessages(data)
-    this.update()
     return data
   }
 
@@ -139,13 +139,18 @@ class MaterialsTableTab {
 
   showError() {
     this.showAlert({
-      title: 'Validation errors',
+      //title: 'Validation errors',
       body: 'Please review and solve the validation errors before continuing'}, $('#page-error-alert'))
+
+    let text = this.messageStore.errorsForLabware(this.tabLabwareIndex()).map((error, pos) => { 
+      return '<li>' + error + '</li>'
+    })
+    $('#page-error-alert > .alert-msg').append(text)
   }
 
   showWarning() {
     this.showAlert({
-      title: 'Validation warnings',
+      //title: 'Validation warnings',
       body: 'Please check the validation warnings in case it was not what you expected '}, $('#page-warning-alert'))
   }
 

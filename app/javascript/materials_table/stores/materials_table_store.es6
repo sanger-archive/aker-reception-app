@@ -1,15 +1,23 @@
 class MaterialsTableStore {
   constructor(store) {
     this.store = store
+    this._alreadyVisited = []
   }
 
   setCurrentTab(tab) {
+    if (!this._alreadyVisited.includes(tab)) {
+      this._alreadyVisited.push(tab)
+    }
     this._currentTab = tab
   }
 
   currentTab() {
     return this._currentTab
   }  
+
+  hasVisitedBefore(tab) {
+    return this._alreadyVisited.includes(tab)
+  }
 
   dataForTab(tab) {
     // This returns the labware object linked to the tab

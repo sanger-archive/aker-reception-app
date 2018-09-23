@@ -4,6 +4,11 @@ class MessageStore {
   }
 
   loadMessages(data) {
+    this.cleanErrors()
+    return this.addMessages(data)
+  }
+
+  addMessages(data) {
     if (data && data.messages) {
       data.messages.forEach($.proxy((message) => {
         if (!this.messageStore[message.labwareIndex]) {
@@ -13,15 +18,18 @@ class MessageStore {
       }, this))
     }
     if (data.update_successful) {
-      //this.messageStore = {}
+      this.cleanErrors()
     }
-    return true
+    return true    
   }
 
   messageFor(inputData) {
     if (this.messageStore[inputData.labwareIndex] && this.messageStore[inputData.labwareIndex][inputData.address]
       && this.messageStore[inputData.labwareIndex][inputData.address][inputData.fieldName]) {
-      return this.messageStore[inputData.labwareIndex][inputData.address][inputData.fieldName]
+      let obj = this.messageStore[inputData.labwareIndex][inputData.address][inputData.fieldName]
+      if (!$.isEmptyObject(obj)) {
+        return obj
+      }
     }
     return null
   }
@@ -31,7 +39,7 @@ class MessageStore {
     for (var fieldName in this.messageStore[labwareIndex][null]) {
       errors = errors.concat(this.messageStore[labwareIndex][null][fieldName].errors)
     }
-    return errors
+    return errors.filter((msg) => { return !!msg})
   }
 
   isEmpty() {
@@ -95,6 +103,42 @@ class MessageStore {
         }
       }
     }
+  }
+
+  cleanErrors() {
+    for (var labwareIndex in this.messageStore) {
+      var labware = this.messageStore[labwareIndex]
+      for (var address in labware) {
+        var well = labware[address]
+        for (var field in well) {
+          var dataError = well[field]
+          delete(dataError.errors)
+        }
+      }
+    }
+  }
+
+  cleanErrorsWithoutAddress() {
+    for (var labwareIndex in this.messageStore) {
+      var labware = this.messageStore[labwareIndex]
+      delete labware[null]
+    }    
+  }
+
+  hasErrors() {
+    for (var labwareIndex in this.messageStore) {
+      var labware = this.messageStore[labwareIndex]
+      for (var address in labware) {
+        var well = labware[address]
+        for (var field in well) {
+          var dataError = well[field]
+          if (dataError.errors) {
+            return true
+          }
+        }
+      }
+    }
+    return false
   }
 
 }

@@ -282,114 +282,120 @@ function validateCorrectPositions(results, positionField) {
   })
 }
 
+function onCompleteFillInTable(results) {
+  debug("results from parse:");
+  debug(results);
+  if (!validateCorrectPositions(results, matchedFields.position)) {
+    return false;
+  }
+
+  // Show any errors to the users
+  if (results.errors.length > 0) {
+    displayError(csvErrorToText(results.errors));
+
+    // Stop filling in data
+    // TODO: should we clear the file if we have one row incorrect?
+    return false;
+  }
+
+  // Clear the table from previous import
+  $('#' + dataTable.attr('id') + ' > tbody > tr').each(function() {
+    var $this = $(this);
+    $this.children().each (function(cell) {
+      var $cell = $(this);
+      $cell.find('input').val('');
+    });
+  });
+
+  // Write each row to the datatable
+  results.data.every(function(row, index) {
+    if (Object.values(row).every(function(val) {
+      return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13)));
+    })) {
+      return true;
+    }
+    var wellPosition = row[matchedFields.position];
+
+    // No position, throw error
+    if (!wellPosition) {
+      displayError('This manifest does not have a valid position field for the wells of row: ' + index);
+      return false;
+    };
+
+    // Attempt to get the row for which we would like to fill in data
+    var tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable);
+    if (tableRow.length == 0) {
+      // Attempt to map positions that don't match A:1 format (i.e A1 or A-1)
+      if (/^([a-zA-Z]([0-9]+))$/.test(wellPosition)) {
+        // A1 format
+        wellPosition = wellPosition.split('')
+        wellPosition.splice(1, 0, ':')
+      } else if (/^([a-zA-Z]-([0-9]+))$/.test(wellPosition)) {
+        // A-1 format
+        wellPosition = wellPosition.split('')
+        wellPosition.splice(1, 1, ':')
+      } else {
+        displayError('This manifest does not have a valid position field for the wells of row: ' + index);
+        return false;
+      }
+      wellPosition = wellPosition.join('')
+      wellPosition = wellPosition.replace(/:0/, ':')
+
+
+      // Data is now in the correct format, so get the row
+      tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable)
+    }
+
+
+    // Check if human material without HMDMC is present, and warn if so
+    var taxon_id = (row[matchedFields['taxon_id']] || '').trim();
+    var hmdmc_number = (row[matchedFields['hmdmc']] || '').trim();
+    if (taxon_id == 9606 && hmdmc_number == '') {
+      ManifestCSVWarnings.addWarning("hmdmc");
+    }
+
+    // Fill in the actual row with the data
+    $.each(matchedFields, function (formField, csvField) {
+      var value = row[csvField].trim();
+
+      if (schema[formField]["allowed"] === undefined) {
+        // Text input fields
+        tableRow.find('input[name*="' + formField + '"]').val(value);
+
+        // We also need to set the value attribute for Capybara to see and pass the test
+        // .prop is similar to .val so .attr seems to be working
+        // https://stackoverflow.com/a/6057122
+        // TODO: Find a fix or implement correctly as we are double filling the value here
+        tableRow.find('input[name*="' + formField + '"]').attr('value', value);
+      } else {
+        // Dropdown input fields
+        var selectValue = find_ci(schema[formField]["allowed"], value);
+        if (value && !selectValue) {
+          displayError("Validation Error: The value '" + value + "' could not be entered for field '" + formField + "'.");
+          return false;
+        }
+        tableRow.find('select[name*="' + formField + '"]').val(selectValue);
+        tableRow.find('select[name*="' + formField + '"]').attr('value', selectValue);
+        // TODO regex checks?
+      }
+    });
+    
+    return true;
+  });
+  debug("importing complete!");
+  //dataTable.trigger('psd.update-table');
+}
+
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile() {
   Papa.parse(file, {
     header: true,
     skipEmptyLines: true,
     complete: function(results) {
-      debug("results from parse:");
-      debug(results);
-      if (!validateCorrectPositions(results, matchedFields.position)) {
-        return false;
-      }
-
-      // Show any errors to the users
-      if (results.errors.length > 0) {
-        displayError(csvErrorToText(results.errors));
-
-        // Stop filling in data
-        // TODO: should we clear the file if we have one row incorrect?
-        return false;
-      }
-
-      // Clear the table from previous import
-      $('#' + dataTable.attr('id') + ' > tbody > tr').each(function() {
-        var $this = $(this);
-        $this.children().each (function(cell) {
-          var $cell = $(this);
-          $cell.find('input').val('');
-        });
-      });
-
-      // Write each row to the datatable
-      results.data.every(function(row, index) {
-        if (Object.values(row).every(function(val) {
-          return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13)));
-        })) {
-          return true;
-        }
-        var wellPosition = row[matchedFields.position];
-
-        // No position, throw error
-        if (!wellPosition) {
-          displayError('This manifest does not have a valid position field for the wells of row: ' + index);
-          return false;
-        };
-
-        // Attempt to get the row for which we would like to fill in data
-        var tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable);
-        if (tableRow.length == 0) {
-          // Attempt to map positions that don't match A:1 format (i.e A1 or A-1)
-          if (/^([a-zA-Z]([0-9]+))$/.test(wellPosition)) {
-            // A1 format
-            wellPosition = wellPosition.split('')
-            wellPosition.splice(1, 0, ':')
-          } else if (/^([a-zA-Z]-([0-9]+))$/.test(wellPosition)) {
-            // A-1 format
-            wellPosition = wellPosition.split('')
-            wellPosition.splice(1, 1, ':')
-          } else {
-            displayError('This manifest does not have a valid position field for the wells of row: ' + index);
-            return false;
-          }
-          wellPosition = wellPosition.join('')
-          wellPosition = wellPosition.replace(/:0/, ':')
-
-
-          // Data is now in the correct format, so get the row
-          tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable)
-        }
-
-
-        // Check if human material without HMDMC is present, and warn if so
-        var taxon_id = (row[matchedFields['taxon_id']] || '').trim();
-        var hmdmc_number = (row[matchedFields['hmdmc']] || '').trim();
-        if (taxon_id == 9606 && hmdmc_number == '') {
-          ManifestCSVWarnings.addWarning("hmdmc");
-        }
-
-        // Fill in the actual row with the data
-        $.each(matchedFields, function (formField, csvField) {
-          var value = row[csvField].trim();
-
-          if (schema[formField]["allowed"] === undefined) {
-            // Text input fields
-            tableRow.find('input[name*="' + formField + '"]').val(value);
-
-            // We also need to set the value attribute for Capybara to see and pass the test
-            // .prop is similar to .val so .attr seems to be working
-            // https://stackoverflow.com/a/6057122
-            // TODO: Find a fix or implement correctly as we are double filling the value here
-            tableRow.find('input[name*="' + formField + '"]').attr('value', value);
-          } else {
-            // Dropdown input fields
-            var selectValue = find_ci(schema[formField]["allowed"], value);
-            if (value && !selectValue) {
-              displayError("Validation Error: The value '" + value + "' could not be entered for field '" + formField + "'.");
-              return false;
-            }
-            tableRow.find('select[name*="' + formField + '"]').val(selectValue);
-            tableRow.find('select[name*="' + formField + '"]').attr('value', selectValue);
-            // TODO regex checks?
-          }
-        });
-
-        return true;
-      });
-      debug("importing complete!");
+      var value = onCompleteFillInTable(results);
       dataTable.trigger('psd.update-table');
-    },
+      return value;
+    }
   })
 }
 
