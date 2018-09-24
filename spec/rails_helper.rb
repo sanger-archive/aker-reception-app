@@ -63,7 +63,7 @@ RSpec.configure do |config|
     Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
   end
 
-  Capybara.javascript_driver = :poltergeist_debug
+  Capybara.javascript_driver = :selenium_chrome_headless
 
   config.include Capybara::DSL
   config.include FactoryBot::Syntax::Methods
