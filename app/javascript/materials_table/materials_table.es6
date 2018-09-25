@@ -53,6 +53,7 @@ class MaterialsTable {
   onUploadedFile() {
     //this.messageStore.reset()
     this.tableStore.currentTab().validate()
+    this.updateAllTabs()
   }
 
   /**
@@ -96,7 +97,7 @@ class MaterialsTable {
   }
 
   updateAllTabs() {
-    this.tabComponents.each((tab) => {tab.update()})
+    this.tabComponents.each((pos, tab) => {tab.update()})
   }
 
   onValidationSuccess(e, ...others) {
