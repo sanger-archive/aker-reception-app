@@ -21,7 +21,13 @@ class MaterialsTable {
   }
 
   update() {
-    this.tableStore.currentTab().update()
+    if (!window.TableValidation) {
+      window.TableValidation = true
+      setTimeout($.proxy(() => {
+        this.tableStore.currentTab().update()
+        window.TableValidation = false
+      }, this), 100)
+    }
   }
 
   attachHandlers() {
@@ -33,9 +39,9 @@ class MaterialsTable {
     // If you have one
     let button = $('.save')
     button.on('click', $.proxy(this.saveCurrentTabBeforeLeaving, this, button))
-    $(this.node).on('psd.schema.success', $.proxy(this.onValidation, this))
-    $(this.node).on('psd.schema.error', $.proxy(this.onValidation, this))
-    $(this.node).on('psd.schema.warning', $.proxy(this.onValidation, this))
+    $(this.node).on('psd.schema.success', $.proxy(this.onValidationSuccess, this))
+    $(this.node).on('psd.schema.error', $.proxy(this.onValidationMessage, this))
+    $(this.node).on('psd.schema.warning', $.proxy(this.onValidationMessage, this))
 
     //debugger;
     //$($('table', this.node)[1]).on('psd.update-table', $.proxy(this.onUploadedFile, this));
@@ -45,6 +51,7 @@ class MaterialsTable {
   }
 
   onUploadedFile() {
+    //this.messageStore.reset()
     this.tableStore.currentTab().validate()
   }
 
@@ -92,7 +99,23 @@ class MaterialsTable {
     this.tabComponents.each((tab) => {tab.update()})
   }
 
-  onValidation(e, ...others) {
+  onValidationSuccess(e, ...others) {
+    let data
+    if (others.length>=0) {
+      data = others
+    } else {
+      data = [others]
+    }
+    var tab = this.findTabForInput(data[0].node)
+    
+    data.forEach($.proxy((datum, pos) => {
+      var node = datum.node
+      this.messageStore.clearInput(tab.inputDataFor(node))
+    }, this))
+    return this.update()
+  }
+
+  onValidationMessage(e, ...others) {
     let data
     if (others.length>=0) {
       data = others
@@ -127,6 +150,12 @@ class MaterialsTable {
     return this.tabComponents.filter($.proxy(function(pos, tab) { 
       return (tab.node() === node)
     }, this))
+  }
+
+  findTabForInput(input) {
+    return this.tabComponents.filter($.proxy(function(pos, tab) { 
+      return (tab.inputs().toArray().includes(input))
+    }, this))[0]
   }
 
 }

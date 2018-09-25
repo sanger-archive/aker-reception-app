@@ -112,6 +112,7 @@
     // Fails if the field is required and the msg value is missing or all whitespace.
     // Returns true if it fails.
     failsDataValueRequired: function(schema, msg) {
+      //if (schema.required && !(msg.value && msg.value.trim())) { debugger }
       return (schema.required && !(msg.value && msg.value.trim()));
     },
     // Fails if the field has an enum, the msg value is specified and not all whitespace,

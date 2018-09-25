@@ -8,6 +8,10 @@ class MessageStore {
     return this.addMessages(data)
   }
 
+  reset() {
+    this.messageStore = {}
+  }
+
   addMessages(data) {
     if (data && data.messages) {
       data.messages.forEach($.proxy((message) => {
@@ -49,6 +53,12 @@ class MessageStore {
   clearInput(inputData) {
     if (this.messageFor(inputData)!=null) {
       delete this.messageStore[inputData.labwareIndex][inputData.address][inputData.fieldName]
+      if (Object.keys(this.messageStore[inputData.labwareIndex][inputData.address]).length == 0) {
+        delete this.messageStore[inputData.labwareIndex][inputData.address]
+      }
+      if (Object.keys(this.messageStore[inputData.labwareIndex]).length == 0) {
+        delete this.messageStore[inputData.labwareIndex]
+      }
     }
   }
 

@@ -308,7 +308,7 @@ function onCompleteFillInTable(results) {
   });
 
   // Write each row to the datatable
-  results.data.every(function(row, index) {
+  return results.data.every(function(row, index) {
     if (Object.values(row).every(function(val) {
       return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13)));
     })) {
@@ -393,7 +393,9 @@ function fillInTableFromFile() {
     skipEmptyLines: true,
     complete: function(results) {
       var value = onCompleteFillInTable(results);
-      dataTable.trigger('psd.update-table');
+      if (value) {
+        dataTable.trigger('psd.update-table');
+      }
       return value;
     }
   })
@@ -421,5 +423,9 @@ function getURLParameter(name) {
   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
 
-
+window.CSVFieldChecker = {
+  matchFields,
+  unmatchFields,
+  finishCSVCheck
+}
 export { displayError, checkCSVFields, validateCorrectPositions }

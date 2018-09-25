@@ -73,6 +73,7 @@ class MaterialsTableInput {
     if (this._hasTooltip) {
       $(this.inputData.input).parent().removeClass('has-error')
       $(this.inputData.input).parent().removeClass('has-warning')
+      $(this.inputData.input).parent().removeClass('has-success')
       $(this.inputData.input).off('click.tooltip')
       $(this.inputData.input).off('mouseenter.tooltip')
       $(this.inputData.input).off('mouseleave.tooltip')
