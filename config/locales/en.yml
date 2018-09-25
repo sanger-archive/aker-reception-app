@@ -36,7 +36,7 @@ en:
   hello: "Hello world"
   activerecord:
     attributes:
-      material_submission:
-        id: 'Submission Identifier'
+      manifest:
+        id: 'Manifest Identifier'
         email: 'Sample Guardian email'
         contact: 'Internal Contact'

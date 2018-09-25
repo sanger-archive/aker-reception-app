@@ -102,7 +102,7 @@
   };
 
   proto.setErrorToInput = function(input, msg) {
-    
+
     // If the error has been generated from a user interaction, it will display a tooltip
     //if ($(input).data('fromUserInteraction') === true) {
       this.cleanTooltip(input);
@@ -115,8 +115,8 @@
 
   proto.findTooltipIndexForInput = function(input) {
     var index;
-    this.tooltipsConfig.some($.proxy(function(config, pos) { 
-      index = pos; 
+    this.tooltipsConfig.some($.proxy(function(config, pos) {
+      index = pos;
       return (config.input === input);
     }, this));
     return index;
@@ -190,7 +190,7 @@
     this.inputs().each($.proxy(this.saveInput, this, data));
 
     if (!leaving) {
-      var changeTabField = $("<input name='material_submission[change_tab]' value='true' type='hidden' />");
+      var changeTabField = $("<input name='manifest[change_tab]' value='true' type='hidden' />");
       $(this.form).append(changeTabField);
     }
     var promise = $.post($(this.form).attr('action'), $(this.form).serialize()).then(

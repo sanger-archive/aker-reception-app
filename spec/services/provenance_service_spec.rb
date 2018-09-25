@@ -130,7 +130,7 @@ RSpec.describe :provenance_service do
 
   describe "#set_biomaterial_data" do
     def make_submission(labwares)
-      double(:material_submission, labwares: labwares)
+      double(:manifest, labwares: labwares)
     end
 
     def make_labwares(number)

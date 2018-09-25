@@ -37,7 +37,7 @@
 
   proto.manifestWithScientificNameWarning = function() {
     if (this.getScientificName().length > 0) {
-      SubmissionCSVWarnings.addWarning("sciname-taxon");
+      ManifestCSVWarnings.addWarning("sciname-taxon");
     }
   };
 

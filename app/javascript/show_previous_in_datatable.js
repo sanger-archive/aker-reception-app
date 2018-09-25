@@ -10,13 +10,13 @@ function attachCollapseEvent($node, path) {
         $('table', $node).DataTable({ ordering: false })
       },
       error: function() {
-        $node.html('There was an error while trying to load these Submissions.');
+        $node.html('There was an error while trying to load these Manifests.');
       }
     });
   });
 };
 
 $(document).ready(function() {
-  attachCollapseEvent($('#previouslyPrinted'), Reception.material_submissions_print_index_path({ format: 'js', status: 'printed' }))
-  attachCollapseEvent($('#previouslyDispatched'), Reception.material_submissions_dispatch_index_path({ format: 'js', status: 'dispatched' }))
+  attachCollapseEvent($('#previouslyPrinted'), Reception.manifests_print_index_path({ format: 'js', status: 'printed' }))
+  attachCollapseEvent($('#previouslyDispatched'), Reception.manifests_dispatch_index_path({ format: 'js', status: 'dispatched' }))
 });

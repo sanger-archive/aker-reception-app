@@ -1,0 +1,18 @@
+<tr>
+  <td><%= check_box_tag("manifest_ids[]", manifest.id) unless show_dispatched %></td>
+  <td><%= manifest.address %></td>
+  <td><%= manifest.id %></td>
+  <% if !show_dispatched? %>
+    <td><%= manifest.status %></td>
+  <% end %>
+  <td><%= manifest.owner_email %></td>
+  <td>
+    <% if show_dispatched %>
+      <%= localize(manifest.dispatch_date, format: :terse) %>
+    <% else %>
+      <%= localize(manifest.created_at, format: :terse) %>
+    <% end %>
+  </td>
+  <td><%= manifest.no_of_labwares_required %></td>
+  <td><%= supply_labware_type(manifest) %></td>
+</tr>
