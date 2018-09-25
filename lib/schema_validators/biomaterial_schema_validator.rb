@@ -6,7 +6,7 @@ module SchemaValidators
       SchemaValidators::BiomaterialSchemaPropertyValidators::AllowedValuesValidator, 
       SchemaValidators::BiomaterialSchemaPropertyValidators::TaxonIdValidator,
       SchemaValidators::BiomaterialSchemaPropertyValidators::HmdmcValidator,
-      SchemaValidators::BiomaterialSchemaPropertyValidators::UniqueValuesValidator 
+      #SchemaValidators::BiomaterialSchemaPropertyValidators::UniqueValuesValidator 
     ]
 
     def self.VALIDATION_CLASSES
