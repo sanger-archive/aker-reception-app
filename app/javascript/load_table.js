@@ -29,7 +29,7 @@ import Reception from './routes';
       $(this).removeClass('is-dragover bg-info').addClass('table-striped')
     })
     .on('drop', $.proxy(function(e) {
-      uploadManifest.call(this, $(this), e.originalEvent.dataTransfer.files[0]);
+      uploadManifest.call(this, $(e.currentTarget), e.originalEvent.dataTransfer.files[0]);
     }, this));
 
     var csvBox = $('.csv-upload-box')
@@ -44,7 +44,7 @@ import Reception from './routes';
         $(this).removeClass('is-dragover bg-info')
       })
       .on('drop', $.proxy(function(e) {
-        var dataTable = $(this).siblings(".material-data-table").find('.dataTable');
+        var dataTable = $(e.currentTarget).siblings(".material-data-table").find('.dataTable');
         uploadManifest.call(this, dataTable, e.originalEvent.dataTransfer.files[0]);
       }, this));
 
