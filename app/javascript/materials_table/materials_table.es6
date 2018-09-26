@@ -87,7 +87,7 @@ class MaterialsTable {
   saveCurrentTabBeforeLeaving(button, e) {
     e.stopPropagation()
     e.preventDefault()
-    let promise = this.tableStore.currentTab().saveWithoutLeaving().then($.proxy((data) => {
+    let promise = this.tableStore.currentTab().save().then($.proxy((data) => {
       if (data.update_successful) {
         window.location.href = $(button).attr('href')
       }
