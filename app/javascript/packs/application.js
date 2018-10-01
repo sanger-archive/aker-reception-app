@@ -27,7 +27,7 @@ require('component_builder')
 require('data_table_initialization')
 require('data_table_schema_validation')
 require('taxonomy_id_control')
-require('single_table_manager')
+require('materials_table/materials_table')
 require('barcode_reader')
 require('sync_select_value')
 require('load_table')
@@ -35,8 +35,9 @@ require('manifest_csv_warnings')
 require('loading_icon')
 require('show_previous_in_datatable')
 
+
 $(document).on("turbolinks:load", function() {
-  $('.has-tooltip').tooltip({trigger: 'click'});
+  //$('.has-tooltip').tooltip({trigger: 'click'});
   $('.has-popover').popover({
     trigger: 'hover'
   });

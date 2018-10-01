@@ -174,3 +174,22 @@ h2 {
   -webkit-box-shadow: inset 0 -2px 0 red;
   box-shadow: inset 0 -5px 0 red;
 }
+
+
+.nav-tabs > li > a.bg-warning {
+  color: orange !important;
+  box-shadow: inset 0 -1px 0 #f9bdbb;
+}
+
+.nav-tabs > li.active > a.bg-warning {
+  box-shadow: inset 0 -2px 0 #f9bdbb !important;
+}
+
+.nav-tabs > li > a.bg-danger {
+  color: red !important;
+  box-shadow: inset 0 -1px 0 #f9bdbb;
+}
+
+.nav-tabs > li.active > a.bg-danger {
+  box-shadow: inset 0 -2px 0 #f9bdbb !important;
+}
