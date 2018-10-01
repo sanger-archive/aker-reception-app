@@ -13,7 +13,7 @@ import Reception from './routes';
   var proto = LoadTable.prototype;
 
   proto.attachHandlers = function() {
-    var table = this.node.DataTable({
+    this.dataTable = this.node.DataTable({
       paging: false,
       searching: false,
       ordering: false
@@ -28,9 +28,9 @@ import Reception from './routes';
     .on('dragleave dragend drop', function() {
       $(this).removeClass('is-dragover bg-info').addClass('table-striped')
     })
-    .on('drop', function(e) {
-      uploadManifest($(this), e.originalEvent.dataTransfer.files[0]);
-    });
+    .on('drop', $.proxy(function(e) {
+      uploadManifest.call(this, $(e.currentTarget), e.originalEvent.dataTransfer.files[0]);
+    }, this));
 
     var csvBox = $('.csv-upload-box')
       .on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
@@ -43,10 +43,10 @@ import Reception from './routes';
       .on('dragleave dragend drop', function() {
         $(this).removeClass('is-dragover bg-info')
       })
-      .on('drop', function(e) {
-        var dataTable = $(this).siblings(".material-data-table").find('.dataTable');
-        uploadManifest(dataTable, e.originalEvent.dataTransfer.files[0]);
-      });
+      .on('drop', $.proxy(function(e) {
+        var dataTable = $(e.currentTarget).siblings(".material-data-table").find('.dataTable');
+        uploadManifest.call(this, dataTable, e.originalEvent.dataTransfer.files[0]);
+      }, this));
 
     $('select#manifest_contact_id').select2({
       tags: true,
@@ -54,14 +54,16 @@ import Reception from './routes';
       tokenSeparators: [',', ' ']
     });
 
-    $('input:file.upload-button').on('change', function() {
-      var sample_table = $(this).closest('.well').siblings().find('table.dataTable');
+    $('input:file.upload-button').on('change', $.proxy(function() {
+      var node = arguments[0].originalEvent.target
+      var sample_table = $(node).closest('.well').siblings().find('table.dataTable');
 
-      uploadManifest(sample_table, $(this)[0].files[0]);
+      var files = node.files
+      uploadManifest.call(this, sample_table, files[0]);
 
       // Clearing the input allows the change event to fire again
-      $(this).val(null);
-    });
+      $(node).val(null);
+    }, this));
 
   }
 
@@ -76,6 +78,7 @@ import Reception from './routes';
     let formData = new FormData();
     formData.append('manifest', manifest);
 
+    //this.dataTable.clear().draw();
     return $.ajax({
       url: Reception.manifests_upload_index_path(),
       type: 'POST',
@@ -86,6 +89,7 @@ import Reception from './routes';
     })
     .then(
       (response) => {
+
         checkCSVFields(dataTable, response.contents);
       },
       (xhr) => {
