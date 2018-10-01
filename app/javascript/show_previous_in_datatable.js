@@ -7,7 +7,10 @@ function attachCollapseEvent($node, path) {
       dataType: 'html',
       success: function(response) {
         $node.html(response);
-        $('table', $node).DataTable({ ordering: false })
+        // We need to recreate the datatable as it doesnt support changing settings after initialization
+        // https://datatables.net/manual/tech-notes/3
+        $('table', $node).destroy()
+        $('table', $node).DataTable({ ordering: false  })
       },
       error: function() {
         $node.html('There was an error while trying to load these Manifests.');

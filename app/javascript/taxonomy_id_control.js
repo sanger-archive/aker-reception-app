@@ -92,6 +92,7 @@
     this.inputSciName.attr('value', scientificName);
     this.inputSciName.val(scientificName);
     this.inputSciName.attr('title', scientificName);
+    this.inputSciName.trigger('change');
   };
 
   proto.getScientificName = function() {
