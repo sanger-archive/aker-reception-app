@@ -24,8 +24,9 @@ Rails.application.routes.draw do
   end
 
   # Redirect to /manifests in case someone still has links to material_submissions bookmarked or in an email
-  get '/material_submissions', to: redirect('/manifests')
-  get '/material_submissions/:id', to: redirect('/manifests/%{id}')
+  get '/material_submissions', to: redirect('manifests')
+  get '/material_submissions/:id', to: redirect('manifests/%{id}')
+  get '/material_submissions/new', to: redirect('manifests/new')
 
   namespace :material_submissions do
     get '/print', to: redirect('/manifests/print')
