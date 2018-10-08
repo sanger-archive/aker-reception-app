@@ -71,6 +71,7 @@ RSpec.configure do |config|
   end
 
   Capybara.javascript_driver = :chrome
+  Capybara.default_max_wait_time = 5
 
   config.include Capybara::DSL
   config.include FactoryBot::Syntax::Methods
