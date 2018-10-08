@@ -46,10 +46,6 @@ class ManifestsController < ApplicationController
     @manifest = Manifest.find(params[:id])
   end
 
-  def edit
-    @manifest = Manifest.find(params[:id])
-  end
-
 private
 
   def user_manifests

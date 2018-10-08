@@ -43,15 +43,12 @@ class MaterialsTable {
     $(this.node).on('psd.schema.error', $.proxy(this.onValidationMessage, this))
     $(this.node).on('psd.schema.warning', $.proxy(this.onValidationMessage, this))
 
-    //debugger;
-    //$($('table', this.node)[1]).on('psd.update-table', $.proxy(this.onUploadedFile, this));
     $('table', this.node).on('psd.update-table', $.proxy(this.onUploadedFile, this));
 
     $('input[type=submit]').on('click', $.proxy(this.toNextStep, this))
   }
 
   onUploadedFile() {
-    //this.messageStore.reset()
     this.tableStore.currentTab().validate()
     this.updateAllTabs()
   }
@@ -108,7 +105,7 @@ class MaterialsTable {
       data = [others]
     }
     var tab = this.findTabForInput(data[0].node)
-    
+
     data.forEach($.proxy((datum, pos) => {
       var node = datum.node
       this.messageStore.clearInput(tab.inputDataFor(node))
@@ -148,13 +145,13 @@ class MaterialsTable {
   * Finds the tab component that has control over a DOM node
   **/
   findTabForNode(node) {
-    return this.tabComponents.filter($.proxy(function(pos, tab) { 
+    return this.tabComponents.filter($.proxy(function(pos, tab) {
       return (tab.node() === node)
     }, this))
   }
 
   findTabForInput(input) {
-    return this.tabComponents.filter($.proxy(function(pos, tab) { 
+    return this.tabComponents.filter($.proxy(function(pos, tab) {
       return (tab.inputs().toArray().includes(input))
     }, this))[0]
   }

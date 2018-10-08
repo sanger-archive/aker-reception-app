@@ -1,3 +1,4 @@
+import Reception from './routes';
 
 const MODAL_ID = 'myModal';
 const FORM_FIELD_SELECT_ID = 'form-fields';
@@ -5,6 +6,17 @@ const CSV_SELECT_ID = 'fields-from-csv';
 const MAPPING_TABLE_ID = 'matched-fields-table';
 const MODAL_ALERT_REQUIRED_ID = 'modal-alert-required';
 const MODAL_ALERT_IGNORED_ID = 'modal-alert-ignored';
+const DATA_TABLES = 'div.tab-pane table.dataTable';
+const LABWARE_TABS = 'ul.nav.nav-tabs';
+const LABWARE_INPUTS = 'input[name*="supplier_plate_name"]';
+
+// Plate ID field
+const PLATE_ID_FIELD = {
+  required: true,
+  field_name_regex: "^plate",
+  friendly_name: "Plate ID",
+  show_on_form: true
+};
 
 // Position field that needs to be added to the schema which comes from the material service
 const POSITION_FIELD = {
@@ -20,8 +32,8 @@ var schema = {};
 var fieldsOnForm = [];
 var fieldsFromCSV = [];
 var requiredFields = [];
-var file = null;
-var dataTable = null;
+var manifest = null;
+var dataTables = null;
 
 function displayError(msg) {
   const PAGE_ERROR_ALERT_ID = "#page-error-alert";
@@ -42,16 +54,16 @@ function csvErrorToText(list) {
 
 // Checks the header fields from the CSV against the fields required for the material service
 // TODO: refactor into class
-function checkCSVFields(table, csvData) {
-  // Get the table and file
-  dataTable = table;
-  file = csvData;
+function checkCSVFields(results) {
+  dataTables = $(DATA_TABLES);
+  manifest = results;
 
   // Clear the matched fields
   matchedFields = {};
 
   // Get the schema from the rails view
   schema = Object.assign({}, materialSchema.properties);
+
   fieldsOnForm = Array.prototype.slice.apply(materialSchema.show_on_form);
   requiredFields = Array.prototype.slice.apply(materialSchema.required);
 
@@ -85,88 +97,78 @@ function checkCSVFields(table, csvData) {
     fieldsOnForm.push('position');
   }
 
+  if (!schema.plate_id) {
+    schema.plate_id = PLATE_ID_FIELD;
+    requiredFields.push('position');
+  }
+
   // Show the schema if we need to debug
   debug("schema:");
   debug(schema);
 
-  // Get the header fields using PapaParse
-  Papa.parse(file, {
-    header: true,
-    preview: 1, // Just get one line to do a quick check of the file
-    skipEmptyLines: true,
-    // The complete callback executes when the parsing is complete
-    complete: function(results) {
-      // If there are errors, display them and return
-      if (results.errors.length > 0) {
-        displayError(csvErrorToText(results.errors));
-        return false;
-      }
+  // If Papa was able to parse the CSV file, extract the header fields and show for debugging
+  fieldsFromCSV = Object.keys(results[0]);
+  debug("fieldsFromCSV:");
+  debug(fieldsFromCSV);
 
-      // If Papa was able to parse the CSV file, extract the header fields and show for debugging
-      fieldsFromCSV = results.meta.fields;
-      debug("fieldsFromCSV:");
-      debug(fieldsFromCSV);
+  // Do the magic!
+  if (fieldsFromCSV.length > 0) {
+    // Create "fields from CSV" select
+    // Empty the current select first
+    $('#' + CSV_SELECT_ID).empty();
+    // Add an option for each field
+    $.each(fieldsFromCSV, function (ffcKey, ffcValue) {
+      addFieldToSelect(CSV_SELECT_ID, ffcValue, ffcValue, false);
 
-      // Do the magic!
-      if (fieldsFromCSV.length > 0) {
-        // Create "fields from CSV" select
-        // Empty the current select first
-        $('#' + CSV_SELECT_ID).empty();
-        // Add an option for each field
-        $.each(fieldsFromCSV, function (ffcKey, ffcValue) {
-          addFieldToSelect(CSV_SELECT_ID, ffcValue, ffcValue, false);
+      // Match form fields and CSV fields
+      // Iterate through the CSV fields, checking if it matches the regex in the visible fields
+      $.each(schema, function (rfKey, rfValue) {
+        // We are only interested in the visible (show_on_form = true) fields at this point and they need a regex to match against
+        if (rfValue.hasOwnProperty('show_on_form') && rfValue.show_on_form && rfValue.hasOwnProperty('field_name_regex')) {
+          // Match using case-insensitivity
+          var pattern = new RegExp(rfValue.field_name_regex, 'i');
 
-          // Match form fields and CSV fields
-          // Iterate through the CSV fields, checking if it matches the regex in the visible fields
-          $.each(schema, function (rfKey, rfValue) {
-            // We are only interested in the visible (show_on_form = true) fields at this point and they need a regex to match against
-            if (rfValue.hasOwnProperty('show_on_form') && rfValue.show_on_form && rfValue.hasOwnProperty('field_name_regex')) {
-              // Match using case-insensitivity
-              var pattern = new RegExp(rfValue.field_name_regex, 'i');
-
-              // Check the regex pattern for the required field against the CSV field
-              if (pattern.test($.trim(ffcValue))) {
-                matchedFields[rfKey] = ffcValue;
-                return false;
-              }
-            }
-          });
-        });
-
-        debug("automatically matched fields:");
-        debug(matchedFields);
-
-        // Create "required fields" select
-        $('#' + FORM_FIELD_SELECT_ID).empty();
-        $.each(schema, function (key, value) {
-          if (value.hasOwnProperty('show_on_form') && value.show_on_form && value.friendly_name) {
-            addFieldToSelect(FORM_FIELD_SELECT_ID, key, value.friendly_name + ' (' + key + ')', value.required);
+          // Check the regex pattern for the required field against the CSV field
+          if (pattern.test($.trim(ffcValue))) {
+            matchedFields[rfKey] = ffcValue;
+            return false;
           }
-        });
-
-        // Clear and populate matched table
-        $("#" + MAPPING_TABLE_ID + " > tbody").html("");
-        if (matchedFields) {
-          $.each(matchedFields, function (propName, propValue) {
-            addRowToMatchedTable(propName, propValue);
-            removeFieldsFromSelects(propName, propValue);
-          });
         }
+      });
+    });
 
-        // Only show the modal dialog if there are un-matched fields or we have ignored fields from the CSV
-        var fieldsIgnored = csvFieldsIgnored();
-        if (fieldsIgnored) $('#' + MODAL_ALERT_IGNORED_ID).show();
-        if (!allRequiredMatched() || fieldsIgnored) {
-          $('#' + MODAL_ID).modal('toggle');
-        } else {
-          fillInTableFromFile();
-        }
-      } else {
-        displayError(csvErrorToText(results.errors));
+    debug("automatically matched fields:");
+    debug(matchedFields);
+
+    // Create "required fields" select
+    $('#' + FORM_FIELD_SELECT_ID).empty();
+    $.each(schema, function (key, value) {
+      if (value.hasOwnProperty('show_on_form') && value.show_on_form && value.friendly_name) {
+        addFieldToSelect(FORM_FIELD_SELECT_ID, key, value.friendly_name + ' (' + key + ')', value.required);
       }
-    },
-  });
-}
+    });
+
+    // Clear and populate matched table
+    $("#" + MAPPING_TABLE_ID + " > tbody").html("");
+    if (matchedFields) {
+      $.each(matchedFields, function (propName, propValue) {
+        addRowToMatchedTable(propName, propValue);
+        removeFieldsFromSelects(propName, propValue);
+      });
+    }
+
+    // Only show the modal dialog if there are un-matched fields or we have ignored fields from the CSV
+    var fieldsIgnored = csvFieldsIgnored();
+    if (fieldsIgnored) $('#' + MODAL_ALERT_IGNORED_ID).show();
+    if (!allRequiredMatched() || fieldsIgnored) {
+      $('#' + MODAL_ID).modal('toggle');
+    } else {
+      fillInTableFromFile();
+    }
+  } else {
+    displayError(csvErrorToText(results.errors));
+  }
+};
 
 // Checks if there are more fields in the CSV that could have been ignored
 function csvFieldsIgnored() {
@@ -268,36 +270,45 @@ function finishCSVCheck() {
   }
 }
 
-function validateCorrectPositions(results, positionField) {
-  var accessionedPositions = [];
-  return results.data.every(function(row, index) {
-    var wellPosition = row[positionField];
-    if (accessionedPositions.indexOf(wellPosition)>=0) {
-      displayError('The position at '+wellPosition+' is duplicated in the uploaded manifest.');
-      return false;
+function validateCorrectPositions(results, plateField, positionField) {
+  let wellPlateMap = new Map();
+  return results.every(function(row, index) {
+    const position = row[positionField].toLowerCase();
+    const plate    = row[plateField].toLowerCase();
+
+    if (wellPlateMap.has(position)) {
+      if (wellPlateMap.get(position).includes(plate)) {
+        displayError(`Duplicate entry found for ${row[plateField]}: Position ${row[positionField]}`);
+        return false;
+      } else {
+        wellPlateMap.get(position).push(plate)
+      }
     } else {
-      accessionedPositions.push(wellPosition);
+      wellPlateMap.set(position, [plate])
     }
     return true;
   })
 }
 
-function onCompleteFillInTable(results) {
-  debug("results from parse:");
-  debug(results);
-  if (!validateCorrectPositions(results, matchedFields.position)) {
+function validateNumberOfContainers(results, plateField, expectedNumberOfContainers) {
+  const plateIds = new Set(results.map(row => row[plateField]));
+
+  if (plateIds.size == expectedNumberOfContainers) {
+    return true;
+  } else if (plateIds.size > expectedNumberOfContainers) {
+    displayError(`Expected ${expectedNumberOfContainers} labwares in Manifest but found ${plateIds.size}.`)
+    return false;
+  } else if (plateIds.size < expectedNumberOfContainers) {
+    displayError(`Expected ${expectedNumberOfContainers} labwares in Manifest but could only find ${plateIds.size}.`)
     return false;
   }
+}
 
-  // Show any errors to the users
-  if (results.errors.length > 0) {
-    displayError(csvErrorToText(results.errors));
+function numberOfContainers() {
+  return $(LABWARE_TABS).data('labware-count');
+}
 
-    // Stop filling in data
-    // TODO: should we clear the file if we have one row incorrect?
-    return false;
-  }
-
+function onCompleteFillInTable(results, dataTable) {
   // Clear the table from previous import
   $('#' + dataTable.attr('id') + ' > tbody > tr').each(function() {
     var $this = $(this);
@@ -308,12 +319,7 @@ function onCompleteFillInTable(results) {
   });
 
   // Write each row to the datatable
-  return results.data.every(function(row, index) {
-    if (Object.values(row).every(function(val) {
-      return ((val.length == 0) || ((val.length==1) && (val.charCodeAt(0)==13)));
-    })) {
-      return true;
-    }
+  return results.every(function(row, index) {
     var wellPosition = row[matchedFields.position];
 
     // No position, throw error
@@ -321,6 +327,8 @@ function onCompleteFillInTable(results) {
       displayError('This manifest does not have a valid position field for the wells of row: ' + index);
       return false;
     };
+
+    debug(wellPosition)
 
     // Attempt to get the row for which we would like to fill in data
     var tableRow = $('tr[data-address="' + wellPosition + '"]', dataTable);
@@ -379,26 +387,53 @@ function onCompleteFillInTable(results) {
         // TODO regex checks?
       }
     });
-    
+
     return true;
   });
-  debug("importing complete!");
-  //dataTable.trigger('psd.update-table');
 }
 
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile() {
-  Papa.parse(file, {
-    header: true,
-    skipEmptyLines: true,
-    complete: function(results) {
-      var value = onCompleteFillInTable(results);
-      if (value) {
-        dataTable.trigger('psd.update-table');
-      }
-      return value;
+
+  if (!validateCorrectPositions(manifest, matchedFields.plate_id, matchedFields.position)) {
+    return false;
+  }
+
+  if (!validateNumberOfContainers(manifest, matchedFields.plate_id, numberOfContainers())) {
+    return false;
+  }
+
+  let groupedByPlate = manifest.reduce(function(memo, row) {
+    if (!memo[row[matchedFields.plate_id]]) {
+      memo[row[matchedFields.plate_id]] = [];
     }
-  })
+    memo[row[matchedFields.plate_id]].push(row);
+    return memo;
+  }, {});
+
+  let result = Object.keys(groupedByPlate).every(function(plate_id, index) {
+    return onCompleteFillInTable(groupedByPlate[plate_id], $(dataTables[index]))
+  });
+
+  if (result) {
+    updateTabsText(manifest, matchedFields.plate_id)
+    dataTables.trigger('psd.update-table');
+  }
+  return result;
+}
+
+function updateTabsText(results, plateField) {
+  const tabs = $('a', LABWARE_TABS)[Symbol.iterator]();
+  const inputs = $(LABWARE_INPUTS)[Symbol.iterator]();
+  const plateIds = new Set(results.map(row => row[plateField]));
+
+  for (let plateId of plateIds) {
+    let $tab = $(tabs.next().value);
+    let $input = $(inputs.next().value);
+    $tab.text(plateId.trim())
+    $input.val(plateId.trim())
+  }
+
 }
 
 function find_ci(array, value) {
@@ -423,9 +458,39 @@ function getURLParameter(name) {
   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
 
+// Send the manifest to the server, convert it to CSV, and then have the front end
+// do all the validation and produce all those helpful warnings.
+//
+// It used to be that only CSV was supported (still as it is done now with all the processing
+// taking place in the front end). The reason Excel spreadsheets are sent up and come back
+// as CSVs (although in a JSON attribute) are so that this logic didn't have to be rewritten
+// for server-side.
+function uploadManifest(manifest) {
+  let formData = new FormData();
+  formData.append('manifest', manifest);
+
+  return $.ajax({
+    url: Reception.manifests_upload_index_path(),
+    type: 'POST',
+    data: formData,
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+  .then(
+    (response) => {
+      checkCSVFields(response.contents);
+    },
+    (xhr) => {
+      displayError(xhr.responseJSON.errors.join("\n"));
+    }
+  )
+}
+
 window.CSVFieldChecker = {
   matchFields,
   unmatchFields,
   finishCSVCheck
 }
-export { displayError, checkCSVFields, validateCorrectPositions }
+
+export { checkCSVFields, validateCorrectPositions, validateNumberOfContainers, uploadManifest }

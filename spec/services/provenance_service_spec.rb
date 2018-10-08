@@ -143,42 +143,50 @@ RSpec.describe :provenance_service do
 
     let(:good_labware_data_long) do
       {
-        "1" => {
-          'REQUIRED_FREE' => 'xyz',
-          'REQUIRED_ENUM' => 'alpha',
-        },
-        "2" => {
-          'REQUIRED_FREE' => 'xyz',
-          'REQUIRED_ENUM' => 'BETA',
-          'OPTIONAL' => 'bananas',
+        "contents" => {
+          "1" => {
+            'REQUIRED_FREE' => 'xyz',
+            'REQUIRED_ENUM' => 'alpha',
+          },
+          "2" => {
+            'REQUIRED_FREE' => 'xyz',
+            'REQUIRED_ENUM' => 'BETA',
+            'OPTIONAL' => 'bananas',
+          }
         }
       }
     end
 
     let(:good_labware_data_short) do
       {
-        "1" => {
-          'REQUIRED_FREE' => 'xyz',
-          'REQUIRED_ENUM' => 'Beta',
-          'OPTIONAL' => '',
-        },
-        "2" => {}
+        "contents" => {
+          "1" => {
+            'REQUIRED_FREE' => 'xyz',
+            'REQUIRED_ENUM' => 'Beta',
+            'OPTIONAL' => '',
+          },
+          "2" => {}
+        }
       }
     end
 
     let(:missing_field_labware_data) do
       {
-        "1" => {
-          'REQUIRED_ENUM' => 'beta',
+        "contents" => {
+          "1" => {
+            'REQUIRED_ENUM' => 'beta',
+          }
         }
       }
     end
 
     let(:enum_field_wrong_labware_data) do
       {
-        "1" => {
-          'REQUIRED_FREE' => 'xyz',
-          'REQUIRED_ENUM' => 'Alabama',
+        "contents" => {
+          "1" => {
+            'REQUIRED_FREE' => 'xyz',
+            'REQUIRED_ENUM' => 'Alabama',
+          }
         }
       }
     end
@@ -210,13 +218,14 @@ RSpec.describe :provenance_service do
             'REQUIRED_ENUM' => 'BETA',
             'OPTIONAL' => 'bananas',
           },
-        })
+        },
+        supplier_plate_name: "")
         expect(@labwares[1]).to have_received(:update_attributes).with(contents: {
           "1" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'BETA',
           },
-        })
+        }, supplier_plate_name: "")
       end
     end
 
@@ -241,13 +250,13 @@ RSpec.describe :provenance_service do
           "1" => {
             'REQUIRED_ENUM' => 'BETA',
           },
-        })
+        }, supplier_plate_name: "")
         expect(@labwares[1]).to have_received(:update_attributes).with(contents: {
           "1" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'Alabama',
           },
-        })
+        }, supplier_plate_name: "")
       end
     end
 
@@ -277,8 +286,8 @@ RSpec.describe :provenance_service do
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'BETA',
           },
-        })
-        expect(@labwares[1]).to have_received(:update_attributes).with(contents: nil)
+        }, supplier_plate_name: "")
+        expect(@labwares[1]).to have_received(:update_attributes).with(contents: nil, supplier_plate_name: "")
       end
     end
 
@@ -286,7 +295,7 @@ RSpec.describe :provenance_service do
       before do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
-        @data = { "1" => good_labware_data_short, "2" => { "1" => { 'REQUIRED_FREE' => '' } }}
+        @data = { "1" => good_labware_data_short, "2" => { "contents" => { "1" => { 'REQUIRED_FREE' => '' } } } }
         @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
@@ -308,8 +317,8 @@ RSpec.describe :provenance_service do
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'BETA',
           },
-        })
-        expect(@labwares[1]).to have_received(:update_attributes).with(contents: nil)
+        }, supplier_plate_name: "")
+        expect(@labwares[1]).to have_received(:update_attributes).with(contents: nil, supplier_plate_name: "")
       end
     end
 
