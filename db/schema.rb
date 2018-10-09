@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_13_103721) do
+ActiveRecord::Schema.define(version: 2018_10_03_164129) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -62,6 +62,7 @@ ActiveRecord::Schema.define(version: 2018_09_13_103721) do
     t.string "container_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "supplier_plate_name"
     t.index ["barcode"], name: "index_labwares_on_barcode", unique: true
     t.index ["container_id"], name: "index_labwares_on_container_id", unique: true
     t.index ["manifest_id", "labware_index"], name: "index_labwares_on_manifest_id_and_labware_index", unique: true

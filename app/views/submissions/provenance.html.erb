@@ -81,7 +81,26 @@
 
     <%= render 'buttons', manifest: manifest, f: f %>
 
-    <ul class="nav nav-tabs" role="tablist">
+    <div style="margin-top: 10px" class="well csv-upload-box">
+      <div class="row">
+        <div class="venter col-md-10">
+          Please drop a Manifest for the current labware onto this box, or the table.
+          Alternatively, you can manually enter material provenance for the current
+          labware in the table below. Use the tabs above this message to switch
+          labware. If necessary, the table can be scrolled horizontally to view all of the fields.
+          <% if Rails.configuration.show_hmdmc_warning %>
+            <br><span style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</span>
+          <% end %>
+        </div>
+        <div class="vcenter col-md-2">
+          <label style="float: right" class="btn btn-primary">
+              Browse for Manifest <input data-psd-component-class="ManifestUploader" id="manifest_upload" type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <ul data-labware-count="<%= labwares.size %>" class="nav nav-tabs" role="tablist">
 
       <% labwares.each_with_index do |labware, i| %>
         <li class="<%= 'active' if i == 0 %>" role="presentation">
@@ -89,8 +108,9 @@
              id="labware_tab[<%= labware.labware_index %>]"
              href="#Labware<%= labware.labware_index %>"
              aria-controls="Labware<%= labware.labware_index %>" role="tab">
-            Labware <%= labware.labware_index %>
+            <%= labware.supplier_plate_name || "Labware #{labware.labware_index}" %>
           </a>
+          <input type="hidden" value="<%= labware.supplier_plate_name %>" name="manifest[labware][<%= labware.labware_index %>][supplier_plate_name]" />
         </li>
       <% end %>
 
@@ -108,24 +128,6 @@
 
         <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware<%= labware.labware_index %>">
 
-           <div style="margin-top: 10px" class="well csv-upload-box">
-            <div class="row">
-              <div class="venter col-md-10">
-                Please drop a Manifest for the current labware onto this box, or the table.
-                Alternatively, you can manually enter material provenance for the current
-                labware in the table below. Use the tabs above this message to switch
-                labware. If necessary, the table can be scrolled horizontally to view all of the fields.
-                <% if Rails.configuration.show_hmdmc_warning %>
-                  <br><span style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</span>
-                <% end %>
-              </div>
-              <div class="vcenter col-md-2">
-                <label style="float: right" class="btn btn-primary">
-                    Browse for Manifest <input type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
-                </label>
-              </div>
-            </div>
-          </div>
           <div style="overflow: scroll;" class="material-data-table">
 
           <table class="table table-condensed table-striped"
@@ -160,7 +162,7 @@
                       <div class="form-group" style="position: relative;">
                         <% if material_schema["properties"][col]['allowed'] %>
                           <select class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
-                                  name="manifest[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
+                                  name="manifest[labware][<%= labware.labware_index %>][contents][<%= address %>][<%= col %>]"
                                   id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]">
                             <option value=""></option>
                             <%= options_for_select(material_schema["properties"][col]['allowed'], (labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present?))%>
@@ -168,7 +170,7 @@
                         <% else %>
                           <input class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
                                 type="<%= material_schema["properties"][col]["field_type"] || 'text' %>"
-                                name="manifest[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
+                                name="manifest[labware][<%= labware.labware_index %>][contents][<%= address %>][<%= col %>]"
                                 id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]"
                                 value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
                         <% end %>

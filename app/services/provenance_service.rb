@@ -48,8 +48,12 @@ class ProvenanceService
       labware_index = labware.labware_index
       labware_data = labware_params[labware_index.to_s]
       filtered_data = {}
+      supplier_plate_name = ''
+
       if labware_data
-        labware_data.each do |address, material_data|
+        supplier_plate_name = labware_data["supplier_plate_name"].strip if labware_data["supplier_plate_name"]
+
+        labware_data["contents"].each do |address, material_data|
           material_data.each do |fieldName, value|
             unless value.blank?
               filtered_data[address] = {} if filtered_data[address].nil?
@@ -65,7 +69,7 @@ class ProvenanceService
       error_messages = validate(labware_index, filtered_data)
       filtered_data = nil if filtered_data.empty?
 
-      success &= labware.update_attributes(contents: filtered_data)
+      success &= labware.update_attributes(supplier_plate_name: supplier_plate_name, contents: filtered_data)
       all_errors += error_messages unless error_messages.empty?
     end
     success &= all_errors.empty?

@@ -1,10 +1,6 @@
 <%= bootstrap_form_for(manifest) do |f| %>
 
   <div class="field">
-    <%= f.text_field :id, readonly: true %>
-  </div>
-
-  <div class="field">
     <%= f.text_field :no_of_labwares_required, readonly: readonly %>
   </div>
 
@@ -13,7 +9,7 @@
   </div>
 
   <div class="field">
-    <%= f.select :labware_type, available_labware_types_select_options, {selected: manifest.labware_type_id}, {disabled: readonly } %>
+    <%= f.select :labware_type, available_labware_types_select_options, { selected: manifest.labware_type_id }, { disabled: readonly } %>
   </div>
 
   <div class="field">
@@ -29,7 +25,7 @@
   </div>
 
   <div class="field">
-    <%= f.select :contact, available_contacts_select_options, {selected: manifest.contact_id}, {disabled: readonly }%>
+    <%= f.select :contact, available_contacts_select_options, { selected: manifest.contact_id }, {disabled: readonly }%>
   </div>
 
   <% if manifest.labwares.any? { |lw| lw.barcode } %>

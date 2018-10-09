@@ -31,8 +31,8 @@ RSpec.feature "ShowDispatchedManifests", type: :feature, js: true do
       end
 
       it 'displays Manifests that have been dispatched' do
-        @dispatched_manifests.each do |manfiest|
-          expect(page.all('td', text: /^#{manfiest.id}$/).size).to eql(1)
+        @dispatched_manifests.each do |manifest|
+          expect(page).to have_css('td', text: manifest.id)
         end
       end
 

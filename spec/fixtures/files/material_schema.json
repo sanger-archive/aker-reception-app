@@ -1,0 +1,228 @@
+{
+  "show_on_form": [
+    "donor_id",
+    "supplier_name",
+    "hmdmc",
+    "is_tumour",
+    "gender",
+    "tissue_type",
+    "taxon_id",
+    "scientific_name",
+    "phenotype"
+  ],
+  "required": [
+    "supplier_name",
+    "is_tumour",
+    "scientific_name",
+    "taxon_id",
+    "tissue_type",
+    "donor_id",
+    "gender"
+  ],
+  "type": "object",
+  "properties": {
+    "is_tumour": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": true,
+      "friendly_name": "Tumour?",
+      "field_name_regex": "^(?:is[-_ ]+)?tumou?r\\??$",
+      "show_on_set_results": true,
+      "allowed": [
+        "tumour",
+        "normal"
+      ],
+      "type": "string"
+    },
+    "scientific_name": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": true,
+      "friendly_name": "Scientific Name",
+      "field_name_regex": "^scientific(?:[-_ ]*name)?$",
+      "show_on_set_results": true,
+      "type": "string"
+    },
+    "hmdmc_set_by": {
+      "not_blank": true,
+      "required": false,
+      "type": "string",
+      "required_with_hmdmc": true
+    },
+    "submitter_id": {
+      "show_on_set_results": true,
+      "friendly_name": "Submitter",
+      "type": "string",
+      "searchable": true
+    },
+    "concentration": {
+      "show_on_form": false,
+      "searchable": true,
+      "nullable": true,
+      "default": null,
+      "required": false,
+      "friendly_name": "Concentration (ng/uL)",
+      "show_on_set_results": true,
+      "type": "float"
+    },
+    "parents": {
+      "type": "list",
+      "schema": {
+        "type": "uuid",
+        "data_relation": {
+          "field": "_id",
+          "resource": "materials",
+          "embeddable": true
+        }
+      }
+    },
+    "phenotype": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": false,
+      "friendly_name": "Phenotype",
+      "field_name_regex": "^phenotype$",
+      "show_on_set_results": true,
+      "type": "string"
+    },
+    "taxon_id": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": true,
+      "friendly_name": "Taxon ID",
+      "field_name_regex": "^taxon(?:[-_ ]*id)?$",
+      "show_on_set_results": true,
+      "type": "string"
+    },
+    "owner_id": {
+      "show_on_set_results": true,
+      "friendly_name": "Sample Guardian",
+      "type": "string",
+      "searchable": true
+    },
+    "available": {
+      "searchable": true,
+      "default": false,
+      "required": false,
+      "friendly_name": "Available",
+      "show_on_set_results": true,
+      "type": "boolean"
+    },
+    "date_of_receipt": {
+      "show_on_set_results": true,
+      "friendly_name": "Date of Receipt",
+      "type": "string",
+      "searchable": true,
+      "format": "date"
+    },
+    "volume": {
+      "show_on_form": false,
+      "searchable": true,
+      "nullable": true,
+      "default": null,
+      "required": false,
+      "friendly_name": "Volume (uL)",
+      "show_on_set_results": true,
+      "type": "float"
+    },
+    "hmdmc": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": false,
+      "friendly_name": "HMDMC No.",
+      "field_name_regex": "^hmdmc(?:[-_ ]+no\\.?)?$",
+      "show_on_set_results": true,
+      "hmdmc_format": true,
+      "type": "string"
+    },
+    "tissue_type": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": true,
+      "friendly_name": "Tissue Type",
+      "field_name_regex": "^tissue[-_ ]*type$",
+      "show_on_set_results": true,
+      "allowed": [
+        "DNA",
+        "RNA",
+        "Blood",
+        "Saliva",
+        "Tissue",
+        "Cells",
+        "Cell Line",
+        "Lysed Cells"
+      ],
+      "type": "string"
+    },
+    "donor_id": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": true,
+      "friendly_name": "Donor ID",
+      "field_name_regex": "^donor(?:[-_ ]*id)?$",
+      "show_on_set_results": true,
+      "type": "string",
+      "unique_value": true
+    },
+    "supplier_name": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": true,
+      "friendly_name": "Supplier Name",
+      "field_name_regex": "^supplier[-_ ]*name$",
+      "show_on_set_results": true,
+      "type": "string",
+      "unique_value": true
+    },
+    "hmdmc_not_required_confirmed_by": {
+      "not_blank": true,
+      "required": false,
+      "type": "string"
+    },
+    "gender": {
+      "show_on_form": true,
+      "searchable": true,
+      "required": true,
+      "friendly_name": "Gender",
+      "field_name_regex": "^(?:gender|sex)$",
+      "show_on_set_results": true,
+      "allowed": [
+        "male",
+        "female",
+        "unknown",
+        "not applicable",
+        "mixed",
+        "hermaphrodite"
+      ],
+      "type": "string"
+    },
+    "amount": {
+      "show_on_form": false,
+      "searchable": true,
+      "nullable": true,
+      "default": null,
+      "required": false,
+      "friendly_name": "Amount (ng)",
+      "show_on_set_results": true,
+      "type": "float"
+    }
+  },
+  "searchable": [
+    "is_tumour",
+    "scientific_name",
+    "submitter_id",
+    "concentration",
+    "phenotype",
+    "taxon_id",
+    "owner_id",
+    "available",
+    "date_of_receipt",
+    "volume",
+    "hmdmc",
+    "tissue_type",
+    "donor_id",
+    "supplier_name",
+    "gender",
+    "amount"
+  ]
+}

@@ -32,7 +32,7 @@ RSpec.feature "ShowPrintedManifests", type: :feature, js: true do
 
       it 'displays Manifests that have been printed' do
         @printed_manifests.each do |manifest|
-          expect(page.all('td', text: /^#{manifest.id}$/).size).to eql(1)
+          expect(page).to have_css('td', text: manifest.id)
         end
       end
 

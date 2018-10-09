@@ -40,7 +40,7 @@ RSpec.describe :create_containers_step do
   end
 
   def make_labware(i)
-    lw = double(:labware, labware_index: i, num_of_rows: 2, num_of_cols: 3, row_is_alpha: true, col_is_alpha: false)
+    lw = double(:labware, labware_index: i, num_of_rows: 2, num_of_cols: 3, row_is_alpha: true, col_is_alpha: false, supplier_plate_name: '')
     allow(lw).to receive(:update_attributes).and_return(true)
     allow(lw).to receive(:container_id).and_return(nil)
     allow(lw).to receive(:contents).and_return({
@@ -72,7 +72,12 @@ RSpec.describe :create_containers_step do
       it "should have created containers" do
         expect(@containers.length).to eq 2
         expect(MatconClient::Container).to have_received(:create).with({
-          num_of_rows: 2, num_of_cols: 3, row_is_alpha: true, col_is_alpha: false, print_count: 0
+          num_of_rows: 2,
+          num_of_cols: 3,
+          row_is_alpha: true,
+          col_is_alpha: false,
+          print_count: 0,
+          supplier_plate_name: ''
         }).twice
       end
 
@@ -106,7 +111,7 @@ RSpec.describe :create_containers_step do
 
       it "should create containers for labware that don't already have one" do
         expect(MatconClient::Container).to have_received(:create).with({
-          num_of_rows: 2, num_of_cols: 3, row_is_alpha: true, col_is_alpha: false, print_count: 0
+          num_of_rows: 2, num_of_cols: 3, row_is_alpha: true, col_is_alpha: false, print_count: 0, supplier_plate_name: ''
         }).once
         expect(@containers.length).to eq 1
       end

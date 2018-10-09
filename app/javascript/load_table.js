@@ -1,5 +1,4 @@
-import { displayError, checkCSVFields } from 'csv_field_checker';
-import Reception from './routes';
+import { uploadManifest } from 'csv_field_checker';
 
 (function($,undefined) {
 
@@ -29,7 +28,7 @@ import Reception from './routes';
       $(this).removeClass('is-dragover bg-info').addClass('table-striped')
     })
     .on('drop', $.proxy(function(e) {
-      uploadManifest.call(this, $(e.currentTarget), e.originalEvent.dataTransfer.files[0]);
+      uploadManifest.call(this, e.originalEvent.dataTransfer.files[0]);
     }, this));
 
     var csvBox = $('.csv-upload-box')
@@ -44,8 +43,7 @@ import Reception from './routes';
         $(this).removeClass('is-dragover bg-info')
       })
       .on('drop', $.proxy(function(e) {
-        var dataTable = $(e.currentTarget).siblings(".material-data-table").find('.dataTable');
-        uploadManifest.call(this, dataTable, e.originalEvent.dataTransfer.files[0]);
+        uploadManifest.call(this, e.originalEvent.dataTransfer.files[0]);
       }, this));
 
     $('select#manifest_contact_id').select2({
@@ -53,49 +51,6 @@ import Reception from './routes';
       minimumResultsForSearch: Infinity,
       tokenSeparators: [',', ' ']
     });
-
-    $('input:file.upload-button').on('change', $.proxy(function() {
-      var node = arguments[0].originalEvent.target
-      var sample_table = $(node).closest('.well').siblings().find('table.dataTable');
-
-      var files = node.files
-      uploadManifest.call(this, sample_table, files[0]);
-
-      // Clearing the input allows the change event to fire again
-      $(node).val(null);
-    }, this));
-
-  }
-
-  // Send the manifest to the server, convert it to CSV, and then have the front end
-  // do all the validation and produce all those helpful warnings.
-  //
-  // It used to be that only CSV was supported (still as it is done now with all the processing
-  // taking place in the front end). The reason Excel spreadsheets are sent up and come back
-  // as CSVs (although in a JSON attribute) are so that this logic didn't have to be rewritten
-  // for server-side.
-  function uploadManifest(dataTable, manifest) {
-    let formData = new FormData();
-    formData.append('manifest', manifest);
-
-    //this.dataTable.clear().draw();
-    return $.ajax({
-      url: Reception.manifests_upload_index_path(),
-      type: 'POST',
-      data: formData,
-      cache: false,
-      contentType: false,
-      processData: false,
-    })
-    .then(
-      (response) => {
-
-        checkCSVFields(dataTable, response.contents);
-      },
-      (xhr) => {
-        displayError(xhr.responseJSON.errors.join("\n"));
-      }
-    )
 
   }
 

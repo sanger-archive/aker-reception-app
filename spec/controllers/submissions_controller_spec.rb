@@ -59,12 +59,14 @@ RSpec.describe SubmissionsController, type: :controller do
     data = {}
     labwares.each do |labware|
       data[labware.labware_index] = {
-        "1" => {
-          "gender" => "male",
-          "donor_id" => "d",
-          "phenotype" => "p",
-          "supplier_name" => "s",
-          "scientific_name" => species,
+        "contents" => {
+          "1" => {
+            "gender" => "male",
+            "donor_id" => "d",
+            "phenotype" => "p",
+            "supplier_name" => "s",
+            "scientific_name" => species,
+          }
         }
       }
     end
