@@ -8,7 +8,6 @@ module Transformers
     def transform
       begin
         @contents = to_csv
-        debugger
         return true
       rescue Roo::FileNotFound, IOError
         errors.add(:base, 'File could not be found.')
