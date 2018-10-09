@@ -99,7 +99,7 @@ function checkCSVFields(results) {
 
   if (!schema.plate_id) {
     schema.plate_id = PLATE_ID_FIELD;
-    requiredFields.push('position');
+    requiredFields.push('plate_id');
   }
 
   // Show the schema if we need to debug
