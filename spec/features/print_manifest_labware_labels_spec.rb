@@ -76,6 +76,7 @@ RSpec.feature "PrintManifestLabwareLabels", type: :feature do
 
     let(:print_manifests) do
       @manifests_to_print.each { |ss| page.check(option: ss.id) }
+      select @printers.first.name, from: 'printer[name]'
       click_button "Print"
     end
 

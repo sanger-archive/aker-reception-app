@@ -1,11 +1,13 @@
-# Transformer to convert an Excel spreadsheet to CSV
+# Transformer to convert an Excel spreadsheet to a List of Hashes where each key is the column name,
+# and each cell is the value
+# e.g. [{ plate_id: 1, position: 'A:1', donor_id: '12345' }, { plate_id: 1, position: 'B:1', donor_id: '67890' }]
 # If a CSV file is provided will parse that also
 module Transformers
-  class ExcelToCsv < Base
+  class ExcelToArray < Base
 
     def transform
       begin
-        @contents = transformer.to_csv
+        @contents = to_csv
         return true
       rescue Roo::FileNotFound, IOError
         errors.add(:base, 'File could not be found.')
@@ -25,6 +27,14 @@ module Transformers
 
     def transformer
       @transformer ||= path.extname == '.csv' ? Roo::CSV.new(path) : Roo::Excelx.new(path)
+    end
+
+    def to_csv
+      CSV.parse(transformer.to_csv, headers: true, skip_blanks: true, header_converters: :symbol)
+        .lazy
+        .map(&:to_h)
+        .reject { |row| row.values.all?(&:blank?) } # Remove any rows that have all blank values
+        .force
     end
 
   end

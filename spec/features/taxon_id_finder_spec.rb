@@ -81,7 +81,6 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
         context 'when writing a taxonomy id in a single input' do
           it 'uses the taxonomy service and searches for the id provided', js: true do
             fill_in('labware[1]address[A:1]fieldName[taxon_id]', with: '3')
-            puts current_url
             expect(page).to have_selector('.has-success')
             expect(!find_by_id('labware[1]address[A:1]fieldName[scientific_name]').value.empty?)
               .to eq(true)
