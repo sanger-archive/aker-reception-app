@@ -33,7 +33,7 @@ module Transformers
       parse_csv
         .lazy
         .map { |row| FormattedRow.new(row: row) }
-        .reject { |formatted_row| formatted_row.empty? }
+        .reject(&:empty?)
         .map(&:to_h)
         .force
     end
