@@ -45,7 +45,7 @@ module Transformers
     # Converts any nil values to empty strings
     def format_row(row)
       row.to_h.inject({}) do |row, (header, value)|
-        row[header] = value || "" unless header.nil?
+        row[header] = value || '' unless header.nil?
         row
       end
     end
