@@ -30,10 +30,12 @@ module Transformers
     end
 
     def to_array
-      parse_csv.each_with_object([]) do |row, memo|
-        formatted_row = FormattedRow.new(row: row)
-        memo << formatted_row.to_h unless formatted_row.empty?
-      end
+      parse_csv
+        .lazy
+        .map { |row| FormattedRow.new(row: row) }
+        .reject { |formatted_row| formatted_row.empty? }
+        .map(&:to_h)
+        .force
     end
 
     def parse_csv
@@ -45,7 +47,7 @@ module Transformers
   # Helpful little class to format a row e.g. remove columns where the header is empty
   class FormattedRow
 
-    attr_accessor :row
+    attr_reader :row
 
     def initialize(options)
       @row = options.fetch(:row)
