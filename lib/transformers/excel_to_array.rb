@@ -31,18 +31,35 @@ module Transformers
 
     def to_array
       parse_csv.each_with_object([]) do |row, memo|
-        formatted_row = row.to_h.inject({}) do |row, (header, value)|
-          row[header] = value || '' unless header.to_s.blank?
-          row
-        end
-
-        # Filter out blank lines
-        memo << formatted_row unless formatted_row.values.all?(&:blank?)
+        formatted_row = FormattedRow.new(row: row)
+        memo << formatted_row.to_h unless formatted_row.empty?
       end
     end
 
     def parse_csv
       CSV.parse(transformer.to_csv, headers: true, skip_blanks: true, header_converters: :symbol)
+    end
+
+  end
+
+  # Helpful little class to format a row e.g. remove columns where the header is empty
+  class FormattedRow
+
+    attr_accessor :row
+
+    def initialize(options)
+      @row = options.fetch(:row)
+    end
+
+    def to_h
+      @to_h ||= row.to_h.inject({}) do |memo, (header, value)|
+        memo[header] = value || '' if header.to_s.present?
+        memo
+      end
+    end
+
+    def empty?
+      to_h.values.all?(&:blank?)
     end
 
   end
