@@ -30,24 +30,19 @@ module Transformers
     end
 
     def to_array
-      parse_csv.reduce([]) do |arr, row|
-        row = format_row(row)
-        arr << row unless row.values.all?(&:blank?) # Filter out blank lines
-        arr
+      parse_csv.each_with_object([]) do |row, memo|
+        formatted_row = row.to_h.inject({}) do |row, (header, value)|
+          row[header] = value || '' unless header.to_s.blank?
+          row
+        end
+
+        # Filter out blank lines
+        memo << formatted_row unless formatted_row.values.all?(&:blank?)
       end
     end
 
     def parse_csv
       CSV.parse(transformer.to_csv, headers: true, skip_blanks: true, header_converters: :symbol)
-    end
-
-    # Doesn't add columns where the header is nil
-    # Converts any nil values to empty strings
-    def format_row(row)
-      row.to_h.inject({}) do |row, (header, value)|
-        row[header] = value || '' unless header.nil?
-        row
-      end
     end
 
   end
