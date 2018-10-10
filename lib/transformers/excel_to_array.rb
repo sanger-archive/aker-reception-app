@@ -29,14 +29,6 @@ module Transformers
       @transformer ||= path.extname == '.csv' ? Roo::CSV.new(path) : Roo::Excelx.new(path)
     end
 
-    def to_csv
-      CSV.parse(transformer.to_csv, headers: true, skip_blanks: true, header_converters: :symbol)
-        .lazy
-        .map {|row| row.to_h.inject({}) { |h, (k, v)| h[k] = v || ""; h } } # Convert nils to empty strings
-        .reject { |row| row.values.all?(&:blank?) } # Remove any rows that have all blank values
-        .force
-    end
-
     def to_array
       parse_csv.reduce([]) do |arr, row|
         row = format_row(row)
