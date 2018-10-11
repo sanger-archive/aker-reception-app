@@ -36,4 +36,5 @@ script:
   - bundle exec rspec
   - yarn test
 after_script:
-  - if [[ "$TRAVIS_PULL_REQUEST" == "false" ]]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+  # Run code climate
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

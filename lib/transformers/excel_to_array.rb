@@ -7,7 +7,7 @@ module Transformers
 
     def transform
       begin
-        @contents = to_csv
+        @contents = to_array
         return true
       rescue Roo::FileNotFound, IOError
         errors.add(:base, 'File could not be found.')
@@ -29,12 +29,39 @@ module Transformers
       @transformer ||= path.extname == '.csv' ? Roo::CSV.new(path) : Roo::Excelx.new(path)
     end
 
-    def to_csv
-      CSV.parse(transformer.to_csv, headers: true, skip_blanks: true, header_converters: :symbol)
+    def to_array
+      parse_csv
         .lazy
-        .map {|row| row.to_h.inject({}) { |h, (k, v)| h[k] = v || ""; h } } # Convert nils to empty strings :(
-        .reject { |row| row.values.all?(&:blank?) } # Remove any rows that have all blank values
+        .map { |row| FormattedRow.new(row: row) }
+        .reject(&:empty?)
+        .map(&:to_h)
         .force
+    end
+
+    def parse_csv
+      CSV.parse(transformer.to_csv, headers: true, skip_blanks: true, header_converters: :symbol)
+    end
+
+  end
+
+  # Helpful little class to format a row e.g. remove columns where the header is empty
+  class FormattedRow
+
+    attr_reader :row
+
+    def initialize(options)
+      @row = options.fetch(:row)
+    end
+
+    def to_h
+      @to_h ||= row.to_h.inject({}) do |memo, (header, value)|
+        memo[header] = value || '' if header.to_s.present?
+        memo
+      end
+    end
+
+    def empty?
+      to_h.values.all?(&:blank?)
     end
 
   end
