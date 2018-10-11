@@ -9,3 +9,5 @@ plugins:
     enabled: true
   rubocop:
     enabled: true
+  eslint:
+    enabled: true
