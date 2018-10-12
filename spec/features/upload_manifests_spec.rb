@@ -1,6 +1,7 @@
 require 'rails_helper'
 require 'webmock/rspec'
 
+
 RSpec.shared_examples "displays an error" do |errorMessage|
 
   it 'displays an error' do
@@ -9,9 +10,11 @@ RSpec.shared_examples "displays an error" do |errorMessage|
 
 end
 
+
 RSpec.feature "Upload Manifests", type: :feature, js: true do
 
   include StubHelper
+
 
   let(:number_of_containers_required) { 3 }
 
@@ -26,6 +29,7 @@ RSpec.feature "Upload Manifests", type: :feature, js: true do
   end
 
   before :each do
+
     stub_matcon_client_schema
     allow(TaxonomyClient::Taxonomy).to receive(:find).and_return(double(taxId: '3', scientificName: 'Something Latiny'))
     @rack = create(:rack_labware_type)
@@ -73,6 +77,13 @@ RSpec.feature "Upload Manifests", type: :feature, js: true do
       expect(page.find('div.tab-content table')).to have_selector("input[value='donor id 3']")
       expect(page.find('div.tab-content table')).to have_selector("input[value='Yellow']")
     end
+
+    it 'does not display any error if the contents are right' do
+      expect(first("td[data-psd-schema-validation-name=taxon_id]")).to have_css('.has-success')
+      expect(first("td[data-psd-schema-validation-name=scientific_name]")).to have_css('.has-success')
+      expect(first("ul.nav.nav-tabs")).not_to have_css('.bg-danger')
+    end
+
   end
 
   context 'when uploading a valid Manifest with no Plate ID column' do
