@@ -19,9 +19,9 @@ RSpec.shared_examples "successful transformation" do
   it 'sets contents' do
     transformer.transform
     expect(transformer.contents).to eq([
-      { well_position: 'A:1', tumour: 'Normal', gender: 'male', hmdmc: nil, donor_id: '3', phenotype: '6', supplier_name: '78placebo-501', taxon_id: '9606', tissue_type: 'RNA' },
-      { well_position: 'B:1', tumour: 'Normal', gender: 'male', hmdmc: nil, donor_id: '3', phenotype: '6', supplier_name: '78placebo-502', taxon_id: '9606', tissue_type: 'RNA' },
-      { well_position: 'C:1', tumour: 'Normal', gender: 'female', hmdmc: nil, donor_id: '3', phenotype: '6', supplier_name: '78placebo-503', taxon_id: '9606', tissue_type: 'RNA' }
+      { well_position: 'A:1', tumour: 'Normal', gender: 'male', hmdmc: '', donor_id: '3', phenotype: '6', supplier_name: '78placebo-501', taxon_id: '9606', tissue_type: 'RNA' },
+      { well_position: 'B:1', tumour: 'Normal', gender: 'male', hmdmc: '', donor_id: '3', phenotype: '6', supplier_name: '78placebo-502', taxon_id: '9606', tissue_type: 'RNA' },
+      { well_position: 'C:1', tumour: 'Normal', gender: 'female', hmdmc: '', donor_id: '3', phenotype: '6', supplier_name: '78placebo-503', taxon_id: '9606', tissue_type: 'RNA' }
     ])
   end
 end
@@ -84,6 +84,11 @@ RSpec.describe Transformers::ExcelToArray do
 
     context 'when file has blank lines' do
       let(:path) { 'spec/fixtures/files/simple_manifest.csv' }
+      include_examples "successful transformation"
+    end
+
+    context 'when file has a column with values but no header' do
+      let(:path) { 'spec/fixtures/files/manifest_no_column_header.xlsx' }
       include_examples "successful transformation"
     end
 

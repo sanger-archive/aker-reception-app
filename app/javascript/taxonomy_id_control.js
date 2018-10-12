@@ -16,6 +16,7 @@
 
     this.numAjaxCalls = 0;
     this.lastStoredCall = (-1);
+    this.taxId = '';
 
     this.attachHandlers();
   };
@@ -42,11 +43,8 @@
   };
 
   proto.manifestWithDifferentValueForScientificNameInputWarning = function() {
-    var previousValue = this.getScientificName();
-    this.findTaxId(true);
-    var actualValue = this.getScientificName();
-    if ((previousValue.length > 0) && (previousValue != actualValue)) {
-      this.markInputsAs('has-warning');
+    if (this.taxId != this.getTaxonId()) {
+      this.findTaxId(true);
     }
   };
 
@@ -127,7 +125,7 @@
   };
 
   proto.findTaxId = function(synchronous) {
-    var taxId = this.getTaxonId();
+    var taxId = this.taxId = this.getTaxonId();
     this.setScientificName('');
     if (this.validateTaxId(taxId)) {
       if (taxId.length == 0) {
