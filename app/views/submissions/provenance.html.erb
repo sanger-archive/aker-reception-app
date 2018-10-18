@@ -1,10 +1,15 @@
 <%= render partial: 'submission_header' %>
 
 <div data-psd-component-class="SingleTableManager"
-     data-psd-component-parameters="<%= (material_submission.labwares).to_json %>">
+     data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
 
   <div id="page-error-alert" class="alert alert-danger hidden" role="alert">
-    <h4 class='alert-title'>Error!</h4>
+    <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <p class='alert-msg'>&nbsp;</p>
+  </div>
+
+  <div id="page-warning-alert" class="alert alert-warning hidden" role="alert">
+    <strong class='alert-title'>Warning!</strong>
     <p class='alert-msg'>&nbsp;</p>
   </div>
 
@@ -40,7 +45,7 @@
             </div>
             <div class="col-md-2">
               <div class="form-group">
-                <button id="match-fields-button" type="button" class="btn btn-primary" onclick="matchFields();">Match</button>
+                <button id="match-fields-button" type="button" class="btn btn-primary" onclick="CSVFieldChecker.matchFields();">Match</button>
               </div>
             </div>
           </div>
@@ -60,23 +65,42 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="complete-csv-matching" type="button" class="btn btn-primary" onclick="finishCSVCheck();">Continue</button>
+          <button id="complete-csv-matching" type="button" class="btn btn-primary" onclick="CSVFieldChecker.finishCSVCheck();">Continue</button>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 
 
-  <%= bootstrap_form_tag url: material_submission_biomaterial_data_path(material_submission.id),
+  <%= bootstrap_form_tag url: manifest_biomaterial_data_path(manifest.id),
                          remote: true,
                          method: :put,
                          html: {:'data-type' => 'json'} do |f| %>
 
-    <% labwares = material_submission.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
+    <% labwares = manifest.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
 
-    <%= render 'buttons', material_submission: material_submission, f: f %>
+    <%= render 'buttons', manifest: manifest, f: f %>
 
-    <ul class="nav nav-tabs" role="tablist">
+    <div style="margin-top: 10px" class="well csv-upload-box">
+      <div class="row">
+        <div class="venter col-md-10">
+          Please drop a Manifest for the current labware onto this box, or the table.
+          Alternatively, you can manually enter material provenance for the current
+          labware in the table below. Use the tabs above this message to switch
+          labware. If necessary, the table can be scrolled horizontally to view all of the fields.
+          <% if Rails.configuration.show_hmdmc_warning %>
+            <br><span style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</span>
+          <% end %>
+        </div>
+        <div class="vcenter col-md-2">
+          <label style="float: right" class="btn btn-primary">
+              Browse for Manifest <input data-psd-component-class="ManifestUploader" id="manifest_upload" type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <ul data-labware-count="<%= labwares.size %>" class="nav nav-tabs" role="tablist">
 
       <% labwares.each_with_index do |labware, i| %>
         <li class="<%= 'active' if i == 0 %>" role="presentation">
@@ -84,8 +108,9 @@
              id="labware_tab[<%= labware.labware_index %>]"
              href="#Labware<%= labware.labware_index %>"
              aria-controls="Labware<%= labware.labware_index %>" role="tab">
-            Labware <%= labware.labware_index %>
+            <%= labware.supplier_plate_name || "Labware #{labware.labware_index}" %>
           </a>
+          <input type="hidden" value="<%= labware.supplier_plate_name %>" name="manifest[labware][<%= labware.labware_index %>][supplier_plate_name]" />
         </li>
       <% end %>
 
@@ -103,24 +128,6 @@
 
         <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware<%= labware.labware_index %>">
 
-           <div style="margin-top: 10px" class="well csv-upload-box">
-            <div class="row">
-              <div class="venter col-md-10">
-                Please drop a CSV for the current labware onto this box, or the table.
-                Alternatively, you can manually enter material provenance for the current
-                labware in the table below. Use the tabs above this message to switch
-                labware. If necessary, the table can be scrolled horizontally to view all of the fields.
-                <% if Rails.configuration.show_hmdmc_warning %>
-                  <br><span style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</span>
-                <% end %>
-              </div>
-              <div class="vcenter col-md-2">
-                <label style="float: right" class="btn btn-primary">
-                    Browse for CSV <input type="file" class="upload-button" accept=".csv, text/csv" style="display: none;">
-                </label>
-              </div>
-            </div>
-          </div>
           <div style="overflow: scroll;" class="material-data-table">
 
           <table class="table table-condensed table-striped"
@@ -152,10 +159,10 @@
                   <td><%= address %></td>
                   <% for col in schema['show_on_form'] %>
                     <td data-psd-schema-validation-name="<%= col %>">
-                      <div class="form-group">
+                      <div class="form-group" style="position: relative;">
                         <% if material_schema["properties"][col]['allowed'] %>
                           <select class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
-                                  name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
+                                  name="manifest[labware][<%= labware.labware_index %>][contents][<%= address %>][<%= col %>]"
                                   id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]">
                             <option value=""></option>
                             <%= options_for_select(material_schema["properties"][col]['allowed'], (labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present?))%>
@@ -163,7 +170,7 @@
                         <% else %>
                           <input class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
                                 type="<%= material_schema["properties"][col]["field_type"] || 'text' %>"
-                                name="material_submission[labware][<%= labware.labware_index %>][<%= address %>][<%= col %>]"
+                                name="manifest[labware][<%= labware.labware_index %>][contents][<%= address %>][<%= col %>]"
                                 id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]"
                                 value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
                         <% end %>
@@ -179,7 +186,7 @@
       <% end %>
     </div>
 
-    <%= render 'buttons', material_submission: material_submission, f: f %>
+    <%= render 'buttons', manifest: manifest, f: f %>
 
   <% end %>
 </div>

@@ -1,21 +1,36 @@
 Rails.application.routes.draw do
-  root 'material_submissions#index'
+  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+
+  root 'manifests#index'
 
   health_check_routes
 
-  get '/materials_schema', to: 'material_submissions#schema'
-  get '/hmdmc', to: 'material_submissions#hmdmc_validate'
+  get '/materials_schema', to: 'manifests#schema'
+  get '/hmdmc', to: 'manifests#hmdmc_validate'
 
   get '/material_receptions/waiting', to: 'material_receptions#pending_receptions'
-    
+
   resources :material_receptions
-  resources :material_submissions do
+
+  namespace :manifests do
+    resources :print, only: [:index, :create]
+    resources :dispatch, only: [:index, :create]
+    resources :upload, only: [:create]
+  end
+
+  resources :manifests, only: [:index, :new, :destroy, :show] do
     resources :build, controller: 'submissions'
     put :biomaterial_data, controller: 'submissions'
   end
 
-  resources :completed_submissions, only: [:index]
-  post '/completed_submissions/print', to: 'completed_submissions#print'
-  post '/completed_submissions/dispatch', to: 'completed_submissions#dispatch_submission'
+  # Redirect to /manifests in case someone still has links to material_submissions bookmarked or in an email
+  get '/material_submissions', to: redirect('manifests')
+  get '/material_submissions/:id', to: redirect('manifests/%{id}')
+  get '/material_submissions/new', to: redirect('manifests/new')
+
+  namespace :material_submissions do
+    get '/print', to: redirect('/manifests/print')
+    get '/dispatch', to: redirect('/manifests/dispatch')
+  end
 
 end

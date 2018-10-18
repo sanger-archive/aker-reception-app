@@ -63,13 +63,19 @@ RSpec.configure do |config|
     Capybara::Poltergeist::Driver.new(app, url_blacklist: ['https://fonts.googleapis.com'])
   end
 
-  Capybara.javascript_driver = :poltergeist_debug
+  Capybara.register_driver :chrome do |app|
+    options = Selenium::WebDriver::Chrome::Options.new(
+      args: %w[headless disable-gpu no-sandbox]
+    )
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  end
+
+  Capybara.javascript_driver = :chrome
+  Capybara.default_max_wait_time = 5
 
   config.include Capybara::DSL
-
   config.include FactoryBot::Syntax::Methods
-
-  config.include WaitForAjax
+  config.include AuthenticationHelper
 
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)

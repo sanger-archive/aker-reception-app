@@ -9,9 +9,9 @@ RSpec.describe Labware, type: :model do
                           num_of_rows: num_of_rows,
                           row_is_alpha: row_is_alpha,
                           col_is_alpha: col_is_alpha)
-    material_submission = create(:material_submission, labware_type: labware_type)
+    manifest = create(:manifest, labware_type: labware_type)
     lw_args = {
-      material_submission: material_submission,
+      manifest: manifest,
       labware_index: 1,
     }
     if attrs
@@ -106,9 +106,7 @@ RSpec.describe Labware, type: :model do
   describe "#received?" do
     context "when labware has a reception" do
       before do
-        @labware = create(:labware, print_count: 1)
-        @labware.material_submission.update_attributes(dispatched: true)
-        create(:material_reception, labware_id: @labware.id)
+        @labware = create(:received_labware)
       end
 
       it "should return true" do

@@ -1,0 +1,9 @@
+Well Position,tumour,gender,hmdmc,donor_id,phenotype,supplier_name,taxon_id,tissue_type
+,,,,,,,,
+A:1,Normal,male,,3,6,78placebo-501,9606,RNA
+,,,,,,,,
+B:1,Normal,male,,3,6,78placebo-502,9606,RNA
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+C:1,Normal,female,,3,6,78placebo-503,9606,RNA

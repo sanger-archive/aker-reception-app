@@ -32,24 +32,28 @@ class ProvenanceService
     end
   end
 
-  # Process request to set the json data for labware in a given submission.
+  # Process request to set the json data for labware in a given manifest.
   # Returns a success boolean and an array of errors.
   # The data will be saved even if the validation failed, because it might be in-progress.
   # - [true, []] - nothing went wrong
   # - [false, [error1, error2, ...]] - some stuff went wrong; here is the information
   # - [false, []] - something unexpected went wrong
-  def set_biomaterial_data(material_submission, labware_params, current_user)
+  def set_biomaterial_data(manifest, labware_params, current_user)
     all_errors = []
 
     success = true
 
     # remove null or empty data from the params
-    material_submission.labwares.each do |labware|
+    manifest.labwares.each do |labware|
       labware_index = labware.labware_index
       labware_data = labware_params[labware_index.to_s]
       filtered_data = {}
+      supplier_plate_name = ''
+
       if labware_data
-        labware_data.each do |address, material_data|
+        supplier_plate_name = labware_data["supplier_plate_name"].strip if labware_data["supplier_plate_name"]
+
+        labware_data["contents"].each do |address, material_data|
           material_data.each do |fieldName, value|
             unless value.blank?
               filtered_data[address] = {} if filtered_data[address].nil?
@@ -65,7 +69,7 @@ class ProvenanceService
       error_messages = validate(labware_index, filtered_data)
       filtered_data = nil if filtered_data.empty?
 
-      success &= labware.update_attributes(contents: filtered_data)
+      success &= labware.update_attributes(supplier_plate_name: supplier_plate_name, contents: filtered_data)
       all_errors += error_messages unless error_messages.empty?
     end
     success &= all_errors.empty?

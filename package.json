@@ -1,0 +1,28 @@
+{
+  "scripts": {
+    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/materials_table/stores spec/javascript/**/*_spec.js spec/javascript/*_spec.es6 spec/javascript/**/*_spec.es6"
+  },
+  "dependencies": {
+    "@rails/webpacker": "3.5",
+    "bootstrap": "^3.0",
+    "datatables.net": "^1.10.18",
+    "datatables.net-bs": "^1.10.19",
+    "jquery": "^3.3.1",
+    "jquery-ujs": "^1.2.2",
+    "moment": "^2.22.2",
+    "papaparse": "^4.5.0",
+    "rails-erb-loader": "^5.5.0",
+    "select2": "^4.0.6-rc.1",
+    "selectize": "^0.12.4"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "jsdom": "^12.0.0",
+    "jsdom-global": "^3.0.2",
+    "mocha": "^5.2.0",
+    "mocha-webpack": "^1.1.0",
+    "sinon": "^6.1.5",
+    "webpack-dev-server": "2.11.2",
+    "webpack-node-externals": "^1.7.2"
+  }
+}

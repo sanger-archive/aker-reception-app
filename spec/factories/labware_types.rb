@@ -35,7 +35,7 @@ FactoryBot.define do
     num_of_cols 12
     num_of_rows 8
     col_is_alpha false
-    row_is_alpha false
+    row_is_alpha true
     uses_decapper true
     name "Rack"
     description "A rack"

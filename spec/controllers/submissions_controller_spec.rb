@@ -4,9 +4,9 @@ require 'ostruct'
 
 RSpec.describe SubmissionsController, type: :controller do
 
-  def step_params(material_submission, step_name)
+  def step_params(manifest, step_name)
     p = {
-        material_submission: case step_name
+        manifest: case step_name
           when :labware
             {
               supply_labwares: true,
@@ -18,13 +18,13 @@ RSpec.describe SubmissionsController, type: :controller do
           when :provenance
             {
               status: 'provenance',
-              labware: labware_attributes_for(material_submission.labwares, 'Mouse')
+              labware: labware_attributes_for(manifest.labwares, 'Mouse')
             }
           when :provenance_human
             step_name = :provenance
             {
               status: 'provenance',
-              labware: labware_attributes_for(material_submission.labwares, 'Homo Sapiens')
+              labware: labware_attributes_for(manifest.labwares, 'Homo Sapiens')
             }
           when :ethics
             {
@@ -48,7 +48,7 @@ RSpec.describe SubmissionsController, type: :controller do
         }.merge(
           {
             format: (step_name == :provenance) ? 'json' : 'html',
-            material_submission_id: material_submission.id,
+            manifest_id: manifest.id,
             id: step_name
           }
         )
@@ -59,12 +59,14 @@ RSpec.describe SubmissionsController, type: :controller do
     data = {}
     labwares.each do |labware|
       data[labware.labware_index] = {
-        "1" => {
-          "gender" => "male",
-          "donor_id" => "d",
-          "phenotype" => "p",
-          "supplier_name" => "s",
-          "scientific_name" => species,
+        "contents" => {
+          "1" => {
+            "gender" => "male",
+            "donor_id" => "d",
+            "phenotype" => "p",
+            "supplier_name" => "s",
+            "scientific_name" => species,
+          }
         }
       }
     end
@@ -83,7 +85,7 @@ RSpec.describe SubmissionsController, type: :controller do
 
   describe "Using the steps defined by wicked" do
     setup do
-      schema = 
+      schema =
         {
           "required":[
             "gender",
@@ -136,7 +138,7 @@ RSpec.describe SubmissionsController, type: :controller do
             }
           }
         }
-      
+
 
       request_headers = {'Content-Type'=>'application/json', 'Accept'=>'application/json'}
 
@@ -144,13 +146,13 @@ RSpec.describe SubmissionsController, type: :controller do
     end
 
     let(:user) { OpenStruct.new(email: 'other@sanger.ac.uk', groups: ['world']) }
-    let(:material_submission) { FactoryBot.create(:material_submission, owner_email: user.email) }
+    let(:manifest) { FactoryBot.create(:manifest, owner_email: user.email) }
 
     context 'when user is not authenticated' do
       let(:login_url) { Rails.configuration.login_url+'?'+{redirect_url:request.original_url}.to_query }
-      
+
       it 'redirects to the login page' do
-        put :update, step_params(material_submission, :labware)
+        put :update, step_params(manifest, :labware)
         expect(response).to redirect_to(login_url)
       end
     end
@@ -161,144 +163,144 @@ RSpec.describe SubmissionsController, type: :controller do
         allow(controller).to receive(:current_user).and_return(user)
       end
 
-      it "does not update the submission if the state is not pending (i.e. broken)" do
+      it "does not update the manifest if the state is not pending (i.e. broken)" do
         allow_any_instance_of(DispatchService).to receive(:process).and_raise  "This step fails"
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
+        put :update, step_params(manifest, :labware)
+        manifest.reload
 
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
 
-        put :update, step_params(material_submission, :dispatch)
-        material_submission.reload
+        put :update, step_params(manifest, :dispatch)
+        manifest.reload
 
-        put :update, step_params(material_submission, :dispatch)
-        material_submission.reload
+        put :update, step_params(manifest, :dispatch)
+        manifest.reload
 
-        expect(material_submission.status).to eq('broken')
-        expect(flash[:error]).to match("This submission cannot be updated.")
+        expect(manifest.status).to eq('broken')
+        expect(flash[:error]).to match("This Manifest cannot be updated.")
       end
 
-      it "does not complete the submission if any steps have not been performed" do
-        put :update, step_params(material_submission, :dispatch)
-        material_submission.reload
-        expect(material_submission.status).not_to eq('active')
+      it "does not complete the manifest if any steps have not been performed" do
+        put :update, step_params(manifest, :dispatch)
+        manifest.reload
+        expect(manifest.status).not_to eq('active')
       end
 
-      it "does not update the submission state if any required data of steps has not been provided" do
+      it "does not update the manifest state if any required data of steps has not been provided" do
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
+        put :update, step_params(manifest, :labware)
+        manifest.reload
 
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
 
-        put :update, step_params(material_submission, :dispatch_contact_error)
-        material_submission.reload
+        put :update, step_params(manifest, :dispatch_contact_error)
+        manifest.reload
 
-        expect(material_submission.status).to eq('dispatch')
+        expect(manifest.status).to eq('dispatch')
       end
 
-      it "updates the submission state to active when all steps are successful and DispatchSerivce#process returns true" do
+      it "updates the manifest state to active when all steps are successful and DispatchSerivce#process returns true" do
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
         allow_any_instance_of(DispatchService).to receive(:process).and_return(true)
 
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
-        expect(material_submission.supply_decappers).to eq(true)
+        put :update, step_params(manifest, :labware)
+        manifest.reload
+        expect(manifest.supply_decappers).to eq(true)
 
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
 
-        put :update, step_params(material_submission, :dispatch)
-        material_submission.reload
+        put :update, step_params(manifest, :dispatch)
+        manifest.reload
 
         expect(flash[:notice]).to match('Your manifest has been created')
-        expect(material_submission.status).to eq('active')
+        expect(manifest.status).to eq('active')
       end
 
-      it "does not update submission status if DispatchSerivce#process returns false" do
+      it "does not update manifest status if DispatchSerivce#process returns false" do
         allow_any_instance_of(DispatchService).to receive(:process).and_return false
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
+        put :update, step_params(manifest, :labware)
+        manifest.reload
 
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
 
-        put :update, step_params(material_submission, :dispatch)
-        material_submission.reload
+        put :update, step_params(manifest, :dispatch)
+        manifest.reload
 
-        expect(material_submission.status).to eq('dispatch')
-        expect(flash[:error]).to match("The submission could not be created")
+        expect(manifest.status).to eq('dispatch')
+        expect(flash[:error]).to match("The Manifest could not be created")
       end
 
-      it "updates the submission status to broken if DispatchSerivce#process raises an exception" do
+      it "updates the manifest status to broken if DispatchSerivce#process raises an exception" do
         allow_any_instance_of(DispatchService).to receive(:process).and_raise  "This step fails"
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
+        put :update, step_params(manifest, :labware)
+        manifest.reload
 
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
 
-        put :update, step_params(material_submission, :dispatch)
-        material_submission.reload
+        put :update, step_params(manifest, :dispatch)
+        manifest.reload
 
-        expect(material_submission.status).to eq('broken')
-        expect(flash[:error]).to match("There has been a problem with the submission. Please contact support.")
+        expect(manifest.status).to eq('broken')
+        expect(flash[:error]).to match("There has been a problem with the Manifest. Please contact support.")
       end
 
       it "updates the labware contents if ProvenanceServive#set_biomaterial_data returns no errors" do
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
 
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
+        put :update, step_params(manifest, :labware)
+        manifest.reload
 
-        expect(material_submission.labwares.first.contents).to eq nil
+        expect(manifest.labwares.first.contents).to eq nil
 
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
 
-        expect(material_submission.labwares.first.contents).not_to eq nil
-        expect(material_submission.status).to eq('dispatch')
+        expect(manifest.labwares.first.contents).not_to eq nil
+        expect(manifest.status).to eq('dispatch')
       end
 
-      it "does not update submission status if ProvenanceServive#set_biomaterial_data returns errors" do
+      it "does not update manifest status if ProvenanceServive#set_biomaterial_data returns errors" do
         allow_any_instance_of(ProvenanceService).to receive(:set_biomaterial_data).and_return [false, ['error', 'error']]
 
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
+        put :update, step_params(manifest, :labware)
+        manifest.reload
 
-        expect(material_submission.labwares.first.contents).to eq nil
+        expect(manifest.labwares.first.contents).to eq nil
 
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
 
-        expect(material_submission.status).to eq('provenance')
+        expect(manifest.status).to eq('provenance')
       end
 
       it "moves on to the ethics step if the labware contains human material" do
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
-        put :biomaterial_data, step_params(material_submission, :provenance_human)
-        material_submission.reload
-        expect(material_submission.status).to eq('ethics')
+        put :update, step_params(manifest, :labware)
+        manifest.reload
+        put :biomaterial_data, step_params(manifest, :provenance_human)
+        manifest.reload
+        expect(manifest.status).to eq('ethics')
       end
 
       it "skips the ethics step if the labware does not contain human material" do
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
-        put :update, step_params(material_submission, :labware)
-        material_submission.reload
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
-        expect(material_submission.status).to eq('dispatch')
+        put :update, step_params(manifest, :labware)
+        manifest.reload
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
+        expect(manifest.status).to eq('dispatch')
       end
 
       it "runs ethics in the ethics service" do
@@ -309,17 +311,17 @@ RSpec.describe SubmissionsController, type: :controller do
         }
 
         allow_any_instance_of(ProvenanceService).to receive(:validate).and_return []
-        put :update, step_params(material_submission, :labware)
-        put :biomaterial_data, step_params(material_submission, :provenance)
-        material_submission.reload
+        put :update, step_params(manifest, :labware)
+        put :biomaterial_data, step_params(manifest, :provenance)
+        manifest.reload
 
-        params = step_params(material_submission, :ethics)
+        params = step_params(manifest, :ethics)
         params[:params].merge!(ethics_params)
         ac_par = ActionController::Parameters.new(ethics_params)
         ac_par.permit!
         expect_any_instance_of(EthicsService).to receive(:update).with(ac_par, user.email)
         put :update, params
-        material_submission.reload
+        manifest.reload
       end
     end
 

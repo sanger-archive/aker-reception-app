@@ -1,6 +1,6 @@
 <%= render partial: 'submission_header' %>
 
-<%= bootstrap_form_for material_submission, url: wizard_path, method: :put  do |f| %>
+<%= bootstrap_form_for manifest, url: wizard_path, method: :put  do |f| %>
 
   <%= f.form_group :labwar_type_id, label: { text: "1) How would you like to submit your material?" } do %>
     <% LabwareType.all.each do |lt| %>
@@ -20,6 +20,6 @@
   { label: '4) Do you require decappers to be supplied to you?' },
   { class: 'supplydecapper' } %>
 
-  <%= render 'buttons', material_submission: material_submission, f: f %>
+  <%= render 'buttons', manifest: manifest, f: f %>
 
 <% end %>

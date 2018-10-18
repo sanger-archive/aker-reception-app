@@ -20,12 +20,12 @@ RSpec.describe 'Application', type: :feature do
       end
 
       it "appends '| Aker' to material submission title" do
-        visit material_submissions_path
+        visit manifests_path
         expect(page).to have_content("My Manifests")
       end
 
       it "appends '| Aker' to completed submission title" do
-        visit completed_submissions_path
+        visit manifests_print_index_path
         expect(page).to have_content("Dispatch Labware")
       end
 

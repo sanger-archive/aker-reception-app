@@ -9,10 +9,10 @@ RSpec.feature 'AwaitingBarcodes', type: :feature do
       allow_any_instance_of(JWTCredentials).to receive(:check_credentials)
       allow_any_instance_of(JWTCredentials).to receive(:current_user).and_return(user)
 
-      @material_submission = FactoryBot.create(:material_submission, status: 'printed', dispatched: true, dispatch_date: Time.current)
+      @manifest = FactoryBot.create(:dispatched_manifest)
       @labwares = []
-      3.times { @labwares << FactoryBot.create(:labware_with_barcode, material_submission: @material_submission, print_count: 1) }
-      @material_submission.labwares << @labwares
+      3.times { @labwares << FactoryBot.create(:barcoded_labware, manifest: @manifest, print_count: 1) }
+      @manifest.labwares << @labwares
     end
 
     context 'with a submission with NO barcodes received' do
@@ -25,10 +25,10 @@ RSpec.feature 'AwaitingBarcodes', type: :feature do
 
       it "doesn't show non-dispatched barcodes" do
         # Create a submission (and labware) that hasn't been printed or dispatched
-        @material_submission_not_dispatched = FactoryBot.create(:material_submission, status: 'active', dispatched: false)
+        @manifest_not_dispatched = FactoryBot.create(:active_manifest)
         @labwares_not_dispatched = []
-        2.times { @labwares_not_dispatched << FactoryBot.create(:labware_with_barcode, material_submission: @material_submission_not_dispatched, print_count: 0) }
-        @material_submission_not_dispatched.labwares << @labwares_not_dispatched
+        2.times { @labwares_not_dispatched << FactoryBot.create(:barcoded_labware, manifest: @manifest_not_dispatched, print_count: 0) }
+        @manifest_not_dispatched.labwares << @labwares_not_dispatched
 
         visit '/material_receptions/waiting'
 

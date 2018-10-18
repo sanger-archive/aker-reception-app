@@ -16,14 +16,13 @@
 # users commonly want.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
-require 'simplecov'
-require 'simplecov-rcov'
 
-SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter
-SimpleCov.start
-
+require 'support/mock_taxonomy_service'
 
 RSpec.configure do |config|
+  config.before :suite do
+    mock_taxonomy_service
+  end
 
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

@@ -1,0 +1,10 @@
+// See https://github.com/railsware/js-routes/issues/234 for what's going on here...
+
+/* rails-erb-loader-dependencies ../config/routes */
+var routes = {};
+
+(function() {
+    <%= JsRoutes.generate(namespace: "Reception") %>
+}.call(routes));
+
+export default routes.Reception;

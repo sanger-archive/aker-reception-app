@@ -5,38 +5,33 @@ require "rspec/json_expectations"
 RSpec.describe MaterialReception, type: :model do
   describe "Validation" do
     it "returns a validation message when the barcode does not exist" do
-      labware = build :labware_with_barcode_and_material_submission
+      labware = build :barcoded_labware
       expect { create :material_reception, labware_id: labware.id }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "returns a validation message when the barcode has been received already" do
-      labware = create(:labware_with_barcode_and_material_submission, print_count: 1)
-      labware.material_submission.update_attributes(dispatched: true)
-      create :material_reception, labware_id: labware.id
+      labware = create(:received_labware)
       expect { create :material_reception, labware_id: labware.id }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "returns a validation message when the barcode has not been printed yet" do
-      labware = create(:labware_with_barcode_and_material_submission)
+      labware = create(:barcoded_labware)
       expect { create :material_reception, labware_id: labware.id }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "returns a validation message when the barcode has not been dispatched yet" do
-      labware = create(:labware_with_barcode_and_material_submission)
-      labware.update_attributes(print_count: 1)
+      labware = create(:printed_labware)
       expect { create :material_reception, labware_id: labware.id }.to raise_error(ActiveRecord::RecordInvalid)
-    end    
+    end
 
     it "creates the reception object when the barcode has not been received and it has been printed" do
-      labware = create(:labware_with_barcode_and_material_submission, print_count: 1)
-      labware.material_submission.update_attributes(dispatched: true)      
+      labware = create(:dispatched_labware)
       r = create :material_reception, labware_id: labware.id
       expect(r.valid?).to eq(true)
     end
 
     it "is valid when labware has been printed and dispatched" do
-      labware = build(:printed_labware)
-      labware.material_submission.update_attributes(dispatched: true)
+      labware = build(:dispatched_labware)
       expect(build(:material_reception, labware: labware)).to be_valid
     end
 
@@ -48,39 +43,34 @@ RSpec.describe MaterialReception, type: :model do
     it "is invalid when labware has not been dispatched" do
       labware = build(:printed_labware)
       expect(build(:material_reception, labware: labware)).to_not be_valid
-    end    
+    end
 
     it "is invalid when labware has already been received" do
-      labware = create(:printed_labware)
-      labware.material_submission.update_attributes(dispatched: true)
-      create(:material_reception, labware: labware)
+      labware = create(:received_labware)
       expect(build(:material_reception, labware: labware)).to_not be_valid
     end
 
     it "is valid when labware has not been receieved" do
-      labware = create(:printed_labware)
-      labware.material_submission.update_attributes(dispatched: true)
+      labware = create(:dispatched_labware)
       expect(build(:material_reception, labware: labware)).to be_valid
     end
   end
 
   describe "#presenter" do
     it "returns an error message when the barcode does not exist" do
-      labware = build :labware_with_barcode_and_material_submission
+      labware = build :barcoded_labware
       r = build :material_reception, labware_id: labware.id
       expect(r.presenter).to include_json({:error => 'Labware must exist'})
     end
 
     it "returns an error message when the barcode has been received already" do
-      labware = create(:labware_with_barcode_and_material_submission, print_count: 1)
-      labware.material_submission.update_attributes(dispatched: true)
-      create :material_reception, labware_id: labware.id
+      labware = create(:received_labware)
       r = build :material_reception, labware_id: labware.id
       expect(r.presenter).to include_json({:error => 'Labware already received'})
     end
 
     it "returns an error message when the barcode has not been printed yet" do
-      labware = create(:labware_with_barcode_and_material_submission)
+      labware = create(:barcoded_labware)
       r = build :material_reception, labware_id: labware.id
       expect(r.presenter).to include_json({
         :error => 'Labware barcode has not been printed. Please contact the administrator. and Labware barcode has not been dispatched prior reception. Please contact the administrator.'
@@ -88,17 +78,15 @@ RSpec.describe MaterialReception, type: :model do
     end
 
     it "returns an error message when the barcode has not been dispatched yet" do
-      labware = create(:labware_with_barcode_and_material_submission)
-      labware.update_attributes(print_count: 1)
+      labware = create(:printed_labware)
       r = build :material_reception, labware_id: labware.id
       expect(r.presenter).to include_json({
         :error => 'Labware barcode has not been dispatched prior reception. Please contact the administrator.'
       })
-    end    
+    end
 
     it "returns json with the info for the barcode when the barcode has not been received and it has been printed and dispatched" do
-      labware = create(:labware_with_barcode_and_material_submission, print_count: 1)
-      labware.material_submission.update_attributes(dispatched: true)
+      labware = create(:dispatched_labware)
       r = build :material_reception, labware_id: labware.id
       expect(r.presenter).to include_json({
         :labware => { :barcode => labware.barcode }
@@ -107,9 +95,8 @@ RSpec.describe MaterialReception, type: :model do
   end
 
   before do
-    @labware = create(:labware, print_count: 1, barcode: 'AKER-42')
-    @labware.material_submission.update_attributes(dispatched: true)
-    @reception = create(:material_reception, labware_id: @labware.id)
+    @labware = create(:dispatched_labware, barcode: 'AKER-42')
+    @reception = create(:material_reception, labware: @labware)
   end
 
   describe "#labware" do
@@ -126,7 +113,7 @@ RSpec.describe MaterialReception, type: :model do
 
   describe "#all_received?" do
     before do
-      @labware2 = create(:labware, labware_index: 2, print_count: 1, barcode: 'AKER-43', material_submission: @labware.material_submission)
+      @labware2 = create(:dispatched_labware, labware_index: 2, barcode: 'AKER-43', manifest: @labware.manifest)
       # A piece of labware from another submission:
       @labware_x = create(:labware, barcode: 'AKER-616')
     end
@@ -167,15 +154,13 @@ RSpec.describe MaterialReception, type: :model do
 
     context "when reception has no labware" do
       it "should return an error" do
-        expect_error(build(:material_reception), 'Labware')
+        expect_error(build(:material_reception, labware: nil), 'Labware')
       end
     end
 
     context "when labware has already been received" do
       it "should return an error" do
-        labware = create(:printed_labware)
-        labware.material_submission.update_attributes(dispatched: true)
-        create(:material_reception, labware: labware)
+        labware = create(:received_labware)
         expect_error(build(:material_reception, labware: labware), 'already received')
       end
     end

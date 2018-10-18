@@ -1,11 +1,11 @@
 module SchemaValidators
   class BiomaterialSchemaValidator
 
-    @@VALIDATION_CLASSES = [ 
-      SchemaValidators::BiomaterialSchemaPropertyValidators::RequiredFieldValidator, 
-      SchemaValidators::BiomaterialSchemaPropertyValidators::AllowedValuesValidator, 
+    @@VALIDATION_CLASSES = [
+      SchemaValidators::BiomaterialSchemaPropertyValidators::RequiredFieldValidator,
+      SchemaValidators::BiomaterialSchemaPropertyValidators::AllowedValuesValidator,
       SchemaValidators::BiomaterialSchemaPropertyValidators::TaxonIdValidator,
-      SchemaValidators::BiomaterialSchemaPropertyValidators::HmdmcValidator 
+      SchemaValidators::BiomaterialSchemaPropertyValidators::HmdmcValidator,
     ]
 
     def self.VALIDATION_CLASSES
@@ -55,9 +55,9 @@ module SchemaValidators
       @validators = schema['properties'].reduce({}) do |memo, prop|
         property_name, property_data = prop
 
-        memo[property_name] = self.class.VALIDATION_CLASSES.select do |klass| 
+        memo[property_name] = self.class.VALIDATION_CLASSES.select do |klass|
           klass.is_applicable?(property_name, property_data)
-        end.map do |klass| 
+        end.map do |klass|
           klass.new(self, property_name, property_data)
         end
 

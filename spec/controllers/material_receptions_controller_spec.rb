@@ -10,7 +10,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
   context 'when no JWT is included' do
     before do
       @user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: %w[world team252])
-      @submission = FactoryBot.create(:material_submission, owner_email: @user.email)
+      @submission = FactoryBot.create(:manifest, owner_email: @user.email)
     end
     it 'redirects to the login page' do
       get :index
@@ -24,8 +24,8 @@ RSpec.describe MaterialReceptionsController, type: :controller do
       allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)
 
-      @submission = FactoryBot.create(:material_submission, owner_email: @user.email)
-      @labware = Labware.create(material_submission: @submission, labware_index: 1, barcode: "AKER-1")
+      @submission = FactoryBot.create(:manifest, owner_email: @user.email)
+      @labware = Labware.create(manifest: @submission, labware_index: 1, barcode: "AKER-1")
       @submission.labwares << @labware
       @labware_type = FactoryBot.create(:labware_type, {:row_is_alpha => true})
     end
@@ -135,7 +135,7 @@ RSpec.describe MaterialReceptionsController, type: :controller do
       it "adds the barcode to the list if the barcode exists and has not been received yet" do
         material_double = instance_double("MatconClient::Material", update_attributes: true)
         allow(MatconClient::Material).to receive(:new).and_return(material_double)
-        labware = create(:printed_with_contents_labware, barcode: 'AKER_500', container_id: 'testing-uuid')
+        labware = create(:dispatched_labware, barcode: 'AKER_500', container_id: 'testing-uuid')
 
         stub_request(:get, Rails.configuration.material_url+"/containers/#{labware.container_id}").
            with(:headers => {'Content-Type'=>'application/json'}).
@@ -145,7 +145,6 @@ RSpec.describe MaterialReceptionsController, type: :controller do
            to_return(:status => 200, :body => {"_items" => [labware.attributes]}.to_json)
 
         count = MaterialReception.all.count
-        labware.material_submission.update_attributes(dispatched: true)
         post :create, params: { :material_reception => {:barcode_value => labware.barcode }}
         expect(response).to have_http_status(:ok)
         MaterialReception.all.reload

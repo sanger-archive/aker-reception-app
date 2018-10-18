@@ -6,7 +6,7 @@ RSpec.describe :ethics_service do
     lw = double('labware')
     allow(lw).to receive(:save!)
     submission = double(
-      'material_submission',
+      'manifest',
       labwares: [lw],
       any_human_material?: true,
     )

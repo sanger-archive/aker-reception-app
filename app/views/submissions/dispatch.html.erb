@@ -1,11 +1,11 @@
 <%= render partial: 'submission_header' %>
 
-<%= bootstrap_form_for material_submission, url: wizard_path, method: :put  do |f| %>
+<%= bootstrap_form_for manifest, url: wizard_path, method: :put  do |f| %>
 
   <div class="row">
     <div class="col-md-12 col-xs-12">
-      <h1>Manifest <%= material_submission.id %></h1>
-      <p><%= pluralize(material_submission.no_of_labwares_required, 'barcode') %> will be printed and dispatched to you in the next 5 working days. A copy of the material manifest will be sent to your email address.</p>
+      <h1>Manifest <%= manifest.id %></h1>
+      <p><%= pluralize(manifest.no_of_labwares_required, 'barcode') %> will be printed and dispatched to you in the next 5 working days. A copy of the material manifest will be sent to your email address.</p>
     </div>
   </div>
 
@@ -20,6 +20,6 @@
     </div>
   </div>
 
-  <%= render 'buttons', material_submission: material_submission, f: f %>
+  <%= render 'buttons', manifest: manifest, f: f %>
 
 <% end %>
