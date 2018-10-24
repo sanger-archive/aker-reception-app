@@ -20,7 +20,7 @@ RSpec.feature "ShowPrintedManifests", type: :feature, js: true do
 
     it 'displays some helpful text' do
       visit_printed_manifests
-      expect(page).to have_text("These Manifests have had labels printed", wait: 3)
+      expect(page).to have_text("These Manifests have had labels printed")
     end
 
     context 'when there are previously printed Manifests' do
