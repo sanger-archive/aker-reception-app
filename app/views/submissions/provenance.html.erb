@@ -1,194 +1,192 @@
-<div data-psd-component-class="LoadingOverlay" data-psd-component-parameters="<%= { image: "#{render "loader"}", imageClass: 'loading-overlay' }.to_json %>">
-  <%= render partial: 'submission_header' %>
+<%= render partial: 'submission_header' %>
 
-  <div data-psd-component-class="SingleTableManager"
-       data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
+<div data-psd-component-class="SingleTableManager"
+     data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
 
-    <div id="page-error-alert" class="alert alert-danger hidden" role="alert">
-      <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <p class='alert-msg'>&nbsp;</p>
-    </div>
+  <div id="page-error-alert" class="alert alert-danger hidden" role="alert">
+    <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <p class='alert-msg'>&nbsp;</p>
+  </div>
 
-    <div id="page-warning-alert" class="alert alert-warning hidden" role="alert">
-      <strong class='alert-title'>Warning!</strong>
-      <p class='alert-msg'>&nbsp;</p>
-    </div>
+  <div id="page-warning-alert" class="alert alert-warning hidden" role="alert">
+    <strong class='alert-title'>Warning!</strong>
+    <p class='alert-msg'>&nbsp;</p>
+  </div>
 
-    <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Select CSV mappings</h4>
+  <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Select CSV mappings</h4>
+        </div>
+        <div class="modal-body">
+          <div id="modal-alert-required" class="alert alert-error" role="alert" style="display: none;">
+            All the required fields must be mapped to a CSV field.
           </div>
-          <div class="modal-body">
-            <div id="modal-alert-required" class="alert alert-error" role="alert" style="display: none;">
-              All the required fields must be mapped to a CSV field.
-            </div>
-            <div id="modal-alert-ignored" class="alert alert-warning" role="alert" style="display: none;">
-              Some fields from the CSV have been ignored, please confirm that the correct matches have been made.
-            </div>
-            <p>Please select a form field on the left and the CSV field on the right, then press the "Match" button to map them. Fields marked with a * must be mapped.</p>
-            <div class="row">
-              <div class="col-md-5">
-                <div class="form-group">
-                  <label for="form-fields">Fields on Form</label>
-                  <select id="form-fields" class="form-control" name="form-fields" size="8">
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-5">
-                <div class="form-group">
-                  <label for="fields-from-csv">Fields from CSV</label>
-                  <select id="fields-from-csv" class="form-control" name="fields-from-csv" size="8">
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-2">
-                <div class="form-group">
-                  <button id="match-fields-button" type="button" class="btn btn-primary" onclick="CSVFieldChecker.matchFields();">Match</button>
-                </div>
+          <div id="modal-alert-ignored" class="alert alert-warning" role="alert" style="display: none;">
+            Some fields from the CSV have been ignored, please confirm that the correct matches have been made.
+          </div>
+          <p>Please select a form field on the left and the CSV field on the right, then press the "Match" button to map them. Fields marked with a * must be mapped.</p>
+          <div class="row">
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="form-fields">Fields on Form</label>
+                <select id="form-fields" class="form-control" name="form-fields" size="8">
+                </select>
               </div>
             </div>
-            <h5>Matched fields</h5>
-            <table id="matched-fields-table" class="table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Available field</th>
-                  <th>Field from CSV</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
+            <div class="col-md-5">
+              <div class="form-group">
+                <label for="fields-from-csv">Fields from CSV</label>
+                <select id="fields-from-csv" class="form-control" name="fields-from-csv" size="8">
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <button id="match-fields-button" type="button" class="btn btn-primary" onclick="CSVFieldChecker.matchFields();">Match</button>
+              </div>
+            </div>
+          </div>
+          <h5>Matched fields</h5>
+          <table id="matched-fields-table" class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Available field</th>
+                <th>Field from CSV</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button id="complete-csv-matching" type="button" class="btn btn-primary" onclick="CSVFieldChecker.finishCSVCheck();">Continue</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+
+  <%= bootstrap_form_tag url: manifest_biomaterial_data_path(manifest.id),
+                         remote: true,
+                         method: :put,
+                         html: {:'data-type' => 'json'} do |f| %>
+
+    <% labwares = manifest.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
+
+    <%= render 'buttons', manifest: manifest, f: f %>
+
+    <div style="margin-top: 10px" class="well csv-upload-box">
+      <div class="row">
+        <div class="venter col-md-10">
+          Please drop a Manifest for the current labware onto this box, or the table.
+          Alternatively, you can manually enter material provenance for the current
+          labware in the table below. Use the tabs above this message to switch
+          labware. If necessary, the table can be scrolled horizontally to view all of the fields.
+          <% if Rails.configuration.show_hmdmc_warning %>
+            <br><span style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</span>
+          <% end %>
+        </div>
+        <div class="vcenter col-md-2">
+          <label style="float: right" class="btn btn-primary">
+              Browse for Manifest <input data-psd-component-class="ManifestUploader" id="manifest_upload" type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <ul data-labware-count="<%= labwares.size %>" class="nav nav-tabs" role="tablist">
+
+      <% labwares.each_with_index do |labware, i| %>
+        <li class="<%= 'active' if i == 0 %>" role="presentation">
+          <a data-toggle="tab"
+             id="labware_tab[<%= labware.labware_index %>]"
+             href="#Labware<%= labware.labware_index %>"
+             aria-controls="Labware<%= labware.labware_index %>" role="tab">
+            <%= labware.supplier_plate_name.present? ? labware.supplier_plate_name : "Labware #{labware.labware_index}" %>
+          </a>
+          <input type="hidden" value="<%= labware.supplier_plate_name %>" name="manifest[labware][<%= labware.labware_index %>][supplier_plate_name]" />
+        </li>
+      <% end %>
+
+    </ul>
+
+    <div class="tab-content">
+      <% schema = material_schema %>
+
+      <% # Send the schema to JS to be used on the client %>
+      <%= javascript_tag do %>
+        window.materialSchema = <%= raw schema.to_json %>
+      <% end %>
+
+      <% labwares.each_with_index do |labware, i| %>
+
+        <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware<%= labware.labware_index %>">
+
+          <div style="overflow: scroll;" class="material-data-table">
+
+          <table class="table table-condensed table-striped"
+                 data-psd-component-class="<%= ['LoadTable', 'DataTableSchemaValidation'].to_json %>"
+                 data-psd-component-parameters="<%= [{}, {material_schema_url: materials_schema_url}].to_json %>">
+            <thead>
+              <tr>
+                <th></th>
+                <% for header in schema['show_on_form'] %>
+                  <th style="white-space: nowrap">
+                    <%= schema['properties'][header]['friendly_name'] || header %><% if schema['required'].include? header %><span style="color: red">*</span><% end %>
+                  </th>
+                <% end %>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% for address in labware.positions %>
+                <tr
+                  data-psd-component-class='TaxonomyIdControl'
+                  data-psd-component-parameters="<%=
+                    {
+                      taxonomyServiceUrl: Rails.configuration.taxonomy_service_url,
+                      relativeCssSelectorSciName: 'td[data-psd-schema-validation-name=scientific_name] input',
+                      relativeCssSelectorTaxId: 'td[data-psd-schema-validation-name=taxon_id] input',
+                      cachedTaxonomies: controller.cached_taxonomies || {}
+                    }.to_json %>"
+                  data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
+                  <td><%= address %></td>
+                  <% for col in schema['show_on_form'] %>
+                    <td data-psd-schema-validation-name="<%= col %>">
+                      <div class="form-group" style="position: relative;">
+                        <% if material_schema["properties"][col]['allowed'] %>
+                          <select class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
+                                  name="manifest[labware][<%= labware.labware_index %>][contents][<%= address %>][<%= col %>]"
+                                  id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]">
+                            <option value=""></option>
+                            <%= options_for_select(material_schema["properties"][col]['allowed'], (labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present?))%>
+                          </select>
+                        <% else %>
+                          <input class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
+                                type="<%= material_schema["properties"][col]["field_type"] || 'text' %>"
+                                name="manifest[labware][<%= labware.labware_index %>][contents][<%= address %>][<%= col %>]"
+                                id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]"
+                                value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
+                        <% end %>
+                      </div>
+                    </td>
+                    <% end %>
+                  </tr>
+                <% end %>
               </tbody>
             </table>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button id="complete-csv-matching" type="button" class="btn btn-primary" onclick="CSVFieldChecker.finishCSVCheck();">Continue</button>
-          </div>
-        </div><!-- /.modal-content -->
-      </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
-
-
-    <%= bootstrap_form_tag url: manifest_biomaterial_data_path(manifest.id),
-                           remote: true,
-                           method: :put,
-                           html: {:'data-type' => 'json'} do |f| %>
-
-      <% labwares = manifest.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
-
-      <%= render 'buttons', manifest: manifest, f: f %>
-
-      <div style="margin-top: 10px" class="well csv-upload-box">
-        <div class="row">
-          <div class="venter col-md-10">
-            Please drop a Manifest for the current labware onto this box, or the table.
-            Alternatively, you can manually enter material provenance for the current
-            labware in the table below. Use the tabs above this message to switch
-            labware. If necessary, the table can be scrolled horizontally to view all of the fields.
-            <% if Rails.configuration.show_hmdmc_warning %>
-              <br><span style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</span>
-            <% end %>
-          </div>
-          <div class="vcenter col-md-2">
-            <label style="float: right" class="btn btn-primary">
-                Browse for Manifest <input data-psd-component-class="ManifestUploader" id="manifest_upload" type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
-            </label>
-          </div>
         </div>
-      </div>
+      <% end %>
+    </div>
 
-      <ul data-labware-count="<%= labwares.size %>" class="nav nav-tabs" role="tablist">
+    <%= render 'buttons', manifest: manifest, f: f %>
 
-        <% labwares.each_with_index do |labware, i| %>
-          <li class="<%= 'active' if i == 0 %>" role="presentation">
-            <a data-toggle="tab"
-               id="labware_tab[<%= labware.labware_index %>]"
-               href="#Labware<%= labware.labware_index %>"
-               aria-controls="Labware<%= labware.labware_index %>" role="tab">
-              <%= labware.supplier_plate_name.present? ? labware.supplier_plate_name : "Labware #{labware.labware_index}" %>
-            </a>
-            <input type="hidden" value="<%= labware.supplier_plate_name %>" name="manifest[labware][<%= labware.labware_index %>][supplier_plate_name]" />
-          </li>
-        <% end %>
-
-      </ul>
-
-      <div class="tab-content">
-        <% schema = material_schema %>
-
-        <% # Send the schema to JS to be used on the client %>
-        <%= javascript_tag do %>
-          window.materialSchema = <%= raw schema.to_json %>
-        <% end %>
-
-        <% labwares.each_with_index do |labware, i| %>
-
-          <div role="tabpanel" class="tab-pane <%= 'active' if i==0 %>" id="Labware<%= labware.labware_index %>">
-
-            <div style="overflow: scroll;" class="material-data-table">
-
-            <table class="table table-condensed table-striped"
-                   data-psd-component-class="<%= ['LoadTable', 'DataTableSchemaValidation'].to_json %>"
-                   data-psd-component-parameters="<%= [{}, {material_schema_url: materials_schema_url}].to_json %>">
-              <thead>
-                <tr>
-                  <th></th>
-                  <% for header in schema['show_on_form'] %>
-                    <th style="white-space: nowrap">
-                      <%= schema['properties'][header]['friendly_name'] || header %><% if schema['required'].include? header %><span style="color: red">*</span><% end %>
-                    </th>
-                  <% end %>
-                </tr>
-              </thead>
-
-              <tbody>
-                <% for address in labware.positions %>
-                  <tr
-                    data-psd-component-class='TaxonomyIdControl'
-                    data-psd-component-parameters="<%=
-                      {
-                        taxonomyServiceUrl: Rails.configuration.taxonomy_service_url,
-                        relativeCssSelectorSciName: 'td[data-psd-schema-validation-name=scientific_name] input',
-                        relativeCssSelectorTaxId: 'td[data-psd-schema-validation-name=taxon_id] input',
-                        cachedTaxonomies: controller.cached_taxonomies || {}
-                      }.to_json %>"
-                    data-labware-index="<%= labware.labware_index %>" data-address="<%= address %>" >
-                    <td><%= address %></td>
-                    <% for col in schema['show_on_form'] %>
-                      <td data-psd-schema-validation-name="<%= col %>">
-                        <div class="form-group" style="position: relative;">
-                          <% if material_schema["properties"][col]['allowed'] %>
-                            <select class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
-                                    name="manifest[labware][<%= labware.labware_index %>][contents][<%= address %>][<%= col %>]"
-                                    id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]">
-                              <option value=""></option>
-                              <%= options_for_select(material_schema["properties"][col]['allowed'], (labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present?))%>
-                            </select>
-                          <% else %>
-                            <input class="form-control" title="<%= schema['properties'][col]['friendly_name'] || col %>"
-                                  type="<%= material_schema["properties"][col]["field_type"] || 'text' %>"
-                                  name="manifest[labware][<%= labware.labware_index %>][contents][<%= address %>][<%= col %>]"
-                                  id="labware[<%= labware.labware_index %>]address[<%= address %>]fieldName[<%= col %>]"
-                                  value="<%= labware.contents[address][col] if labware.contents.present? && labware.contents[address].present? && labware.contents[address][col].present? %>" />
-                          <% end %>
-                        </div>
-                      </td>
-                      <% end %>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        <% end %>
-      </div>
-
-      <%= render 'buttons', manifest: manifest, f: f %>
-
-    <% end %>
-  </div>
+  <% end %>
 </div>
