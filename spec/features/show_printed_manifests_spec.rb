@@ -15,7 +15,7 @@ RSpec.feature "ShowPrintedManifests", type: :feature, js: true do
 
   describe '#index' do
 
-    before do
+    before(:each) do
       visit_printed_manifests
     end
 
