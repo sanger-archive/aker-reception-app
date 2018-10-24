@@ -24,7 +24,7 @@ RSpec.feature "ShowDispatchedManifests", type: :feature, js: true do
     end
 
     it 'displays some helpful text' do
-      expect(page).to have_text("These Manifests have been dispatched", wait: 5)
+      expect(page).to have_text("These Manifests have been dispatched", wait: 20)
     end
 
     context 'when there are previously dispatched Manifests' do
