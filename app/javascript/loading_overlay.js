@@ -38,6 +38,8 @@ class LoadingOverlay {
 
 }
 
+export default LoadingOverlay;
+
 $(document).ready(function() {
   $(document).trigger('registerComponent.builder', { 'LoadingOverlay': LoadingOverlay });
 });
