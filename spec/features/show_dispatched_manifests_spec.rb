@@ -6,17 +6,13 @@ RSpec.feature "ShowDispatchedManifests", type: :feature, js: true do
     login
   end
 
-  let!(:dispatched_manifests) { create_list(:dispatched_manifest, 3) }
-
-  let(:visit_dispatched_manifests) do
-    visit manifests_dispatch_index_path
-    click_button "View Previously Dispatched Manifests"
-  end
-
   describe '#index' do
 
-    before(:each) do
-      visit_dispatched_manifests
+    let!(:dispatched_manifests) { create_list(:dispatched_manifest, 3) }
+
+    before do
+      visit manifests_dispatch_index_path
+      click_button "View Previously Dispatched Manifests"
     end
 
     it 'displays the "Dispatch Labware" title' do
