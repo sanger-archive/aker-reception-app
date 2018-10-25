@@ -8,15 +8,11 @@ RSpec.feature "ShowPrintedManifests", type: :feature, js: true do
 
   let!(:printed_manifests) { create_list(:printed_manifest, 3) }
 
-  let(:visit_printed_manifests) do
-    visit manifests_print_index_path
-    click_button "View Previously Printed Manifests"
-  end
-
   describe '#index' do
 
     before(:each) do
-      visit_printed_manifests
+      visit manifests_print_index_path
+      click_button "View Previously Printed Manifests"
     end
 
     it 'displays the "Dispatch Labware" title' do
