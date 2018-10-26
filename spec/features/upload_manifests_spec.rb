@@ -10,11 +10,9 @@ RSpec.shared_examples "displays an error" do |errorMessage|
 
 end
 
-
 RSpec.feature "Upload Manifests", type: :feature, js: true do
 
   include StubHelper
-
 
   let(:number_of_containers_required) { 3 }
 
@@ -29,7 +27,6 @@ RSpec.feature "Upload Manifests", type: :feature, js: true do
   end
 
   before :each do
-
     stub_matcon_client_schema
     allow(TaxonomyClient::Taxonomy).to receive(:find).and_return(double(taxId: '3', scientificName: 'Something Latiny'))
     @rack = create(:rack_labware_type)
