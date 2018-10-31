@@ -468,6 +468,7 @@ function getURLParameter(name) {
 function uploadManifest(manifest) {
   let formData = new FormData();
   formData.append('manifest', manifest);
+  $(document).trigger('showLoadingOverlay');
 
   return $.ajax({
     url: Reception.manifests_upload_index_path(),
@@ -485,6 +486,9 @@ function uploadManifest(manifest) {
       displayError(xhr.responseJSON.errors.join("\n"));
     }
   )
+  .always(() => {
+    $(document).trigger('hideLoadingOverlay');
+  })
 }
 
 window.CSVFieldChecker = {
