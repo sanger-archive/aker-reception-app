@@ -34,7 +34,10 @@
       <%= yield %>
     </div>
     <% else %>
-    <div class="container-fluid" id="provenance">
+    <div class="container-fluid"
+         id="provenance"
+         data-psd-component-class="LoadingOverlay"
+         data-psd-component-parameters="<%= { image: "#{render "loader"}", imageClass: 'loading-overlay' }.to_json %>">
       <div class="row">
         <div class="col-md-8">
           <h1>

@@ -34,6 +34,7 @@ require('manifest_csv_warnings')
 require('loading_icon')
 require('show_previous_in_datatable')
 require('manifest_uploader')
+require('loading_overlay')
 
 $(document).on("turbolinks:load", function() {
   $('.has-popover').popover({

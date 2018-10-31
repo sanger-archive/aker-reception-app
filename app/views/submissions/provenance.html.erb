@@ -108,7 +108,7 @@
              id="labware_tab[<%= labware.labware_index %>]"
              href="#Labware<%= labware.labware_index %>"
              aria-controls="Labware<%= labware.labware_index %>" role="tab">
-            <%= labware.supplier_plate_name || "Labware #{labware.labware_index}" %>
+            <%= labware.supplier_plate_name.present? ? labware.supplier_plate_name : "Labware #{labware.labware_index}" %>
           </a>
           <input type="hidden" value="<%= labware.supplier_plate_name %>" name="manifest[labware][<%= labware.labware_index %>][supplier_plate_name]" />
         </li>
