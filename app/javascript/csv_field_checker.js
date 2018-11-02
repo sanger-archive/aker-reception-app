@@ -480,7 +480,7 @@ function uploadManifest(manifest) {
   })
   .then(
     (response) => {
-      checkCSVFields(response.contents);
+      checkCSVFields(response.contents.manifest);
     },
     (xhr) => {
       displayError(xhr.responseJSON.errors.join("\n"));
