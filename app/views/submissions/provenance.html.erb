@@ -1,5 +1,7 @@
 <%= render partial: 'submission_header' %>
-
+hi
+<%= react_component("ManifestEditor", { schema: MatconClient::Material.schema }) %>
+hi
 <div data-psd-component-class="SingleTableManager"
      data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
 

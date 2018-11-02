@@ -38,6 +38,8 @@ gem 'turbolinks', '~> 5' # Turbolinks makes navigating your web application fast
 gem 'uglifier', '~> 3.2' # Use Uglifier as compressor for JavaScript assets
 gem 'uuid'
 gem 'webpacker', '~> 3.5', '>= 3.5.3'
+gem 'webpacker-react'
+gem 'react-rails'
 gem 'wicked'
 
 ###

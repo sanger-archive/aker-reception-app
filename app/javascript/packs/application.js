@@ -21,6 +21,8 @@ import dt from 'datatables.net';
 import 'datatables.net-bs/js/dataTables.bootstrap.js';
 import 'src/application.scss';
 
+import ManifestEditor from 'components/manifest_editor';
+
 require('select2')
 require('csv_field_checker')
 require('component_builder')
@@ -35,6 +37,9 @@ require('loading_icon')
 require('show_previous_in_datatable')
 require('manifest_uploader')
 require('loading_overlay')
+
+import WebpackerReact from 'webpacker-react'
+WebpackerReact.setup({ManifestEditor})
 
 $(document).on("turbolinks:load", function() {
   $('.has-popover').popover({

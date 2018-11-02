@@ -12,7 +12,7 @@ private
   end
 
   def transformer
-    @transformer ||= Transformers::ExcelToArray.new(path: manifest_path)
+    @transformer ||= Transformers::ExcelToState.new(path: manifest_path)
   end
 
   def manifest_path
