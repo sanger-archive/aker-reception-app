@@ -7,23 +7,23 @@ RSpec.describe Transformers::ExcelToState do
       "type"=>"object",
       "properties"=>{
         "is_tumour"=>{
-          "show_on_form"=>true,"friendly_name"=>"Tumour?",
+          "show_on_form"=>true,"friendly_name"=>"Tumour?","required"=>false,
           "field_name_regex"=>"^(?:is[-_ ]+)?tumou?r\\??$","type"=>"string"
         },
         "scientific_name"=>{
-          "show_on_form"=>true,"friendly_name"=>"Scientific Name",
+          "show_on_form"=>true,"friendly_name"=>"Scientific Name","required"=>false,
           "field_name_regex"=>"^scientific(?:[-_ ]*name)?$","type"=>"string"
         },
         "taxon_id"=>{
-          "show_on_form"=>true,"friendly_name"=>"Taxon ID",
+          "show_on_form"=>true,"friendly_name"=>"Taxon ID","required"=>false,
           "field_name_regex"=>"^taxon(?:[-_ ]*id)?$","type"=>"string"
         },
         "supplier_name"=>{
-          "show_on_form"=>true,"friendly_name"=>"Supplier Name",
+          "show_on_form"=>true,"friendly_name"=>"Supplier Name","required"=>true,
           "field_name_regex"=>"^supplier[-_ ]*name$","type"=>"string"
         },
         "gender"=>{
-          "show_on_form"=>true,"friendly_name"=>"Gender",
+          "show_on_form"=>true,"friendly_name"=>"Gender","required"=>false,
           "field_name_regex"=>"^(?:gender|sex)$","type"=>"string"
         }
       }

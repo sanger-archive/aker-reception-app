@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/materials_table/stores spec/javascript/**/*_spec.js spec/javascript/*_spec.es6 spec/javascript/**/*_spec.es6"
+    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/materials_table/stores spec/javascript/**/*_spec.js spec/javascript/*_spec.es6 spec/javascript/**/*_spec.es6 spec/javascript/**/*_spec.jsx"
   },
   "dependencies": {
     "@rails/webpacker": "3.5",
@@ -30,10 +30,13 @@
   "devDependencies": {
     "@babel/preset-env": "^7.1.0",
     "chai": "^4.1.2",
+    "enzyme": "^3.7.0",
+    "enzyme-adapter-react-16": "^1.6.0",
     "jsdom": "^12.0.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^5.2.0",
     "mocha-webpack": "^1.1.0",
+    "redux-test-utils": "^0.3.0",
     "sinon": "^6.1.5",
     "webpack-dev-server": "2.11.2",
     "webpack-node-externals": "^1.7.2"

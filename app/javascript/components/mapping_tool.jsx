@@ -1,5 +1,8 @@
 import React, {Fragment} from "react"
 import PropTypes from "prop-types"
+import { connect } from 'react-redux'
+
+import {matchSelection, unmatch} from '../actions'
 
 let matchedFields = {}
 
@@ -7,9 +10,10 @@ const MODAL_ID = 'myModal'
 const FORM_FIELD_SELECT_ID = 'form-fields'
 const CSV_SELECT_ID = 'fields-from-csv'
 const MAPPING_TABLE_ID = 'matched-fields-table'
+const DATA_TABLES = 'div.tab-pane table.dataTable';
 
 // Match the fields selected in the required and CSV selects
-function matchFields() {
+function matchFields(schema) {
   var selectedformField = $('#' + FORM_FIELD_SELECT_ID + ' :selected').val()
   var selectedFieldFromCSV = $('#' + CSV_SELECT_ID + ' :selected').val()
 
@@ -19,7 +23,7 @@ function matchFields() {
     matchedFields[selectedformField] = selectedFieldFromCSV
 
     // Add match to table and remove fields from the selects
-    addRowToMatchedTable(selectedformField, selectedFieldFromCSV)
+    addRowToMatchedTable(schema, selectedformField, selectedFieldFromCSV)
     removeFieldsFromSelects(selectedformField, selectedFieldFromCSV)
   } else {
     alert("Please select a required field and a field from the CSV.")
@@ -27,13 +31,13 @@ function matchFields() {
 }
 
 // Unmatch fields and add them back to the selects
-function unmatchFields(row) {
+function unmatchFields(schema, row) {
   // Extract the data from the row
   var formField = row.children()[1].innerHTML;
   var fieldFromCSV = row.children()[2].innerHTML;
 
   // Add fields back to the selects
-  addFieldToSelect(FORM_FIELD_SELECT_ID, formField, schema[formField].friendly_name + ' (' + formField + ')', schema[formField].required);
+  addFieldToSelect(FORM_FIELD_SELECT_ID, formField, schema.properties[formField].friendly_name + ' (' + formField + ')', schema.properties[formField].required);
   addFieldToSelect(CSV_SELECT_ID, fieldFromCSV, fieldFromCSV, false);
 
   // Remove the property
@@ -42,11 +46,11 @@ function unmatchFields(row) {
 
 
 // Adds the required and CSV field to the matched table
-function addRowToMatchedTable(formField, csvField) {
+function addRowToMatchedTable(schema, formField, csvField) {
   $('#' + MAPPING_TABLE_ID + ' > tbody:last-child')
     .append($('<tr>')
       .append(
-        $('<td>').text(schema[formField].friendly_name),
+        $('<td>').text(schema.properties[formField].friendly_name),
         $('<td>').text(formField),
         $('<td>').text(csvField),
         $('<td>').append(
@@ -56,7 +60,7 @@ function addRowToMatchedTable(formField, csvField) {
           }).text('x')
             .click(function() {
               var row = $(this).parent().parent();
-              unmatchFields(row);
+              unmatchFields(schema, row);
 
               // Remove the table row
               row.remove();
@@ -85,23 +89,44 @@ const MappingHeader = () => {
     )
 }
 
-const MappingFooter = () => {
+const MappingFooter = (props) => {
  return(
   <div className="modal-footer">
     <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
     <button id="complete-csv-matching" type="button" className="btn btn-primary"
-      onClick={ () => { alert("CSVFieldChecker.finishCSVCheck()") }} >Continue</button>
+      onClick={ () => {
+        CSVFieldChecker.fillInTableFromFile(props.manifest, buildMatchedFields(props.matched), $(DATA_TABLES), props.schema.properties)
+        $("#myModal").modal('hide')
+      }} >Continue</button>
   </div>
   )
 }
 
-const MappingInterface = () => {
+
+const mappingOption = (text, value, pos) => {
+  return(<option key={pos} value={value}>{false ? '*':''}{text}</option>)
+}
+
+const ExpectedMappingOptions = (props) => {
+  return(props.expected.map((key, pos) => {
+    return mappingOption(props.schema.properties[key].friendly_name, key, pos)
+  }))
+}
+
+const ObservedMappingOptions = (props) => {
+  return(props.observed.map((key, pos) => {
+    return mappingOption(key, key, pos)
+  }))
+}
+
+const MappingInterface = (props) => {
   return (
     <div className="row">
       <div className="col-md-5">
         <div className="form-group">
           <label htmlFor="form-fields">Fields on Form</label>
           <select id="form-fields" className="form-control" name="form-fields" size="8">
+            <ExpectedMappingOptions expected={props.expected} schema={props.schema} />
           </select>
         </div>
       </div>
@@ -109,13 +134,14 @@ const MappingInterface = () => {
         <div className="form-group">
           <label htmlFor="fields-from-csv">Fields from CSV</label>
           <select id="fields-from-csv" className="form-control" name="fields-from-csv" size="8">
+            <ObservedMappingOptions observed={props.observed} />
           </select>
         </div>
       </div>
       <div className="col-md-2">
         <div className="form-group">
           <button id="match-fields-button" type="button" className="btn btn-primary"
-          onClick={ matchFields }>Match</button>
+          onClick={ props.onMatchFields }>Match</button>
         </div>
       </div>
     </div>
@@ -123,7 +149,21 @@ const MappingInterface = () => {
     )
 }
 
-const MappedFields = () => {
+const MappedPair = (pairInfo, schema, onUnmatch, number) => {
+  return(
+    <tr key={number.toString()}>
+      <td>{ schema.properties[pairInfo.expected].friendly_name }</td>
+      <td>{ pairInfo.expected}</td>
+      <td>{ pairInfo.observed}</td>
+      <td><button className='btn btn-danger' onClick={onUnmatch}>x</button></td>
+    </tr>)
+}
+
+const MappedPairs = (props) => {
+  return(props.matched.map((pair, pos) => { return MappedPair(pair, props.schema, props.onUnmatch, pos) }))
+}
+
+const MappedFieldsList = (props) => {
   return (
     <Fragment>
       <h5>Matched fields</h5>
@@ -137,13 +177,14 @@ const MappedFields = () => {
           </tr>
         </thead>
         <tbody>
+          <MappedPairs {...props} />
         </tbody>
       </table>
     </Fragment>
   )
 }
 
-const MappingBody = () => {
+const MappingBody = (props) => {
   return (
     <div className="modal-body">
       <div id="modal-alert-required" className="alert alert-error" role="alert" style={{ display: 'none' }}>
@@ -157,21 +198,32 @@ const MappingBody = () => {
         button to map them. Fields marked with a * must be mapped.
       </p>
 
-      <MappingInterface />
-      <MappedFields />
+      <MappingInterface {...props }/>
+      <MappedFieldsList {...props } />
     </div>
     )
 }
 
-class MappingTool extends React.Component {
-  render () {
+class MappingToolComponent extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+    }
+  }
+  componentDidUpdate(){
+    if (this.props.expected.length > 0) {
+      $("#myModal").modal('show')
+    }
+      //$(this.modal).on('hidden.bs.modal', this.props.handleHideModal);
+  }
+  render (props) {
     return(
-      <div id="myModal" className="modal fade" tabIndex="-1" role="dialog">
+      <div id="myModal" ref={modal=> this.modal = modal} className="modal fade" tabIndex="-1" role="dialog" data-show="true">
         <div className="modal-dialog modal-lg" role="document">
           <div className="modal-content">
             <MappingHeader />
-            <MappingBody />
-            <MappingFooter />
+            <MappingBody {...this.props} />
+            <MappingFooter {...this.props} />
           </div>
         </div>
       </div>
@@ -179,5 +231,42 @@ class MappingTool extends React.Component {
   }
 }
 
+const mapStateToProps = (state) => {
+  return {
+    expected: state && state.mapping_tool ? state.mapping_tool.expected : [],
+    observed: state && state.mapping_tool ? state.mapping_tool.observed : [],
+    matched: state && state.mapping_tool ? state.mapping_tool.matched : [],
+    manifest: state && state.manifest ? state.manifest : {},
+    schema: state ? state.schema : null,
+    modal: state ? state.modal : $('#myModal')
+  }
+};
 
+const buildMatchedFields = (matched) => {
+  return matched.reduce((memo, obj) => {
+    memo[obj.expected] = obj.observed
+    return memo
+  }, {})
+}
+
+const mapDispatchToProps = (dispatch, { match, location }) => {
+  return {
+    onMatchFields: () => {
+      let expected = $('#' + FORM_FIELD_SELECT_ID + ' :selected').val()
+      let observed = $('#' + CSV_SELECT_ID + ' :selected').val()
+
+      dispatch(matchSelection(expected, observed))
+    },
+    onUnmatch: (e) => {
+      let row = $(e.target).parent().parent()
+      let expected = row.children()[1].innerHTML;
+      let observed = row.children()[2].innerHTML;
+
+      dispatch(unmatch(expected, observed))
+    }
+  }
+}
+
+
+let MappingTool = connect(mapStateToProps, mapDispatchToProps)(MappingToolComponent)
 export default MappingTool

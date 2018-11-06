@@ -163,7 +163,7 @@ function checkCSVFields(results) {
     if (!allRequiredMatched() || fieldsIgnored) {
       $('#' + MODAL_ID).modal('toggle');
     } else {
-      fillInTableFromFile();
+      fillInTableFromFile(manifest, matchedFields, $(DATA_TABLES), schema);
     }
   } else {
     displayError(csvErrorToText(results.errors));
@@ -206,6 +206,7 @@ function addRowToMatchedTable(formField, csvField) {
             class: 'btn btn-danger',
           }).text('x')
             .click(function() {
+              debugger
               var row = $(this).parent().parent();
               unmatchFields(row);
 
@@ -258,9 +259,9 @@ function addFieldToSelect(select, value, text, required) {
 }
 
 // Completes the matching
-function finishCSVCheck() {
+function finishCSVCheck(matchedFields) {
   if (allRequiredMatched()) {
-    fillInTableFromFile();
+    fillInTableFromFile(manifest, matchedFields, $(DATA_TABLES), schema);
 
     // Hide the modal after all the data has been imported
     $('#' + MODAL_ID).modal('hide');
@@ -273,6 +274,11 @@ function finishCSVCheck() {
 function validateCorrectPositions(results, plateField, positionField) {
   let wellPlateMap = new Map();
   return results.every(function(row, index) {
+    if (!row[positionField]) {
+      displayError(`The mapping provided does not have a position field`);
+      return false;
+    }
+
     const position = row[positionField].toLowerCase();
     const plate    = row[plateField].toLowerCase();
 
@@ -308,7 +314,7 @@ function numberOfContainers() {
   return $(LABWARE_TABS).data('labware-count');
 }
 
-function onCompleteFillInTable(results, dataTable) {
+function onCompleteFillInTable(results, dataTable, matchedFields, schema) {
   // Clear the table from previous import
   $('#' + dataTable.attr('id') + ' > tbody > tr').each(function() {
     var $this = $(this);
@@ -393,7 +399,7 @@ function onCompleteFillInTable(results, dataTable) {
 }
 
 // Complete the data table using the mapped fields and CSV
-function fillInTableFromFile() {
+function fillInTableFromFile(manifest, matchedFields, dataTables, schema) {
 
   if (!validateCorrectPositions(manifest, matchedFields.plate_id, matchedFields.position)) {
     return false;
@@ -412,7 +418,7 @@ function fillInTableFromFile() {
   }, {});
 
   let result = Object.keys(groupedByPlate).every(function(plate_id, index) {
-    return onCompleteFillInTable(groupedByPlate[plate_id], $(dataTables[index]))
+    return onCompleteFillInTable(groupedByPlate[plate_id], $(dataTables[index]), matchedFields, schema)
   });
 
   if (result) {
@@ -480,7 +486,8 @@ function uploadManifest(manifest) {
   })
   .then(
     (response) => {
-      checkCSVFields(response.contents.manifest);
+      $(document.body).trigger('uploadedmanifest', response)
+      //checkCSVFields(response.contents.manifest);
     },
     (xhr) => {
       displayError(xhr.responseJSON.errors.join("\n"));
@@ -494,7 +501,8 @@ function uploadManifest(manifest) {
 window.CSVFieldChecker = {
   matchFields,
   unmatchFields,
-  finishCSVCheck
+  finishCSVCheck,
+  fillInTableFromFile
 }
 
 export { checkCSVFields, validateCorrectPositions, validateNumberOfContainers, uploadManifest }

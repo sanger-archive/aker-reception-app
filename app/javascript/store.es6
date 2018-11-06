@@ -9,10 +9,9 @@ const initialState = {
     "contents": {}
   },
   "mappingTool": {
-    "shown": false,
-    "fieldsMatched": [],
-    "leftFieldsUnmatched": [],
-    "rightFieldsUnmatched": []
+    "matched": [],
+    "expected": [],
+    "observed": []
   }
 }
 

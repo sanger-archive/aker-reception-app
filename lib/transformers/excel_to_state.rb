@@ -11,7 +11,7 @@ module Transformers
             observed_key.strip.match(expected_properties['field_name_regex'])
           end
           if found
-            memo[:matched].push({observed: found, expected: expected_key })
+            memo[:matched].push({expected: expected_key, observed: found})
             memo[:observed].reject! { |observed_key| (observed_key == found) }
           else
             memo[:expected].push(expected_key)
@@ -24,7 +24,8 @@ module Transformers
     def contents
       {
         manifest: manifest,
-        mapping_tool: mapping_tool
+        mapping_tool: mapping_tool,
+        schema: schema
       }
     end
 
@@ -32,7 +33,13 @@ module Transformers
       @contents
     end
 
+
     private
+
+    def expected_info(expected)
+      data = schema['properties'][expected]
+      {required: data['required']||false, friendly_name: data['friendly_name'], field_name: expected}
+    end
 
     def observed_keys
       return manifest.first.keys.map(&:to_s) if manifest.length > 0
@@ -46,7 +53,20 @@ module Transformers
     end
 
     def schema
-      MatconClient::Material.schema
+      @schema ||= MatconClient::Material.schema
+      @schema['properties']['plate_id'] = {
+        "required" => true,
+        "field_name_regex" => "^plate",
+        "friendly_name" => "Plate ID",
+        "show_on_form" => true
+      }
+      @schema['properties']['position'] = {
+        "required" => true,
+        "field_name_regex" => "^(well(\\s*|_*|-*))?position$",
+        "friendly_name" => "Position",
+        "show_on_form" => true
+      }
+      @schema
     end
   end
 end

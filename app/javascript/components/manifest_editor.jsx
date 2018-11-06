@@ -1,8 +1,10 @@
 import React from "react"
 import PropTypes from "prop-types"
 import store from 'store'
-import { Provider } from 'react-redux'
+import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
+
+import C from '../constants'
 
 const ErrorsDisplay = () => {
   return (
@@ -24,8 +26,13 @@ const WarningsDisplay = () => {
 
 const Containers = () => { return (<div></div>) }
 
+
 class ManifestEditorComponent extends React.Component {
-  render () {
+  constructor(props) {
+    super(props)
+    this.state = {mappingTool: {}}
+  }
+  render() {
     return(
       <div>
         <ErrorsDisplay />
@@ -37,12 +44,33 @@ class ManifestEditorComponent extends React.Component {
   }
 }
 
+
+const mapStateToProps = (state) => {
+  return {
+    manifest: state ? state.manifest : {},
+    schema: state ? state.schema : null
+  }
+}
+
+const mapDispatchToProps = (dispatch, { match, location }) => {
+  return {
+  }
+}
+
+let ManifestEditorConnected = connect(mapStateToProps, mapDispatchToProps)(ManifestEditorComponent)
+
 const ManifestEditor = () => {
+  $(document.body).on('uploadedmanifest', $.proxy(function(event, response) {
+    this.dispatch({type: C.UPLOADED_MANIFEST, manifestData: response.contents})
+  }, store))
+
   return(
     <Provider store={store}>
-      <ManifestEditorComponent />
+      <ManifestEditorConnected />
     </Provider>
   )
 }
+
+export { ManifestEditorConnected }
 
 export default ManifestEditor
