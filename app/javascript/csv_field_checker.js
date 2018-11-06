@@ -206,7 +206,6 @@ function addRowToMatchedTable(formField, csvField) {
             class: 'btn btn-danger',
           }).text('x')
             .click(function() {
-              debugger
               var row = $(this).parent().parent();
               unmatchFields(row);
 

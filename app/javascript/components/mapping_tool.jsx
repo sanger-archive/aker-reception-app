@@ -103,19 +103,19 @@ const MappingFooter = (props) => {
 }
 
 
-const mappingOption = (text, value, pos) => {
-  return(<option key={pos} value={value}>{false ? '*':''}{text}</option>)
+const mappingOption = (text, value, pos, required) => {
+  return(<option key={pos} value={value}>{required ? '*':''}{text}</option>)
 }
 
 const ExpectedMappingOptions = (props) => {
   return(props.expected.map((key, pos) => {
-    return mappingOption(props.schema.properties[key].friendly_name, key, pos)
+    return mappingOption(props.schema.properties[key].friendly_name, key, pos, props.schema.properties[key].required)
   }))
 }
 
 const ObservedMappingOptions = (props) => {
   return(props.observed.map((key, pos) => {
-    return mappingOption(key, key, pos)
+    return mappingOption(key, key, pos, false)
   }))
 }
 

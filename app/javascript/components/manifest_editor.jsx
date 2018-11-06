@@ -61,6 +61,9 @@ let ManifestEditorConnected = connect(mapStateToProps, mapDispatchToProps)(Manif
 
 const ManifestEditor = () => {
   $(document.body).on('uploadedmanifest', $.proxy(function(event, response) {
+    if (response.contents.mapping_tool.expected.length > 0) {
+      $('#myModal').modal('show')
+    }
     this.dispatch({type: C.UPLOADED_MANIFEST, manifestData: response.contents})
   }, store))
 

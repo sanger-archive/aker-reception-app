@@ -53,7 +53,8 @@ module Transformers
     end
 
     def schema
-      @schema ||= MatconClient::Material.schema
+      @schema ||= MatconClient::Material.schema.dup
+      @schema['properties'] = @schema['properties'].dup
       @schema['properties']['plate_id'] = {
         "required" => true,
         "field_name_regex" => "^plate",
