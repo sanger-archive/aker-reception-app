@@ -30,7 +30,7 @@ const Containers = () => { return (<div></div>) }
 class ManifestEditorComponent extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {mappingTool: {}}
+    this.state = {mapping: {}}
   }
   render() {
     return(
@@ -47,7 +47,6 @@ class ManifestEditorComponent extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    manifest: state ? state.manifest : {},
     schema: state ? state.schema : null
   }
 }
@@ -61,10 +60,10 @@ let ManifestEditorConnected = connect(mapStateToProps, mapDispatchToProps)(Manif
 
 const ManifestEditor = () => {
   $(document.body).on('uploadedmanifest', $.proxy(function(event, response) {
-    if (response.contents.mapping_tool.expected.length > 0) {
+    if (response.contents.manifest.mapping.expected.length > 0) {
       $('#myModal').modal('show')
     }
-    this.dispatch({type: C.UPLOADED_MANIFEST, manifestData: response.contents})
+    this.dispatch({type: C.UPLOADED_MANIFEST, manifestData: response.contents.manifest})
   }, store))
 
   return(

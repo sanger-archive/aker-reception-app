@@ -1,12 +1,41 @@
 module Transformers
   class ExcelToState < ExcelToArray
+    def initialize(options)
+      super(options)
+      @manifest_model = options.fetch(:manifest_model)
+    end
 
-    def mapping_tool
+    def contents
+      {
+        manifest: {
+          id: manifest_id,
+          schema: manifest_schema,
+          content: manifest_content,
+          mapping: mapping_data
+        }
+      }
+    end
+
+    def manifest_id
+      @manifest_model.id
+    end
+
+    def manifest_content
+      @contents
+    end
+
+    def manifest_schema
+      @manifest_model.manifest_schema
+    end
+
+    def mapping_data
       expected_keys_and_properties.reduce({
-        observed: observed_keys.dup, expected: [], matched: []
+        observed: observed_keys.dup,
+        expected: [],
+        matched: []
       }) do |memo, expected_key_and_properties|
         expected_key, expected_properties = expected_key_and_properties
-        if expected_properties['show_on_form'] && expected_properties['field_name_regex']
+        if ((expected_properties['required']) || (expected_properties['show_on_form'] && expected_properties['field_name_regex']))
           found = observed_keys.detect do |observed_key|
             observed_key.strip.match(expected_properties['field_name_regex'])
           end
@@ -21,53 +50,23 @@ module Transformers
       end
     end
 
-    def contents
-      {
-        manifest: manifest,
-        mapping_tool: mapping_tool,
-        schema: schema
-      }
-    end
-
-    def manifest
-      @contents
-    end
-
-
     private
 
     def expected_info(expected)
-      data = schema['properties'][expected]
+      data = manifest_schema['properties'][expected]
       {required: data['required']||false, friendly_name: data['friendly_name'], field_name: expected}
     end
 
     def observed_keys
-      return manifest.first.keys.map(&:to_s) if manifest.length > 0
+      return manifest_content.first.keys.map(&:to_s) if manifest_content.length > 0
       []
     end
 
     def expected_keys_and_properties
-      schema['properties'].each_pair.select do |expected_key, expected_properties|
-        (expected_properties['show_on_form'] && expected_properties['field_name_regex'])
+      manifest_schema['properties'].each_pair.select do |expected_key, expected_properties|
+        (expected_properties['required'] || (expected_properties['show_on_form'] && expected_properties['field_name_regex']))
       end.map{|k,v| [k.to_s, v]}
     end
 
-    def schema
-      @schema ||= MatconClient::Material.schema.dup
-      @schema['properties'] = @schema['properties'].dup
-      @schema['properties']['plate_id'] = {
-        "required" => true,
-        "field_name_regex" => "^plate",
-        "friendly_name" => "Plate ID",
-        "show_on_form" => true
-      }
-      @schema['properties']['position'] = {
-        "required" => true,
-        "field_name_regex" => "^(well(\\s*|_*|-*))?position$",
-        "friendly_name" => "Position",
-        "show_on_form" => true
-      }
-      @schema
-    end
   end
 end

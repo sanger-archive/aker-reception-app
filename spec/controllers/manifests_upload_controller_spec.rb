@@ -25,7 +25,7 @@ RSpec.shared_examples "a valid ManifestEditor state generator" do
   end
   it 'generates the mapping tool part of the state' do
     json = JSON.parse(response.body, symbolize_names: true)
-    expect(json[:contents][:mapping_tool]).to include({
+    expect(json[:contents][:manifest][:mapping]).to include({
       :expected=>[],
       :matched=>[
         {:observed=>"taxon_id", :expected=>"taxon_id"},
@@ -56,12 +56,13 @@ RSpec.describe Manifests::UploadController, type: :controller  do
       }
     }
   }
+  let(:manifest) { create :manifest }
 
   describe 'POST #create' do
     before do
       allow(MatconClient::Material).to receive(:schema).and_return(schema)
       login
-      post :create, params: { manifest: file }, xhr: true
+      post :create, params: { manifest: file, manifest_id: manifest.id }, xhr: true
     end
 
     context 'when file is .xlsm' do

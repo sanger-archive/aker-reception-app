@@ -95,7 +95,7 @@ const MappingFooter = (props) => {
     <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
     <button id="complete-csv-matching" type="button" className="btn btn-primary"
       onClick={ () => {
-        CSVFieldChecker.fillInTableFromFile(props.manifest, buildMatchedFields(props.matched), $(DATA_TABLES), props.schema.properties)
+        CSVFieldChecker.fillInTableFromFile(props.content, buildMatchedFields(props.matched), $(DATA_TABLES), props.schema.properties)
         $("#myModal").modal('hide')
       }} >Continue</button>
   </div>
@@ -153,8 +153,8 @@ const MappedPair = (pairInfo, schema, onUnmatch, number) => {
   return(
     <tr key={number.toString()}>
       <td>{ schema.properties[pairInfo.expected].friendly_name }</td>
-      <td>{ pairInfo.expected}</td>
-      <td>{ pairInfo.observed}</td>
+      <td>{ pairInfo.expected }</td>
+      <td>{ pairInfo.observed }</td>
       <td><button className='btn btn-danger' onClick={onUnmatch}>x</button></td>
     </tr>)
 }
@@ -233,12 +233,11 @@ class MappingToolComponent extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    expected: state && state.mapping_tool ? state.mapping_tool.expected : [],
-    observed: state && state.mapping_tool ? state.mapping_tool.observed : [],
-    matched: state && state.mapping_tool ? state.mapping_tool.matched : [],
-    manifest: state && state.manifest ? state.manifest : {},
-    schema: state ? state.schema : null,
-    modal: state ? state.modal : $('#myModal')
+    content: state && state.content ? state.content : {},
+    expected: state && state.mapping ? state.mapping.expected : [],
+    observed: state && state.mapping ? state.mapping.observed : [],
+    matched: state && state.mapping ? state.mapping.matched : [],
+    schema: state ? state.schema : null
   }
 };
 

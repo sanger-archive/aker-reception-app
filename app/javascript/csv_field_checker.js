@@ -470,9 +470,10 @@ function getURLParameter(name) {
 // taking place in the front end). The reason Excel spreadsheets are sent up and come back
 // as CSVs (although in a JSON attribute) are so that this logic didn't have to be rewritten
 // for server-side.
-function uploadManifest(manifest) {
+function uploadManifest(manifest, manifest_id) {
   let formData = new FormData();
   formData.append('manifest', manifest);
+  formData.append('manifest_id', manifest_id);
   $(document).trigger('showLoadingOverlay');
 
   return $.ajax({

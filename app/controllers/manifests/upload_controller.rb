@@ -12,15 +12,18 @@ private
   end
 
   def transformer
-    @transformer ||= Transformers::ExcelToState.new(path: manifest_path)
+    @transformer ||= Transformers::ExcelToState.new(path: manifest_file.path, manifest_model: manifest_model)
   end
 
-  def manifest_path
-    manifest.path
-  end
-
-  # manifest is an uploaded file. Will be an instance of ruby IO class (probably File).
-  def manifest
+  # manifest_file is an uploaded file. Will be an instance of ruby IO class (probably File).
+  def manifest_file
     params[:manifest]
   end
+
+  # manifest_model is the instance of the manifest model that we are currently building
+  def manifest_model
+    @manifest ||= Manifest.find(params[:manifest_id])
+  end
+
+
 end

@@ -29,29 +29,31 @@ RSpec.describe Transformers::ExcelToState do
       }
     }
   }
-  let(:transformer) { build(:excel_to_state) }
+
+  let(:manifest) { create :manifest }
+  let(:transformer) { Transformers::ExcelToState.new(path: 'some path', manifest_model: manifest) }
   before do
     allow(MatconClient::Material).to receive(:schema).and_return(schema)
-    allow(transformer).to receive(:manifest).and_return(manifest)
+    allow(transformer).to receive(:manifest_content).and_return(manifest_content)
   end
-  context '#mapping_tool' do
+  context '#contents' do
     context 'with an empty manifest' do
-      let(:manifest) { {} }
+      let(:manifest_content) { {} }
       it 'does not match anything' do
-        expect(transformer.mapping_tool).to eq(
+        expect(transformer.contents[:manifest][:mapping]).to include(
           expected: ["is_tumour", "scientific_name", "taxon_id", "supplier_name", "gender"],
           observed: [], matched: []
         )
       end
     end
     context 'with a manifest that contains all the fields' do
-      let(:manifest) {
+      let(:manifest_content) {
         [
           "is_tumour" => "", "scientific_name" => "", "taxon_id" => "", "supplier_name" => "", "gender" => ""
         ]
       }
       it 'does match everything' do
-        expect(transformer.mapping_tool).to eq(
+        expect(transformer.contents[:manifest][:mapping]).to include(
           expected: [],
           observed: [], matched: [
             { expected: 'is_tumour', observed: 'is_tumour' }, { expected: 'scientific_name', observed: 'scientific_name' },
@@ -62,13 +64,13 @@ RSpec.describe Transformers::ExcelToState do
       end
     end
     context 'with a manifest that contains some fields' do
-      let(:manifest) {
+      let(:manifest_content) {
         [
           "is_tumour" => "", "scientific_name" => "", "unknown_value" => ""
         ]
       }
       it 'returns the list of matched pairs and the list of columsn unmatched in both sides' do
-        expect(transformer.mapping_tool).to eq(
+        expect(transformer.contents[:manifest][:mapping]).to include(
           expected: ["taxon_id", "supplier_name", "gender"],
           observed: ["unknown_value"],
           matched: [
@@ -84,13 +86,13 @@ RSpec.describe Transformers::ExcelToState do
           "column_to_hide" => { "show_on_form" => true}
         }}
       }
-      let(:manifest) {
+      let(:manifest_content) {
         [
           "column_to_show" => "", "column_to_hide" => ""
         ]
       }
       it 'does not expect to find them, but matches the others' do
-        expect(transformer.mapping_tool).to eq(
+        expect(transformer.contents[:manifest][:mapping]).to include(
           expected: [],
           observed: ["column_to_hide"],
           matched: [
@@ -106,20 +108,40 @@ RSpec.describe Transformers::ExcelToState do
           "column_to_hide" => { "show_on_form" => false, "field_name_regex" => "column_to_hide"}
         }}
       }
-      let(:manifest) {
+      let(:manifest_content) {
         [
           "column_to_show" => "", "column_to_hide" => ""
         ]
       }
 
       it 'does not expect to find them, but matches the others' do
-        expect(transformer.mapping_tool).to eq(
+        expect(transformer.contents[:manifest][:mapping]).to include(
           expected: [],
           observed: ["column_to_hide"],
           matched: [
             { expected: 'column_to_show', observed: 'column_to_show' }
           ]
         )
+      end
+
+      context 'when any of this columns not to shown are actually required by the schema' do
+        let(:schema) {
+          {"properties" => {
+            "column_to_show" => { "show_on_form" => true, "field_name_regex" => "column_to_show"},
+            "hidden_required_column" => { "show_on_form" => false, "field_name_regex" => "hidden_required_column",
+              "required" => true}
+          }}
+        }
+
+        it 'expects to find them and tries to map them' do
+          expect(transformer.contents[:manifest][:mapping]).to include(
+            expected: ["hidden_required_column"],
+            observed: ["column_to_hide"],
+            matched: [
+              { expected: 'column_to_show', observed: 'column_to_show' }
+            ]
+          )
+        end
       end
     end
   end

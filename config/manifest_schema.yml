@@ -1,0 +1,16 @@
+# This file provides the information needed to generate the schema needed to validate a specific manifest
+# by combining this information with the Biomaterial schema. For more information refer to app/models/manifest/schema.rb
+field_labware_name: 'plate_id'
+field_position: 'position'
+
+property_additions:
+  plate_id:
+    field_name_regex: "^plate"
+    friendly_name: "Plate ID"
+    show_on_form: false
+
+  position:
+    field_name_regex: "^(well(\\s*|_*|-*))?position$"
+    friendly_name: "Position"
+    show_on_form: false
+

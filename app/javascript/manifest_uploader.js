@@ -14,7 +14,7 @@ class ManifestUploader {
   }
 
   onChange() {
-    uploadManifest(this.node[0].files[0]);
+    uploadManifest(this.node[0].files[0], this.params.manifest_id);
 
     // Clearing the input allows the change event to fire again
     $(this).val(null);

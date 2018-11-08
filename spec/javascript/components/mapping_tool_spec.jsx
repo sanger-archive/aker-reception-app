@@ -15,14 +15,16 @@ const getContext = (status) => {
 describe('<MappingTool />', () => {
 
   let status = {
-    expected: [
-      'tissue',
-      'phenotype'],
-    observed: ['Tissue', 'concentration', 'volume'],
-    matched: [
-      {expected: 'taxId', observed: 'taxonomy id'},
-      {expected: 'sampleName', observed: 'samplename'}
-    ],
+    mapping: {
+      expected: [
+        'tissue',
+        'phenotype'],
+      observed: ['Tissue', 'concentration', 'volume'],
+      matched: [
+        {expected: 'taxId', observed: 'taxonomy id'},
+        {expected: 'sampleName', observed: 'samplename'}
+      ]
+    },
     schema: {
       properties: {
         taxId: { friendly_name: "Taxon id", required: true},

@@ -12,6 +12,8 @@ class Manifest < ApplicationRecord
     'broken'
   end
 
+  include Manifest::Schema
+
   belongs_to :labware_type, optional: true
   belongs_to :contact, optional: true
   accepts_nested_attributes_for :contact, update_only: true

@@ -28,7 +28,7 @@ import { uploadManifest } from 'csv_field_checker';
       $(this).removeClass('is-dragover bg-info').addClass('table-striped')
     })
     .on('drop', $.proxy(function(e) {
-      uploadManifest.call(this, e.originalEvent.dataTransfer.files[0]);
+      uploadManifest.call(this, e.originalEvent.dataTransfer.files[0], this.params.manifest_id);
     }, this));
 
     var csvBox = $('.csv-upload-box')
@@ -43,7 +43,7 @@ import { uploadManifest } from 'csv_field_checker';
         $(this).removeClass('is-dragover bg-info')
       })
       .on('drop', $.proxy(function(e) {
-        uploadManifest.call(this, e.originalEvent.dataTransfer.files[0]);
+        uploadManifest.call(this, e.originalEvent.dataTransfer.files[0], this.params.manifest_id);
       }, this));
 
     $('select#manifest_contact_id').select2({

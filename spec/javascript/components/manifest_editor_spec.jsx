@@ -14,7 +14,7 @@ const getContext = (status) => {
 }
 
 let status = {
-  mappingTool: { expected: [], observed: [], matched: []}
+  mapping: { expected: [], observed: [], matched: []}
 }
 
 describe('<ManifestEditor />', () => {

@@ -96,7 +96,9 @@
         </div>
         <div class="vcenter col-md-2">
           <label style="float: right" class="btn btn-primary">
-              Browse for Manifest <input data-psd-component-class="ManifestUploader" id="manifest_upload" type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
+              Browse for Manifest <input data-psd-component-class="ManifestUploader"
+              data-psd-component-parameters="<%= { manifest_id: manifest.id }.to_json %>"
+              id="manifest_upload" type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
           </label>
         </div>
       </div>
@@ -112,6 +114,7 @@
              aria-controls="Labware<%= labware.labware_index %>" role="tab">
             <%= labware.supplier_plate_name.present? ? labware.supplier_plate_name : "Labware #{labware.labware_index}" %>
           </a>
+          <input type="hidden" value="<%= manifest.id %>" name="manifest_id" />
           <input type="hidden" value="<%= labware.supplier_plate_name %>" name="manifest[labware][<%= labware.labware_index %>][supplier_plate_name]" />
         </li>
       <% end %>
@@ -134,7 +137,7 @@
 
           <table class="table table-condensed table-striped"
                  data-psd-component-class="<%= ['LoadTable', 'DataTableSchemaValidation'].to_json %>"
-                 data-psd-component-parameters="<%= [{}, {material_schema_url: materials_schema_url}].to_json %>">
+                 data-psd-component-parameters="<%= [{manifest_id: manifest.id}, {material_schema_url: materials_schema_url}].to_json %>">
             <thead>
               <tr>
                 <th></th>
