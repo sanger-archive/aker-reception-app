@@ -1,16 +1,43 @@
 # This file provides the information needed to generate the schema needed to validate a specific manifest
 # by combining this information with the Biomaterial schema. For more information refer to app/models/manifest/schema.rb
-field_labware_name: 'plate_id'
-field_position: 'position'
+field_labware_name: plate_id
+field_position: position
 
-property_additions:
+property_updates:
+  supplier_name:
+    show_on_form: true
+    field_name_regex: ^supplier[-_ ]*name$
+  is_tumour:
+    show_on_form: true
+    field_name_regex: ^(?:is[-_ ]+)?tumou?r\??$
+  tissue_type:
+    show_on_form: true
+    field_name_regex: ^tissue[-_ ]*type$
+  donor_id:
+    show_on_form: true
+    field_name_regex: '^donor(?:[-_ ]*id)?$'
+  gender:
+    show_on_form: true
+    field_name_regex: '^(?:gender|sex)$'
+  taxon_id:
+    show_on_form: true
+    field_name_regex: '^taxon(?:[-_ ]*id)?$'
+  scientific_name:
+    required: false
+    show_on_form: false
+    field_name_regex: '^scientific(?:[-_ ]*name)?$'
+  phenotype:
+    show_on_form: true
+    field_name_regex: '^phenotype$'
+  hmdmc:
+    show_on_form: true
+    field_name_regex: ^hmdmc(?:[-_ ]+no\.?)?$
   plate_id:
-    field_name_regex: "^plate"
+    field_name_regex: ^plate
     friendly_name: "Plate ID"
     show_on_form: false
-
   position:
-    field_name_regex: "^(well(\\s*|_*|-*))?position$"
+    field_name_regex: ^(well(\\s*|_*|-*))?position$
     friendly_name: "Position"
     show_on_form: false
 

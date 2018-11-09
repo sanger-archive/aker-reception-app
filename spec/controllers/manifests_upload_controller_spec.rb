@@ -25,13 +25,13 @@ RSpec.shared_examples "a valid ManifestEditor state generator" do
   end
   it 'generates the mapping tool part of the state' do
     json = JSON.parse(response.body, symbolize_names: true)
-    expect(json[:contents][:manifest][:mapping]).to include({
-      :expected=>[],
-      :matched=>[
-        {:observed=>"taxon_id", :expected=>"taxon_id"},
-        {:observed=>"supplier_name", :expected=>"supplier_name"},
-        {:observed=>"gender", :expected=>"gender"}
-      ]})
+    expect(json[:contents][:manifest][:mapping][:observed]).to eq([])
+    expect(json[:contents][:manifest][:mapping][:expected]).to eq([])
+    expect(json[:contents][:manifest][:mapping][:matched]).to include(
+      {:observed=>"taxon_id", :expected=>"taxon_id"},
+      {:observed=>"supplier_name", :expected=>"supplier_name"},
+      {:observed=>"gender", :expected=>"gender"}
+    )
   end
 end
 
@@ -56,10 +56,14 @@ RSpec.describe Manifests::UploadController, type: :controller  do
       }
     }
   }
-  let(:manifest) { create :manifest }
+  let(:lt) { create :plate_labware_type }
+  let(:manifest) { create :manifest, labware_type: lt }
+  let(:labware) { create :labware }
 
   describe 'POST #create' do
     before do
+      manifest.update_attributes(labwares: [labware])
+
       allow(MatconClient::Material).to receive(:schema).and_return(schema)
       login
       post :create, params: { manifest: file, manifest_id: manifest.id }, xhr: true
