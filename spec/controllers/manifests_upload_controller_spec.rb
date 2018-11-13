@@ -26,7 +26,7 @@ RSpec.shared_examples "a valid ManifestEditor state generator" do
   it 'generates the mapping tool part of the state' do
     json = JSON.parse(response.body, symbolize_names: true)
     expect(json[:contents][:manifest][:mapping][:observed]).to eq([])
-    expect(json[:contents][:manifest][:mapping][:expected]).to eq([])
+    expect(json[:contents][:manifest][:mapping][:expected]).to eq(["scientific_name"])
     expect(json[:contents][:manifest][:mapping][:matched]).to include(
       {:observed=>"taxon_id", :expected=>"taxon_id"},
       {:observed=>"supplier_name", :expected=>"supplier_name"},

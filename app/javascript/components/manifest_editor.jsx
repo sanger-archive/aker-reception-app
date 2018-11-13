@@ -3,8 +3,7 @@ import PropTypes from "prop-types"
 import store from 'store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
-
-import C from '../constants'
+import {uploadManifest} from '../actions'
 
 const ErrorsDisplay = () => {
   return (
@@ -60,11 +59,15 @@ let ManifestEditorConnected = connect(mapStateToProps, mapDispatchToProps)(Manif
 
 const ManifestEditor = () => {
   $(document.body).on('uploadedmanifest', $.proxy(function(event, response) {
-    if (response.contents.manifest.mapping.expected.length > 0) {
+    /*if (response.contents.manifest.mapping.expected.length > 0) {
+      $('#myModal').modal('show')
+    }*/
+
+    store.dispatch(uploadManifest(response))
+    if (store.getState().mapping.shown) {
       $('#myModal').modal('show')
     }
-    this.dispatch({type: C.UPLOADED_MANIFEST, manifestData: response.contents.manifest})
-  }, store))
+  }, this))
 
   return(
     <Provider store={store}>

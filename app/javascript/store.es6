@@ -1,23 +1,19 @@
-import { createStore, combineReducers } from 'redux'
+import { createStore } from 'redux'
 import manifest from 'reducers/manifest'
-import mappingTool from 'reducers/mapping_tool'
 
 const initialState = {
-  "manifest": {
-    "type": "Manifest",
-    "loading": false,
-    "contents": {}
+  "content": {
   },
-  "mappingTool": {
+  "mapping": {
+    "shown": false,
     "matched": [],
     "expected": [],
     "observed": []
-  }
+  },
+  "schema": null
 }
 
-const store = createStore(
-    manifest,
-    initialState
-)
+
+const store = createStore(manifest, initialState)
 
 export default store

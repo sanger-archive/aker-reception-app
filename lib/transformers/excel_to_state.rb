@@ -29,6 +29,19 @@ module Transformers
     end
 
     def mapping_data
+      build_mapping_data
+    end
+
+    private
+
+    # def add_shown_to_mapping_data(data)
+    #   all_required_fields = manifest_schema['properties'].select{|e| e['required']}
+    #   all_matched_expected = data.map(&:matched).map(&:expected)
+
+    #   data[:mapping].merge(shown: ((all_required_fields - all_matched_expected).count > 0))
+    # end
+
+    def build_mapping_data
       expected_keys_and_properties.reduce({
         observed: observed_keys.dup,
         expected: [],
@@ -49,8 +62,6 @@ module Transformers
         memo
       end
     end
-
-    private
 
     def expected_info(expected)
       data = manifest_schema['properties'][expected]

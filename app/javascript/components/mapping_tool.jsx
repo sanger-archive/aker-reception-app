@@ -2,7 +2,7 @@ import React, {Fragment} from "react"
 import PropTypes from "prop-types"
 import { connect } from 'react-redux'
 
-import {matchSelection, unmatch} from '../actions'
+import {matchSelection, unmatch, selectExpectedOption, selectObservedOption } from '../actions'
 
 let matchedFields = {}
 
@@ -89,6 +89,8 @@ const MappingHeader = () => {
     )
 }
 
+
+
 const MappingFooter = (props) => {
  return(
   <div className="modal-footer">
@@ -97,25 +99,24 @@ const MappingFooter = (props) => {
       onClick={ () => {
         CSVFieldChecker.fillInTableFromFile(props.content, buildMatchedFields(props.matched), $(DATA_TABLES), props.schema.properties)
         $("#myModal").modal('hide')
-      }} >Continue</button>
+      }} disabled={!props.valid}  >Continue</button>
   </div>
   )
 }
 
-
-const mappingOption = (text, value, pos, required) => {
-  return(<option key={pos} value={value}>{required ? '*':''}{text}</option>)
+const mappingOption = (text, value, pos, required, onClick) => {
+  return(<option key={pos} value={value} onClick={() => {onClick(value)}}>{required ? '*':''}{text}</option>)
 }
 
 const ExpectedMappingOptions = (props) => {
   return(props.expected.map((key, pos) => {
-    return mappingOption(props.schema.properties[key].friendly_name, key, pos, props.schema.properties[key].required)
+    return mappingOption(props.schema.properties[key].friendly_name, key, pos, props.schema.properties[key].required, props.onSelectExpectedOption)
   }))
 }
 
 const ObservedMappingOptions = (props) => {
   return(props.observed.map((key, pos) => {
-    return mappingOption(key, key, pos, false)
+    return mappingOption(key, key, pos, false, props.onSelectObservedOption)
   }))
 }
 
@@ -125,23 +126,24 @@ const MappingInterface = (props) => {
       <div className="col-md-5">
         <div className="form-group">
           <label htmlFor="form-fields">Fields on Form</label>
-          <select id="form-fields" className="form-control" name="form-fields" size="8">
-            <ExpectedMappingOptions expected={props.expected} schema={props.schema} />
+          <select id="form-fields" className="form-control" name="form-fields" size="8" defaultValue={props.selectedExpected||""}>
+            <ExpectedMappingOptions {...props} />
           </select>
         </div>
       </div>
       <div className="col-md-5">
         <div className="form-group">
           <label htmlFor="fields-from-csv">Fields from CSV</label>
-          <select id="fields-from-csv" className="form-control" name="fields-from-csv" size="8">
-            <ObservedMappingOptions observed={props.observed} />
+          <select id="fields-from-csv" className="form-control" name="fields-from-csv" size="8" defaultValue={props.selectedObserved||""}>
+            <ObservedMappingOptions {...props} />
           </select>
         </div>
       </div>
       <div className="col-md-2">
         <div className="form-group">
           <button id="match-fields-button" type="button" className="btn btn-primary"
-          onClick={ props.onMatchFields }>Match</button>
+          disabled={(!props.selectedExpected || !props.selectedObserved)}
+          onClick={ () => { props.onMatchFields(props.selectedExpected, props.selectedObserved) }}>Match</button>
         </div>
       </div>
     </div>
@@ -155,7 +157,7 @@ const MappedPair = (pairInfo, schema, onUnmatch, number) => {
       <td>{ schema.properties[pairInfo.expected].friendly_name }</td>
       <td>{ pairInfo.expected }</td>
       <td>{ pairInfo.observed }</td>
-      <td><button className='btn btn-danger' onClick={onUnmatch}>x</button></td>
+      <td><button className='btn btn-danger' onClick={() => {onUnmatch(pairInfo.expected, pairInfo.observed)}}>x</button></td>
     </tr>)
 }
 
@@ -211,12 +213,19 @@ class MappingToolComponent extends React.Component {
     }
   }
   componentDidUpdate(){
-    if (this.props.expected.length > 0) {
-      $("#myModal").modal('show')
+    if (this.props && this.props.valid) {
+      if (this.props.content &&  this.props.schema && this.props.schema.properties) {
+        CSVFieldChecker.fillInTableFromFile(this.props.content, buildMatchedFields(this.props.matched), $(DATA_TABLES), this.props.schema.properties)
+      }
     }
-      //$(this.modal).on('hidden.bs.modal', this.props.handleHideModal);
+
+    //$(this.modal).on('hidden.bs.modal', this.props.handleHideModal);
+  }
+  allRequiredFieldsMatched() {
+
   }
   render (props) {
+
     return(
       <div id="myModal" ref={modal=> this.modal = modal} className="modal fade" tabIndex="-1" role="dialog" data-show="true">
         <div className="modal-dialog modal-lg" role="document">
@@ -233,10 +242,14 @@ class MappingToolComponent extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
+    selectedObserved: state && state.mapping ? state.mapping.selectedObserved : null,
+    selectedExpected: state && state.mapping ? state.mapping.selectedExpected : null,
     content: state && state.content ? state.content : {},
     expected: state && state.mapping ? state.mapping.expected : [],
     observed: state && state.mapping ? state.mapping.observed : [],
     matched: state && state.mapping ? state.mapping.matched : [],
+    shown: state && state.mapping.shown ? state.mapping.shown : false,
+    valid: state && state.mapping.valid ? state.mapping.valid : false,
     schema: state ? state.schema : null
   }
 };
@@ -250,17 +263,16 @@ const buildMatchedFields = (matched) => {
 
 const mapDispatchToProps = (dispatch, { match, location }) => {
   return {
-    onMatchFields: () => {
-      let expected = $('#' + FORM_FIELD_SELECT_ID + ' :selected').val()
-      let observed = $('#' + CSV_SELECT_ID + ' :selected').val()
-
+    onSelectExpectedOption: (value) => {
+      dispatch(selectExpectedOption(value))
+    },
+    onSelectObservedOption: (value) => {
+      dispatch(selectObservedOption(value))
+    },
+    onMatchFields: (expected, observed) => {
       dispatch(matchSelection(expected, observed))
     },
-    onUnmatch: (e) => {
-      let row = $(e.target).parent().parent()
-      let expected = row.children()[1].innerHTML;
-      let observed = row.children()[2].innerHTML;
-
+    onUnmatch: (expected, observed) => {
       dispatch(unmatch(expected, observed))
     }
   }
