@@ -52,4 +52,15 @@ module ManifestHelper
     return manifest.labware_type.name
   end
 
+  def state_for_manifest(manifest)
+    {
+      content: content_for_manifest(manifest),
+      schema: manifest.schema
+    }
+  end
+
+  def content_for_manifest(manifest)
+    manifest.labwares
+  end
+
 end

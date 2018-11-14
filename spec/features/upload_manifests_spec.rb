@@ -95,9 +95,9 @@ RSpec.feature "Upload Manifests", type: :feature, js: true do
   end
 
   context 'when uploading a manifest that misses or misspells some of the required columns' do
-    let(:manifest_file) {'incomplete_manifest.xlsx'}
+    let(:manifest_file) {'incomplete_manifest.csv'}
     it 'shows the mapping tool to fix the problem' do
-      expect(page).to have_content('Select CSV mappings')
+      expect(page).to have_content('Select CSV mappings', wait: 25)
     end
   end
 end

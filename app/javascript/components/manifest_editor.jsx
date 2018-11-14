@@ -3,6 +3,7 @@ import PropTypes from "prop-types"
 import store from 'store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
+import ManifestContainers from './manifest_containers'
 import {uploadManifest} from '../actions'
 
 const ErrorsDisplay = () => {
@@ -23,8 +24,6 @@ const WarningsDisplay = () => {
   )
 }
 
-const Containers = () => { return (<div></div>) }
-
 
 class ManifestEditorComponent extends React.Component {
   constructor(props) {
@@ -37,7 +36,7 @@ class ManifestEditorComponent extends React.Component {
         <ErrorsDisplay />
         <WarningsDisplay />
         <MappingTool />
-        <Containers />
+        <ManifestContainers />
       </div>
     )
   }

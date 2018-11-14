@@ -15,65 +15,6 @@
     <p class='alert-msg'>&nbsp;</p>
   </div>
 
-  <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Select CSV mappings</h4>
-        </div>
-        <div class="modal-body">
-          <div id="modal-alert-required" class="alert alert-error" role="alert" style="display: none;">
-            All the required fields must be mapped to a CSV field.
-          </div>
-          <div id="modal-alert-ignored" class="alert alert-warning" role="alert" style="display: none;">
-            Some fields from the CSV have been ignored, please confirm that the correct matches have been made.
-          </div>
-          <p>Please select a form field on the left and the CSV field on the right, then press the "Match" button to map them. Fields marked with a * must be mapped.</p>
-          <div class="row">
-            <div class="col-md-5">
-              <div class="form-group">
-                <label for="form-fields">Fields on Form</label>
-                <select id="form-fields" class="form-control" name="form-fields" size="8">
-                </select>
-              </div>
-            </div>
-            <div class="col-md-5">
-              <div class="form-group">
-                <label for="fields-from-csv">Fields from CSV</label>
-                <select id="fields-from-csv" class="form-control" name="fields-from-csv" size="8">
-                </select>
-              </div>
-            </div>
-            <div class="col-md-2">
-              <div class="form-group">
-                <button id="match-fields-button" type="button" class="btn btn-primary" onclick="CSVFieldChecker.matchFields();">Match</button>
-              </div>
-            </div>
-          </div>
-          <h5>Matched fields</h5>
-          <table id="matched-fields-table" class="table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Available field</th>
-                <th>Field from CSV</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button id="complete-csv-matching" type="button" class="btn btn-primary" onclick="CSVFieldChecker.finishCSVCheck();">Continue</button>
-        </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
-
-
   <%= bootstrap_form_tag url: manifest_biomaterial_data_path(manifest.id),
                          remote: true,
                          method: :put,
