@@ -15,9 +15,15 @@ export const unmatch = (expected, observed) =>  {
   }
 }
 
-export const uploadManifest = (response) => {
+export const loadManifestMapping = (mapping) => {
   return {
-    type: C.UPLOADED_MANIFEST, manifestData: response.contents.manifest
+    type: C.LOAD_MANIFEST_MAPPING, mapping
+  }
+}
+
+export const loadManifestContent = (content) => {
+  return {
+    type: C.LOAD_MANIFEST_CONTENT, content
   }
 }
 

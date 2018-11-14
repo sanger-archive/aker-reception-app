@@ -29,12 +29,16 @@ export default (state = {}, action) => {
           valid: validMapping
         })
       })
-    case C.UPLOADED_MANIFEST:
+    case C.LOAD_MANIFEST_MAPPING:
       return Object.assign({}, state, {
         mapping: Object.assign({}, state.mapping, {
           valid: validMapping,
           shown: !validMapping
         })
+      })
+    case C.LOAD_MANIFEST_CONTENT:
+      return Object.assign({}, state, {
+        content: action.content
       })
     default:
       return state

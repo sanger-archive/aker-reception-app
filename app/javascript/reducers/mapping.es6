@@ -18,14 +18,10 @@ export default (state = {}, action) => {
       mapping.observed.push(action.observed)
       mapping.expected.push(action.expected)
       return Object.assign({}, state, mapping)
-    case C.UPLOADED_MANIFEST:
-      return Object.assign({}, state, action.manifestData.mapping, {selectedObserved: null, selectedExpected: null})
-
     case C.SELECT_OBSERVED_OPTION:
       return Object.assign({}, state, {selectedObserved: action.value})
     case C.SELECT_EXPECTED_OPTION:
       return Object.assign({}, state, {selectedExpected: action.value})
-
     default:
       return state
   }

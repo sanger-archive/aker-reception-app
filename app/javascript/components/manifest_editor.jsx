@@ -4,7 +4,7 @@ import store from 'store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
-import {uploadManifest} from '../actions'
+import { loadManifestContent } from '../actions'
 
 const ErrorsDisplay = () => {
   return (
@@ -58,13 +58,17 @@ let ManifestEditorConnected = connect(mapStateToProps, mapDispatchToProps)(Manif
 
 const ManifestEditor = () => {
   $(document.body).on('uploadedmanifest', $.proxy(function(event, response) {
-    /*if (response.contents.manifest.mapping.expected.length > 0) {
-      $('#myModal').modal('show')
-    }*/
+    const manifest = response.contents.manifest
 
-    store.dispatch(uploadManifest(response))
+    store.dispatch(loadManifestMapping(manifest.mapping))
     if (store.getState().mapping.shown) {
+
+      store.dispatch(selectExpectedOption(null))
+      store.dispatch(selectObservedOption(null))
+
       $('#myModal').modal('show')
+    } else {
+      store.dispatch(loadManifestContent(manifest.content))
     }
   }, this))
 

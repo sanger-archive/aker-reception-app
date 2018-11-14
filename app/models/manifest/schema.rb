@@ -4,11 +4,16 @@ module Manifest::Schema
     MatconClient::Material.schema
   end
 
+  def manifest_schema_field(sym)
+    config = Rails.application.config.manifest_schema_config
+    return config["field_labware_name"] if sym == :labware_id
+    return config["field_position"] if sym == :position
+    sym
+  end
+
   def manifest_schema
+    config = Rails.application.config.manifest_schema_config
     @manifest_schema ||= material_schema.dup.tap do |schema|
-      config = Rails.application.config.manifest_schema_config
-      labware_name = config["field_labware_name"]
-      position = config["field_position"]
 
       # Merges properties from the biomaterial schema and the manifest schema config to create a new schema object
       # The resulting schema will have all the information from the material schema but any fields defined in the manifest
@@ -21,9 +26,9 @@ module Manifest::Schema
 
       # Here we will modify the manifest schema about decisions taken because of the manifest contents:
       # 'labware_name' is only required when there are several plates in the same manifest to be able to identify it
-      schema["properties"][labware_name]["required"] = (labwares.count > 1)
+      schema["properties"][manifest_schema_field(:labware_id)]["required"] = (labwares.count > 1)
       # 'position' is required when there are several positions to choose inside the same labware to put the sample in
-      schema["properties"][position]["required"] = ((labwares.count > 0) && (labwares.first.positions.count > 1))
+      schema["properties"][manifest_schema_field(:position)]["required"] = ((labwares.count > 0) && (labwares.first.positions.count > 1))
     end
     @manifest_schema
   end

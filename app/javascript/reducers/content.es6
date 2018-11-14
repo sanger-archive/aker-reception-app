@@ -22,8 +22,6 @@ const POSITION_FIELD = {
 export default (state = {}, action) => {
 
   switch(action.type) {
-    case C.UPLOADED_MANIFEST:
-      return Object.assign([], state, action.manifestData.content)
     case C.SET_VALUE_TO_FIELD:
       return tab(state.contents[action.labwareId], action)
     default:
