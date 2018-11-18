@@ -17,7 +17,7 @@ private
 
   # manifest_file is an uploaded file. Will be an instance of ruby IO class (probably File).
   def manifest_state
-    params[:manifest]
+    params[:state]
   end
 
   # manifest_model is the instance of the manifest model that we are currently building

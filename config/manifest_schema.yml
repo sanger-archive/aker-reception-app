@@ -2,6 +2,8 @@
 # by combining this information with the Biomaterial schema. For more information refer to app/models/manifest/schema.rb
 field_labware_name: plate_id
 field_position: position
+default_labware_name_value: default
+default_position_value: default
 
 property_updates:
   supplier_name:
@@ -35,9 +37,9 @@ property_updates:
   plate_id:
     field_name_regex: ^plate
     friendly_name: "Plate ID"
-    show_on_form: false
+    show_on_form: true
   position:
     field_name_regex: ^(well(\\s*|_*|-*))?position$
     friendly_name: "Position"
-    show_on_form: false
+    show_on_form: true
 

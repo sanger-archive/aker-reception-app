@@ -1,12 +1,51 @@
-class MappingService
+class ManifestUpdateService
   def initialize(manifest, user)
     @manifest = manifest
     @user = user
   end
 
+  def process(state)
+    @manifest_update_state = Manifest::ProvenanceState.new(@manifest, @user)
+    @manifest_update_state.apply(state)
+    return @manifest_update_state.state
+
+    if @manifest_update_state.valid?
+      provenance = ProvenanceService.new(@manifest.manifest_schema)
+      messages = provenance.set_biomaterial_data(@manifest, @manifest_update_state.updates, @user)
+      @manifest_update_state.apply_messages(messages)
+    end
+    @manifest_update_state.state
+
+    update unless manifest_update_state.updated?
+
+    manifest_update_state.state
+
+    if @manifest_update_state.valid?
+      @manifest_update_state.save
+    end
+    @manifest_update_state.state
+    @state = state
+    build_mapping(state) if @state[:content][:raw] && !@state[:mapping]
+    @contents = state[:content][:raw]
+  end
+
+  def save_updates(updates)
+    ProvenanceService.new(@manifest.manifest_schema).set_biomaterial_data(@manifest, updates, @user)
+  end
+
+
+
+  def has_raw_content?
+    !@state[:content][:raw].nil?
+  end
+
+  def has_mapping?
+    !@state[:mapping]
+  end
+
   def process_array(array)
     @contents = array
-    @mapping = parse_array
+    @mapping = build_mapping
     save_mapped_contents(mapped_array_params(array))
     build_state
   end
@@ -14,13 +53,52 @@ class MappingService
   def process_state(state)
     @contents = state[:content]
     @mapping = state[:mapping]
+    validate_mapping
+    if mapping.valid?
     save_mapped_contents(mapped_labware_params(state[:content]))
     build_state
   end
 
   private
 
-  def parse_array
+  def validate_mapping
+    @mapping[:valid] = (required_unmatched_fields.length == 0) unless (@mapping.has_key(:valid))
+  end
+
+  def required_unmatched_fields
+    required_schema_fields.select{|f| matched_expected_fields.include(f)}
+  end
+
+  def matched_expected_fields
+    @mapping[:matched].map{|m| m[:expected]}
+  end
+
+  def required_schema_fields
+    @manifest.manifest_schema['properties'].select{|prop| prop['required'] == true}
+  end
+
+export const allRequiredFields = (providedProps) => {
+  return Object.keys(providedProps.schema.properties).filter((prop) => {
+    return providedProps.schema.properties[prop].required === true
+  })
+}
+export const allMatchedFields = (providedProps) => {
+  return Array.from(new Set(providedProps.mapping.matched.map(obj => obj.expected)))
+}
+export const allRequiredUnmatchedFields = (providedProps) => {
+  const matchedFields = new Set(allMatchedFields(providedProps))
+  return (allRequiredFields(providedProps).filter(elem => !matchedFields.has(elem)))
+}
+export const isThereAnyRequiredUnmatchedField = (providedProps) => {
+  if (!providedProps.schema) {
+    return true
+  }
+  return (allRequiredUnmatchedFields(providedProps).length > 0)
+}
+
+  end
+
+  def build_mapping
     @mapping = expected_keys_and_properties.reduce({
       observed: observed_keys.dup,
       expected: [],
@@ -99,15 +177,5 @@ class MappingService
   end
 
 
-  def observed_keys
-    return @contents.first.keys.map(&:to_s) if @contents.length > 0
-    []
-  end
-
-  def expected_keys_and_properties
-    @manifest.manifest_schema['properties'].each_pair.select do |expected_key, expected_properties|
-      (expected_properties['required'] || (expected_properties['show_on_form'] && expected_properties['field_name_regex']))
-    end.map{|k,v| [k.to_s, v]}
-  end
 
 end

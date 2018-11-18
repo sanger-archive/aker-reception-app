@@ -12,7 +12,8 @@ private
   end
 
   def transformer
-    @transformer ||= Transformers::ExcelToState.new(path: manifest_file.path, manifest_model: manifest_model)
+    @transformer ||= Transformers::ExcelToState.new(path: manifest_file.path,
+      manifest_model: manifest_model, current_user: current_user)
   end
 
   # manifest_file is an uploaded file. Will be an instance of ruby IO class (probably File).

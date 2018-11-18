@@ -21,13 +21,13 @@ RSpec.shared_examples "a valid ManifestEditor state generator" do
 
   it 'generates the manifest part of the state' do
     json = JSON.parse(response.body, symbolize_names: true)
-    expect(!!json[:contents][:manifest]).to eq(true)
+    expect(!!json[:contents]).to eq(true)
   end
   it 'generates the mapping tool part of the state' do
     json = JSON.parse(response.body, symbolize_names: true)
-    expect(json[:contents][:manifest][:mapping][:observed]).to eq([])
-    expect(json[:contents][:manifest][:mapping][:expected]).to eq(["scientific_name"])
-    expect(json[:contents][:manifest][:mapping][:matched]).to include(
+    expect(json[:contents][:mapping][:observed]).to eq([])
+    expect(json[:contents][:mapping][:expected]).to eq(["scientific_name"])
+    expect(json[:contents][:mapping][:matched]).to include(
       {:observed=>"taxon_id", :expected=>"taxon_id"},
       {:observed=>"supplier_name", :expected=>"supplier_name"},
       {:observed=>"gender", :expected=>"gender"}
@@ -62,6 +62,10 @@ RSpec.describe Manifests::UploadController, type: :controller  do
 
   describe 'POST #create' do
     before do
+      @user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: %w[world team252])
+      allow(controller).to receive(:check_credentials)
+      allow(controller).to receive(:current_user).and_return(@user)
+
       manifest.update_attributes(labwares: [labware])
 
       allow(MatconClient::Material).to receive(:schema).and_return(schema)

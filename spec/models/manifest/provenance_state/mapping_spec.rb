@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Transformers::ExcelToState do
+RSpec.describe 'Manifest::ProvenanceState::Mapping' do
   let(:schema) {
     {
       "show_on_form"=> ["taxon_id","scientific_name","supplier_name","gender","is_tumour"],
@@ -25,22 +25,40 @@ RSpec.describe Transformers::ExcelToState do
         "gender"=>{
           "show_on_form"=>true,"friendly_name"=>"Gender","required"=>false,
           "field_name_regex"=>"^(?:gender|sex)$","type"=>"string"
+        },
+        "unneeded_field"=>{
+          "show_on_form"=>false,"friendly_name"=>"Unneeded","required"=>false,
+          "field_name_regex"=>"unneeded_field","type"=>"string"
         }
+
       }
     }
   }
 
+  let(:labware_name) {
+    Rails.configuration.manifest_schema_config["field_labware_name"]
+
+  }
+  let(:position) {
+    Rails.configuration.manifest_schema_config["field_position"]
+  }
+  let(:user) { create :user }
+  let(:provenance_state) { Manifest::ProvenanceState.new(manifest, user) }
+  let(:mapping_accessor) { provenance_state.mapping }
+
+
   let(:manifest) { create :manifest }
-  let(:transformer) { Transformers::ExcelToState.new(path: 'some path', manifest_model: manifest) }
-  before do
-    allow(MatconClient::Material).to receive(:schema).and_return(schema)
-    allow(transformer).to receive(:manifest_content).and_return(manifest_content)
-  end
-  context '#contents' do
+  context '#apply' do
+    before do
+      allow(provenance_state.schema).to receive(:manifest_schema).and_return(schema)
+      mapping_accessor.apply({content: {raw: manifest_content}})
+
+    end
+
     context 'with an empty manifest' do
-      let(:manifest_content) { {} }
+      let(:manifest_content) { [] }
       it 'does not match anything' do
-        expect(transformer.contents[:manifest][:mapping]).to include(
+        expect(mapping_accessor.state[:mapping]).to include(
           expected: ["is_tumour", "scientific_name", "taxon_id", "supplier_name", "gender"],
           observed: [], matched: []
         )
@@ -49,13 +67,14 @@ RSpec.describe Transformers::ExcelToState do
     context 'with a manifest that contains all the fields' do
       let(:manifest_content) {
         [
-          "is_tumour" => "", "scientific_name" => "", "taxon_id" => "", "supplier_name" => "", "gender" => ""
+          "is_tumour" => "", "scientific_name" => "", "taxon_id" => "",
+          "supplier_name" => "", "gender" => "", "unneeded_field" => "not needed"
         ]
       }
-      it 'does match everything' do
-        expect(transformer.contents[:manifest][:mapping]).to include(
+      it 'does match all needed fields' do
+        expect(mapping_accessor.state[:mapping]).to include(
           expected: [],
-          observed: [], matched: [
+          observed: ["unneeded_field"], matched: [
             { expected: 'is_tumour', observed: 'is_tumour' }, { expected: 'scientific_name', observed: 'scientific_name' },
             { expected: 'taxon_id', observed: 'taxon_id' }, { expected: 'supplier_name', observed: 'supplier_name' },
             { expected: 'gender', observed: 'gender' }
@@ -70,7 +89,7 @@ RSpec.describe Transformers::ExcelToState do
         ]
       }
       it 'returns the list of matched pairs and the list of columsn unmatched in both sides' do
-        expect(transformer.contents[:manifest][:mapping]).to include(
+        expect(mapping_accessor.state[:mapping]).to include(
           expected: ["taxon_id", "supplier_name", "gender"],
           observed: ["unknown_value"],
           matched: [
@@ -92,7 +111,7 @@ RSpec.describe Transformers::ExcelToState do
         ]
       }
       it 'does not expect to find them, but matches the others' do
-        expect(transformer.contents[:manifest][:mapping]).to include(
+        expect(mapping_accessor.state[:mapping]).to include(
           expected: [],
           observed: ["column_to_hide"],
           matched: [
@@ -115,7 +134,7 @@ RSpec.describe Transformers::ExcelToState do
       }
 
       it 'does not expect to find them, but matches the others' do
-        expect(transformer.contents[:manifest][:mapping]).to include(
+        expect(mapping_accessor.state[:mapping]).to include(
           expected: [],
           observed: ["column_to_hide"],
           matched: [
@@ -134,7 +153,7 @@ RSpec.describe Transformers::ExcelToState do
         }
 
         it 'expects to find them and tries to map them' do
-          expect(transformer.contents[:manifest][:mapping]).to include(
+          expect(mapping_accessor.state[:mapping]).to include(
             expected: ["hidden_required_column"],
             observed: ["column_to_hide"],
             matched: [
@@ -142,6 +161,44 @@ RSpec.describe Transformers::ExcelToState do
             ]
           )
         end
+      end
+    end
+
+    context 'with the default schema data' do
+      let(:manifest_content) {
+        [
+          {:plate_id=>"plate_1", :well_position=>"A:1", :supplier_name=>"supplier name 1",
+            :donor_id=>"donor id 1", :gender=>"male", :scientific_name=>"Triticum turgidum subsp. durum",
+            :phenotype=>"Red", :tumour=>"normal", :tissue_type=>"blood", :taxon_id=>"4567"},
+          {:plate_id=>"plate_2", :well_position=>"A:1", :supplier_name=>"supplier name 2",
+            :donor_id=>"donor id 2", :gender=>"male", :scientific_name=>"Triticum turgidum subsp. durum",
+            :phenotype=>"Green", :tumour=>"normal", :tissue_type=>"dna", :taxon_id=>"4567"},
+          {:plate_id=>"plate_3", :well_position=>"A:1", :supplier_name=>"supplier name 3", :donor_id=>"donor id 3",
+            :gender=>"male", :scientific_name=>"Triticum turgidum subsp. durum", :phenotype=>"Yellow",
+            :tumour=>"normal", :tissue_type=>"cells", :taxon_id=>"4567"}
+        ]
+      }
+      let(:schema_with_plate_id_and_pos) {
+        schema2 = schema.dup
+        schema2['properties'].merge!({
+            "plate_id"=>{
+              "show_on_form"=>true,"friendly_name"=>"Plate id","required"=>true,
+              "field_name_regex"=>"plate_id","type"=>"string"
+            },
+            "position"=>{
+              "show_on_form"=>true,"friendly_name"=>"Well position","required"=>true,
+              "field_name_regex"=>"positio","type"=>"string"
+            }
+          })
+        schema2
+      }
+      it 'matches plate id and position' do
+        allow(provenance_state.schema).to receive(:manifest_schema).and_return(schema_with_plate_id_and_pos)
+        mapping_accessor.apply({content: {raw: manifest_content}})
+        expect((mapping_accessor.state[:mapping][:matched].select do |e|
+          ((((e[:expected] == 'plate_id') && (e[:observed] == 'plate_id'))) ||
+          (((e[:expected]=='position') && (e[:observed] == 'well_position'))))
+        end).count==2).to eq(true)
       end
     end
   end

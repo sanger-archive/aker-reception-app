@@ -37,6 +37,9 @@ RSpec.describe :mapping_service do
     allow(manifest).to receive(:manifest_schema).and_return(schema)
   end
 
+  context '#process_state' do
+    let(:state) { create :manifest_editor_valid_state }
+  end
   context '#process_array' do
     context 'generating the mapping info' do
       context 'with an empty manifest' do
@@ -46,6 +49,9 @@ RSpec.describe :mapping_service do
             expected: ["is_tumour", "scientific_name", "taxon_id", "supplier_name", "gender"],
             observed: [], matched: []
           )
+        end
+        it 'does not validate the mapping' do
+          expect(mapping_service.process_array(manifest_content)[:manifest][:mapping][:valid]).to be_falsy
         end
       end
       context 'with a manifest that contains all the fields' do
@@ -63,6 +69,9 @@ RSpec.describe :mapping_service do
               { expected: 'gender', observed: 'gender' }
             ]
           )
+        end
+        it 'validates the mapping' do
+          expect(mapping_service.process_array(manifest_content)[:manifest][:mapping][:valid]).to be_truthy
         end
       end
       context 'with a manifest that contains some fields' do

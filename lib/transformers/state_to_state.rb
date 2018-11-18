@@ -1,12 +1,16 @@
 module Transformers
   class StateToState
-    def initialize(state)
-      @mapping_service = MappingService.new(options.fetch(:manifest_model), options.fetch(:current_user))
+    def initialize(options)
+      @provenance_state = Manifest::ProvenanceState.new(options.fetch(:manifest_model), options.fetch(:current_user))
       @state = options.fetch(:state)
     end
 
+    def transform
+      @provenance_state.apply(@state)
+    end
+
     def contents
-      @mapping_service.process_state(@state)
+      @provenance_state.state
     end
   end
 end
