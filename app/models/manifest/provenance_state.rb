@@ -6,6 +6,7 @@ class Manifest::ProvenanceState
   delegate :manifest_schema, to: :schema
   delegate :labwares, to: :manifest
 
+  class WrongNumberLabwares < StandardError ; end
 
   def initialize(manifest, user)
     @manifest = manifest
@@ -23,8 +24,15 @@ class Manifest::ProvenanceState
     @mapping.apply(@state)
     @content.apply(@state)
 
+    validate
     save
     @state
+  end
+
+  def validate
+    if @state[:content][:structured][:labwares]
+      raise WrongNumberLabwares if (@state[:content][:structured][:labwares].keys.length != @manifest.labwares.count)
+    end
   end
 
   def save

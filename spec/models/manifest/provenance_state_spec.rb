@@ -19,6 +19,7 @@ RSpec.describe 'Manifest::ProvenanceState' do
     context 'when the state does not have updates' do
       before do
         allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
+        manifest.update_attributes(labwares: 1.times.map { create :labware })
         provenance_state.apply(state)
       end
 

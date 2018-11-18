@@ -33,6 +33,22 @@ RSpec.describe Transformers::ExcelToState do
           end
         end
       end
+      context 'when the manifest is declared for 2 labwares' do
+        before do
+          manifest.update_attributes(labwares: 2.times.map { create :labware })
+        end
+        context 'the schema will declare plate id as required' do
+          context 'but the number of labwares is different between state and manifest' do
+            it 'gives an error' do
+              expect(transformer.errors).to be_truthy
+            end
+            it 'fails transforming to state' do
+              expect(transformer.transform).to be_falsy
+            end
+          end
+        end
+      end
+
       context 'when the manifest is declared for 3 labwares' do
         before do
           manifest.update_attributes(labwares: 3.times.map { create :labware })

@@ -271,9 +271,11 @@ const mapDispatchToProps = (dispatch, { match, location }) => {
     },
     onMatchFields: (expected, observed) => {
       dispatch(matchSelection(expected, observed))
+      //dispatch(updateState())
     },
     onUnmatch: (expected, observed) => {
       dispatch(unmatch(expected, observed))
+      //dispatch(updateState())
     }
   }
 }

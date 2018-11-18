@@ -164,6 +164,98 @@ RSpec.describe 'Manifest::ProvenanceState::Mapping' do
       end
     end
 
+    context 'validate' do
+      let(:manifest_content) {
+        [
+          "column_to_show" => "", "column_to_hide" => ""
+        ]
+      }
+      context 'when any shown field is not mapped' do
+        let(:schema) {
+          {"properties" => {
+            "column_to_show" => { "show_on_form" => true, "field_name_regex" => "showcol"},
+            "column_to_hide" => { "show_on_form" => false, "field_name_regex" => "column_to_hide",
+              "required" => true}
+          }}
+        }
+
+        it 'does show the mapping tool (shown: true)' do
+          expect(mapping_accessor.state[:mapping]).to include(
+            shown: true,
+            expected: ["column_to_show"],
+            observed: ["column_to_show"],
+            matched: [{observed: "column_to_hide", expected: "column_to_hide"}
+            ]
+          )
+        end
+      end
+
+      context 'when all shown field are mapped' do
+        let(:schema) {
+          {"properties" => {
+            "column_to_show" => { "show_on_form" => true, "field_name_regex" => "column_to_show"},
+            "column_to_hide" => { "show_on_form" => false, "field_name_regex" => "column_to_hide",
+              "required" => true}
+          }}
+        }
+
+        it 'does not show the mapping tool (shown: false)' do
+          expect(mapping_accessor.state[:mapping]).to include(
+            shown: false,
+            expected: [],
+            observed: [],
+            matched: [{expected: 'column_to_show', observed: 'column_to_show'},
+              {expected: 'column_to_hide', observed: 'column_to_hide'}
+            ]
+          )
+        end
+      end
+
+      context 'when any required field is not mapped' do
+        let(:schema) {
+          {"properties" => {
+            "column_to_show" => { "show_on_form" => true, "field_name_regex" => "column_to_show"},
+            "hidden_required_column" => { "show_on_form" => false, "field_name_regex" => "hidden_required_column",
+              "required" => true}
+          }}
+        }
+
+        it 'does not validate the mapping' do
+          expect(mapping_accessor.state[:mapping]).to include(
+            valid: false,
+            expected: ["hidden_required_column"],
+            observed: ["column_to_hide"],
+            matched: [
+              { expected: 'column_to_show', observed: 'column_to_show' }
+            ]
+          )
+        end
+      end
+      context 'when all required fields are mapped' do
+        let(:schema) {
+          {"properties" => {
+            "column_to_show" => { "show_on_form" => true, "field_name_regex" => "column_to_show"},
+            "hidden_required_column" => { "show_on_form" => false, "field_name_regex" => "column_to_hide",
+              "required" => true}
+          }}
+        }
+
+        it 'validates the mapping' do
+          expect(mapping_accessor.state[:mapping]).to include(
+            valid: true,
+            expected: [],
+            observed: [],
+            matched: [
+
+              { expected: 'column_to_show', observed: 'column_to_show' },
+              { expected: 'hidden_required_column', observed: 'column_to_hide'}
+            ]
+          )
+
+        end
+      end
+    end
+
     context 'with the default schema data' do
       let(:manifest_content) {
         [

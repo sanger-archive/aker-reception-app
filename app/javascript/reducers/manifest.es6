@@ -19,6 +19,7 @@ const reducers = combineReducers({
 
 export default (state = {}, action) => {
   state = reducers(state, action)
+  return state
   const validMapping = isValidMapping(state)
 
   switch(action.type) {

@@ -4,8 +4,13 @@ class Manifest::ProvenanceState::Mapping < Manifest::ProvenanceState::Accessor
   def apply(state = nil)
     @state = state if state
     _build_mapping
+    validate
+  end
+
+  def validate
     unless (@state[:mapping].key?(:valid))
       @state[:mapping][:valid] = (required_unmatched_fields.length == 0)
+      @state[:mapping][:shown] = (shown_unmatched_fields.length != 0)
     end
   end
 
@@ -63,7 +68,11 @@ class Manifest::ProvenanceState::Mapping < Manifest::ProvenanceState::Accessor
   end
 
   def required_unmatched_fields
-    required_schema_fields.select{|f| matched_expected_fields.include(f)}
+    required_schema_fields.select{|f| !matched_expected_fields.include?(f)}
+  end
+
+  def shown_unmatched_fields
+    shown_schema_fields.select{|f| !matched_expected_fields.include?(f)}
   end
 
   def matched_expected_fields
@@ -71,7 +80,11 @@ class Manifest::ProvenanceState::Mapping < Manifest::ProvenanceState::Accessor
   end
 
   def required_schema_fields
-    manifest_schema['properties'].select{|prop| prop['required'] == true}
+    manifest_schema['properties'].keys.select{|key| manifest_schema['properties'][key]['required'] == true}
+  end
+
+  def shown_schema_fields
+    manifest_schema['properties'].keys.select{|key| manifest_schema['properties'][key]['show_on_form'] == true}
   end
 
 
