@@ -1,6 +1,44 @@
 require 'rails_helper'
 
 RSpec.describe 'Manifest::ProvenanceState::Content' do
+
+  let(:schema) {
+    {
+      "show_on_form"=> ["taxon_id","scientific_name","supplier_name","gender","is_tumour"],
+      "type"=>"object",
+      "properties"=>{
+        "is_tumour"=>{
+          "show_on_form"=>true,"friendly_name"=>"Tumour?","required"=>false,
+          "field_name_regex"=>"^(?:is[-_ ]+)?tumou?r\\??$","type"=>"string"
+        },
+        "scientific_name"=>{
+          "show_on_form"=>true,"friendly_name"=>"Scientific Name","required"=>false,
+          "field_name_regex"=>"^scientific(?:[-_ ]*name)?$","type"=>"string"
+        },
+        "taxon_id"=>{
+          "show_on_form"=>true,"friendly_name"=>"Taxon ID","required"=>false,
+          "field_name_regex"=>"^taxon(?:[-_ ]*id)?$","type"=>"string"
+        },
+        "supplier_name"=>{
+          "show_on_form"=>true,"friendly_name"=>"Supplier Name","required"=>true,
+          "field_name_regex"=>"^supplier[-_ ]*name$","type"=>"string"
+        },
+        "gender"=>{
+          "show_on_form"=>true,"friendly_name"=>"Gender","required"=>false,
+          "field_name_regex"=>"^(?:gender|sex)$","type"=>"string"
+        },
+        "plate_id"=>{
+          "show_on_form"=>true,"friendly_name"=>"Plate Id","required"=>false,
+          "field_name_regex"=>"^plate","type"=>"string"
+        },
+        "position"=>{
+          "show_on_form"=>true,"friendly_name"=>"Position","required"=>false,
+          "field_name_regex"=>"position","type"=>"string"
+        }
+      }
+    }
+  }
+
   let(:default_position_value) {
     Rails.configuration.manifest_schema_config['default_position_value']
   }
@@ -21,10 +59,111 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
 
 
   let(:manifest) { create :manifest }
-  before do
-    content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
+  context '#apply error checks' do
+    context 'with a manifest with a labware that contains the same position twice' do
+      let(:manifest_content) {
+        [
+            {"plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"},
+            {"plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen2"}
+        ]
+      }
+
+      let(:mapping) {
+        {
+          expected: [],
+          observed: [], matched: [
+            { expected: 'plate_id', observed: 'plate_id'},
+            { expected: 'supplier_name', observed: 'supplier_name'},
+            { expected: 'position', observed: 'position'}
+          ]
+        }
+      }
+
+      it 'raises PositionDuplicated' do
+        expect{
+          content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
+        }.to raise_error(Manifest::ProvenanceState::Content::PositionDuplicated)
+      end
+    end
+
+    context 'when the labware is not defined in some entries of the manifest' do
+      let(:manifest_content) {
+        [
+          {"plate_id" => "Labware 1", "supplier_name" => "InGen", "position" => "A:1"},
+          {"supplier_name" => "InGen2", "position" => "A:1"}
+        ]
+      }
+
+      context 'with a manifest that contains a plate_id match' do
+        let(:mapping) {
+          {
+            expected: [],
+            observed: [], matched: [
+              { expected: 'plate_id', observed: 'plate_id'},
+              { expected: 'supplier_name', observed: 'supplier_name'},
+              { expected: 'position', observed: 'position'}
+            ]
+          }
+        }
+
+        context 'when the plate_id is required' do
+
+          before do
+            allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(true)
+            allow(content_accessor).to receive(:manifest_schema_field_required?).with("plate_id").and_return(true)
+          end
+
+          it 'raises LabwareNotFound error' do
+            expect{
+              content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
+            }.to raise_error(Manifest::ProvenanceState::Content::LabwareNotFound)
+          end
+        end
+
+      end
+    end
+
+    context 'when the position is not defined in some entries of the manifest' do
+      let(:manifest_content) {
+        [
+          {"plate_id" => "Labware 1", "supplier_name" => "InGen", "position" => "A:1"},
+          {"plate_id" => "Labware 1", "supplier_name" => "InGen2"}
+        ]
+      }
+
+      context 'with a manifest that contains a position match' do
+        let(:mapping) {
+          {
+            expected: [],
+            observed: [], matched: [
+              { expected: 'plate_id', observed: 'plate_id'},
+              { expected: 'supplier_name', observed: 'supplier_name'},
+              { expected: 'position', observed: 'position'}
+            ]
+          }
+        }
+
+        context 'when the position is required' do
+
+          before do
+            allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(true)
+            allow(content_accessor).to receive(:manifest_schema_field_required?).with("plate_id").and_return(true)
+          end
+
+          it 'raises PositionNotFound error' do
+            expect{
+              content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
+            }.to raise_error(Manifest::ProvenanceState::Content::PositionNotFound)
+          end
+        end
+
+      end
+    end
   end
   context '#apply' do
+    before do
+      content_accessor.apply({schema: schema, mapping: mapping, content: {raw: manifest_content}})
+    end
     context 'with an empty manifest' do
       let(:mapping) {
         {
@@ -76,38 +215,13 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
           "plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"
         ]
       }
-
-      it 'does generate content setting position for the plate as DEFAULT_POSITION_VALUE' do
-        expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          "Labware 1" => { addresses: {
-          "#{default_position_value}"=>  { fields: {"plate_id" => {value: "Labware 1"}, "supplier_name" => {value: "InGen"}}}
-          } } } } )
-      end
-    end
-
-    context 'with a manifest with a labware that contains the same position twice' do
-      let(:mapping) {
-        {
-          expected: [],
-          observed: [], matched: [
-            { expected: 'plate_id', observed: 'plate_id'},
-            { expected: 'supplier_name', observed: 'supplier_name'},
-            { expected: 'position', observed: 'position'}
-          ]
-        }
-      }
-      let(:manifest_content) { [] }
-
-      it 'raises PositionError' do
-        content =
-          [
-            {"plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"},
-            {"plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen2"}
-          ]
-
-        expect{
-          content_accessor.apply({mapping: mapping, content: {raw: content}})
-        }.to raise_error(Manifest::ProvenanceState::Content::PositionError)
+      context 'when the position is not required' do
+        it 'does generate content setting position for the plate as DEFAULT_POSITION_VALUE' do
+          expect(content_accessor.state[:content]).to include(structured: { labwares: {
+            "Labware 1" => { addresses: {
+            "#{default_position_value}"=>  { fields: {"plate_id" => {value: "Labware 1"}, "supplier_name" => {value: "InGen"}}}
+            } } } } )
+        end
       end
     end
 
