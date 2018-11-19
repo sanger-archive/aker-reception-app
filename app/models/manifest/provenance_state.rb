@@ -3,6 +3,7 @@ class Manifest::ProvenanceState
   attr_reader :schema, :mapping, :content
 
   delegate :manifest_schema_field, to: :schema
+  delegate :manifest_schema_field_required?, to: :schema
   delegate :manifest_schema, to: :schema
   delegate :labwares, to: :manifest
 

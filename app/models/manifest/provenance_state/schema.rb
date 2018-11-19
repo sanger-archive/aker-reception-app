@@ -14,7 +14,7 @@ class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
   end
 
   def valid?
-    @state.key?(:schema)
+    @state && @state.key?(:schema)
   end
 
   def material_schema
@@ -28,7 +28,12 @@ class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
     sym
   end
 
+  def manifest_schema_field_required?(sym)
+    manifest_schema["properties"][sym]["required"]
+  end
+
   def manifest_schema
+    return @state[:schema] if valid?
     config = Rails.application.config.manifest_schema_config
     @manifest_schema = material_schema.dup.tap do |schema|
 

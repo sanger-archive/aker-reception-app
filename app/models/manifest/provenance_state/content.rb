@@ -2,6 +2,7 @@ require 'active_support/core_ext/module/delegation'
 
 class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
   delegate :manifest_schema_field, to: :provenance_state
+  delegate :manifest_schema_field_required?, to: :provenance_state
 
   def apply(state = nil)
     @state = state if state
@@ -12,7 +13,9 @@ class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
     @state.key?(:content) && @state[:content].key?(:structured)
   end
 
-  class PositionError < StandardError ; end
+  class PositionNotFound < StandardError ; end
+  class LabwareNotFound < StandardError ; end
+  class PositionDuplicated < StandardError ; end
 
   private
 
@@ -49,24 +52,45 @@ class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
     end
   end
 
+
+  def validate_labware_existence(mapped, idx)
+    if (manifest_schema_field_required?(manifest_schema_field(:labware_id)) && !mapped[manifest_schema_field(:labware_id)])
+      raise LabwareNotFound.new("This manifest does not have a valid labware id field for the labware at row: #{idx}")
+    end
+  end
+
+  def validate_position_existence(mapped, idx)
+    if (manifest_schema_field_required?(manifest_schema_field(:position)) && !mapped[manifest_schema_field(:position)])
+      raise PositionNotFound.new("This manifest does not have a valid position field for the wells of row: #{idx}")
+    end
+  end
+
   def _content_from_raw
+    idx = 0
     @state[:content][:raw].reduce({}) do |memo, row|
       mapped = mapped_row(row)
+
+      validate_labware_existence(mapped, idx)
+
       labware_id = labware_id(mapped)
+
+      validate_position_existence(mapped, idx)
+
       position = position(mapped)
       build_keys(memo, [:labwares, labware_id, :addresses])
 
-      validate_position(memo, labware_id, position)
+      validate_position_duplication(memo, labware_id, position)
 
       build_keys(memo, [:labwares, labware_id, :addresses, position, :fields])
       memo[:labwares][labware_id][:addresses][position] = { fields:  mapped }
+      idx = idx + 1
       memo
     end
   end
 
-  def validate_position(obj, labware_id, position)
+  def validate_position_duplication(obj, labware_id, position)
     if obj[:labwares][labware_id][:addresses].key?(position)
-      raise PositionError.new("Duplicate entry found for #{labware_id}: Position #{position}")
+      raise PositionDuplicated.new("Duplicate entry found for #{labware_id}: Position #{position}")
     end
   end
 
