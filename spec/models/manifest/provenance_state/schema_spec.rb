@@ -15,9 +15,13 @@ RSpec.describe 'Manifest::ProvenanceState::Schema' do
   let(:user) { create :user }
   let(:provenance_state) { Manifest::ProvenanceState.new(manifest, user) }
   let(:schema_accessor) { provenance_state.schema }
+
+  let(:state) {
+    {}
+  }
   before do
     allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
-    schema_accessor.apply({})
+    schema_accessor.apply(state)
   end
   context '#material_schema' do
     it 'returns the material schema object' do
@@ -56,10 +60,9 @@ RSpec.describe 'Manifest::ProvenanceState::Schema' do
 
     context 'when completing the generation of the manifest schema' do
       context 'taking decisions about the contents of the manifest' do
-        context 'when the manifest model refers to several labware' do
+        context 'when the manifest refers to several labware' do
           before do
-            manifest.update_attributes(labwares: 2.times.map { create :labware })
-            schema_accessor.apply({})
+            schema_accessor.apply({manifest: {labwares: [{}, {}]}})
           end
           it 'sets the labware name as required' do
             expect(schema_accessor.state[:schema]["properties"][labware_name]["required"]).to be_truthy
@@ -67,32 +70,23 @@ RSpec.describe 'Manifest::ProvenanceState::Schema' do
         end
         context 'when the manifest model refers to just one labware' do
           before do
-            manifest.update_attributes(labwares: 1.times.map { create :labware })
-            schema_accessor.apply({})
+            schema_accessor.apply({manifest: {labwares: [{}]}})
           end
           it 'sets the labware name as not required' do
             expect(schema_accessor.state[:schema]["properties"][labware_name]["required"]).to be_falsy
           end
         end
         context 'when the manifest model refers has several positions' do
-          let(:manifest) { create :manifest, labware_type: lt }
-          let(:lt) { create :plate_labware_type }
-          let(:labwares) { 2.times.map { create :labware } }
           before do
-            manifest.update_attributes(labwares: labwares)
-            schema_accessor.apply({})
+            schema_accessor.apply({manifest: {labwares: [{positions: ["1", "2"]}, {positions: ["1", "2"]}]}})
           end
           it 'sets the position as required' do
             expect(schema_accessor.state[:schema]["properties"][position]["required"]).to be_truthy
           end
         end
         context 'when the manifest model refers has just one position' do
-          let(:manifest) { create :manifest, labware_type: lt }
-          let(:lt) { create :tube_labware_type }
-          let(:labwares) { 2.times.map { create :labware } }
           before do
-            manifest.update_attributes(labwares: labwares)
-            schema_accessor.apply({})
+            schema_accessor.apply({manifest: {labwares: [{positions: ["1"]}, {positions: ["1"]}]}})
           end
           it 'sets the position as not required' do
             expect(schema_accessor.state[:schema]["properties"][position]["required"]).to be_falsy

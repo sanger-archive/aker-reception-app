@@ -1,6 +1,5 @@
 class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
 
-  delegate :labwares, to: :provenance_state
 
   def apply(state = nil)
     @state = state if state
@@ -32,6 +31,11 @@ class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
     manifest_schema["properties"][sym]["required"]
   end
 
+  def labwares
+    return [] unless @state[:manifest] && @state[:manifest][:labwares]
+    @state[:manifest][:labwares]
+  end
+
   def manifest_schema
     return @state[:schema] if valid?
     config = Rails.application.config.manifest_schema_config
@@ -48,11 +52,17 @@ class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
 
       # Here we will modify the manifest schema about decisions taken because of the manifest contents:
       # 'labware_name' is only required when there are several plates in the same manifest to be able to identify it
-      schema["properties"][manifest_schema_field(:labware_id)]["required"] = (labwares.count > 1)
-      schema["properties"][manifest_schema_field(:labware_id)]["show_on_form"] = (labwares.count > 1)
+      schema["properties"][manifest_schema_field(:labware_id)]["required"] = (labwares.length > 1)
+      schema["properties"][manifest_schema_field(:labware_id)]["show_on_form"] = (labwares.length > 1)
       # 'position' is required when there are several positions to choose inside the same labware to put the sample in
-      schema["properties"][manifest_schema_field(:position)]["required"] = ((labwares.count > 0) && (labwares.first.positions.count > 1))
-      schema["properties"][manifest_schema_field(:position)]["show_on_form"] = ((labwares.count > 0) && (labwares.first.positions.count > 1))
+      schema["properties"][manifest_schema_field(:position)]["required"] = false
+      schema["properties"][manifest_schema_field(:position)]["show_on_form"] = false
+      if (labwares.length > 0)
+        if labwares[0][:positions]
+          schema["properties"][manifest_schema_field(:position)]["required"] = (labwares[0][:positions].length > 1)
+          schema["properties"][manifest_schema_field(:position)]["show_on_form"] = (labwares[0][:positions].length > 1)
+        end
+      end
     end
     @manifest_schema
   end

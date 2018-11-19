@@ -44,9 +44,15 @@ class ManifestEditorComponent extends React.Component {
 
 
 const mapStateToProps = (state) => {
-  return {
+  return state
+  /*return {
+    schema,
+    manifest,
+    mapping,
+    content
+    schema: state ? state.schema : null,
     schema: state ? state.schema : null
-  }
+  }*/
 }
 
 const mapDispatchToProps = (dispatch, { match, location }) => {
@@ -56,7 +62,10 @@ const mapDispatchToProps = (dispatch, { match, location }) => {
 
 let ManifestEditorConnected = connect(mapStateToProps, mapDispatchToProps)(ManifestEditorComponent)
 
-const ManifestEditor = () => {
+const ManifestEditor = (props) => {
+  if (props) {
+    store.dispatch(loadManifest(props))
+  }
   $(document.body).on('uploadedmanifest', $.proxy(function(event, response) {
     const manifest = response.contents
 
@@ -75,7 +84,7 @@ const ManifestEditor = () => {
 
   return(
     <Provider store={store}>
-      <ManifestEditorConnected />
+      <ManifestEditorConnected {...props} />
     </Provider>
   )
 }

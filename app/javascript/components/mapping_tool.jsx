@@ -215,7 +215,7 @@ class MappingToolComponent extends React.Component {
   componentDidUpdate(){
     if (this.props && this.props.valid) {
       if (this.props.content &&  this.props.schema && this.props.schema.properties) {
-        CSVFieldChecker.fillInTableFromFile(buildContentFromStructured(this.props.content.structured), buildMatchedFields(this.props.matched), $(DATA_TABLES), this.props.schema.properties)
+        //CSVFieldChecker.fillInTableFromFile(buildContentFromStructured(this.props.content.structured), buildMatchedFields(this.props.matched), $(DATA_TABLES), this.props.schema.properties)
       }
     }
 
@@ -243,9 +243,9 @@ const mapStateToProps = (state) => {
     selectedObserved: state && state.mapping ? state.mapping.selectedObserved : null,
     selectedExpected: state && state.mapping ? state.mapping.selectedExpected : null,
     content: state && state.content ? state.content : {},
-    expected: state && state.mapping ? state.mapping.expected : [],
-    observed: state && state.mapping ? state.mapping.observed : [],
-    matched: state && state.mapping ? state.mapping.matched : [],
+    expected: state && state.mapping && state.mapping.expected ? state.mapping.expected : [],
+    observed: state && state.mapping && state.mapping.observed ? state.mapping.observed : [],
+    matched: state && state.mapping && state.mapping.matched ? state.mapping.matched : [],
     shown: state && state.mapping.shown ? state.mapping.shown : false,
     valid: state && state.mapping.valid ? state.mapping.valid : false,
     schema: state ? state.schema : null

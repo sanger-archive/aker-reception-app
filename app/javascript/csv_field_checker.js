@@ -405,17 +405,19 @@ function fillInTableFromFile(manifest, matchedFields, dataTables, schema) {
     return false;
   }*/
 
-  if (!validateNumberOfContainers(manifest, matchedFields.plate_id, numberOfContainers())) {
+  // Not needed anymore as this validation is done in the server
+  /*if (!validateNumberOfContainers(manifest, matchedFields.plate_id, numberOfContainers())) {
     return false;
-  }
+  }*/
 
-  let groupedByPlate = manifest.reduce(function(memo, row) {
+  /*let groupedByPlate = manifest.reduce(function(memo, row) {
     if (!memo[row[matchedFields.plate_id]]) {
       memo[row[matchedFields.plate_id]] = [];
     }
     memo[row[matchedFields.plate_id]].push(row);
     return memo;
-  }, {});
+  }, {});*/
+  let groupedByPlate = manifest
 
   let result = Object.keys(groupedByPlate).every(function(plate_id, index) {
     return onCompleteFillInTable(groupedByPlate[plate_id], $(dataTables[index]), matchedFields, schema)

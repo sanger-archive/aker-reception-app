@@ -52,11 +52,16 @@ module ManifestHelper
     return manifest.labware_type.name
   end
 
-  def state_for_manifest(manifest)
-    {
-      content: content_for_manifest(manifest),
-      schema: manifest.schema
-    }
+  def state_for_manifest(manifest, user)
+    Manifest::ProvenanceState.new(manifest, user).apply({})
+    # {
+    #   manifest: {
+    #     manifest_id: manifest.id,
+    #     labwares: labwares.map{|l| }
+    #   },
+    #   content: content_for_manifest(manifest),
+    #   schema: manifest.schema
+    # }
   end
 
   def content_for_manifest(manifest)

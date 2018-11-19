@@ -1,6 +1,6 @@
 class Manifest::ProvenanceState
   attr_reader :state, :manifest, :user
-  attr_reader :schema, :mapping, :content
+  attr_reader :schema, :mapping, :content, :manifest_model
 
   delegate :manifest_schema_field, to: :schema
   delegate :manifest_schema_field_required?, to: :schema
@@ -10,9 +10,11 @@ class Manifest::ProvenanceState
   class WrongNumberLabwares < StandardError ; end
 
   def initialize(manifest, user)
-    @manifest = manifest
+    @state = {}
     @user = user
+    @manifest_model = manifest
 
+    @manifest = ManifestAccessor.new(self)
     @schema = Schema.new(self)
     @mapping = Mapping.new(self)
     @content = Content.new(self)
@@ -21,6 +23,7 @@ class Manifest::ProvenanceState
   def apply(state)
     @state = (state.dup || _build_state)
 
+    @manifest.apply(@state)
     @schema.apply(@state)
     @mapping.apply(@state)
     @content.apply(@state) if @mapping.valid?
@@ -70,12 +73,10 @@ class Manifest::ProvenanceState
 
   def _build_state
     {
-      manifest: {
-        id: @manifest.id,
-        schema: nil,
-        content: nil,
-        mapping: nil
-      }
+      id: @manifest.id,
+      schema: nil,
+      content: nil,
+      mapping: nil
     }
   end
 

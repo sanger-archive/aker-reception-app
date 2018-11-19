@@ -1,6 +1,6 @@
 <%= render partial: 'submission_header' %>
 
-<%= react_component("ManifestEditor") %>
+
 
 <div data-psd-component-class="SingleTableManager"
      data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
@@ -44,6 +44,9 @@
         </div>
       </div>
     </div>
+
+
+    <%= react_component("ManifestEditor", state_for_manifest(manifest, current_user)) %>
 
     <ul data-labware-count="<%= labwares.size %>" class="nav nav-tabs" role="tablist">
 

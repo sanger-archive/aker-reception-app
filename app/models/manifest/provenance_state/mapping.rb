@@ -22,10 +22,11 @@ class Manifest::ProvenanceState::Mapping < Manifest::ProvenanceState::Accessor
 
   def _build_mapping
     unless @state[:mapping]
-      if @state[:content][:raw]
-        @state[:mapping] = _mapping_from_raw
-      else
-        @state[:mapping] = {valid: false}
+      @state[:mapping] = {valid: false}
+      if @state[:content]
+        if @state[:content][:raw]
+          @state[:mapping] = _mapping_from_raw
+        end
       end
     end
   end
@@ -76,6 +77,7 @@ class Manifest::ProvenanceState::Mapping < Manifest::ProvenanceState::Accessor
   end
 
   def matched_expected_fields
+    return [] unless @state && @state[:mapping] && @state[:mapping][:matched]
     @state[:mapping][:matched].map{|m| m[:expected]}
   end
 
