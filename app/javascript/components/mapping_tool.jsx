@@ -215,15 +215,13 @@ class MappingToolComponent extends React.Component {
   componentDidUpdate(){
     if (this.props && this.props.valid) {
       if (this.props.content &&  this.props.schema && this.props.schema.properties) {
-        CSVFieldChecker.fillInTableFromFile(this.props.content, buildMatchedFields(this.props.matched), $(DATA_TABLES), this.props.schema.properties)
+        CSVFieldChecker.fillInTableFromFile(buildContentFromStructured(this.props.content.structured), buildMatchedFields(this.props.matched), $(DATA_TABLES), this.props.schema.properties)
       }
     }
 
     //$(this.modal).on('hidden.bs.modal', this.props.handleHideModal);
   }
-  allRequiredFieldsMatched() {
 
-  }
   render (props) {
 
     return(
@@ -260,6 +258,24 @@ const buildMatchedFields = (matched) => {
     return memo
   }, {})
 }
+
+const reduceAndProcess = (obj, process) => {
+  return Object.keys(obj).reduce((memo, key) => {
+    memo[key] = process(obj, key)
+    return memo
+  }, {})
+}
+
+const buildContentFromStructured = (structured) => {
+  return reduceAndProcess(structured.labwares, (memo, labId) => {
+    return reduceAndProcess(structured.labwares[labId].addresses, (memo, address) => {
+      return reduceAndProcess(structured.labwares[labId].addresses[address].fields, (memo, field) => {
+        return structured.labwares[labId].addresses[address].fields[field].value
+      })
+    })
+  })
+}
+
 
 const mapDispatchToProps = (dispatch, { match, location }) => {
   return {

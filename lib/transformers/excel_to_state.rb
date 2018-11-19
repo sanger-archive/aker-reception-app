@@ -8,10 +8,8 @@ module Transformers
     def transform
       begin
         return !!(super && @provenance_state.apply(build_state(@contents)))
-      rescue Manifest::ProvenanceState::Content::PositionError
-        errors.add(:base, 'Manifest is defining more than 1 sample for the same labware position')
-      rescue Manifest::ProvenanceState::WrongNumberLabwares
-        errors.add(:base, 'Manifest is defining different number of labwares than the manifest provided')
+      rescue StandardError => e
+        errors.add(:base, e)
       end
 
       return false

@@ -55,12 +55,22 @@ class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
       labware_id = labware_id(mapped)
       position = position(mapped)
       build_keys(memo, [:labwares, labware_id, :addresses])
-      raise PositionError if memo[:labwares][labware_id][:addresses].key?(position)
+
+      validate_position(memo, labware_id, position)
+
       build_keys(memo, [:labwares, labware_id, :addresses, position, :fields])
       memo[:labwares][labware_id][:addresses][position] = { fields:  mapped }
       memo
     end
   end
+
+  def validate_position(obj, labware_id, position)
+    if obj[:labwares][labware_id][:addresses].key?(position)
+      raise PositionError.new("Duplicate entry found for #{labware_id}: Position #{position}")
+    end
+  end
+
+
 
   def mapped_row(row)
     row.keys.reduce({}) do |memo, key|

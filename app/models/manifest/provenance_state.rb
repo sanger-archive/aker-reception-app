@@ -31,7 +31,13 @@ class Manifest::ProvenanceState
 
   def validate
     if @state[:content][:structured][:labwares]
-      raise WrongNumberLabwares if (@state[:content][:structured][:labwares].keys.length != @manifest.labwares.count)
+      num_labwares_file = @state[:content][:structured][:labwares].keys.length
+      num_labwares_manifest = @manifest.labwares.count
+      if (num_labwares_file > num_labwares_manifest)
+        raise WrongNumberLabwares.new("Expected #{num_labwares_manifest} labwares in Manifest but found #{num_labwares_file}.")
+      elsif (num_labwares_file < num_labwares_manifest)
+        raise WrongNumberLabwares.new("Expected #{num_labwares_manifest} labwares in Manifest but could only find #{num_labwares_file}.")
+      end
     end
   end
 

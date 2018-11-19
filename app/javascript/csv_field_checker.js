@@ -400,9 +400,10 @@ function onCompleteFillInTable(results, dataTable, matchedFields, schema) {
 // Complete the data table using the mapped fields and CSV
 function fillInTableFromFile(manifest, matchedFields, dataTables, schema) {
 
-  if (!validateCorrectPositions(manifest, matchedFields.plate_id, matchedFields.position)) {
+  // Not needed anymore as this validation is done in the server
+  /*if (!validateCorrectPositions(manifest, matchedFields.plate_id, matchedFields.position)) {
     return false;
-  }
+  }*/
 
   if (!validateNumberOfContainers(manifest, matchedFields.plate_id, numberOfContainers())) {
     return false;

@@ -35,7 +35,7 @@ property_updates:
     show_on_form: true
     field_name_regex: ^hmdmc(?:[-_ ]+no\.?)?$
   plate_id:
-    field_name_regex: ^bubidu
+    field_name_regex: ^plate
     friendly_name: "Plate ID"
     show_on_form: true
   position:
