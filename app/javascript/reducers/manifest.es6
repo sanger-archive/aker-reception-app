@@ -19,24 +19,11 @@ const reducers = combineReducers({
 
 export default (state = {}, action) => {
   state = reducers(state, action)
-  return state
-  const validMapping = isValidMapping(state)
+  //const validMapping = isValidMapping(state)
 
   switch(action.type) {
-    case C.MATCH_SELECTION:
-    case C.UNMATCH:
-      return Object.assign({}, state, {
-        mapping: Object.assign({}, state.mapping, {
-          valid: validMapping
-        })
-      })
-    case C.LOAD_MANIFEST_MAPPING:
-      return Object.assign({}, state, {
-        mapping: Object.assign({}, state.mapping, {
-          valid: validMapping,
-          shown: !validMapping
-        })
-      })
+    case C.LOAD_MANIFEST:
+      return Object.assign({}, state, action.manifest)
     case C.LOAD_MANIFEST_CONTENT:
       return Object.assign({}, state, {
         content: action.content

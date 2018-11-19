@@ -15,6 +15,12 @@ export const unmatch = (expected, observed) =>  {
   }
 }
 
+export const loadManifest = (manifest) => {
+  return {
+    type: C.LOAD_MANIFEST, manifest
+  }
+}
+
 export const loadManifestMapping = (mapping) => {
   return {
     type: C.LOAD_MANIFEST_MAPPING, mapping

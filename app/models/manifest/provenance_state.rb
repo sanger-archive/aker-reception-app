@@ -22,9 +22,9 @@ class Manifest::ProvenanceState
 
     @schema.apply(@state)
     @mapping.apply(@state)
-    @content.apply(@state)
+    @content.apply(@state) if @mapping.valid?
 
-    validate
+    validate if @mapping.valid?
     save
     @state
   end
@@ -53,7 +53,7 @@ class Manifest::ProvenanceState
   end
 
   def valid?
-    @content.valid?
+    @mapping.valid? && @content.valid?
   end
 
 
