@@ -20,8 +20,8 @@ describe('<ManifestContainers />', () => {
     },
     "manifest": {
       "labwares": [
-        {"labware_id": "Labware 1","positions": ["A:1","B:1"]},
-        {"labware_id": "Labware 2","positions": ["1"]}
+        {"supplier_plate_name": "Labware 1","positions": ["A:1","B:1"]},
+        {"supplier_plate_name": "Labware 2","positions": ["1"]}
       ]
     },
 

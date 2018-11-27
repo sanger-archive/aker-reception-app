@@ -1,8 +1,8 @@
 export const StateAccessors = (state) => {
   const ACCESSORS =  {
     manifest: {
-      positionsForLabware: (labware) => {
-        return labware.positions || []
+      labwareAtIndex: (labwareIndex) => {
+        return state.manifest.labwares[labwareIndex]
       },
       labwaresForManifest: () => {
         return state.manifest.labwares || []
