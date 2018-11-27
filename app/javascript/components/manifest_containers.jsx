@@ -79,6 +79,7 @@ class LabwareContentTextComponent extends React.Component {
   }
 
   render() {
+    console.log('rerendering')
     const {fieldName,supplierPlateName,address,selectedValue,title,name,id} = this.props
     return(
       <input onChange={this.buildOnChangeManifestInput(supplierPlateName, address, fieldName)}
@@ -103,9 +104,23 @@ const LabwareContentText = connect((state)=> { return {} }, (dispatch, { match, 
 
 const LabwareContentInputComponent = (props) => {
   if (props.isSelect) {
-    return <LabwareContentSelect {...props} />
+    return <LabwareContentSelect
+          supplierPlateName={props.supplierPlateName}
+          address={props.address}
+          fieldName={props.fieldName}
+          selectedValue={props.selectedValue}
+          title={props.title}
+          name={props.name}
+          id={props.id} />
   } else {
-    return <LabwareContentText {... props} />
+    return <LabwareContentText
+          supplierPlateName={props.supplierPlateName}
+          address={props.address}
+          fieldName={props.fieldName}
+          selectedValue={props.selectedValue}
+          title={props.title}
+          name={props.name}
+          id={props.id} />
   }
 }
 
@@ -118,9 +133,13 @@ const LabwareContentCellComponent = (props) => {
     <td data-psd-schema-validation-name={props.fieldName}>
       <div className="form-group" style={{position: "relative"}}>
         <LabwareContentInput
-          supplierPlateName={props.supplierPlateName} address={props.address} fieldName={props.fieldName}
+          supplierPlateName={props.supplierPlateName}
+          address={props.address}
+          fieldName={props.fieldName}
           selectedValue={props.selectedValue}
-          title={props.title} name={props.name} id={props.cellId} />
+          title={props.title}
+          name={props.name}
+          id={props.cellId} />
       </div>
     </td>
   )
@@ -144,12 +163,12 @@ const LabwareContentAddressComponent = (props) => {
     <tr
       data-psd-component-class='TaxonomyIdControl'
       data-psd-component-parameters={
-        {
+        JSON.stringify({
           taxonomyServiceUrl: props.taxonomyServiceUrl,
           relativeCssSelectorSciName: 'td[data-psd-schema-validation-name=scientific_name] input',
           relativeCssSelectorTaxId: 'td[data-psd-schema-validation-name=taxon_id] input',
           cachedTaxonomies: {}
-        }
+        })
       }
       data-labware-index={ props.labwareIndex } data-address={ props.address }>
       <td>{ props.address }</td>
@@ -183,12 +202,12 @@ const LabwareContentComponent = (props) => {
 
       <table className="table table-condensed table-striped"
              data-psd-component-class={JSON.stringify(["LoadTable", "DataTableSchemaValidation"])}
-             data-psd-component-parameters={[{
+             data-psd-component-parameters={JSON.stringify([{
               manifest_id: props.manifestId
               }, {
                 material_schema_url: props.materialSchemaUrl
               }
-              ]}>
+              ])}>
         <thead>
           <tr>
             <th></th>
