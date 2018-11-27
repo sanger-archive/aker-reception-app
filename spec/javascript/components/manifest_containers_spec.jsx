@@ -5,7 +5,7 @@ import { expect } from 'chai'
 import { shallow, mount } from 'enzyme';
 import { createMockStore } from 'redux-test-utils';
 
-import ManifestContainers from "../../../app/javascript/components/manifest_containers.jsx"
+import ManifestContainersConnected from "../../../app/javascript/components/manifest_containers.jsx"
 
 const getContext = (status) => {
   let context = { store: createMockStore(status) };
@@ -15,7 +15,17 @@ const getContext = (status) => {
 describe('<ManifestContainers />', () => {
 
   let status = {
-    "contents": {
+    "services": {
+      "material_schema_url": ""
+    },
+    "manifest": {
+      "labwares": [
+        {"labware_id": "Labware 1","positions": ["A:1","B:1"]},
+        {"labware_id": "Labware 2","positions": ["1"]}
+      ]
+    },
+
+    "content": {
       "structured": {
         "messages": [{
           "type": "warning",
@@ -23,6 +33,13 @@ describe('<ManifestContainers />', () => {
           "text": "There is an error in taxon id 1234"
         }],
         "labwares": {
+          "Labware 2": {
+            "addresses": {
+              "1": {
+                "fields": {}
+              }
+            }
+          },
           "Labware 1": {
             "messages": [{
               "type": "warning",
@@ -44,6 +61,18 @@ describe('<ManifestContainers />', () => {
                     "messages": [{"type": "warning", "display": "tooltip", "text": "taxon id is wrong"}]
                   }
                 }
+              },
+              "B:1": {
+                "row": 0,
+                "changed": true,
+                "invalid": false,
+                "fields": {
+                  "taxId": {
+                    "changed": true,
+                    "invalid": true,
+                    "value": "4567",
+                  }
+                }
               }
             }
           }
@@ -56,34 +85,95 @@ describe('<ManifestContainers />', () => {
       ]
     },
     schema: {
+      show_on_form: ['taxId', 'sampleName', 'tissue', 'groupId'],
       properties: {
         taxId: { friendly_name: "Taxon id", required: true},
         sampleName: { friendly_name: "Sample Name", required: true},
         tissue: { friendly_name: "Tissue", required: false},
-        phenotype: { friendly_name: "Phenotype", required: false},
+        groupId: {friendly_name: "GroupId", required: false, allowed: ["C1", "C2"]}
       }
     }
   }
 
   context('when rendering it', () => {
-    let wrapper = mount(<ManifestContainers />, getContext(status))
-    it('renders the MappingInterface element', () => {
-      expect(wrapper.find('MappingInterface')).to.have.length(1)
+    let wrapper = mount(<ManifestContainersConnected />, getContext(status))
+
+    it('renders the ManifestContainersComponent element', () => {
+      expect(wrapper.find('ManifestContainersComponent')).to.have.length(1)
     })
-    it('renders the MappedFieldsList element', () => {
-      expect(wrapper.find('MappedFieldsList')).to.have.length(1)
+
+    context('<LabwareTab>', () => {
+      it('displays a tab for each labware', () => {
+        expect(wrapper.find('LabwareTab')).to.have.length(2)
+      })
+
     })
-    it('renders the list of fields mapped from the status', () => {
-      expect(wrapper.find('MappedFieldsList').find('MappedPairs').find('tr')).to.have.length(2)
+
+    context('<LabwareContent>', () => {
+      it('displays the 2 labwares', () => {
+        expect(wrapper.find('LabwareContent')).to.have.length(2)
+      })
     })
-    it('renders the MappingInterface element', () => {
-      expect(wrapper.find('MappingInterface')).to.have.length(1)
+
+    context('<LabwareContentAddress>', () => {
+      it('displays 2 positions for the first labware', () => {
+        expect(wrapper.find('LabwareContent').first().find('LabwareContentAddress')).to.have.length(2)
+      })
+      it('displays 1 positions for the last labware', () => {
+        expect(wrapper.find('LabwareContent').last().find('LabwareContentAddress')).to.have.length(1)
+      })
+
+      it('displays all the addresses of the status', ()=> {
+        ["A:1","B:1","1"].forEach((val) => {
+          expect(wrapper.find('LabwareContentAddress').filterWhere((n) => n.prop('address')==val)).to.have.length(1)
+        })
+      })
     })
-    it('renders the list of observed fields', () => {
-      expect(wrapper.find('MappingInterface').find('ExpectedMappingOptions').find('option')).to.have.length(2)
+
+    context('<LabwareContentCell>', ()=>{
+      it('displays 4 inputs for each address of the first labware', () => {
+        const cells = wrapper.find('LabwareContent').first().find('LabwareContentAddress').first().find('LabwareContentCell')
+        expect(cells).to.have.length(4)
+      })
+
+      it('displays a value in a cell that should contain a value', () => {
+        expect(wrapper.find('LabwareContent').filterWhere((item) => {
+          return (item.prop('labware').labware_id == "Labware 1")
+        }).find('LabwareContentInput').filterWhere((item) => {
+          return ((item.prop('title') == "Taxon id") && (item.prop('selectedValue') == "1234"))
+        })).to.have.length(1)
+      })
     })
-    it('renders the list of expected fields', () => {
-      expect(wrapper.find('MappingInterface').find('ObservedMappingOptions').find('option')).to.have.length(3)
+
+    context('<LabwareContentInput>', ()=>{
+      let contextedWrapperFunction = (address, fieldName) => {
+        return wrapper.find('LabwareContentAddress').filterWhere((n) => {
+          return n.prop('address')==address
+        }).find('LabwareContentInput').filterWhere((item) => {
+          return (item.prop('title') == fieldName)
+        })
+      }
+      context('when the field does not have a list of allowed values', ()=> {
+        let contextedWrapper = contextedWrapperFunction("A:1", "Taxon id")
+
+        it('shows an input', () => {
+          expect(contextedWrapper.find('input')).to.have.length(1)
+        })
+        it('does not show a select', ()=>{
+          expect(contextedWrapper.find('select')).to.have.length(0)
+        })
+      })
+      context('when the field does have a list of allowed values', ()=> {
+        let contextedWrapper = contextedWrapperFunction("A:1", "GroupId")
+
+        it('shows a select', () => {
+          expect(contextedWrapper.find('select')).to.have.length(1)
+        })
+        it('does not show an input', ()=>{
+          expect(contextedWrapper.find('input')).to.have.length(0)
+        })
+      })
     })
+
   })
 })

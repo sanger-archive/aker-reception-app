@@ -36,6 +36,15 @@ class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
     @state[:manifest][:labwares]
   end
 
+  def _build_show_on_form(schema)
+    unless schema["show_on_form"]
+      schema["show_on_form"] = schema["properties"].keys.reduce([]) do |m,k|
+        m.push(k) if schema["properties"][k]["show_on_form"]
+        m
+      end
+    end
+  end
+
   def manifest_schema
     return @state[:schema] if valid?
     config = Rails.application.config.manifest_schema_config
@@ -49,6 +58,8 @@ class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
         memo[key] = (schema["properties"][key] || {}).merge(config["property_updates"][key])
         memo
       end
+
+      _build_show_on_form(schema)
 
       # Here we will modify the manifest schema about decisions taken because of the manifest contents:
       # 'labware_name' is only required when there are several plates in the same manifest to be able to identify it

@@ -15,6 +15,7 @@ class Manifest::ProvenanceState
     @manifest_model = manifest
 
     @manifest = ManifestAccessor.new(self)
+    @services = Manifest::ProvenanceState::Services.new(self)
     @schema = Schema.new(self)
     @mapping = Mapping.new(self)
     @content = Content.new(self)
@@ -23,6 +24,7 @@ class Manifest::ProvenanceState
   def apply(state)
     @state = (state.dup || _build_state)
 
+    @services.apply(@state)
     @manifest.apply(@state)
     @schema.apply(@state)
     @mapping.apply(@state)

@@ -3,12 +3,11 @@
     "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/materials_table/stores spec/javascript/**/*_spec.js spec/javascript/*_spec.es6 spec/javascript/**/*_spec.es6 spec/javascript/**/*_spec.jsx"
   },
   "dependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-transform-react-jsx": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
     "@rails/webpacker": "3.5",
-    "babel": "^6.23.0",
-    "babel-core": "^6.26.3",
-    "babel-loader": "7",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
+    "babel-loader": "^8.0.0",
     "bootstrap": "^3.0",
     "datatables.net": "^1.10.18",
     "datatables.net-bs": "^1.10.19",
@@ -28,6 +27,10 @@
     "webpacker-react": "^0.3.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/preset-env": "^7.1.0",
     "chai": "^4.1.2",
     "enzyme": "^3.7.0",

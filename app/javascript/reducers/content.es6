@@ -1,29 +1,23 @@
 import C from '../constants'
-
-import tab from './tab'
-
-// Plate ID field
-const PLATE_ID_FIELD = {
-  required: true,
-  field_name_regex: "^plate",
-  friendly_name: "Plate ID",
-  show_on_form: true
-};
-
-// Position field that needs to be added to the schema which comes from the material service
-const POSITION_FIELD = {
-  required: true,
-  field_name_regex: "^(well(\\s*|_*|-*))?position$",
-  friendly_name: "Position",
-  show_on_form: true
-}
-
+import { StateAccessors } from '../lib/state_accessors'
 
 export default (state = {}, action) => {
-
+  let newState
   switch(action.type) {
-    case C.SET_VALUE_TO_FIELD:
-      return tab(state.contents[action.labwareId], action)
+    case C.SET_MANIFEST_VALUE:
+      newState = Object.assign({}, state)
+      let obj = ['structured', 'labwares',
+        action.labwareId, 'addresses',
+        action.address, 'fields',
+        action.fieldName
+      ].reduce((memo, key) => {
+        if (!memo[key]) {
+          memo[key] = {}
+        }
+        return memo[key]
+      }, newState)
+      obj.value = action.value
+      return newState
     default:
       return state
   }

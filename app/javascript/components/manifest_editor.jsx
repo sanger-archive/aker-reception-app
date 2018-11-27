@@ -5,6 +5,7 @@ import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
 import { loadManifest, selectExpectedOption, selectObservedOption} from '../actions'
+import {StateAccessors} from '../lib/state_accessors'
 
 const ErrorsDisplay = () => {
   return (
@@ -43,16 +44,10 @@ class ManifestEditorComponent extends React.Component {
 }
 
 
+
 const mapStateToProps = (state) => {
+
   return state
-  /*return {
-    schema,
-    manifest,
-    mapping,
-    content
-    schema: state ? state.schema : null,
-    schema: state ? state.schema : null
-  }*/
 }
 
 const mapDispatchToProps = (dispatch, { match, location }) => {

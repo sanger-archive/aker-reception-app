@@ -1,5 +1,5 @@
 import { createStore } from 'redux'
-import manifest from 'reducers/manifest'
+import reducers from 'reducers/index'
 
 const initialState = {
   "content": {
@@ -14,6 +14,6 @@ const initialState = {
 }
 
 
-const store = createStore(manifest, initialState)
+const store = createStore(reducers, initialState)
 
 export default store

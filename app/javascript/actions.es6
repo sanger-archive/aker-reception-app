@@ -21,18 +21,6 @@ export const loadManifest = (manifest) => {
   }
 }
 
-export const loadManifestMapping = (mapping) => {
-  return {
-    type: C.LOAD_MANIFEST_MAPPING, mapping
-  }
-}
-
-export const loadManifestContent = (content) => {
-  return {
-    type: C.LOAD_MANIFEST_CONTENT, content
-  }
-}
-
 export const selectExpectedOption = (val) => {
   return {
     type: C.SELECT_EXPECTED_OPTION, value: val
@@ -42,5 +30,11 @@ export const selectExpectedOption = (val) => {
 export const selectObservedOption = (val) => {
   return {
     type: C.SELECT_OBSERVED_OPTION, value: val
+  }
+}
+
+export const setManifestValue = (labwareId, address, fieldName, value) => {
+  return {
+    type: C.SET_MANIFEST_VALUE, labwareId, address, fieldName, value
   }
 }
