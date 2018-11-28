@@ -67,7 +67,7 @@ const ManifestEditor = (props) => {
     store.dispatch(loadManifest(manifest))
     //store.dispatch(loadManifestMapping(manifest.mapping))
     console.log(store.getState())
-    if (store.getState().mapping.shown) {
+    if (!store.getState().mapping.valid) {
       store.dispatch(selectExpectedOption(null))
       store.dispatch(selectObservedOption(null))
 

@@ -14,11 +14,18 @@
   var proto = DataTableSchemaValidation.prototype;
 
   proto.loadSchema = function() {
-    return $.ajax({url: this.params.material_schema_url,
-      success: $.proxy(function(json) {
-        this._loadedSchema = json;
-        return this._loadedSchema;
-    }, this)});
+    if (this.params.schemaJson) {
+      var defer = $.Deferred();
+      this._loadedSchema = this.params.schemaJson;
+      defer.resolve(this._loadedSchema);
+      return defer;
+    } else {
+      return $.ajax({url: this.params.material_schema_url,
+        success: $.proxy(function(json) {
+          this._loadedSchema = json;
+          return this._loadedSchema;
+      }, this)});
+    }
   };
 
   proto.dataForNode = function(node) {
@@ -67,9 +74,9 @@
   }
 
   proto.column = function(labwareId, fieldName) {
-    return $('input').filter((pos, input) => { 
+    return $('input').filter((pos, input) => {
       var id = $(input).attr('id');
-      return (id && id.match("fieldName\\["+fieldName+"\\]") && 
+      return (id && id.match("fieldName\\["+fieldName+"\\]") &&
         id.match("labware\\["+labwareId+"\\]"));
     }).toArray().reduce($.proxy(function(memo, input) {
       var data = this.positionDataForInput(input)
@@ -132,13 +139,13 @@
   };
 
   proto.warnSchemaCheck = function(schema, msg, failFunct, textFunct) {
-    // 
+    //
     if (failFunct.call(this, schema, msg)) {
       this.validationWarning(msg.node, msg.name, textFunct(schema, msg));
       return true;
     }
     return false;
-  };  
+  };
 
   proto.failSchemaCheck = function(schema, msg, failFunct, textFunct) {
     if (failFunct(schema, msg)) {
@@ -216,6 +223,7 @@
     var fieldProperties = this._loadedSchema.properties[htmlField.name];
 
     var failed = false;
+    var warned = false;
     if (fieldProperties) {
       warned = this.warnSchemaCheck(fieldProperties,
         htmlField,
@@ -257,7 +265,7 @@
 
   proto.triggerEvents = function() {
     var dataEvents = Array.from(arguments);
-    var reducedEvents = dataEvents.reduce((memo, dataEvent) => { 
+    var reducedEvents = dataEvents.reduce((memo, dataEvent) => {
       if (!memo[dataEvent.eventName]) {
         memo[dataEvent.eventName] = [];
       }

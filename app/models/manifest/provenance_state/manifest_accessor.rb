@@ -30,6 +30,7 @@ class Manifest::ProvenanceState::ManifestAccessor < Manifest::ProvenanceState::A
   def _build_manifest
     @state[:manifest] = {
       manifest_id: manifest_model.id,
+      selectedTabPosition: 0,
       labwares: _labwares
     }
   end

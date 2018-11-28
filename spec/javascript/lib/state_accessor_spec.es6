@@ -24,6 +24,35 @@ describe('StateAccessor', () => {
     })
   })
 
+  describe('.schema', () => {
+    let state = {
+      schema: {
+        show_on_form: ['taxId', 'sampleName', 'tissue', 'groupId'],
+        properties: {
+          taxId: { friendly_name: "Taxon id", required: true},
+          sampleName: { friendly_name: "Sample Name", required: true},
+          tissue: { friendly_name: "Tissue", required: false},
+          groupId: {friendly_name: "GroupId", required: false, allowed: ["C1", "C2","AsDeF"]}
+        }
+      }
+    }
+
+    context('#selectedOptionValue', () => {
+      it('matches the valid option when case do not match', () => {
+        expect(StateAccessors(state).schema.selectedOptionValue('groupId','asdef')).to.equal("AsDeF")
+      })
+      it('returns the empty string if trying to find an empty string', () => {
+        expect(StateAccessors(state).schema.selectedOptionValue('groupId','')).to.equal("")
+      })
+      it('returns the empty string if trying to find null', () => {
+        expect(StateAccessors(state).schema.selectedOptionValue('groupId',null)).to.equal("")
+      })
+      it('returns the empty string if no match is found', () => {
+        expect(StateAccessors(state).schema.selectedOptionValue('groupId','ardf')).to.equal("")
+      })
+    })
+  })
+
   describe('.content', () => {
     let state={
       "content": {

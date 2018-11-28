@@ -10,7 +10,7 @@ class Manifest::ProvenanceState::Mapping < Manifest::ProvenanceState::Accessor
   def validate
     unless (@state[:mapping].key?(:valid))
       @state[:mapping][:valid] = (required_unmatched_fields.length == 0)
-      @state[:mapping][:shown] = (shown_unmatched_fields.length != 0)
+      @state[:mapping][:hasUnmatched] = (shown_unmatched_fields.length != 0)
     end
   end
 

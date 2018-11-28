@@ -29,11 +29,13 @@ class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
     end
   end
 
-  def build_keys(obj, list)
-    list.reduce(obj) do |memo, e|
+  def build_keys(obj, list, value=nil)
+    obj = list.reduce(obj) do |memo, e|
       memo[e]={} unless memo[e]
       memo[e]
     end
+    obj = value if value
+    obj
   end
 
   def labware_id(mapped)
@@ -67,22 +69,37 @@ class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
 
   def _content_from_raw
     idx = 0
+    labware_id_schema_field =  manifest_schema_field(:labware_id)
     @state[:content][:raw].reduce({}) do |memo, row|
       mapped = mapped_row(row)
 
       validate_labware_existence(mapped, idx)
 
+
       labware_id = labware_id(mapped)
+
+      memo[:labwares]={} unless memo[:labwares]
+      labware_found = memo[:labwares].keys.select{|l| memo[:labwares][l][labware_id_schema_field]==labware_id }[0]
+      unless labware_found
+        labware_found = memo[:labwares].keys.length
+        memo[:labwares][labware_found] = {}
+      end
 
       validate_position_existence(mapped, idx)
 
       position = position(mapped)
-      build_keys(memo, [:labwares, labware_id, :addresses])
+      build_keys(memo, [:labwares, labware_found, :addresses])
+      build_keys(memo, [:labwares, labware_found, :position])
+      memo[:labwares][labware_found][:position] = labware_found
+      build_keys(memo, [:labwares, labware_found, labware_id_schema_field])
+      memo[:labwares][labware_found][labware_id_schema_field]=labware_id
 
-      validate_position_duplication(memo, labware_id, position)
+      validate_position_duplication(memo, labware_found, position)
 
-      build_keys(memo, [:labwares, labware_id, :addresses, position, :fields])
-      memo[:labwares][labware_id][:addresses][position] = { fields:  mapped }
+      build_keys(memo, [:labwares, labware_found, :addresses, position, :fields])
+
+
+      memo[:labwares][labware_found][:addresses][position] = { fields:  mapped }
       idx = idx + 1
       memo
     end

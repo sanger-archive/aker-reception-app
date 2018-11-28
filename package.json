@@ -22,6 +22,7 @@
     "react-redux": "^5.1.0",
     "react_ujs": "^2.4.4",
     "redux": "^4.0.1",
+    "redux-saga": "^0.16.2",
     "select2": "^4.0.6-rc.1",
     "selectize": "^0.12.4",
     "webpacker-react": "^0.3.2"

@@ -246,7 +246,7 @@ const mapStateToProps = (state) => {
     expected: state && state.mapping && state.mapping.expected ? state.mapping.expected : [],
     observed: state && state.mapping && state.mapping.observed ? state.mapping.observed : [],
     matched: state && state.mapping && state.mapping.matched ? state.mapping.matched : [],
-    shown: state && state.mapping.shown ? state.mapping.shown : false,
+    shown: state && state.mapping.hasUnmatched ? state.mapping.hasUnmatched : false,
     valid: state && state.mapping.valid ? state.mapping.valid : false,
     schema: state ? state.schema : null
   }

@@ -50,6 +50,14 @@ export const StateAccessors = (state) => {
       },
       optionsForSelect: (fieldName) => {
         return state.schema.properties[fieldName]['allowed']
+      },
+      selectedOptionValue: (fieldName, selectedValue) => {
+        if ((!selectedValue) || (selectedValue.length==0)) {
+          return ""
+        }
+        return ACCESSORS.schema.optionsForSelect(fieldName).filter((o) => {
+          return o.match(new RegExp(selectedValue, 'i'))
+        })[0] || ""
       }
     }
   }

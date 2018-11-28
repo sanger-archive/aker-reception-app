@@ -38,3 +38,15 @@ export const setManifestValue = (labwareId, address, fieldName, value) => {
     type: C.SET_MANIFEST_VALUE, labwareId, address, fieldName, value
   }
 }
+
+export const saveTab = (labwareId) => {
+  return {
+    type: C.SAVE_TAB, labwareId
+  }
+}
+
+export const restoreTab = (labwareId) => {
+  return {
+    type: C.RESTORE_TAB, labwareId
+  }
+}

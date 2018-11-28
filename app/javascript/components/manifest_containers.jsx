@@ -57,10 +57,10 @@ const LabwareContentHeader = connect((state, ownProps) => {
 })(LabwareContentHeaderComponent)
 
 const LabwareContentSelectComponent = (props) => {
-  const {fieldName,address,title,name,id,selectedValue} = props
+  const {fieldName,title,name,id,selectedOptionValue,onChange} = props
 
   return(
-    <select className="form-control" title={title} name={name} id={id} selected={selectedValue}>
+    <select onChange={onChange} className="form-control" title={title} name={name} id={id} value={selectedOptionValue}>
       <option value=""></option>
       { props.optionsForSelect.map((val, pos) => {
         return (<option key={pos} value={val}>{val}</option>)
@@ -70,76 +70,78 @@ const LabwareContentSelectComponent = (props) => {
 }
 
 const LabwareContentSelect = connect((state, ownProps) => {
-  return { optionsForSelect: StateAccessors(state).schema.optionsForSelect(ownProps.fieldName) }
+  return {
+    selectedOptionValue: StateAccessors(state).schema.selectedOptionValue(ownProps.fieldName, ownProps.selectedValue),
+    optionsForSelect: StateAccessors(state).schema.optionsForSelect(ownProps.fieldName)
+  }
 })(LabwareContentSelectComponent)
 
-class LabwareContentTextComponent extends React.Component {
+const LabwareContentText = (props) => {
+  const {onChange,selectedValue,title,name,id} = props
+  return(
+    <input onChange={onChange}
+      className="form-control" title={title} name={name} id={id}
+      value={selectedValue} />
+  )
+}
+
+class LabwareContentInputComponent extends React.Component {
   constructor(props) {
     super(props)
   }
 
-  render() {
-    console.log('rerendering')
-    const {fieldName,supplierPlateName,address,selectedValue,title,name,id} = this.props
-    return(
-      <input onChange={this.buildOnChangeManifestInput(supplierPlateName, address, fieldName)}
-        className="form-control" title={title} name={name} id={id}
-        value={selectedValue} />
-    )
-  }
-  buildOnChangeManifestInput(supplierPlateName, address, fieldName) {
+  buildOnChangeManifestInput(labwareIndex, address, fieldName) {
     return (e) => {
-      return this.props.onChangeManifestInput(supplierPlateName, address, fieldName, e.target.value)
+      return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value)
+    }
+  }
+
+  commonPropsForInput() {
+    const { title, name, id, selectedValue, labwareIndex, address, fieldName } = this.props
+    const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName)
+    return { selectedValue, title, name, id, onChange }
+  }
+
+  render() {
+    const {isSelect, fieldName} = this.props
+    if (isSelect) {
+      return <LabwareContentSelect {...this.commonPropsForInput()} fieldName={fieldName} />
+    } else {
+      return <LabwareContentText {...this.commonPropsForInput()} />
     }
   }
 }
 
-const LabwareContentText = connect((state)=> { return {} }, (dispatch, { match, location }) => {
-  return {
-    onChangeManifestInput: (supplierPlateName, address, fieldName, value) => {
-      dispatch(setManifestValue(supplierPlateName, address, fieldName, value))
+const LabwareContentInput = connect(
+  (state, ownProps) => {
+    return {
+      labwareIndex: ownProps.labwareIndex,
+      address: ownProps.address,
+      fieldName: ownProps.fieldName,
+
+      selectedValue: StateAccessors(state).content.selectedValueAtCell(ownProps.labwareIndex, ownProps.address, ownProps.fieldName),
+      isSelect: StateAccessors(state).schema.isSelectFieldName(ownProps.fieldName),
+      title: StateAccessors(state).schema.friendlyNameFor(ownProps.fieldName),
+      name: `manifest[labware][${ownProps.labwareIndex}][contents][${ownProps.address}][${ownProps.fieldName}]`,
+      id: `labware[${ownProps.labwareIndex}]address[${ownProps.address}]fieldName[${ownProps.fieldName}]`
+      }
+  },
+  (dispatch, { match, location }) => {
+    return {
+      onChangeManifestInput: (labwareIndex, address, fieldName, value) => {
+        dispatch(setManifestValue(labwareIndex, address, fieldName, value))
+      }
     }
-  }
-})(LabwareContentTextComponent)
-
-const LabwareContentInputComponent = (props) => {
-  if (props.isSelect) {
-    return <LabwareContentSelect
-          supplierPlateName={props.supplierPlateName}
-          address={props.address}
-          fieldName={props.fieldName}
-          selectedValue={props.selectedValue}
-          title={props.title}
-          name={props.name}
-          id={props.id} />
-  } else {
-    return <LabwareContentText
-          supplierPlateName={props.supplierPlateName}
-          address={props.address}
-          fieldName={props.fieldName}
-          selectedValue={props.selectedValue}
-          title={props.title}
-          name={props.name}
-          id={props.id} />
-  }
-}
-
-const LabwareContentInput = connect((state, ownProps) => {
-  return { isSelect: StateAccessors(state).schema.isSelectFieldName(ownProps.fieldName) }
-})(LabwareContentInputComponent)
+  })(LabwareContentInputComponent)
 
 const LabwareContentCellComponent = (props) => {
   return (
     <td data-psd-schema-validation-name={props.fieldName}>
       <div className="form-group" style={{position: "relative"}}>
         <LabwareContentInput
-          supplierPlateName={props.supplierPlateName}
+          labwareIndex={props.labwareIndex}
           address={props.address}
-          fieldName={props.fieldName}
-          selectedValue={props.selectedValue}
-          title={props.title}
-          name={props.name}
-          id={props.cellId} />
+          fieldName={props.fieldName} />
       </div>
     </td>
   )
@@ -147,14 +149,9 @@ const LabwareContentCellComponent = (props) => {
 
 const LabwareContentCell = connect((state, ownProps) => {
   return {
-    fieldName: ownProps.fieldName,
     labwareIndex: ownProps.labwareIndex,
-    supplierPlateName: ownProps.supplierPlateName,
     address: ownProps.address,
-    title: StateAccessors(state).schema.friendlyNameFor(ownProps.fieldName),
-    name: `manifest[labware][${ownProps.labwareIndex}][contents][${ownProps.address}][${ownProps.fieldName}]`,
-    cellId: `labware[${ownProps.labwareIndex}]address[${ownProps.address}]fieldName[${ownProps.fieldName}]`,
-    selectedValue: StateAccessors(state).content.selectedValueAtCell(ownProps.supplierPlateName, ownProps.address, ownProps.fieldName)
+    fieldName: ownProps.fieldName,
   }
 })(LabwareContentCellComponent)
 
@@ -175,7 +172,6 @@ const LabwareContentAddressComponent = (props) => {
 
       {props.fieldsToShow.map((fieldName, pos) => {
         return <LabwareContentCell
-          supplierPlateName={props.supplierPlateName}
           labwareIndex={props.labwareIndex}
           address={props.address} fieldName={fieldName}
                 key={fieldName} />
@@ -186,17 +182,17 @@ const LabwareContentAddressComponent = (props) => {
 
 const LabwareContentAddress = connect((state, ownProps) => {
   return {
-    fieldsToShow: StateAccessors(state).schema.fieldsToShow(),
-    taxonomyServiceUrl: state.services.taxonomy_service_url,
     labwareIndex: ownProps.labwareIndex,
     address: ownProps.address,
-    supplierPlateName: ownProps.supplierPlateName
+
+    fieldsToShow: StateAccessors(state).schema.fieldsToShow(),
+    taxonomyServiceUrl: state.services.taxonomy_service_url,
   }
 })(LabwareContentAddressComponent)
 
 const LabwareContentComponent = (props) => {
   return(
-    <div role="tabpanel" className="tab-pane" id={"Labware"+ props.labwareIndex}>
+    <div role="tabpanel" className={"tab-pane"+ ((props.selectedTabPosition === props.labwareIndex) ? " active": "")} id={"Labware"+ props.labwareIndex}>
 
       <div style={{overflow: "scroll"}} className="material-data-table">
 
@@ -205,6 +201,7 @@ const LabwareContentComponent = (props) => {
              data-psd-component-parameters={JSON.stringify([{
               manifest_id: props.manifestId
               }, {
+                schemaJson: props.schema,
                 material_schema_url: props.materialSchemaUrl
               }
               ])}>
@@ -222,7 +219,6 @@ const LabwareContentComponent = (props) => {
             { props.positionsForLabware.map((address, posAddress) => {
               return (
                 <LabwareContentAddress key={address}
-                  supplierPlateName={props.supplierPlateName}
                   labwareIndex={props.labwareIndex}
                   address={address}  />
             )}) }
@@ -236,9 +232,11 @@ const LabwareContentComponent = (props) => {
 const LabwareContent = connect((state, ownProps) => {
   const labware = StateAccessors(state).manifest.labwareAtIndex(ownProps.labwareIndex)
   return {
-    manifestId: state.manifest.manifest_id,
     labwareIndex: ownProps.labwareIndex,
-    supplierPlateName: labware.supplier_plate_name,
+
+    schema: state.schema,
+    manifestId: state.manifest.manifest_id,
+    selectedTabPosition: state.manifest.selectedTabPosition,
     positionsForLabware: labware.positions,
     materialSchemaUrl: state.services.materials_schema_url,
     fieldsToShow: StateAccessors(state).schema.fieldsToShow()
