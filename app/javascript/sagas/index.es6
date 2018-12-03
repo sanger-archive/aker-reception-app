@@ -29,9 +29,10 @@ function* restoreTab(action) {
   Allows concurrent fetches of user.
 */
 function* mySaga() {
-  //yield takeEvery(C.SAVE_TAB, saveTab);
-  yield takeLatest(C.SAVE_TAB, saveTab);
-  yield takeLatest(C.RESTORE_TAB, saveTab);
+  yield takeEvery(C.SAVE_TAB, saveTab);
+  //yield takeLatest(C.CHANGE_TAB, saveTab);
+  /*yield takeLatest(C.SAVE_TAB, saveTab);
+  yield takeLatest(C.RESTORE_TAB, saveTab);*/
 }
 
 /*

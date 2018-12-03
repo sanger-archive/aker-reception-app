@@ -6,7 +6,7 @@ class MaterialsTable {
   constructor(node, params) {
     this.node = $(node)
     this.params = params
-
+    return
     this.tableStore = new MaterialsTableStore(this.params)
     this.messageStore = new MessageStore()
 

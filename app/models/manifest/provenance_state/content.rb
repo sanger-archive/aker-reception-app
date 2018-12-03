@@ -4,8 +4,9 @@ class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
   delegate :manifest_schema_field, to: :provenance_state
   delegate :manifest_schema_field_required?, to: :provenance_state
 
-  def apply(state = nil)
+  def apply(state = nil, manifest_model)
     @state = state if state
+    @manifest_model = manifest_model
     _build_content
   end
 
@@ -22,11 +23,36 @@ class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
   def _build_content
     @state[:content] = {} unless @state[:content]
     unless @state[:content][:structured]
-      @state[:content][:structured] = {valid: false}
       if @state[:content][:raw] && @state[:mapping]
-        @state[:content][:structured] = _content_from_raw
+        _read_from_raw
+      else
+        _read_from_database
       end
     end
+  end
+
+  def _read_from_database
+    returned_list = {}
+    @manifest_model.labwares.each_with_index do |labware, pos|
+      next unless labware.contents
+      returned_list[pos.to_s] = {
+        addresses: labware.contents.keys.reduce({}) do |memo_address, address|
+            memo_address[address] = {
+              fields: labware.contents[address].keys.reduce({}) do |memo_field, field|
+                memo_field[field] = {value: labware.contents[address][field]}
+                memo_field
+              end
+            }
+            memo_address
+          end
+      }
+    end
+    @state[:content][:structured] = {:labwares => returned_list}
+  end
+
+  def _read_from_raw
+    @state[:content][:structured] = {valid: false}
+    @state[:content][:structured] = _content_from_raw
   end
 
   def build_keys(obj, list, value=nil)

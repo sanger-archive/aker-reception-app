@@ -4,6 +4,7 @@ import React, { Fragment } from 'react';
 import { expect } from 'chai'
 import { shallow, mount } from 'enzyme';
 import { createMockStore } from 'redux-test-utils';
+import { Provider, connect } from 'react-redux'
 
 import ManifestContainersConnected from "../../../app/javascript/components/manifest_containers.jsx"
 
@@ -16,9 +17,10 @@ describe('<ManifestContainers />', () => {
 
   let status = {
     "services": {
-      "material_schema_url": ""
+      "materials_schema_url": ""
     },
     "manifest": {
+      "manifest_id": "1234",
       "labwares": [
         {"supplier_plate_name": "Labware 1","positions": ["A:1","B:1"]},
         {"supplier_plate_name": "Labware 2","positions": ["1"]}
@@ -33,14 +35,14 @@ describe('<ManifestContainers />', () => {
           "text": "There is an error in taxon id 1234"
         }],
         "labwares": {
-          "Labware 2": {
+          "1": {
             "addresses": {
               "1": {
                 "fields": {}
               }
             }
           },
-          "Labware 1": {
+          "0": {
             "messages": [{
               "type": "warning",
               "display": "alert",
@@ -102,6 +104,13 @@ describe('<ManifestContainers />', () => {
       expect(wrapper.find('ManifestContainersComponent')).to.have.length(1)
     })
 
+    it('<LabwareTabsComponent>', () => {
+      it('renders the component', () => {
+        expect(wrapper.find('LabwareTabsComponent')).to.have.length(1)
+        expect(wrapper.find('LabwareTabs')).to.have.length(1)
+      })
+    })
+
     context('<LabwareTab>', () => {
       it('displays a tab for each labware', () => {
         expect(wrapper.find('LabwareTab')).to.have.length(2)
@@ -111,35 +120,35 @@ describe('<ManifestContainers />', () => {
 
     context('<LabwareContent>', () => {
       it('displays the 2 labwares', () => {
-        expect(wrapper.find('LabwareContent')).to.have.length(2)
+        expect(wrapper.find('LabwareContentComponent')).to.have.length(2)
       })
     })
 
     context('<LabwareContentAddress>', () => {
       it('displays 2 positions for the first labware', () => {
-        expect(wrapper.find('LabwareContent').first().find('LabwareContentAddress')).to.have.length(2)
+        expect(wrapper.find('LabwareContentComponent').first().find('LabwareContentAddressComponent')).to.have.length(2)
       })
       it('displays 1 positions for the last labware', () => {
-        expect(wrapper.find('LabwareContent').last().find('LabwareContentAddress')).to.have.length(1)
+        expect(wrapper.find('LabwareContentComponent').last().find('LabwareContentAddressComponent')).to.have.length(1)
       })
 
       it('displays all the addresses of the status', ()=> {
         ["A:1","B:1","1"].forEach((val) => {
-          expect(wrapper.find('LabwareContentAddress').filterWhere((n) => n.prop('address')==val)).to.have.length(1)
+          expect(wrapper.find('LabwareContentAddressComponent').filterWhere((n) => n.prop('address')==val)).to.have.length(1)
         })
       })
     })
 
     context('<LabwareContentCell>', ()=>{
       it('displays 4 inputs for each address of the first labware', () => {
-        const cells = wrapper.find('LabwareContent').first().find('LabwareContentAddress').first().find('LabwareContentCell')
+        const cells = wrapper.find('LabwareContentComponent').first().find('LabwareContentAddressComponent').first().find('LabwareContentCellComponent')
         expect(cells).to.have.length(4)
       })
 
       it('displays a value in a cell that should contain a value', () => {
-        expect(wrapper.find('LabwareContent').filterWhere((item) => {
-          return (item.prop('labware').labware_id == "Labware 1")
-        }).find('LabwareContentInput').filterWhere((item) => {
+        expect(wrapper.find('LabwareContentComponent').filterWhere((item) => {
+          return (item.prop('labwareIndex') == 0)
+        }).find('LabwareContentInputComponent').filterWhere((item) => {
           return ((item.prop('title') == "Taxon id") && (item.prop('selectedValue') == "1234"))
         })).to.have.length(1)
       })
@@ -147,9 +156,9 @@ describe('<ManifestContainers />', () => {
 
     context('<LabwareContentInput>', ()=>{
       let contextedWrapperFunction = (address, fieldName) => {
-        return wrapper.find('LabwareContentAddress').filterWhere((n) => {
+        return wrapper.find('LabwareContentAddressComponent').filterWhere((n) => {
           return n.prop('address')==address
-        }).find('LabwareContentInput').filterWhere((item) => {
+        }).find('LabwareContentInputComponent').filterWhere((item) => {
           return (item.prop('title') == fieldName)
         })
       }

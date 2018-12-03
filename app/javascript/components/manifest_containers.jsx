@@ -5,39 +5,7 @@ import { connect } from 'react-redux'
 import { StateAccessors } from '../lib/state_accessors'
 import { setManifestValue} from '../actions'
 
-const LabwareTab = (props) => {
-  const {position, supplierPlateName} = props
-
-  return(
-    <li key={position} className={ (position == 0) ? 'active' : '' } role="presentation">
-      <a data-toggle="tab"
-         id={`labware_tab[${ position }]`}
-         href={`#Labware${ position }`}
-         aria-controls="Labware{ position }" role="tab">
-          { (supplierPlateName) ? supplierPlateName : "Labware " + (position+1)  }
-      </a>
-      <input type="hidden" value={ supplierPlateName } name={`manifest[labware][${ position }][supplier_plate_name]`} />
-    </li>
-    )
-}
-
-const LabwareTabsComponent = (props) => {
-  return(
-    <ul data-labware-count={ props.supplierPlateNames.length } className="nav nav-tabs" role="tablist">
-      { props.supplierPlateNames.map((supplierPlateName, position) => {
-        return (
-          <LabwareTab supplierPlateName={supplierPlateName} position={position} key={position} />
-        )
-      })}
-    </ul>
-  )
-}
-
-const LabwareTabs = connect((state) => {
-  return {
-    supplierPlateNames: StateAccessors(state).manifest.labwaresForManifest().map((l) => l.supplier_plate_name)
-  }
-})(LabwareTabsComponent)
+import LabwareTabs from './labware_tabs'
 
 const LabwareContentHeaderComponent = (props) => {
   const requiredMark = props.isRequiredField ? (<span style={{color: "red"}}>*</span>) : null
@@ -192,12 +160,17 @@ const LabwareContentAddress = connect((state, ownProps) => {
 
 const LabwareContentComponent = (props) => {
   return(
-    <div role="tabpanel" className={"tab-pane"+ ((props.selectedTabPosition === props.labwareIndex) ? " active": "")} id={"Labware"+ props.labwareIndex}>
+    <div role="tabpanel"
+    className={
+      "tab-pane"+ ((props.selectedTabPosition === props.position) ? " active": "")
+    } id={"Labware"+ props.labwareIndex}>
 
       <div style={{overflow: "scroll"}} className="material-data-table">
 
       <table className="table table-condensed table-striped"
-             data-psd-component-class={JSON.stringify(["LoadTable", "DataTableSchemaValidation"])}
+             data-psd-component-class={
+              JSON.stringify(["LoadTable", "DataTableSchemaValidation"])
+            }
              data-psd-component-parameters={JSON.stringify([{
               manifest_id: props.manifestId
               }, {
@@ -221,7 +194,8 @@ const LabwareContentComponent = (props) => {
                 <LabwareContentAddress key={address}
                   labwareIndex={props.labwareIndex}
                   address={address}  />
-            )}) }
+              )
+            }) }
           </tbody>
         </table>
       </div>
@@ -236,7 +210,7 @@ const LabwareContent = connect((state, ownProps) => {
 
     schema: state.schema,
     manifestId: state.manifest.manifest_id,
-    selectedTabPosition: state.manifest.selectedTabPosition,
+    selectedTabPosition: parseInt(state.manifest.selectedTabPosition, 10),
     positionsForLabware: labware.positions,
     materialSchemaUrl: state.services.materials_schema_url,
     fieldsToShow: StateAccessors(state).schema.fieldsToShow()
@@ -248,7 +222,7 @@ const LabwareContentsComponent = (props) => {
     <div className="tab-content">
       { props.labwareIndexes.map((labwareIndex, pos) => {
         return (
-          <LabwareContent key={labwareIndex} labwareIndex={labwareIndex} />
+          <LabwareContent key={labwareIndex} labwareIndex={labwareIndex} position={pos} />
         )
       })}
     </div>

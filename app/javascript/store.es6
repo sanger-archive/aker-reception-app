@@ -1,7 +1,8 @@
 import { createStore, applyMiddleware } from 'redux'
 import reducers from 'reducers/index'
-import createSagaMiddleware from 'redux-saga'
-import saga from 'sagas/index'
+//import createSagaMiddleware from 'redux-saga'
+//import saga from 'sagas/index'
+import thunk from 'redux-thunk';
 
 const initialState = {
   "content": {
@@ -15,10 +16,10 @@ const initialState = {
   "schema": null
 }
 
-const sagaMiddleware = createSagaMiddleware()
+//const sagaMiddleware = createSagaMiddleware()
 
-const store = createStore(reducers, initialState, applyMiddleware(sagaMiddleware))
+const store = createStore(reducers, initialState, applyMiddleware(thunk))
 
-sagaMiddleware.run(saga)
+//sagaMiddleware.run(saga)
 
 export default store

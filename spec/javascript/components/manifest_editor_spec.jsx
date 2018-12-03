@@ -24,7 +24,7 @@ describe('<ManifestEditor />', () => {
       expect(wrapper.find('Provider')).to.have.length(1);
     })
     xit('renders the ManifestEditorConnected element', () => {
-      expect(wrapper.find('ManifestEditorConnected')).to.have.length(1);
+      expect(wrapper.find('ManifestEditorComponent')).to.have.length(1);
     })
 
   })
@@ -32,9 +32,9 @@ describe('<ManifestEditor />', () => {
 
 describe('<ManifestEditorConnected>', () => {
   context('when rendering it', () => {
-    let wrapper = shallow(<ManifestEditorConnected />, getContext(status));
+    let wrapper = shallow(<ManifestEditor />, getContext(status));
 
-    xit('renders the MappingTool element', () => {
+    it('renders the MappingTool element', () => {
       expect(wrapper.find('MappingTool')).to.have.length(1);
     })
   })

@@ -1,6 +1,5 @@
 import C from './constants'
 
-
 export const matchSelection = (expected, observed) => {
   return {
     type: C.MATCH_SELECTION,
@@ -39,14 +38,30 @@ export const setManifestValue = (labwareId, address, fieldName, value) => {
   }
 }
 
-export const saveTab = (labwareId) => {
-  return {
-    type: C.SAVE_TAB, labwareId
+export const saveTab = (form) => {
+  return (dispatch, getState) => {
+    const state = getState()
+    const manifestId = state.manifest.manifest_id
+
+    return $.ajax("/manifests/state/"+manifestId, {
+      method: 'PUT',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify(getState())
+    }).then((data) => {
+      dispatch(loadManifest(data.contents))
+    })
   }
 }
 
 export const restoreTab = (labwareId) => {
   return {
     type: C.RESTORE_TAB, labwareId
+  }
+}
+
+export const changeTab = (position) => {
+  return {
+    type: C.CHANGE_TAB, position
   }
 }

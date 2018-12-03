@@ -52,8 +52,8 @@ module SchemaValidators
     private
 
     def build_validators(schema)
-      @validators = schema['properties'].reduce({}) do |memo, prop|
-        property_name, property_data = prop
+      @validators = schema['properties'].keys.reduce({}) do |memo, property_name|
+        property_data = schema['properties'][property_name]
 
         memo[property_name] = self.class.VALIDATION_CLASSES.select do |klass|
           klass.is_applicable?(property_name, property_data)

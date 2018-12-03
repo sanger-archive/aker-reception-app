@@ -5,6 +5,12 @@ export const StateAccessors = (state) => {
         return state.manifest.labwares[labwareIndex]
       },
       labwaresForManifest: () => {
+        if (state.manifest.labwares instanceof Object) {
+          return Object.keys(state.manifest.labwares).reduce((memo, key) => {
+            memo[key] = state.manifest.labwares[key]
+            return memo
+          }, [])
+        }
         return state.manifest.labwares || []
       }
     },

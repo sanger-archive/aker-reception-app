@@ -28,11 +28,13 @@ class Manifest::ProvenanceState::ManifestAccessor < Manifest::ProvenanceState::A
   private
 
   def _build_manifest
-    @state[:manifest] = {
-      manifest_id: manifest_model.id,
-      selectedTabPosition: 0,
-      labwares: _labwares
-    }
+    unless @state[:manifest] && !(@state[:manifest].nil?)
+      @state[:manifest] = {
+        manifest_id: manifest_model.id,
+        selectedTabPosition: 0,
+        labwares: _labwares
+      }
+    end
   end
 
   def _labwares

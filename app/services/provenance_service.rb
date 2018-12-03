@@ -44,15 +44,14 @@ class ProvenanceService
     success = true
 
     # remove null or empty data from the params
-    manifest.labwares.each do |labware|
-      labware_index = labware.labware_index
-      labware_data = labware_params[labware_index.to_s]
+    manifest.labwares.each_with_index do |labware, position|
+      #position = labware.position
+      labware_data = labware_params[position.to_s]
       filtered_data = {}
       supplier_plate_name = ''
 
       if labware_data
         supplier_plate_name = labware_data["supplier_plate_name"].strip if labware_data["supplier_plate_name"]
-
         labware_data["contents"].each do |address, material_data|
           material_data.each do |fieldName, value|
             unless value.blank?
@@ -66,7 +65,7 @@ class ProvenanceService
         end
       end
 
-      error_messages = validate(labware_index, filtered_data)
+      error_messages = validate(position, filtered_data)
       filtered_data = nil if filtered_data.empty?
 
       success &= labware.update_attributes(supplier_plate_name: supplier_plate_name, contents: filtered_data)

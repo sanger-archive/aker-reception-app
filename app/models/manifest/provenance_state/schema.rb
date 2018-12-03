@@ -7,7 +7,7 @@ class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
   end
 
   def _build_schema
-    unless @state[:schema]
+    unless @state[:schema] && !(@state[:schema].nil?)
       @state[:schema] = manifest_schema
     end
   end
