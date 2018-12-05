@@ -5,16 +5,6 @@
 <div data-psd-component-class="SingleTableManager"
      data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
 
-  <div id="page-error-alert" class="alert alert-danger hidden" role="alert">
-    <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    <p class='alert-msg'>&nbsp;</p>
-  </div>
-
-  <div id="page-warning-alert" class="alert alert-warning hidden" role="alert">
-    <strong class='alert-title'>Warning!</strong>
-    <p class='alert-msg'>&nbsp;</p>
-  </div>
-
   <%= bootstrap_form_tag url: manifest_biomaterial_data_path(manifest.id),
                          remote: true,
                          method: :put,

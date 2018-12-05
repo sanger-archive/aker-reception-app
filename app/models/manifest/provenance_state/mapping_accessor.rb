@@ -1,4 +1,4 @@
-class Manifest::ProvenanceState::Mapping < Manifest::ProvenanceState::Accessor
+class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Accessor
   delegate :manifest_schema, to: :provenance_state
 
   def apply(state = nil)

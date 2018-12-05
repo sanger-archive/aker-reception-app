@@ -15,10 +15,10 @@ class Manifest::ProvenanceState
     @manifest_model = manifest
 
     @manifest = ManifestAccessor.new(self)
-    @services = Manifest::ProvenanceState::Services.new(self)
-    @schema = Schema.new(self)
-    @mapping = Mapping.new(self)
-    @content = Content.new(self)
+    @services = ServicesAccessor.new(self)
+    @schema = SchemaAccessor.new(self)
+    @mapping = MappingAccessor.new(self)
+    @content = ContentAccessor.new(self)
   end
 
   def apply(state)
@@ -74,8 +74,17 @@ class Manifest::ProvenanceState
     if updates
       if valid?
         provenance = ProvenanceService.new(@schema.manifest_schema)
-        messages = provenance.set_biomaterial_data(@manifest_model, updates, @user)
-        #@manifest_update_state.apply_messages(messages)
+        success, messages = provenance.set_biomaterial_data(@manifest_model, updates, @user)
+        apply_messages(messages) if !success
+      end
+    end
+  end
+
+  def apply_messages(messages)
+    @state[:content][:structured][:messages] = []
+    messages.each do |message|
+      message[:errors].keys.each do |field|
+        @content.add_message(message[:labwareIndex].to_s, message[:address], field, message[:errors][field])
       end
     end
   end
@@ -84,10 +93,6 @@ class Manifest::ProvenanceState
     @content.valid?
   end
 
-
-  def apply_messages(messages)
-    @content = {}
-  end
 
   def _build_state
     {

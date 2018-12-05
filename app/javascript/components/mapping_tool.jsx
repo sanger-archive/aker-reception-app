@@ -2,7 +2,7 @@ import React, {Fragment} from "react"
 import PropTypes from "prop-types"
 import { connect } from 'react-redux'
 
-import {matchSelection, unmatch, selectExpectedOption, selectObservedOption } from '../actions'
+import {matchSelection, unmatch, selectExpectedOption, selectObservedOption, toggleMapping } from '../actions'
 
 let matchedFields = {}
 
@@ -77,10 +77,10 @@ function removeFieldsFromSelects(formField, csvField) {
 }
 
 
-const MappingHeader = () => {
+const MappingHeaderComponent = (props) => {
   return (
     <div className="modal-header">
-      <button type="button" className="close"
+      <button type="button" className="close" onClick={props.onClickClose}
         data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
       </button>
@@ -88,6 +88,14 @@ const MappingHeader = () => {
     </div>
     )
 }
+
+const MappingHeader = connect((status) => {return {}}, (dispatch) => {
+  return {
+    onClickClose: () => {
+      dispatch(toggleMapping(false))
+    }
+  }
+})(MappingHeaderComponent)
 
 
 
@@ -222,23 +230,34 @@ class MappingToolComponent extends React.Component {
     //$(this.modal).on('hidden.bs.modal', this.props.handleHideModal);
   }
 
-  render (props) {
+  render () {
+    if (this.props.shown) {
+    // <div id="myModal" ref={modal=> this.modal = modal} className="modal fade" tabIndex="-1" role="dialog" data-show="true">
+      return(
 
-    return(
-      <div id="myModal" ref={modal=> this.modal = modal} className="modal fade" tabIndex="-1" role="dialog" data-show="true">
-        <div className="modal-dialog modal-lg" role="document">
-          <div className="modal-content">
-            <MappingHeader />
-            <MappingBody {...this.props} />
-            <MappingFooter {...this.props} />
+          <div className="modal-dialog modal-lg" role="document">
+            <div className="modal-content">
+              <MappingHeader />
+              <MappingBody {...this.props} />
+              <MappingFooter {...this.props} />
+            </div>
           </div>
-        </div>
-      </div>
-    )
+
+      )
+    }
+    return null
+    //</div>
   }
 }
 
 const mapStateToProps = (state) => {
+  let shown = state && state.mapping.hasUnmatched ? state.mapping.hasUnmatched : false
+  if (state && state.mapping) {
+    if (typeof state.mapping.shown !== 'undefined') {
+      shown = state.mapping.shown
+    }
+  }
+
   return {
     selectedObserved: state && state.mapping ? state.mapping.selectedObserved : null,
     selectedExpected: state && state.mapping ? state.mapping.selectedExpected : null,
@@ -246,7 +265,7 @@ const mapStateToProps = (state) => {
     expected: state && state.mapping && state.mapping.expected ? state.mapping.expected : [],
     observed: state && state.mapping && state.mapping.observed ? state.mapping.observed : [],
     matched: state && state.mapping && state.mapping.matched ? state.mapping.matched : [],
-    shown: state && state.mapping.hasUnmatched ? state.mapping.hasUnmatched : false,
+    shown: shown,
     valid: state && state.mapping.valid ? state.mapping.valid : false,
     schema: state ? state.schema : null
   }

@@ -1,4 +1,4 @@
-class Manifest::ProvenanceState::Schema < Manifest::ProvenanceState::Accessor
+class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Accessor
 
 
   def apply(state = nil)

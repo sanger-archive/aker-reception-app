@@ -22,6 +22,8 @@ export default (state = {}, action) => {
       return Object.assign({}, state, {selectedObserved: action.value})
     case C.SELECT_EXPECTED_OPTION:
       return Object.assign({}, state, {selectedExpected: action.value})
+    case C.TOGGLE_MAPPING:
+      return Object.assign({}, state, {shown: action.toggle})
     default:
       return state
   }

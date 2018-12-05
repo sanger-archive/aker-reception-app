@@ -32,9 +32,9 @@ export const selectObservedOption = (val) => {
   }
 }
 
-export const setManifestValue = (labwareId, address, fieldName, value) => {
+export const setManifestValue = (labwareId, address, fieldName, value, plateId) => {
   return {
-    type: C.SET_MANIFEST_VALUE, labwareId, address, fieldName, value
+    type: C.SET_MANIFEST_VALUE, labwareId, address, fieldName, value, plateId
   }
 }
 
@@ -50,8 +50,18 @@ export const saveTab = (form) => {
       data: JSON.stringify(getState())
     }).then((data) => {
       dispatch(loadManifest(data.contents))
+    }).fail((e) => {
+      dispatch(displayMessage({level: 'FATAL', display: 'alert', text: "There is no connection with the service" }))
     })
   }
+}
+
+export const displayMessage = (data) => {
+  return { type: C.DISPLAY_MESSAGE, data }
+}
+
+export const toggleMapping = (toggle) => {
+  return { type: C.TOGGLE_MAPPING, toggle}
 }
 
 export const restoreTab = (labwareId) => {

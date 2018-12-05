@@ -26,12 +26,14 @@ module SchemaValidators
           obtained_value = find_by_taxon_id(taxon_id).scientificName
         rescue TaxonomyClient::Errors::NotFound => e
           add_error(labware_index, address, property_name, "The Taxon Id provided (#{taxon_id}) was not found in the EBI Taxonomy service")
-          return false          
+          return false
         end
 
-        unless scientific_name == obtained_value
-          add_error(labware_index, address, property_name, "The Taxon Id provided (#{taxon_id}) does not match the scientific name provided '#{scientific_name}'. The taxonomy service indicates it should be '#{obtained_value}.")
-          return false
+        if scientific_name
+          unless scientific_name == obtained_value
+            add_error(labware_index, address, property_name, "The Taxon Id provided (#{taxon_id}) does not match the scientific name provided '#{scientific_name}'. The taxonomy service indicates it should be '#{obtained_value}.")
+            return false
+          end
         end
         true
       end

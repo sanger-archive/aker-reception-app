@@ -4,27 +4,65 @@ import store from 'store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
-import { loadManifest, selectExpectedOption, selectObservedOption} from '../actions'
+import { loadManifest, selectExpectedOption, selectObservedOption, displayMessage} from '../actions'
 import {StateAccessors} from '../lib/state_accessors'
 
-const ErrorsDisplay = () => {
+const MessageDisplay = (props) => {
+  return(
+    <span>At ({props.supplierPlateNames[props.labware_index]} - {props.address} {props.field}): {props.text}</span>
+  )
+}
+
+const ErrorDisplay = (props) => {
   return (
-    <div id="page-error-alert" className="alert alert-danger hidden" role="alert">
+    <div id="page-error-alert" className="alert alert-danger" role="alert">
       <button type="button" className="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <p className='alert-msg'>&nbsp;</p>
+      <p className='alert-msg'>&nbsp;<MessageDisplay {...props} /></p>
     </div>
     )
 }
 
-const WarningsDisplay = () => {
+const WarningDisplay = (props) => {
   return (
-    <div id="page-warning-alert" className="alert alert-warning hidden" role="alert">
+    <div id="page-warning-alert" className="alert alert-warning" role="alert">
       <strong className='alert-title'>Warning!</strong>
-      <p className='alert-msg'>&nbsp;</p>
+      <p className='alert-msg'>&nbsp;<MessageDisplay {...props} /></p>
     </div>
   )
 }
 
+const MessagesDisplayComponent = (props) => {
+  return (
+    <div>
+      { props.warnings.map((msg, pos) => {
+        if (msg.labware_index && (props.selectedTabPosition!=msg.labware_index)) {
+          return
+        }
+        return <WarningsDisplay {...msg}
+          supplierPlateNames={props.supplierPlateNames}
+          selectedTabPosition={props.selectedTabPosition}
+          key={pos} />
+      }) }
+      { props.errors.map((msg, pos) => {
+        if (msg.labware_index && (props.selectedTabPosition!=msg.labware_index)) {
+          return
+        }
+        return <ErrorDisplay {...msg}
+          supplierPlateNames={props.supplierPlateNames}
+          selectedTabPosition={props.selectedTabPosition}
+          key={pos} /> }) }
+    </div>
+  )
+}
+
+const MessagesDisplay = connect((state) => {
+  return {
+    warnings: StateAccessors(state).content.warningMessages(),
+    errors: StateAccessors(state).content.errorMessages(),
+    supplierPlateNames: StateAccessors(state).manifest.labwaresForManifest().map((l) => l.supplier_plate_name),
+    selectedTabPosition: StateAccessors(state).manifest.selectedTabPosition()
+  }
+})(MessagesDisplayComponent)
 
 class ManifestEditorComponent extends React.Component {
   constructor(props) {
@@ -34,9 +72,8 @@ class ManifestEditorComponent extends React.Component {
   render() {
     return(
       <div>
-        <ErrorsDisplay />
-        <WarningsDisplay />
         <MappingTool />
+        <MessagesDisplay />
         <ManifestContainers />
       </div>
     )
@@ -61,21 +98,34 @@ const ManifestEditor = (props) => {
   if (props) {
     store.dispatch(loadManifest(props))
   }
-  $(document.body).on('uploadedmanifest', $.proxy(function(event, response) {
-    const manifest = response.contents
 
-    store.dispatch(loadManifest(manifest))
-    //store.dispatch(loadManifestMapping(manifest.mapping))
-    console.log(store.getState())
-    if (!store.getState().mapping.valid) {
-      store.dispatch(selectExpectedOption(null))
-      store.dispatch(selectObservedOption(null))
+  $(document.body).on('uploadManifest', (event, request) => {
+    return $.ajax(request)
+    .then(
+      $.proxy(function(response, event) {
+        const manifest = response.contents
 
-      $('#myModal').modal('show')
-    } else {
-      //store.dispatch(loadManifestContent(manifest.content))
-    }
-  }, this))
+        store.dispatch(loadManifest(manifest))
+        //store.dispatch(loadManifestMapping(manifest.mapping))
+        console.log(store.getState())
+        if (!store.getState().mapping.valid) {
+          store.dispatch(selectExpectedOption(null))
+          store.dispatch(selectObservedOption(null))
+
+          $('#myModal').modal('show')
+        } else {
+          //store.dispatch(loadManifestContent(manifest.content))
+        }
+      }, this),
+      (xhr) => {
+        store.dispatch(displayMessage({level: 'FATAL', display: 'alert', text: xhr.responseJSON.errors.join("\n") }))
+      }
+    )
+    .always(() => {
+      $(document).trigger('hideLoadingOverlay');
+    })
+  })
+  //$(document.body).on('uploadedmanifest', )
 
   return(
     <Provider store={store}>

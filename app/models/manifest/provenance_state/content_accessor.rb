@@ -1,13 +1,13 @@
 require 'active_support/core_ext/module/delegation'
 
-class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
+class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Accessor
   delegate :manifest_schema_field, to: :provenance_state
   delegate :manifest_schema_field_required?, to: :provenance_state
 
   def apply(state = nil, manifest_model)
     @state = state if state
     @manifest_model = manifest_model
-    _build_content
+    _build_content if @state[:mapping][:valid]
   end
 
   def valid?
@@ -18,15 +18,40 @@ class Manifest::ProvenanceState::Content < Manifest::ProvenanceState::Accessor
   class LabwareNotFound < StandardError ; end
   class PositionDuplicated < StandardError ; end
 
+
+  def add_message(labware_index, address, field, text)
+    @state[:content][:structured][:messages] = [] unless @state[:content][:structured][:messages]
+    @state[:content][:structured][:messages].push({level: "ERROR",
+      text: text, labware_index: labware_index, address: address, field: field
+      })
+    if labware_index && address && field
+      build_keys(@state, [:content, :structured, :labwares, labware_index, :addresses, address, :fields, field, :messages])
+      @state[:content][:structured][:labwares][labware_index][:addresses][address][:fields][field][:messages] = [text]
+    end
+  end
+
   private
 
   def _build_content
     @state[:content] = {} unless @state[:content]
-    unless @state[:content][:structured]
+    if @state[:content][:structured]
+      _clean_errors
+    else
       if @state[:content][:raw] && @state[:mapping]
         _read_from_raw
       else
         _read_from_database
+      end
+    end
+  end
+
+  def _clean_errors
+    @state[:content][:structured][:messages] = []
+    @state[:content][:structured][:labwares].keys.each do |l_key|
+      @state[:content][:structured][:labwares][l_key][:addresses].keys.each do |a_key|
+        @state[:content][:structured][:labwares][l_key][:addresses][a_key][:fields].keys.each do |f_key|
+          @state[:content][:structured][:labwares][l_key][:addresses][a_key][:fields][f_key][:messages] = []
+        end
       end
     end
   end

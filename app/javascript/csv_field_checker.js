@@ -479,26 +479,19 @@ function uploadManifest(manifest, manifest_id) {
   formData.append('manifest_id', manifest_id);
   $(document).trigger('showLoadingOverlay');
 
-  return $.ajax({
+
+  var ajaxRequest = {
     url: Reception.manifests_upload_index_path(),
     type: 'POST',
+    method: 'POST',
     data: formData,
     cache: false,
     contentType: false,
     processData: false,
-  })
-  .then(
-    (response) => {
-      $(document.body).trigger('uploadedmanifest', response)
-      //checkCSVFields(response.contents.manifest);
-    },
-    (xhr) => {
-      displayError(xhr.responseJSON.errors.join("\n"));
-    }
-  )
-  .always(() => {
-    $(document).trigger('hideLoadingOverlay');
-  })
+  };
+
+  $(document.body).trigger('uploadManifest', ajaxRequest);
+
 }
 
 window.CSVFieldChecker = {

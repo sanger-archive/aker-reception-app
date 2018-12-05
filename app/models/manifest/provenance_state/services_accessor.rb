@@ -1,4 +1,4 @@
-class Manifest::ProvenanceState::Services < Manifest::ProvenanceState::Accessor
+class Manifest::ProvenanceState::ServicesAccessor < Manifest::ProvenanceState::Accessor
   def apply(state = nil)
     @state = state if state
     _build_content

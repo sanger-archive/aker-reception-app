@@ -2,16 +2,19 @@ import React from "react"
 import { connect } from 'react-redux'
 import { StateAccessors } from '../lib/state_accessors'
 import { changeTab, saveTab } from '../actions'
+import classNames from 'classnames'
 
-const LabwareTab = (props) => {
+const LabwareTabComponent = (props) => {
   const {position, supplierPlateName, selectedTabPosition} = props
 
   return(
     <li onClick={props.onClickTab} key={position}
-        className={ (position == selectedTabPosition) ? 'active' : '' } role="presentation">
+        className={ classNames({'active': position == selectedTabPosition}) }
+        role="presentation">
       <a data-toggle="tab"
          id={`labware_tab[${ position }]`}
          href={`#Labware${ position }`}
+         className={ classNames({'bg-danger': props.displayError, 'bg-warning': props.displayWarning}) }
          aria-controls="Labware{ position }" role="tab">
           { (supplierPlateName) ? supplierPlateName : "Labware " + (position+1)  }
       </a>
@@ -19,6 +22,17 @@ const LabwareTab = (props) => {
     </li>
     )
 }
+
+const LabwareTab = connect((state, ownProps) => {
+  const contentAccessor = StateAccessors(state).content
+  const hasMessages = contentAccessor.hasMessages(ownProps.position)
+  const hasErrors = contentAccessor.hasErrors(ownProps.position)
+
+  return {
+    displayError: hasMessages && hasErrors,
+    displayWarning: hasMessages && !hasErrors
+  }
+})(LabwareTabComponent)
 
 const LabwareTabsComponent = (props) => {
   return(
@@ -38,7 +52,7 @@ const LabwareTabsComponent = (props) => {
 const LabwareTabs = connect((state) => {
   return {
     supplierPlateNames: StateAccessors(state).manifest.labwaresForManifest().map((l) => l.supplier_plate_name),
-    selectedTabPosition: parseInt(state.manifest.selectedTabPosition, 10)
+    selectedTabPosition: StateAccessors(state).manifest.selectedTabPosition()
   }
 }, (dispatch, ownProps) => {
   return {

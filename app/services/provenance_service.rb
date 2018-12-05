@@ -11,10 +11,10 @@ class ProvenanceService
 
   # Checks the given labware data against the schema to see if it looks OK.
   # Returns an array of errors. If the list is empty, the data seems to be OK.
-  def validate(labware_index, labware_data)
+  def validate(labware_index, labware_data, completed=nil)
     schema_validator.error_messages = []
 
-    if labware_data.empty? && !schema_validator.default_field.nil?
+    if completed && labware_data.empty? && !schema_validator.default_field.nil?
       schema_validator.error_messages = [{
         errors: { schema_validator.default_field => "At least one material must be specified for each item of labware" },
         labwareIndex: labware_index,
@@ -38,7 +38,7 @@ class ProvenanceService
   # - [true, []] - nothing went wrong
   # - [false, [error1, error2, ...]] - some stuff went wrong; here is the information
   # - [false, []] - something unexpected went wrong
-  def set_biomaterial_data(manifest, labware_params, current_user)
+  def set_biomaterial_data(manifest, labware_params, current_user, completed=nil)
     all_errors = []
 
     success = true
@@ -65,7 +65,7 @@ class ProvenanceService
         end
       end
 
-      error_messages = validate(position, filtered_data)
+      error_messages = validate(position, filtered_data, completed)
       filtered_data = nil if filtered_data.empty?
 
       success &= labware.update_attributes(supplier_plate_name: supplier_plate_name, contents: filtered_data)

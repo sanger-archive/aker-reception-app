@@ -58,15 +58,15 @@ class LabwareContentInputComponent extends React.Component {
     super(props)
   }
 
-  buildOnChangeManifestInput(labwareIndex, address, fieldName) {
+  buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId) {
     return (e) => {
-      return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value)
+      return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value, plateId)
     }
   }
 
   commonPropsForInput() {
-    const { title, name, id, selectedValue, labwareIndex, address, fieldName } = this.props
-    const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName)
+    const { title, name, id, selectedValue, labwareIndex, address, fieldName, plateId } = this.props
+    const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId)
     return { selectedValue, title, name, id, onChange }
   }
 
@@ -87,6 +87,8 @@ const LabwareContentInput = connect(
       address: ownProps.address,
       fieldName: ownProps.fieldName,
 
+      plateId: StateAccessors(state).manifest.plateIdFor(ownProps.labwareIndex),
+
       selectedValue: StateAccessors(state).content.selectedValueAtCell(ownProps.labwareIndex, ownProps.address, ownProps.fieldName),
       isSelect: StateAccessors(state).schema.isSelectFieldName(ownProps.fieldName),
       title: StateAccessors(state).schema.friendlyNameFor(ownProps.fieldName),
@@ -96,8 +98,8 @@ const LabwareContentInput = connect(
   },
   (dispatch, { match, location }) => {
     return {
-      onChangeManifestInput: (labwareIndex, address, fieldName, value) => {
-        dispatch(setManifestValue(labwareIndex, address, fieldName, value))
+      onChangeManifestInput: (labwareIndex, address, fieldName, value, plateId) => {
+        dispatch(setManifestValue(labwareIndex, address, fieldName, value, plateId))
       }
     }
   })(LabwareContentInputComponent)
@@ -105,7 +107,7 @@ const LabwareContentInput = connect(
 const LabwareContentCellComponent = (props) => {
   return (
     <td data-psd-schema-validation-name={props.fieldName}>
-      <div className="form-group" style={{position: "relative"}}>
+      <div className={"form-group" + " " + props.classToShow} style={{position: "relative"}}>
         <LabwareContentInput
           labwareIndex={props.labwareIndex}
           address={props.address}
@@ -120,6 +122,7 @@ const LabwareContentCell = connect((state, ownProps) => {
     labwareIndex: ownProps.labwareIndex,
     address: ownProps.address,
     fieldName: ownProps.fieldName,
+    classToShow: StateAccessors(state).content.classToShowForInput(ownProps.labwareIndex, ownProps.address, ownProps.fieldName)
   }
 })(LabwareContentCellComponent)
 
@@ -210,7 +213,7 @@ const LabwareContent = connect((state, ownProps) => {
 
     schema: state.schema,
     manifestId: state.manifest.manifest_id,
-    selectedTabPosition: parseInt(state.manifest.selectedTabPosition, 10),
+    selectedTabPosition: StateAccessors(state).manifest.selectedTabPosition(),
     positionsForLabware: labware.positions,
     materialSchemaUrl: state.services.materials_schema_url,
     fieldsToShow: StateAccessors(state).schema.fieldsToShow()
