@@ -1,25 +1,6 @@
 class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Accessor
 
-
-  def apply(state = nil)
-    @state = state if state
-    _build_schema
-  end
-
-  def _build_schema
-    unless @state[:schema] && !(@state[:schema].nil?)
-      @state[:schema] = manifest_schema
-    end
-  end
-
-  def valid?
-    @state && @state.key?(:schema)
-  end
-
-  def material_schema
-    MatconClient::Material.schema
-  end
-
+  # Accessor methods
   def manifest_schema_field(sym)
     config = Rails.application.config.manifest_schema_config
     return config["field_labware_name"] if sym == :labware_id
@@ -32,21 +13,22 @@ class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Acc
   end
 
   def labwares
-    return [] unless @state[:manifest] && @state[:manifest][:labwares]
-    @state[:manifest][:labwares]
+    return [] unless state_access && state_access[:labwares]
+    state_access[:labwares]
   end
 
-  def _build_show_on_form(schema)
-    unless schema["show_on_form"]
-      schema["show_on_form"] = schema["properties"].keys.reduce([]) do |m,k|
-        m.push(k) if schema["properties"][k]["show_on_form"]
-        m
-      end
-    end
+  # Build methods
+
+  def build
+    manifest_schema
+  end
+
+  def material_schema
+    MatconClient::Material.schema
   end
 
   def manifest_schema
-    return @state[:schema] if valid?
+    return @manifest_schema if @manifest_schema
     config = Rails.application.config.manifest_schema_config
     @manifest_schema = material_schema.dup.tap do |schema|
 
@@ -77,4 +59,16 @@ class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Acc
     end
     @manifest_schema
   end
+
+  private
+
+  def _build_show_on_form(schema)
+    unless schema["show_on_form"]
+      schema["show_on_form"] = schema["properties"].keys.reduce([]) do |m,k|
+        m.push(k) if schema["properties"][k]["show_on_form"]
+        m
+      end
+    end
+  end
+
 end

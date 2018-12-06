@@ -251,23 +251,17 @@ class MappingToolComponent extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  let shown = state && state.mapping.hasUnmatched ? state.mapping.hasUnmatched : false
-  if (state && state.mapping) {
-    if (typeof state.mapping.shown !== 'undefined') {
-      shown = state.mapping.shown
-    }
-  }
 
   return {
-    selectedObserved: state && state.mapping ? state.mapping.selectedObserved : null,
-    selectedExpected: state && state.mapping ? state.mapping.selectedExpected : null,
-    content: state && state.content ? state.content : {},
-    expected: state && state.mapping && state.mapping.expected ? state.mapping.expected : [],
-    observed: state && state.mapping && state.mapping.observed ? state.mapping.observed : [],
-    matched: state && state.mapping && state.mapping.matched ? state.mapping.matched : [],
-    shown: shown,
-    valid: state && state.mapping.valid ? state.mapping.valid : false,
-    schema: state ? state.schema : null
+    selectedObserved: state?.mapping?.selectedObserved || null,
+    selectedExpected: state?.mapping?.selectedExpected || null,
+    content: state?.content || {},
+    expected: state?.mapping?.expected || [],
+    observed: state?.mapping?.observed || [],
+    matched: state?.mapping?.matched || [],
+    shown: !!state?.mapping?.hasUnmatched,
+    valid: !!state?.mapping?.valid,
+    schema: state?.schema || null
   }
 };
 

@@ -5,7 +5,7 @@ import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
 import { loadManifest, selectExpectedOption, selectObservedOption, displayMessage} from '../actions'
-import {StateAccessors} from '../lib/state_accessors'
+import StateSelectors from '../selectors'
 
 const MessageDisplay = (props) => {
   return(
@@ -55,44 +55,26 @@ const MessagesDisplayComponent = (props) => {
   )
 }
 
-const MessagesDisplay = connect((state) => {
+const MessagesDisplay = connect((state, ownProps) => {
+  const selectedTabPosition = StateSelectors.manifest.selectedTabPosition(state)
   return {
-    warnings: StateAccessors(state).content.warningMessages(),
-    errors: StateAccessors(state).content.errorMessages(),
-    supplierPlateNames: StateAccessors(state).manifest.labwaresForManifest().map((l) => l.supplier_plate_name),
-    selectedTabPosition: StateAccessors(state).manifest.selectedTabPosition()
+    warnings: StateSelectors.content.warningTabMessages(state, selectedTabPosition),
+    errors: StateSelectors.content.errorTabMessages(state, selectedTabPosition),
+    supplierPlateNames: StateSelectors.manifest.supplierPlateNames(state),
+    selectedTabPosition
   }
 })(MessagesDisplayComponent)
 
-class ManifestEditorComponent extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {mapping: {}}
-  }
-  render() {
-    return(
-      <div>
-        <MappingTool />
-        <MessagesDisplay />
-        <ManifestContainers />
-      </div>
-    )
-  }
+
+export const ManifestEditorComponent = (props) => {
+  return(
+    <div>
+      <MappingTool />
+      <MessagesDisplay />
+      <ManifestContainers />
+    </div>
+  )
 }
-
-
-
-const mapStateToProps = (state) => {
-
-  return state
-}
-
-const mapDispatchToProps = (dispatch, { match, location }) => {
-  return {
-  }
-}
-
-let ManifestEditorConnected = connect(mapStateToProps, mapDispatchToProps)(ManifestEditorComponent)
 
 const ManifestEditor = (props) => {
   if (props) {
@@ -129,11 +111,9 @@ const ManifestEditor = (props) => {
 
   return(
     <Provider store={store}>
-      <ManifestEditorConnected {...props} />
+      <ManifestEditorComponent />
     </Provider>
   )
 }
-
-export { ManifestEditorConnected }
 
 export default ManifestEditor

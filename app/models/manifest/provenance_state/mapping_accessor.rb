@@ -1,42 +1,35 @@
 class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Accessor
   delegate :manifest_schema, to: :provenance_state
 
-  def apply(state = nil)
-    @state = state if state
-    _build_mapping
-    validate
-  end
-
   def validate
-    unless (@state[:mapping].key?(:valid))
-      @state[:mapping][:valid] = (required_unmatched_fields.length == 0)
-      @state[:mapping][:hasUnmatched] = (shown_unmatched_fields.length != 0)
+    unless (state_access.key?(:valid))
+      state_access[:valid] = (required_unmatched_fields.length == 0)
+      state_access[:hasUnmatched] = (shown_unmatched_fields.length != 0)
     end
   end
 
   def valid?
-    @state.key?(:mapping) && @state[:mapping].key?(:valid) && @state[:mapping][:valid]
+    state_access.key?(:valid) && state_access[:valid]
   end
 
-  private
-
-  def _build_mapping
-    unless @state[:mapping]
-      @state[:mapping] = {valid: false}
-      if @state[:content]
-        if @state[:content][:raw]
-          @state[:mapping] = _mapping_from_raw
-        end
-      end
-    end
+  def rebuild?
+    (super && @state[:content] && !@state[:content][:structured] && @state[:content][:raw])
   end
 
-  def _mapping_from_raw
-    expected_keys_and_properties.reduce({
+  def build
+    perform_mapping
+  end
+
+  def initial_mapping
+    {
       observed: observed_keys.dup,
       expected: [],
       matched: []
-    }) do |memo, expected_key_and_properties|
+    }
+  end
+
+  def perform_mapping
+    expected_keys_and_properties.reduce(initial_mapping) do |memo, expected_key_and_properties|
       expected_key, expected_properties = expected_key_and_properties
       if ((expected_properties['required']) || (expected_properties['show_on_form'] && expected_properties['field_name_regex']))
         found = observed_keys.detect do |observed_key|
@@ -54,7 +47,7 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
   end
 
   def observed_keys
-    return @state[:content][:raw].first.keys.map(&:to_s) if @state[:content][:raw].length > 0
+    return @state[:content][:raw].first.keys.map(&:to_s) if @state[:content] && @state[:content][:raw] && @state[:content][:raw].length > 0
     []
   end
 
@@ -77,8 +70,8 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
   end
 
   def matched_expected_fields
-    return [] unless @state && @state[:mapping] && @state[:mapping][:matched]
-    @state[:mapping][:matched].map{|m| m[:expected]}
+    return [] unless state_access && state_access[:matched]
+    state_access[:matched].map{|m| m[:expected]}
   end
 
   def required_schema_fields

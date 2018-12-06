@@ -1,6 +1,6 @@
 import React from "react"
 import { connect } from 'react-redux'
-import { StateAccessors } from '../lib/state_accessors'
+import StateSelectors from '../selectors'
 import { changeTab, saveTab } from '../actions'
 import classNames from 'classnames'
 
@@ -24,9 +24,9 @@ const LabwareTabComponent = (props) => {
 }
 
 const LabwareTab = connect((state, ownProps) => {
-  const contentAccessor = StateAccessors(state).content
-  const hasMessages = contentAccessor.hasMessages(ownProps.position)
-  const hasErrors = contentAccessor.hasErrors(ownProps.position)
+  const contentAccessor = StateSelectors.content
+  const hasMessages = contentAccessor.hasTabMessages(state, ownProps.position)
+  const hasErrors = contentAccessor.hasTabErrors(state, ownProps.position)
 
   return {
     displayError: hasMessages && hasErrors,
@@ -51,8 +51,8 @@ const LabwareTabsComponent = (props) => {
 
 const LabwareTabs = connect((state) => {
   return {
-    supplierPlateNames: StateAccessors(state).manifest.labwaresForManifest().map((l) => l.supplier_plate_name),
-    selectedTabPosition: StateAccessors(state).manifest.selectedTabPosition()
+    supplierPlateNames: StateSelectors.manifest.supplierPlateNames(state),
+    selectedTabPosition: StateSelectors.manifest.selectedTabPosition(state)
   }
 }, (dispatch, ownProps) => {
   return {

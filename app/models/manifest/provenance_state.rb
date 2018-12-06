@@ -14,84 +14,27 @@ class Manifest::ProvenanceState
     @user = user
     @manifest_model = manifest
 
-    @manifest = ManifestAccessor.new(self)
-    @services = ServicesAccessor.new(self)
-    @schema = SchemaAccessor.new(self)
-    @mapping = MappingAccessor.new(self)
-    @content = ContentAccessor.new(self)
+    @services = ServicesAccessor.new(self, :services)
+    @manifest = ManifestAccessor.new(self, :manifest)
+    @schema = SchemaAccessor.new(self, :schema)
+    @mapping = MappingAccessor.new(self, :mapping)
+    @content = ContentAccessor.new(self, :content)
+    @store = StoreAccessor.new(self, :content)
   end
 
   def apply(state)
-    @state = (state.dup || _build_state)
+    @state = (state.dup || build_state)
 
     @services.apply(@state)
     @manifest.apply(@state)
     @schema.apply(@state)
     @mapping.apply(@state)
-    @content.apply(@state, @manifest_model)
+    @content.apply(@state)
+    @store.apply(@state)
 
-    validate if @mapping.valid?
-    save
     @state
   end
 
-  def validate
-    if @state[:content][:structured][:labwares]
-      num_labwares_file = @state[:content][:structured][:labwares].keys.length
-      num_labwares_manifest = @manifest_model.labwares.count
-      if (num_labwares_file > num_labwares_manifest)
-        raise WrongNumberLabwares.new("Expected #{num_labwares_manifest} labwares in Manifest but found #{num_labwares_file}.")
-      elsif (num_labwares_file < num_labwares_manifest)
-        raise WrongNumberLabwares.new("Expected #{num_labwares_manifest} labwares in Manifest but could only find #{num_labwares_file}.")
-      end
-    end
-  end
-
-  def save
-
-    if valid?
-      updates = updates_for(@state[:content][:structured][:labwares])
-      update(updates)
-    end
-  end
-
-  def updates_for(obj)
-    obj.keys.reduce({}) do |memo_labware, labware_key|
-      memo_labware[labware_key.to_s] = {
-        "contents" =>  obj[labware_key][:addresses].keys.reduce({}) do |memo_address, address_key|
-          memo_address[address_key] = obj[labware_key][:addresses][address_key][:fields].keys.reduce({}) do |memo_fields, field_key|
-            memo_fields[field_key] = obj[labware_key][:addresses][address_key][:fields][field_key][:value]
-            memo_fields
-          end
-          memo_address
-        end
-      }
-      memo_labware
-    end
-  end
-
-  def update(updates)
-    if updates
-      if valid?
-        provenance = ProvenanceService.new(@schema.manifest_schema)
-        success, messages = provenance.set_biomaterial_data(@manifest_model, updates, @user)
-        apply_messages(messages) if !success
-      end
-    end
-  end
-
-  def apply_messages(messages)
-    @state[:content][:structured][:messages] = []
-    messages.each do |message|
-      message[:errors].keys.each do |field|
-        @content.add_message(message[:labwareIndex].to_s, message[:address], field, message[:errors][field])
-      end
-    end
-  end
-
-  def valid?
-    @content.valid?
-  end
 
 
   def _build_state

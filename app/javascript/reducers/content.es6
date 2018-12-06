@@ -1,5 +1,5 @@
 import C from '../constants'
-import { StateAccessors } from '../lib/state_accessors'
+import { StateAccessors } from '../selectors'
 
 export default (state = {}, action) => {
   let newState

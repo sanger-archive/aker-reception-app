@@ -26,6 +26,7 @@
     "redux": "^4.0.1",
     "redux-saga": "^0.16.2",
     "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0",
     "select2": "^4.0.6-rc.1",
     "selectize": "^0.12.4",
     "webpacker-react": "^0.3.2"

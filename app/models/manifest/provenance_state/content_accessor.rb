@@ -3,15 +3,10 @@ require 'active_support/core_ext/module/delegation'
 class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Accessor
   delegate :manifest_schema_field, to: :provenance_state
   delegate :manifest_schema_field_required?, to: :provenance_state
+  delegate :manifest_model, to: :provenance_state
 
-  def apply(state = nil, manifest_model)
-    @state = state if state
-    @manifest_model = manifest_model
-    _build_content if @state[:mapping][:valid]
-  end
-
-  def valid?
-    @state.key?(:content) && @state[:content].key?(:structured)
+  def rebuild?
+    (super || !state_access.key?(:structured))
   end
 
   class PositionNotFound < StandardError ; end
@@ -19,46 +14,28 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   class PositionDuplicated < StandardError ; end
 
 
-  def add_message(labware_index, address, field, text)
-    @state[:content][:structured][:messages] = [] unless @state[:content][:structured][:messages]
-    @state[:content][:structured][:messages].push({level: "ERROR",
-      text: text, labware_index: labware_index, address: address, field: field
-      })
-    if labware_index && address && field
-      build_keys(@state, [:content, :structured, :labwares, labware_index, :addresses, address, :fields, field, :messages])
-      @state[:content][:structured][:labwares][labware_index][:addresses][address][:fields][field][:messages] = [text]
-    end
+  def build
+    {
+      structured: (state_access && state_access[:raw] && @state[:mapping]) ? read_from_raw : read_from_database
+    }
   end
 
-  private
-
-  def _build_content
-    @state[:content] = {} unless @state[:content]
-    if @state[:content][:structured]
-      _clean_errors
-    else
-      if @state[:content][:raw] && @state[:mapping]
-        _read_from_raw
-      else
-        _read_from_database
+  def validate
+    if state_access[:structured][:labwares]
+      num_labwares_file = state_access[:structured][:labwares].keys.length
+      num_labwares_manifest = manifest_model.labwares.count
+      if (num_labwares_file > num_labwares_manifest)
+        raise WrongNumberLabwares.new("Expected #{num_labwares_manifest} labwares in Manifest but found #{num_labwares_file}.")
+      elsif (num_labwares_file < num_labwares_manifest)
+        raise WrongNumberLabwares.new("Expected #{num_labwares_manifest} labwares in Manifest but could only find #{num_labwares_file}.")
       end
     end
   end
 
-  def _clean_errors
-    @state[:content][:structured][:messages] = []
-    @state[:content][:structured][:labwares].keys.each do |l_key|
-      @state[:content][:structured][:labwares][l_key][:addresses].keys.each do |a_key|
-        @state[:content][:structured][:labwares][l_key][:addresses][a_key][:fields].keys.each do |f_key|
-          @state[:content][:structured][:labwares][l_key][:addresses][a_key][:fields][f_key][:messages] = []
-        end
-      end
-    end
-  end
 
-  def _read_from_database
+  def read_from_database
     returned_list = {}
-    @manifest_model.labwares.each_with_index do |labware, pos|
+    manifest_model.labwares.each_with_index do |labware, pos|
       next unless labware.contents
       returned_list[pos.to_s] = {
         addresses: labware.contents.keys.reduce({}) do |memo_address, address|
@@ -72,56 +49,13 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
           end
       }
     end
-    @state[:content][:structured] = {:labwares => returned_list}
+    {:labwares => returned_list}
   end
 
-  def _read_from_raw
-    @state[:content][:structured] = {valid: false}
-    @state[:content][:structured] = _content_from_raw
-  end
-
-  def build_keys(obj, list, value=nil)
-    obj = list.reduce(obj) do |memo, e|
-      memo[e]={} unless memo[e]
-      memo[e]
-    end
-    obj = value if value
-    obj
-  end
-
-  def labware_id(mapped)
-    if mapped[manifest_schema_field(:labware_id)]
-      mapped[manifest_schema_field(:labware_id)][:value]
-    else
-      Rails.configuration.manifest_schema_config['default_labware_name_value']
-    end
-  end
-
-  def position(mapped)
-    if mapped[manifest_schema_field(:position)]
-      mapped[manifest_schema_field(:position)][:value]
-    else
-      Rails.configuration.manifest_schema_config['default_position_value']
-    end
-  end
-
-
-  def validate_labware_existence(mapped, idx)
-    if (manifest_schema_field_required?(manifest_schema_field(:labware_id)) && !mapped[manifest_schema_field(:labware_id)])
-      raise LabwareNotFound.new("This manifest does not have a valid labware id field for the labware at row: #{idx}")
-    end
-  end
-
-  def validate_position_existence(mapped, idx)
-    if (manifest_schema_field_required?(manifest_schema_field(:position)) && !mapped[manifest_schema_field(:position)])
-      raise PositionNotFound.new("This manifest does not have a valid position field for the wells of row: #{idx}")
-    end
-  end
-
-  def _content_from_raw
+  def read_from_raw
     idx = 0
     labware_id_schema_field =  manifest_schema_field(:labware_id)
-    @state[:content][:raw].reduce({}) do |memo, row|
+    state_access[:raw].reduce({}) do |memo, row|
       mapped = mapped_row(row)
 
       validate_labware_existence(mapped, idx)
@@ -156,13 +90,42 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
     end
   end
 
+
+  def labware_id(mapped)
+    if mapped[manifest_schema_field(:labware_id)]
+      mapped[manifest_schema_field(:labware_id)][:value]
+    else
+      Rails.configuration.manifest_schema_config['default_labware_name_value']
+    end
+  end
+
+  def position(mapped)
+    if mapped[manifest_schema_field(:position)]
+      mapped[manifest_schema_field(:position)][:value]
+    else
+      Rails.configuration.manifest_schema_config['default_position_value']
+    end
+  end
+
+
+  def validate_labware_existence(mapped, idx)
+    if (manifest_schema_field_required?(manifest_schema_field(:labware_id)) && !mapped[manifest_schema_field(:labware_id)])
+      raise LabwareNotFound.new("This manifest does not have a valid labware id field for the labware at row: #{idx}")
+    end
+  end
+
+  def validate_position_existence(mapped, idx)
+    if (manifest_schema_field_required?(manifest_schema_field(:position)) && !mapped[manifest_schema_field(:position)])
+      raise PositionNotFound.new("This manifest does not have a valid position field for the wells of row: #{idx}")
+    end
+  end
+
+
   def validate_position_duplication(obj, labware_id, position)
     if obj[:labwares][labware_id][:addresses].key?(position)
       raise PositionDuplicated.new("Duplicate entry found for #{labware_id}: Position #{position}")
     end
   end
-
-
 
   def mapped_row(row)
     row.keys.reduce({}) do |memo, key|

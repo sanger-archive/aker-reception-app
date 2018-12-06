@@ -1,43 +1,18 @@
 class Manifest::ProvenanceState::ManifestAccessor < Manifest::ProvenanceState::Accessor
-  def apply(state = nil)
-    @state = state if state
-    _build_manifest
-    validate
-    @state
-  end
 
   def manifest_model
     @provenance_state.manifest_model
   end
 
-  def validate
-  end
-
-  def valid?
-    true
+  def build
+    {
+      manifest_id: manifest_model.id,
+      selectedTabPosition: 0,
+      labwares: labwares
+    }
   end
 
   def labwares
-    if @state && @state[:manifest] && @state[:manifest][:labwares]
-      @state[:manifest][:labwares]
-    else
-      []
-    end
-  end
-
-  private
-
-  def _build_manifest
-    unless @state[:manifest] && !(@state[:manifest].nil?)
-      @state[:manifest] = {
-        manifest_id: manifest_model.id,
-        selectedTabPosition: 0,
-        labwares: _labwares
-      }
-    end
-  end
-
-  def _labwares
     manifest_model.labwares.each_with_index.map do |labware, idx|
       labware_index = idx+1
       supplier_plate_name = labware.supplier_plate_name

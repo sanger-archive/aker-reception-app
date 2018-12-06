@@ -2,10 +2,11 @@ import React from "react"
 import {Fragment} from "react"
 import PropTypes from "prop-types"
 import { connect } from 'react-redux'
-import { StateAccessors } from '../lib/state_accessors'
+import StateSelectors from '../selectors'
 import { setManifestValue} from '../actions'
 
 import LabwareTabs from './labware_tabs'
+import classNames from 'classnames'
 
 const LabwareContentHeaderComponent = (props) => {
   const requiredMark = props.isRequiredField ? (<span style={{color: "red"}}>*</span>) : null
@@ -19,8 +20,8 @@ const LabwareContentHeaderComponent = (props) => {
 
 const LabwareContentHeader = connect((state, ownProps) => {
   return {
-    friendlyName: StateAccessors(state).schema.friendlyNameFor(ownProps.fieldName),
-    isRequiredField: StateAccessors(state).schema.isRequiredField(ownProps.fieldName)
+    friendlyName: StateSelectors.schema.friendlyNameFor(state, ownProps.fieldName),
+    isRequiredField: StateSelectors.schema.isRequiredField(state, ownProps.fieldName)
   }
 })(LabwareContentHeaderComponent)
 
@@ -39,8 +40,8 @@ const LabwareContentSelectComponent = (props) => {
 
 const LabwareContentSelect = connect((state, ownProps) => {
   return {
-    selectedOptionValue: StateAccessors(state).schema.selectedOptionValue(ownProps.fieldName, ownProps.selectedValue),
-    optionsForSelect: StateAccessors(state).schema.optionsForSelect(ownProps.fieldName)
+    selectedOptionValue: StateSelectors.schema.selectedOptionValue(state, ownProps.fieldName, ownProps.selectedValue),
+    optionsForSelect: StateSelectors.schema.optionsForSelect(state, ownProps.fieldName)
   }
 })(LabwareContentSelectComponent)
 
@@ -87,11 +88,11 @@ const LabwareContentInput = connect(
       address: ownProps.address,
       fieldName: ownProps.fieldName,
 
-      plateId: StateAccessors(state).manifest.plateIdFor(ownProps.labwareIndex),
+      plateId: StateSelectors.manifest.plateIdFor(state, ownProps.labwareIndex),
 
-      selectedValue: StateAccessors(state).content.selectedValueAtCell(ownProps.labwareIndex, ownProps.address, ownProps.fieldName),
-      isSelect: StateAccessors(state).schema.isSelectFieldName(ownProps.fieldName),
-      title: StateAccessors(state).schema.friendlyNameFor(ownProps.fieldName),
+      selectedValue: StateSelectors.content.selectedValueAtCell(state, ownProps.labwareIndex, ownProps.address, ownProps.fieldName),
+      isSelect: StateSelectors.schema.isSelectFieldName(state, ownProps.fieldName),
+      title: StateSelectors.schema.friendlyNameFor(state, ownProps.fieldName),
       name: `manifest[labware][${ownProps.labwareIndex}][contents][${ownProps.address}][${ownProps.fieldName}]`,
       id: `labware[${ownProps.labwareIndex}]address[${ownProps.address}]fieldName[${ownProps.fieldName}]`
       }
@@ -107,7 +108,15 @@ const LabwareContentInput = connect(
 const LabwareContentCellComponent = (props) => {
   return (
     <td data-psd-schema-validation-name={props.fieldName}>
-      <div className={"form-group" + " " + props.classToShow} style={{position: "relative"}}>
+      <div className={ classNames({
+              'form-group': true,
+              'has-error': props.displayError,
+              'has-warning': props.displayWarning
+            }
+          )
+        }
+        style={{position: "relative"}}>
+
         <LabwareContentInput
           labwareIndex={props.labwareIndex}
           address={props.address}
@@ -118,11 +127,16 @@ const LabwareContentCellComponent = (props) => {
 }
 
 const LabwareContentCell = connect((state, ownProps) => {
+  const contentAccessor = StateSelectors.content
+  const hasMessages = contentAccessor.hasInputMessages(state, ownProps)
+  const hasErrors = contentAccessor.hasInputErrors(state, ownProps)
+
   return {
     labwareIndex: ownProps.labwareIndex,
     address: ownProps.address,
     fieldName: ownProps.fieldName,
-    classToShow: StateAccessors(state).content.classToShowForInput(ownProps.labwareIndex, ownProps.address, ownProps.fieldName)
+    displayError: hasMessages && hasErrors,
+    displayWarning: hasMessages && !hasErrors
   }
 })(LabwareContentCellComponent)
 
@@ -156,12 +170,15 @@ const LabwareContentAddress = connect((state, ownProps) => {
     labwareIndex: ownProps.labwareIndex,
     address: ownProps.address,
 
-    fieldsToShow: StateAccessors(state).schema.fieldsToShow(),
+    fieldsToShow: StateSelectors.schema.fieldsToShow(state),
     taxonomyServiceUrl: state.services.taxonomy_service_url,
   }
 })(LabwareContentAddressComponent)
 
 const LabwareContentComponent = (props) => {
+  if (!props.positionsForLabware) {
+    debugger
+  }
   return(
     <div role="tabpanel"
     className={
@@ -207,16 +224,15 @@ const LabwareContentComponent = (props) => {
 }
 
 const LabwareContent = connect((state, ownProps) => {
-  const labware = StateAccessors(state).manifest.labwareAtIndex(ownProps.labwareIndex)
   return {
     labwareIndex: ownProps.labwareIndex,
 
     schema: state.schema,
     manifestId: state.manifest.manifest_id,
-    selectedTabPosition: StateAccessors(state).manifest.selectedTabPosition(),
-    positionsForLabware: labware.positions,
+    selectedTabPosition: StateSelectors.manifest.selectedTabPosition(state),
+    positionsForLabware: StateSelectors.manifest.positionsForLabware(state, ownProps),
     materialSchemaUrl: state.services.materials_schema_url,
-    fieldsToShow: StateAccessors(state).schema.fieldsToShow()
+    fieldsToShow: StateSelectors.schema.fieldsToShow(state)
   }
 })(LabwareContentComponent)
 
@@ -234,7 +250,7 @@ const LabwareContentsComponent = (props) => {
 
 const LabwareContents = connect((state) => {
   return {
-    labwareIndexes: StateAccessors(state).manifest.labwaresForManifest().map((labware,pos) => pos)
+    labwareIndexes: StateSelectors.manifest.supplierPlateNames(state).map((labware,pos) => pos)
   }
 })(LabwareContentsComponent)
 

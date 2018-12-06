@@ -38,6 +38,14 @@ export const setManifestValue = (labwareId, address, fieldName, value, plateId) 
   }
 }
 
+export const filteredState = (state) => {
+  let dupState = Object.assign({}, state)
+
+  if (Object.keys(dupState.mapping).length == 0) {
+    delete dupState.mapping
+  }
+}
+
 export const saveTab = (form) => {
   return (dispatch, getState) => {
     const state = getState()
