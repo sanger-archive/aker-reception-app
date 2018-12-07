@@ -18,7 +18,21 @@ const initialState = {
 
 //const sagaMiddleware = createSagaMiddleware()
 
-const store = createStore(reducers, initialState, applyMiddleware(thunk))
+const userTiming = () => (next) => (action) => {
+  if (performance.mark === undefined) return next(action);
+  performance.mark(`${action.type}_start`);
+  const result = next(action);
+  performance.mark(`${action.type}_end`);
+  performance.measure(
+    `${action.type}`,
+    `${action.type}_start`,
+    `${action.type}_end`,
+  );
+  return result;
+}
+
+
+const store = createStore(reducers, initialState, applyMiddleware(thunk, userTiming))
 
 //sagaMiddleware.run(saga)
 

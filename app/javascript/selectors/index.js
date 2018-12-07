@@ -1,5 +1,19 @@
 import { createSelector } from 'reselect'
 
+const buildCheckTabMessages = () => {
+  return createSelector(
+    (state, labwareIndex) => StateAccessors.content.tabMessages(state, labwareIndex),
+    (messages) => { return (messages.length > 0) }
+  )
+}
+
+const buildCheckTabErrors = () => {
+  return createSelector(
+    (state, labwareIndex) => StateAccessors.content.errorTabMessages(state, labwareIndex),
+    (messages) => { return (messages.length > 0) }
+  )
+}
+
 const StateAccessors = {
   manifest: {
     selectedTabPosition: createSelector(
@@ -14,17 +28,17 @@ const StateAccessors = {
       (state) => state.manifest.labwares,
       (labwares) => labwares.map((l) => l.supplier_plate_name)
     ),
+    labwareIndexes: createSelector(
+      (state) => StateAccessors.manifest.supplierPlateNames(state),
+      (names) => names.map((n, pos) => pos)
+    ),
     plateIdFor: (state, pos) => StateAccessors.manifest.supplierPlateNames(state)[pos]
   },
   content: {
-    hasTabMessages: createSelector(
-      (state, labwareIndex) => StateAccessors.content.tabMessages(state, labwareIndex),
-      (messages) => { return (messages.length > 0) }
-    ),
-    hasTabErrors: createSelector(
-      (state, labwareIndex) => StateAccessors.content.errorTabMessages(state, labwareIndex),
-      (messages) => { return (messages.length > 0) }
-    ),
+    buildCheckTabMessages,
+    hasTabMessages: buildCheckTabMessages(),
+    buildCheckTabErrors,
+    hasTabErrors: buildCheckTabErrors(),
     isWarning: (m) => { return (m.level == 'WARN')},
     warningTabMessages: createSelector(
       (state, labwareIndex) => StateAccessors.content.tabMessages(state, labwareIndex),
@@ -83,38 +97,42 @@ const StateAccessors = {
     }
   },
   schema: {
-    fieldsToShow: (state) => {
-      return state.schema.show_on_form || []
-    },
-    friendlyNameFor: (state, fieldName) => {
-      return (state.schema.properties[fieldName].friendly_name || fieldName)
-    },
-    isRequiredField: (state, fieldName) => {
-      return StateAccessors.schema.propertyForFieldName(state, fieldName)["required"]
-    },
-    propertyForFieldName: (state, fieldName) => {
-      return state.schema["properties"][fieldName]
-    },
-    fieldTypeFor: (state, fieldName)=> {
-      return (state.schema["properties"][fieldName]["field_type"] || 'text')
-    },
-    fieldNameForPos: (state, pos) => {
-      return state.schema.show_on_form[pos]
-    },
-    isSelectFieldName: (state, fieldName) => {
-      return !!StateAccessors.schema.optionsForSelect(state, fieldName)
-    },
-    optionsForSelect: (state, fieldName) => {
-      return state.schema.properties[fieldName]['allowed']
-    },
-    selectedOptionValue: (state, fieldName, selectedValue) => {
-      if ((!selectedValue) || (selectedValue.length==0)) {
-        return ""
+    get: createSelector(
+      (state) => JSON.stringify(state.schema),
+      (schema) => JSON.parse(schema)
+    ),
+    fieldsToShow: createSelector(
+      (state) => StateAccessors.schema.get(state),
+      (schema) => { return schema.show_on_form || [] }
+    ),
+    propertyForFieldName: (state, fieldName) => StateAccessors.schema.get(state).properties[fieldName],
+    friendlyNameFor: createSelector(
+      (state, fieldName) => StateAccessors.schema.propertyForFieldName(state, fieldName),
+      (property) => property["friendly_name"]
+    ),
+    isRequiredField: createSelector(
+      (state, fieldName) => StateAccessors.schema.propertyForFieldName(state, fieldName),
+      (property) => property["required"]
+    ),
+    fieldTypeFor: createSelector(
+      (state, fieldName) => StateAccessors.schema.propertyForFieldName(state, fieldName),
+      (property) => { return property["field_type"] || 'text'}
+    ),
+    fieldNameForPos: (state, pos) => StateAccessors.schema.fieldsToShow(state)[pos],
+    isSelectFieldName: (state, fieldName) => !!StateAccessors.schema.optionsForSelect(state, fieldName),
+    optionsForSelect: createSelector(
+      (state, fieldName) => StateAccessors.schema.propertyForFieldName(state, fieldName),
+      (property) => property['allowed']
+    ),
+    selectedOptionValue: createSelector(
+      [
+        (state, fieldName) => StateAccessors.schema.optionsForSelect(state, fieldName),
+        (state, fieldName, selectedValue) => selectedValue
+      ],
+      (options, selectedValue) => {
+        return (options.filter((o) => o.match(new RegExp(selectedValue, 'i')))[0] || "")
       }
-      return StateAccessors.schema.optionsForSelect(state, fieldName).filter((o) => {
-        return o.match(new RegExp(selectedValue, 'i'))
-      })[0] || ""
-    }
+    )
   }
 }
 

@@ -8,6 +8,8 @@ import { setManifestValue} from '../actions'
 import LabwareTabs from './labware_tabs'
 import classNames from 'classnames'
 
+const logName = (name) => { }
+
 const LabwareContentHeaderComponent = (props) => {
   const requiredMark = props.isRequiredField ? (<span style={{color: "red"}}>*</span>) : null
 
@@ -26,6 +28,7 @@ const LabwareContentHeader = connect((state, ownProps) => {
 })(LabwareContentHeaderComponent)
 
 const LabwareContentSelectComponent = (props) => {
+  logName('LabwareContentSelectComponent')
   const {fieldName,title,name,id,selectedOptionValue,onChange} = props
 
   return(
@@ -46,6 +49,7 @@ const LabwareContentSelect = connect((state, ownProps) => {
 })(LabwareContentSelectComponent)
 
 const LabwareContentText = (props) => {
+  logName('LabwareContentText')
   const {onChange,selectedValue,title,name,id} = props
   return(
     <input onChange={onChange}
@@ -60,9 +64,12 @@ class LabwareContentInputComponent extends React.Component {
   }
 
   buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId) {
-    return (e) => {
-      return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value, plateId)
+    if (!this.onChange) {
+      this.onChange = (e) => {
+        return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value, plateId)
+      }
     }
+    return this.onChange
   }
 
   commonPropsForInput() {
@@ -72,6 +79,7 @@ class LabwareContentInputComponent extends React.Component {
   }
 
   render() {
+    logName('LabwareContentInputComponent')
     const {isSelect, fieldName} = this.props
     if (isSelect) {
       return <LabwareContentSelect {...this.commonPropsForInput()} fieldName={fieldName} />
@@ -105,25 +113,34 @@ const LabwareContentInput = connect(
     }
   })(LabwareContentInputComponent)
 
-const LabwareContentCellComponent = (props) => {
-  return (
-    <td data-psd-schema-validation-name={props.fieldName}>
-      <div className={ classNames({
-              'form-group': true,
-              'has-error': props.displayError,
-              'has-warning': props.displayWarning
-            }
-          )
-        }
-        style={{position: "relative"}}>
+class LabwareContentCellComponent extends React.Component {
+  /*shouldComponentUpdate(nextProps, nextState) {
+    const val = StateSelectors.content.selectedValueAtCell(this.state, this.props.labwareIndex, this.props.address, this.props.fieldName)
+    const nextVal = StateSelectors.content.selectedValueAtCell(nextState, nextProps.labwareIndex, nextProps.address, nextProps.fieldName)
+    return (val !== nextVal)
+  }*/
+  render() {
+    logName('LabwareContentCellComponent')
+    const props = this.props
+    return (
+      <td data-psd-schema-validation-name={props.fieldName}>
+        <div className={ classNames({
+                'form-group': true,
+                'has-error': props.displayError,
+                'has-warning': props.displayWarning
+              }
+            )
+          }
+          style={{position: "relative"}}>
 
-        <LabwareContentInput
-          labwareIndex={props.labwareIndex}
-          address={props.address}
-          fieldName={props.fieldName} />
-      </div>
-    </td>
-  )
+          <LabwareContentInput
+            labwareIndex={props.labwareIndex}
+            address={props.address}
+            fieldName={props.fieldName} />
+        </div>
+      </td>
+    )
+  }
 }
 
 const LabwareContentCell = connect((state, ownProps) => {
@@ -141,6 +158,7 @@ const LabwareContentCell = connect((state, ownProps) => {
 })(LabwareContentCellComponent)
 
 const LabwareContentAddressComponent = (props) => {
+  logName('LabwareContentAddressComponent')
   return(
     <tr
       data-psd-component-class='TaxonomyIdControl'
@@ -175,47 +193,58 @@ const LabwareContentAddress = connect((state, ownProps) => {
   }
 })(LabwareContentAddressComponent)
 
-const LabwareContentComponent = (props) => {
-  if (!props.positionsForLabware) {
-    debugger
+class LabwareContentAddresses extends React.Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    const update = (nextProps.selectedTabPosition == this.props.position)
+    return update
   }
+  render() {
+    logName('LabwareContentAddresses')
+    const props = this.props
+    return props.positionsForLabware.map((address, posAddress) => {
+      return (
+        <LabwareContentAddress key={address}
+          labwareIndex={props.position}
+          address={address}  />
+      )
+    })
+  }
+}
+
+const LabwareContentComponent = (props) => {
+  logName('LabwareContentComponent')
   return(
     <div role="tabpanel"
-    className={
-      "tab-pane"+ ((props.selectedTabPosition === props.position) ? " active": "")
-    } id={"Labware"+ props.labwareIndex}>
+      className={classNames({"tab-pane": true, "active": (props.selectedTabPosition === props.position)})}
+      id={"Labware"+ props.labwareIndex}>
 
       <div style={{overflow: "scroll"}} className="material-data-table">
 
-      <table className="table table-condensed table-striped"
-             data-psd-component-class={
-              JSON.stringify(["LoadTable", "DataTableSchemaValidation"])
-            }
-             data-psd-component-parameters={JSON.stringify([{
-              manifest_id: props.manifestId
-              }, {
-                schemaJson: props.schema,
-                material_schema_url: props.materialSchemaUrl
+        <table className="table table-condensed table-striped"
+               data-psd-component-class={
+                JSON.stringify(["LoadTable", "DataTableSchemaValidation"])
               }
-              ])}>
-        <thead>
-          <tr>
-            <th></th>
-            { props.fieldsToShow.map((name, pos) => {
-              return (
-                <LabwareContentHeader fieldName={name} key={name} />
-            )})}
-          </tr>
-        </thead>
+               data-psd-component-parameters={JSON.stringify([{
+                manifest_id: props.manifestId
+                }, {
+                  schemaJson: props.schema,
+                  material_schema_url: props.materialSchemaUrl
+                }
+                ])}>
+          <thead>
+            <tr>
+              <th></th>
+              { props.fieldsToShow.map((name, pos) => {
+                return (
+                  <LabwareContentHeader fieldName={name} key={name} />
+              )})}
+            </tr>
+          </thead>
 
-        <tbody>
-            { props.positionsForLabware.map((address, posAddress) => {
-              return (
-                <LabwareContentAddress key={address}
-                  labwareIndex={props.labwareIndex}
-                  address={address}  />
-              )
-            }) }
+          <tbody>
+            <LabwareContentAddresses
+              positionsForLabware={props.positionsForLabware}
+              selectedTabPosition={props.selectedTabPosition} position={props.position} />
           </tbody>
         </table>
       </div>
@@ -227,7 +256,7 @@ const LabwareContent = connect((state, ownProps) => {
   return {
     labwareIndex: ownProps.labwareIndex,
 
-    schema: state.schema,
+    schema: StateSelectors.schema.get(state),
     manifestId: state.manifest.manifest_id,
     selectedTabPosition: StateSelectors.manifest.selectedTabPosition(state),
     positionsForLabware: StateSelectors.manifest.positionsForLabware(state, ownProps),
@@ -237,6 +266,7 @@ const LabwareContent = connect((state, ownProps) => {
 })(LabwareContentComponent)
 
 const LabwareContentsComponent = (props) => {
+  logName('LabwareContentsComponent')
   return (
     <div className="tab-content">
       { props.labwareIndexes.map((labwareIndex, pos) => {
@@ -249,12 +279,14 @@ const LabwareContentsComponent = (props) => {
 }
 
 const LabwareContents = connect((state) => {
+  logName('LabwareContents')
   return {
-    labwareIndexes: StateSelectors.manifest.supplierPlateNames(state).map((labware,pos) => pos)
+    labwareIndexes: StateSelectors.manifest.labwareIndexes(state)
   }
 })(LabwareContentsComponent)
 
 const ManifestContainersComponent = (props) => {
+  logName('ManifestContainersComponent')
   if (props.manifestId) {
     return(
       <Fragment>

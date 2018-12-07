@@ -7,13 +7,16 @@ import ManifestContainers from './manifest_containers'
 import { loadManifest, selectExpectedOption, selectObservedOption, displayMessage} from '../actions'
 import StateSelectors from '../selectors'
 
+const logName = (name) => { }
 const MessageDisplay = (props) => {
+  logName('MessageDisplay')
   return(
     <span>At ({props.supplierPlateNames[props.labware_index]} - {props.address} {props.field}): {props.text}</span>
   )
 }
 
 const ErrorDisplay = (props) => {
+  logName('ErrorDisplay')
   return (
     <div id="page-error-alert" className="alert alert-danger" role="alert">
       <button type="button" className="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -23,6 +26,7 @@ const ErrorDisplay = (props) => {
 }
 
 const WarningDisplay = (props) => {
+  logName('WarningDisplay')
   return (
     <div id="page-warning-alert" className="alert alert-warning" role="alert">
       <strong className='alert-title'>Warning!</strong>
@@ -32,6 +36,7 @@ const WarningDisplay = (props) => {
 }
 
 const MessagesDisplayComponent = (props) => {
+  logName('MessagesDisplayComponent')
   return (
     <div>
       { props.warnings.map((msg, pos) => {
@@ -67,6 +72,7 @@ const MessagesDisplay = connect((state, ownProps) => {
 
 
 export const ManifestEditorComponent = (props) => {
+  logName('ManifestEditorComponent')
   return(
     <div>
       <MappingTool />
@@ -77,6 +83,7 @@ export const ManifestEditorComponent = (props) => {
 }
 
 const ManifestEditor = (props) => {
+  logName('ManifestEditor')
   if (props) {
     store.dispatch(loadManifest(props))
   }
@@ -89,7 +96,7 @@ const ManifestEditor = (props) => {
 
         store.dispatch(loadManifest(manifest))
         //store.dispatch(loadManifestMapping(manifest.mapping))
-        console.log(store.getState())
+        logName(store.getState())
         if (!store.getState().mapping.valid) {
           store.dispatch(selectExpectedOption(null))
           store.dispatch(selectObservedOption(null))
