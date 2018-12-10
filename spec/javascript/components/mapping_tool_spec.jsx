@@ -15,7 +15,15 @@ const getContext = (status) => {
 describe('<MappingTool />', () => {
 
   let status = {
+    "manifest": {
+      "manifest_id": "1234",
+      "labwares": [
+        {"supplier_plate_name": "Labware 1","positions": ["A:1","B:1"]},
+        {"supplier_plate_name": "Labware 2","positions": ["1"]}
+      ]
+    },
     mapping: {
+      hasUnmatched: true,
       expected: [
         'tissue',
         'phenotype'],

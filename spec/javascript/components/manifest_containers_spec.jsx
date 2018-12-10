@@ -113,7 +113,7 @@ describe('<ManifestContainers />', () => {
 
     context('<LabwareTab>', () => {
       it('displays a tab for each labware', () => {
-        expect(wrapper.find('LabwareTab')).to.have.length(2)
+        expect(wrapper.find('LabwareTabComponent')).to.have.length(2)
       })
 
     })

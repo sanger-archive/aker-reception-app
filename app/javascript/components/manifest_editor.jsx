@@ -84,7 +84,7 @@ export const ManifestEditorComponent = (props) => {
 
 const ManifestEditor = (props) => {
   logName('ManifestEditor')
-  if (props) {
+  if (props && props.manifest) {
     store.dispatch(loadManifest(props))
   }
 

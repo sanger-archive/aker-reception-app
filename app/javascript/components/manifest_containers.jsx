@@ -259,7 +259,7 @@ const LabwareContent = connect((state, ownProps) => {
     schema: StateSelectors.schema.get(state),
     manifestId: state.manifest.manifest_id,
     selectedTabPosition: StateSelectors.manifest.selectedTabPosition(state),
-    positionsForLabware: StateSelectors.manifest.positionsForLabware(state, ownProps),
+    positionsForLabware: StateSelectors.manifest.positionsForLabware(state, ownProps.labwareIndex),
     materialSchemaUrl: state.services.materials_schema_url,
     fieldsToShow: StateSelectors.schema.fieldsToShow(state)
   }

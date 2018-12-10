@@ -4,7 +4,7 @@ import React, { Fragment } from 'react';
 import { expect } from 'chai'
 import { shallow, mount } from 'enzyme';
 import ManifestEditor from "../../../app/javascript/components/manifest_editor.jsx"
-import { ManifestEditorConnected } from "../../../app/javascript/components/manifest_editor.jsx"
+import { ManifestEditorComponent } from "../../../app/javascript/components/manifest_editor.jsx"
 
 import { createMockStore } from 'redux-test-utils';
 
@@ -14,8 +14,17 @@ const getContext = (status) => {
 }
 
 let status = {
+  "manifest": {
+    "selectedTabPosition": "0",
+    "manifest_id": "1234",
+    "labwares": [
+      {"supplier_plate_name": "Labware 1","positions": ["A:1","B:1"]},
+      {"supplier_plate_name": "Labware 2","positions": ["1"]}
+    ]
+  },
   mapping: { expected: [], observed: [], matched: []}
 }
+
 
 describe('<ManifestEditor />', () => {
   context('when rendering it', () => {
@@ -23,19 +32,19 @@ describe('<ManifestEditor />', () => {
     it('renders the Provider element', () => {
       expect(wrapper.find('Provider')).to.have.length(1);
     })
-    xit('renders the ManifestEditorConnected element', () => {
+    it('renders the ManifestEditorConnected element', () => {
       expect(wrapper.find('ManifestEditorComponent')).to.have.length(1);
     })
 
   })
 })
 
-describe('<ManifestEditorConnected>', () => {
+describe('<ManifestEditorComponent>', () => {
   context('when rendering it', () => {
-    let wrapper = shallow(<ManifestEditor />, getContext(status));
+    let wrapper = mount(<ManifestEditor />, getContext(status));
 
     it('renders the MappingTool element', () => {
-      expect(wrapper.find('MappingTool')).to.have.length(1);
+      expect(wrapper.find('MappingToolComponent')).to.have.length(1);
     })
   })
 })
