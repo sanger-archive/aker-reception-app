@@ -22,6 +22,7 @@ const reducers = combineReducers({
 })
 
 export default (state, action) => {
+
   switch(action.type) {
     case C.LOAD_MANIFEST:
       return action.manifest

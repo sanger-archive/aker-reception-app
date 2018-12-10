@@ -8,6 +8,8 @@ import { setManifestValue} from '../actions'
 import LabwareTabs from './labware_tabs'
 import classNames from 'classnames'
 
+import { unstable_trace as trace } from "scheduler/tracing";
+
 const logName = (name) => { }
 
 const LabwareContentHeaderComponent = (props) => {
@@ -66,7 +68,12 @@ class LabwareContentInputComponent extends React.Component {
   buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId) {
     if (!this.onChange) {
       this.onChange = (e) => {
-        return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value, plateId)
+
+
+        trace("Change input", performance.now(), () => {
+          return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value, plateId)
+        });
+        //return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value, plateId)
       }
     }
     return this.onChange

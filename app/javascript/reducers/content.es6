@@ -35,6 +35,7 @@ export const removeEmptyRows = (newState, labwareId, address) => {
 
 
 export default (state = {}, action) => {
+
   let newState
   switch(action.type) {
     case C.DISPLAY_MESSAGE:

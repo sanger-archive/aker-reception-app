@@ -1,7 +1,7 @@
 import C from '../constants'
-import field from './field'
 
 export default (state = {}, action) => {
+
   switch(action.type) {
     case C.MATCH_SELECTION:
       let mp = Object.assign({}, state)
