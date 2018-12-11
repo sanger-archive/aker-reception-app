@@ -35,6 +35,13 @@ export const selectObservedOption = (val) => {
 export const setManifestValue = (labwareId, address, fieldName, value, plateId) => {
   return {
     type: C.SET_MANIFEST_VALUE, labwareId, address, fieldName, value, plateId
+    //,
+    /*meta: {
+      debounce: {
+        time: 1000,
+        key: 'SET_MANIFEST_INPUT_DEBOUNCED'
+      }
+    }*/
   }
 }
 

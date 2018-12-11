@@ -29,6 +29,7 @@
     "reselect": "^4.0.0",
     "select2": "^4.0.6-rc.1",
     "selectize": "^0.12.4",
+    "throttle-debounce": "^2.0.1",
     "webpacker-react": "^0.3.2"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "mocha": "^5.2.0",
     "mocha-webpack": "^1.1.0",
     "redux-test-utils": "^0.3.0",
+    "scheduler": "^0.11.3",
     "sinon": "^6.1.5",
     "webpack-dev-server": "2.11.2",
     "webpack-node-externals": "^1.7.2"

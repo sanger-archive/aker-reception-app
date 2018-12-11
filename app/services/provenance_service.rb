@@ -56,7 +56,7 @@ class ProvenanceService
           material_data.each do |fieldName, value|
             unless value.blank?
               filtered_data[address] = {} if filtered_data[address].nil?
-              filtered_data[address][fieldName] = value.strip()
+              filtered_data[address][fieldName] = value.to_s.strip()
 
               # Add HMDMC set_by field for each sample
               filtered_data[address]['hmdmc_set_by'] = current_user.email if fieldName == 'hmdmc'

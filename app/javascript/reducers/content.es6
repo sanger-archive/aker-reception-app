@@ -47,10 +47,15 @@ export default (state = {}, action) => {
       return displayObj
     case C.SET_MANIFEST_VALUE:
       newState = Object.assign({}, state)
+      console.log('STATE=')
+      console.log(state)
+
       setManifestValue(newState, action.labwareId, action.address, "plate_id", action.labwareId)
       setManifestValue(newState, action.labwareId, action.address, "position", action.address)
       setManifestValue(newState, action.labwareId, action.address, action.fieldName, action.value)
       removeEmptyRows(newState, action.labwareId, action.address)
+      console.log('NEWSTATE=')
+      console.log(newState)
       return newState
     default:
       return state

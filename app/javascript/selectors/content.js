@@ -14,11 +14,33 @@ export const buildCheckTabErrors = () => {
   )
 }
 
+export const buildCheckInputMessages = () => {
+  return createSelector(
+    (state, props) => ContentSelector.inputMessages(state,props),
+    (messages) => (messages.length > 0)
+  )
+}
+
+export const buildCheckInputErrors = () => {
+  return createSelector(
+    (state, props) => ContentSelector.errorInputMessages(state,props),
+    (messages) => (messages.length > 0)
+  )
+}
+
 export const ContentSelector = {
   buildCheckTabMessages,
   hasTabMessages: buildCheckTabMessages(),
+
   buildCheckTabErrors,
   hasTabErrors: buildCheckTabErrors(),
+
+  buildCheckInputMessages,
+  hasInputMessages: buildCheckInputMessages(),
+
+  buildCheckInputErrors,
+  hasInputErrors: buildCheckInputErrors(),
+
   isWarning: (m) => { return (m.level == 'WARN')},
   warningTabMessages: createSelector(
     (state, labwareIndex) => ContentSelector.tabMessages(state, labwareIndex),
@@ -47,16 +69,6 @@ export const ContentSelector = {
   warningInputMessages: createSelector(
     (state, props) => ContentSelector.inputMessages(state,props),
     (messages) => messages.filter((m) => ContentSelector.isWarning(m))
-  ),
-
-  hasInputMessages: createSelector(
-    (state, props) => ContentSelector.inputMessages(state,props),
-    (messages) => (messages.length > 0)
-  ),
-
-  hasInputErrors: createSelector(
-    (state, props) => ContentSelector.errorInputMessages(state,props),
-    (messages) => (messages.length > 0)
   ),
 
   selectedValueAtCell: (state, labwareId, address, fieldName) => {

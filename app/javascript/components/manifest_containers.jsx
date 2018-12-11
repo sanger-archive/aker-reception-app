@@ -3,14 +3,18 @@ import {Fragment} from "react"
 import PropTypes from "prop-types"
 import { connect } from 'react-redux'
 import StateSelectors from '../selectors'
-import { setManifestValue} from '../actions'
+import { setManifestValue, saveTab } from '../actions'
 
 import LabwareTabs from './labware_tabs'
 import classNames from 'classnames'
 
 import { unstable_trace as trace } from "scheduler/tracing";
 
-const logName = (name) => { }
+import { debounce, throttle } from 'throttle-debounce'
+
+const logName = (name) => {  }
+
+const DEBOUNCED_TIMING=500
 
 const LabwareContentHeaderComponent = (props) => {
   const requiredMark = props.isRequiredField ? (<span style={{color: "red"}}>*</span>) : null
@@ -63,24 +67,54 @@ const LabwareContentText = (props) => {
 class LabwareContentInputComponent extends React.Component {
   constructor(props) {
     super(props)
+    this.state = {
+      value: props.selectedValue
+    }
+    this.onChangeProcessThrottelledCall = this.buildThrottelledCall()
+  }
+
+  onChangeProcess(receivedChanges) {
+    receivedChanges.reduceRight((memo, receivedChange) => {
+      const found = (memo.filter((actualChange)=> {
+        return ((actualChange[0]==receivedChange[0]) && (actualChange[1]==receivedChange[1]) && (actualChange[2]==receivedChange[2]))
+      }))
+      if (found.length == 0) {
+        memo.push(receivedChange)
+      }
+      return memo
+    }, []).reverse().forEach((receivedChange, pos) => {
+      this.props.onChangeManifestInput.apply(this, receivedChange)
+    })
+
+    this.receivedChanges=[]
+  }
+
+  buildThrottelledCall() {
+    let receivedChanges = []
+
+    const debouncedCall = debounce(DEBOUNCED_TIMING, () => { this.onChangeProcess(receivedChanges)} )
+
+    return (labwareIndex, address, fieldName, value, plateId) => {
+      receivedChanges.push([labwareIndex, address, fieldName, value, plateId])
+      debouncedCall()
+    }
   }
 
   buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId) {
     if (!this.onChange) {
       this.onChange = (e) => {
-
-
-        trace("Change input", performance.now(), () => {
-          return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value, plateId)
-        });
-        //return this.props.onChangeManifestInput(labwareIndex, address, fieldName, e.target.value, plateId)
+        const value = e.target.value
+        this.setState({value: value})
+        this.onChangeProcessThrottelledCall(labwareIndex, address, fieldName, value, plateId)
       }
     }
     return this.onChange
   }
 
   commonPropsForInput() {
-    const { title, name, id, selectedValue, labwareIndex, address, fieldName, plateId } = this.props
+    const selectedValue = this.state.value
+
+    const { title, name, id, labwareIndex, address, fieldName, plateId } = this.props
     const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId)
     return { selectedValue, title, name, id, onChange }
   }
@@ -116,6 +150,7 @@ const LabwareContentInput = connect(
     return {
       onChangeManifestInput: (labwareIndex, address, fieldName, value, plateId) => {
         dispatch(setManifestValue(labwareIndex, address, fieldName, value, plateId))
+        dispatch(saveTab())
       }
     }
   })(LabwareContentInputComponent)
@@ -150,19 +185,22 @@ class LabwareContentCellComponent extends React.Component {
   }
 }
 
-const LabwareContentCell = connect((state, ownProps) => {
-  const contentAccessor = StateSelectors.content
-  const hasMessages = contentAccessor.hasInputMessages(state, ownProps)
-  const hasErrors = contentAccessor.hasInputErrors(state, ownProps)
+const mapStateToPropsLabwareContentCell = ((hasInputMessages, hasInputErrors) => {
+  return (state, ownProps) => {
+    const hasMessages = hasInputMessages(state, ownProps)
+    const hasErrors = hasInputErrors(state, ownProps)
 
-  return {
-    labwareIndex: ownProps.labwareIndex,
-    address: ownProps.address,
-    fieldName: ownProps.fieldName,
-    displayError: hasMessages && hasErrors,
-    displayWarning: hasMessages && !hasErrors
+    return {
+      labwareIndex: ownProps.labwareIndex,
+      address: ownProps.address,
+      fieldName: ownProps.fieldName,
+      displayError: hasMessages && hasErrors,
+      displayWarning: hasMessages && !hasErrors
+    }
   }
-})(LabwareContentCellComponent)
+})(StateSelectors.content.buildCheckInputMessages(), StateSelectors.content.buildCheckInputErrors())
+
+const LabwareContentCell = connect(mapStateToPropsLabwareContentCell)(LabwareContentCellComponent)
 
 const LabwareContentAddressComponent = (props) => {
   logName('LabwareContentAddressComponent')
