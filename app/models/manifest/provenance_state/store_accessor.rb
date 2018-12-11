@@ -14,21 +14,23 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
 
   def updates_for(obj)
     obj.keys.reduce({}) do |memo_labware, labware_key|
-      memo_labware[labware_key.to_s] = {
-        "contents" =>  obj[labware_key][:addresses].keys.reduce({}) do |memo_address, address_key|
-          memo_address[address_key] = obj[labware_key][:addresses][address_key][:fields].keys.reduce({}) do |memo_fields, field_key|
-            memo_fields[field_key] = obj[labware_key][:addresses][address_key][:fields][field_key][:value]
-            memo_fields
+      if obj[labware_key][:addresses]
+        memo_labware[labware_key.to_s] = {
+          "contents" =>  obj[labware_key][:addresses].keys.reduce({}) do |memo_address, address_key|
+            memo_address[address_key] = obj[labware_key][:addresses][address_key][:fields].keys.reduce({}) do |memo_fields, field_key|
+              memo_fields[field_key] = obj[labware_key][:addresses][address_key][:fields][field_key][:value]
+              memo_fields
+            end
+            memo_address
           end
-          memo_address
-        end
-      }
+        }
+      end
       memo_labware
     end
   end
 
   def update(updates)
-    if updates
+    if updates && !updates.empty?
       provenance = ProvenanceService.new(manifest_schema)
       success, messages = provenance.set_biomaterial_data(manifest_model, updates, user)
       apply_messages(messages)
@@ -50,9 +52,11 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
     if state_access[:structured]
       state_access[:structured][:messages] = []
       state_access[:structured][:labwares].keys.each do |l_key|
-        state_access[:structured][:labwares][l_key][:addresses].keys.each do |a_key|
-          state_access[:structured][:labwares][l_key][:addresses][a_key][:fields].keys.each do |f_key|
-            state_access[:structured][:labwares][l_key][:addresses][a_key][:fields][f_key][:messages] = []
+        if state_access[:structured][:labwares][l_key][:addresses]
+          state_access[:structured][:labwares][l_key][:addresses].keys.each do |a_key|
+            state_access[:structured][:labwares][l_key][:addresses][a_key][:fields].keys.each do |f_key|
+              state_access[:structured][:labwares][l_key][:addresses][a_key][:fields][f_key][:messages] = []
+            end
           end
         end
       end

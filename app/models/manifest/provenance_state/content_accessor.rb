@@ -12,7 +12,12 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   class PositionNotFound < StandardError ; end
   class LabwareNotFound < StandardError ; end
   class PositionDuplicated < StandardError ; end
+  class WrongNumberLabwares < StandardError ; end
 
+
+  def present?
+    super && state_access.key?(:structured)
+  end
 
   def build
     {
@@ -36,18 +41,18 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   def read_from_database
     returned_list = {}
     manifest_model.labwares.each_with_index do |labware, pos|
-      next unless labware.contents
-      returned_list[pos.to_s] = {
-        addresses: labware.contents.keys.reduce({}) do |memo_address, address|
-            memo_address[address] = {
-              fields: labware.contents[address].keys.reduce({}) do |memo_field, field|
-                memo_field[field] = {value: labware.contents[address][field]}
-                memo_field
-              end
-            }
-            memo_address
-          end
-      }
+      returned_list[pos.to_s] = {}
+      if (labware.contents)
+        returned_list[pos.to_s][:addresses] = labware.contents.keys.reduce({}) do |memo_address, address|
+          memo_address[address] = {
+            fields: labware.contents[address].keys.reduce({}) do |memo_field, field|
+              memo_field[field] = {value: labware.contents[address][field]}
+              memo_field
+            end
+          }
+          memo_address
+        end
+      end
     end
     {:labwares => returned_list}
   end
