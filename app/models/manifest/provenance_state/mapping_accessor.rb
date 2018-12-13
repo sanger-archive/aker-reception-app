@@ -5,6 +5,8 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
     unless (state_access.key?(:valid))
       state_access[:valid] = (required_unmatched_fields.length == 0)
       state_access[:hasUnmatched] = (shown_unmatched_fields.length != 0)
+      state_access[:shown] = state_access[:hasUnmatched]
+      state_access[:rebuild] = state_access.key?(:rebuild) ? state_access[:rebuild] : state_access[:shown]
     end
   end
 

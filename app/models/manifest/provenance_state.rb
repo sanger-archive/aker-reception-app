@@ -24,14 +24,12 @@ class Manifest::ProvenanceState
 
   def apply(state)
     @state = (state.dup || build_state)
-
     @services.apply(@state)
     @manifest.apply(@state)
     @schema.apply(@state)
     @mapping.apply(@state)
     @content.apply(@state)
     @store.apply(@state)
-
     @state
   end
 

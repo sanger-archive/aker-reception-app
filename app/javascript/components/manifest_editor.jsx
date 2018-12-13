@@ -107,7 +107,7 @@ const ManifestEditor = (props) => {
         }
       }, this),
       (xhr) => {
-        store.dispatch(displayMessage({level: 'FATAL', display: 'alert', text: xhr.responseJSON.errors.join("\n") }))
+        store.dispatch(displayMessage({labwareIndex: null, address: null, level: 'FATAL', display: 'alert', text: xhr.responseJSON.errors.join("\n") }))
       }
     )
     .always(() => {

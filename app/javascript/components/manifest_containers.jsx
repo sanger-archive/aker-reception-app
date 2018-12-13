@@ -68,9 +68,14 @@ class LabwareContentInputComponent extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      value: props.selectedValue
+      value: props.selectedValue,
+      stateValueSelected: 'redux'
     }
     this.onChangeProcessThrottelledCall = this.buildThrottelledCall()
+  }
+
+  setStateValueSelected(str) {
+    this.setState({stateValueSelected: str})
   }
 
   onChangeProcess(receivedChanges) {
@@ -86,6 +91,7 @@ class LabwareContentInputComponent extends React.Component {
       this.props.onChangeManifestInput.apply(this, receivedChange)
     })
 
+    this.setStateValueSelected('redux')
     this.receivedChanges=[]
   }
 
@@ -95,6 +101,7 @@ class LabwareContentInputComponent extends React.Component {
     const debouncedCall = debounce(DEBOUNCED_TIMING, () => { this.onChangeProcess(receivedChanges)} )
 
     return (labwareIndex, address, fieldName, value, plateId) => {
+      this.setStateValueSelected('react')
       receivedChanges.push([labwareIndex, address, fieldName, value, plateId])
       debouncedCall()
     }
@@ -112,7 +119,9 @@ class LabwareContentInputComponent extends React.Component {
   }
 
   commonPropsForInput() {
-    const selectedValue = this.state.value
+    // If we are in React mode, we'll get the value from the state of this component. If we are working in Redux mode
+    /// we'll get it from Redux state
+    const selectedValue = (this.state.stateValueSelected =='react') ? this.state.value : this.props.selectedValue
 
     const { title, name, id, labwareIndex, address, fieldName, plateId } = this.props
     const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId)
@@ -346,6 +355,7 @@ const ManifestContainersComponent = (props) => {
 }
 
 const ManifestContainers = connect((state) => {
+  console.log(state)
   return { manifestId: state.manifest.manifest_id }
 })(ManifestContainersComponent)
 

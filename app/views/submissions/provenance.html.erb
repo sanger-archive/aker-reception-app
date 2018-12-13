@@ -5,14 +5,10 @@
 <div data-psd-component-class="SingleTableManager"
      data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
 
-  <%= bootstrap_form_tag url: manifest_biomaterial_data_path(manifest.id),
-                         remote: true,
-                         method: :put,
-                         html: {:'data-type' => 'json'} do |f| %>
-
+  <div>
     <% labwares = manifest.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
 
-    <%= render 'buttons', manifest: manifest, f: f %>
+    <!-- %= render 'buttons', manifest: manifest, f: f % -->
 
     <div style="margin-top: 10px" class="well csv-upload-box">
       <div class="row">
@@ -37,7 +33,7 @@
 
     <%= react_component("ManifestEditor", state_for_manifest(manifest, current_user)) %>
 
-    <%= render 'buttons', manifest: manifest, f: f %>
+    <!-- %= render 'buttons', manifest: manifest, f: f % -->
 
-  <% end %>
+  </div>
 </div>

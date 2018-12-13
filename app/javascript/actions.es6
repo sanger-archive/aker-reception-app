@@ -76,7 +76,7 @@ export const displayMessage = (data) => {
 }
 
 export const toggleMapping = (toggle) => {
-  return { type: C.TOGGLE_MAPPING, toggle}
+  return { type: C.TOGGLE_MAPPING, toggle }
 }
 
 export const restoreTab = (labwareId) => {

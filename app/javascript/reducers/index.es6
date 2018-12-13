@@ -22,10 +22,10 @@ const reducers = combineReducers({
 })
 
 export default (state, action) => {
-
   switch(action.type) {
     case C.LOAD_MANIFEST:
-      return action.manifest
+      let obj = Object.assign({}, action.manifest, reducers(state, action))
+      return obj
     default:
       return reducers(state, action)
   }

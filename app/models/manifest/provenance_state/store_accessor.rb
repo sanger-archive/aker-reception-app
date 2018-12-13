@@ -42,24 +42,24 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
     state_access[:structured][:messages].push({level: "ERROR",
       text: text, labware_index: labware_index, address: address, field: field
       })
-    if labware_index && address && field
-      build_keys(@state, [:content, :structured, :labwares, labware_index, :addresses, address, :fields, field, :messages])
-      state_access[:structured][:labwares][labware_index][:addresses][address][:fields][field][:messages] = [text]
-    end
+    #if labware_index && address && field
+    #  build_keys(@state, [:content, :structured, :labwares, labware_index, :addresses, address, :fields, field, :messages])
+    #  state_access[:structured][:labwares][labware_index][:addresses][address][:fields][field][:messages] = [text]
+    #end
   end
 
   def clean_errors
     if state_access[:structured]
       state_access[:structured][:messages] = []
-      state_access[:structured][:labwares].keys.each do |l_key|
-        if state_access[:structured][:labwares][l_key][:addresses]
-          state_access[:structured][:labwares][l_key][:addresses].keys.each do |a_key|
-            state_access[:structured][:labwares][l_key][:addresses][a_key][:fields].keys.each do |f_key|
-              state_access[:structured][:labwares][l_key][:addresses][a_key][:fields][f_key][:messages] = []
-            end
-          end
-        end
-      end
+      # state_access[:structured][:labwares].keys.each do |l_key|
+      #   if state_access[:structured][:labwares][l_key][:addresses]
+      #     state_access[:structured][:labwares][l_key][:addresses].keys.each do |a_key|
+      #       state_access[:structured][:labwares][l_key][:addresses][a_key][:fields].keys.each do |f_key|
+      #         state_access[:structured][:labwares][l_key][:addresses][a_key][:fields][f_key][:messages] = []
+      #       end
+      #     end
+      #   end
+      # end
     end
   end
 

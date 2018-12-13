@@ -51,8 +51,9 @@ export const ContentSelector = {
     (messages) => messages.filter((m) => !ContentSelector.isWarning(m))
   ),
   tabMessages: (state, tabIndex) => {
-    let val = state?.content?.structured?.messages?.filter((m) => m.labware_index==tabIndex)
-    return (val ? val : [])
+    return (state?.content?.structured?.messages?.filter((m) => {
+      return (m.labware_index==tabIndex) || (m.labware_index==null)
+    }) || [])
   },
 
   inputMessages: (state, props) => {

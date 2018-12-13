@@ -3,6 +3,9 @@ import C from '../constants'
 export default (state = {}, action) => {
 
   switch(action.type) {
+    case C.LOAD_MANIFEST:
+      return Object.assign({}, state, action.manifest.mapping)
+
     case C.MATCH_SELECTION:
       let mp = Object.assign({}, state)
       mp.matched.push({observed: action.observed, expected: action.expected})

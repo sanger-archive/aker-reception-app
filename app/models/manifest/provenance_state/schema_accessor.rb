@@ -1,5 +1,7 @@
 class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Accessor
 
+  delegate :labwares, to: :provenance_state
+
   # Accessor methods
   def manifest_schema_field(sym)
     config = Rails.application.config.manifest_schema_config
@@ -10,11 +12,6 @@ class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Acc
 
   def manifest_schema_field_required?(sym)
     manifest_schema["properties"][sym]["required"]
-  end
-
-  def labwares
-    return [] unless state_access && state_access[:labwares]
-    state_access[:labwares]
   end
 
   # Build methods

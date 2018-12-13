@@ -10,11 +10,11 @@ export const createKeys = (state, keys) => {
 }
 
 export const setManifestValue = (state, labwareId, address, fieldName, value) => {
-  createKeys(state,
+  Object.assign(createKeys(state,
     [
       'structured', 'labwares', labwareId, 'addresses', address,
       'fields', fieldName
-    ]).value = value
+    ]), { value })
 }
 
 export const removeEmptyRows = (newState, labwareId, address) => {
@@ -33,11 +33,54 @@ export const removeEmptyRows = (newState, labwareId, address) => {
   }
 }
 
+export const found = (state, labwareId, addressId, fieldName, value) => {
+  return state?.structured?.labwares?.[labwareId]?.addresses?.[addressId]?.fields?.[fieldName]
+}
+
+const applyForAddresses = (state, handler) => {
+  const labwares = state?.structured?.labwares
+  for (let labwareId in labwares) {
+    let labware = labwares[labwareId]
+    for (let addressId in labware.addresses) {
+      let address = labware.addresses[addressId]
+      for (let fieldName in address.fields) {
+        handler.call(this, labwareId, addressId, fieldName)
+      }
+    }
+  }
+}
+
+const resetPreviousValues = (prevState, newState) => {
+  applyForAddresses(prevState, (labwareId, addressId, fieldName) => {
+    if (!found(newState, labwareId, addressId, fieldName)) {
+      setManifestValue(newState, labwareId, addressId, fieldName, "")
+    }
+  })
+  return newState
+}
+
+// const resetPreviousValues = (prevState, newState) => {
+//   for (let labwareId of Object.keys(prevState.structured.labwares)) {
+//     let labware = prevStructure.labwares[labwareId]
+//     for (let addressId of Object.keys(labware.addresses)) {
+//       let address = labware.addresses[addressId]
+//       for (let fieldName of Object.keys(address[addressId].fields)) {
+//         let field = address.fields[fieldName]
+//         if (!found(newState, labwareId, addressId, fieldName)) {
+//           setManifestValue(newState, labwareId, address, fieldName, "")
+//         }
+//       }
+//     }
+//   }
+//   return newState
+// }
 
 export default (state = {}, action) => {
 
   let newState
   switch(action.type) {
+    case C.LOAD_MANIFEST:
+      return resetPreviousValues(state, Object.assign({}, action.manifest.content))
     case C.DISPLAY_MESSAGE:
       let displayObj = Object.assign({}, state)
       if (!displayObj.structured) {

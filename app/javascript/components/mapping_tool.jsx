@@ -2,7 +2,7 @@ import React, {Fragment} from "react"
 import PropTypes from "prop-types"
 import { connect } from 'react-redux'
 
-import {matchSelection, unmatch, selectExpectedOption, selectObservedOption, toggleMapping } from '../actions'
+import {matchSelection, unmatch, selectExpectedOption, selectObservedOption, toggleMapping, saveTab } from '../actions'
 
 let matchedFields = {}
 
@@ -99,18 +99,20 @@ const MappingHeader = connect((status) => {return {}}, (dispatch) => {
 
 
 
-const MappingFooter = (props) => {
+const MappingFooterComponent = (props) => {
  return(
   <div className="modal-footer">
     <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
     <button id="complete-csv-matching" type="button" className="btn btn-primary"
-      onClick={ () => {
-        CSVFieldChecker.fillInTableFromFile(props.content, buildMatchedFields(props.matched), $(DATA_TABLES), props.schema.properties)
-        $("#myModal").modal('hide')
-      }} disabled={!props.valid}  >Continue</button>
+      onClick={ () => { props.onAccept() } }
+      disabled={!props.valid}  >Accept</button>
   </div>
   )
 }
+
+const MappingFooter = connect((state) => { return{} }, (dispatch) => {
+  return {onAccept: () => { dispatch(toggleMapping(false))} }
+})(MappingFooterComponent)
 
 const mappingOption = (text, value, pos, required, onClick) => {
   return(<option key={pos} value={value} onClick={() => {onClick(value)}}>{required ? '*':''}{text}</option>)
@@ -259,7 +261,7 @@ const mapStateToProps = (state) => {
     expected: state?.mapping?.expected || [],
     observed: state?.mapping?.observed || [],
     matched: state?.mapping?.matched || [],
-    shown: !!state?.mapping?.hasUnmatched,
+    shown: (typeof state?.mapping?.shown !=='undefined') ? state.mapping.shown : !!state?.mapping?.hasUnmatched,
     valid: !!state?.mapping?.valid,
     schema: state?.schema || null
   }
@@ -300,10 +302,12 @@ const mapDispatchToProps = (dispatch, { match, location }) => {
     },
     onMatchFields: (expected, observed) => {
       dispatch(matchSelection(expected, observed))
+      dispatch(saveTab())
       //dispatch(updateState())
     },
     onUnmatch: (expected, observed) => {
       dispatch(unmatch(expected, observed))
+      dispatch(saveTab())
       //dispatch(updateState())
     }
   }
