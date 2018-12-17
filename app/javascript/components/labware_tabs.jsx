@@ -37,7 +37,6 @@ const LabwareTab = connect(
     return (state, ownProps) => {
       const hasMessages = hasTabMessages(state, ownProps.position)
       const hasErrors = hasTabErrors(state, ownProps.position)
-
       return {
         displayError: hasMessages && hasErrors,
         displayWarning: hasMessages && !hasErrors

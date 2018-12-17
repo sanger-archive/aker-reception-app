@@ -1,20 +1,14 @@
 import React from "react"
 import {Fragment} from "react"
-import PropTypes from "prop-types"
 import { connect } from 'react-redux'
-import StateSelectors from '../selectors'
-import { setManifestValue, saveTab } from '../actions'
-
-import LabwareTabs from './labware_tabs'
 import classNames from 'classnames'
 
-import { unstable_trace as trace } from "scheduler/tracing";
+import StateSelectors from '../selectors'
+import LabwareTabs from './labware_tabs'
+import { LabwareContentInput } from './labware_content_input'
 
-import { debounce, throttle } from 'throttle-debounce'
 
 const logName = (name) => {  }
-
-const DEBOUNCED_TIMING=500
 
 const LabwareContentHeaderComponent = (props) => {
   const requiredMark = props.isRequiredField ? (<span style={{color: "red"}}>*</span>) : null
@@ -33,136 +27,6 @@ const LabwareContentHeader = connect((state, ownProps) => {
   }
 })(LabwareContentHeaderComponent)
 
-const LabwareContentSelectComponent = (props) => {
-  logName('LabwareContentSelectComponent')
-  const {fieldName,title,name,id,selectedOptionValue,onChange} = props
-
-  return(
-    <select onChange={onChange} className="form-control" title={title} name={name} id={id} value={selectedOptionValue}>
-      <option value=""></option>
-      { props.optionsForSelect.map((val, pos) => {
-        return (<option key={pos} value={val}>{val}</option>)
-      }) }
-    </select>
-  )
-}
-
-const LabwareContentSelect = connect((state, ownProps) => {
-  return {
-    selectedOptionValue: StateSelectors.schema.selectedOptionValue(state, ownProps.fieldName, ownProps.selectedValue),
-    optionsForSelect: StateSelectors.schema.optionsForSelect(state, ownProps.fieldName)
-  }
-})(LabwareContentSelectComponent)
-
-const LabwareContentText = (props) => {
-  logName('LabwareContentText')
-  const {onChange,selectedValue,title,name,id} = props
-  return(
-    <input onChange={onChange}
-      className="form-control" title={title} name={name} id={id}
-      value={selectedValue} />
-  )
-}
-
-class LabwareContentInputComponent extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      value: props.selectedValue,
-      stateValueSelected: 'redux'
-    }
-    this.onChangeProcessThrottelledCall = this.buildThrottelledCall()
-  }
-
-  setStateValueSelected(str) {
-    this.setState({stateValueSelected: str})
-  }
-
-  onChangeProcess(receivedChanges) {
-    receivedChanges.reduceRight((memo, receivedChange) => {
-      const found = (memo.filter((actualChange)=> {
-        return ((actualChange[0]==receivedChange[0]) && (actualChange[1]==receivedChange[1]) && (actualChange[2]==receivedChange[2]))
-      }))
-      if (found.length == 0) {
-        memo.push(receivedChange)
-      }
-      return memo
-    }, []).reverse().forEach((receivedChange, pos) => {
-      this.props.onChangeManifestInput.apply(this, receivedChange)
-    })
-
-    this.setStateValueSelected('redux')
-    this.receivedChanges=[]
-  }
-
-  buildThrottelledCall() {
-    let receivedChanges = []
-
-    const debouncedCall = debounce(DEBOUNCED_TIMING, () => { this.onChangeProcess(receivedChanges)} )
-
-    return (labwareIndex, address, fieldName, value, plateId) => {
-      this.setStateValueSelected('react')
-      receivedChanges.push([labwareIndex, address, fieldName, value, plateId])
-      debouncedCall()
-    }
-  }
-
-  buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId) {
-    if (!this.onChange) {
-      this.onChange = (e) => {
-        const value = e.target.value
-        this.setState({value: value})
-        this.onChangeProcessThrottelledCall(labwareIndex, address, fieldName, value, plateId)
-      }
-    }
-    return this.onChange
-  }
-
-  commonPropsForInput() {
-    // If we are in React mode, we'll get the value from the state of this component. If we are working in Redux mode
-    /// we'll get it from Redux state
-    const selectedValue = (this.state.stateValueSelected =='react') ? this.state.value : this.props.selectedValue
-
-    const { title, name, id, labwareIndex, address, fieldName, plateId } = this.props
-    const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId)
-    return { selectedValue, title, name, id, onChange }
-  }
-
-  render() {
-    logName('LabwareContentInputComponent')
-    const {isSelect, fieldName} = this.props
-    if (isSelect) {
-      return <LabwareContentSelect {...this.commonPropsForInput()} fieldName={fieldName} />
-    } else {
-      return <LabwareContentText {...this.commonPropsForInput()} />
-    }
-  }
-}
-
-const LabwareContentInput = connect(
-  (state, ownProps) => {
-    return {
-      labwareIndex: ownProps.labwareIndex,
-      address: ownProps.address,
-      fieldName: ownProps.fieldName,
-
-      plateId: StateSelectors.manifest.plateIdFor(state, ownProps.labwareIndex),
-
-      selectedValue: StateSelectors.content.selectedValueAtCell(state, ownProps.labwareIndex, ownProps.address, ownProps.fieldName),
-      isSelect: StateSelectors.schema.isSelectFieldName(state, ownProps.fieldName),
-      title: StateSelectors.schema.friendlyNameFor(state, ownProps.fieldName),
-      name: `manifest[labware][${ownProps.labwareIndex}][contents][${ownProps.address}][${ownProps.fieldName}]`,
-      id: `labware[${ownProps.labwareIndex}]address[${ownProps.address}]fieldName[${ownProps.fieldName}]`
-      }
-  },
-  (dispatch, { match, location }) => {
-    return {
-      onChangeManifestInput: (labwareIndex, address, fieldName, value, plateId) => {
-        dispatch(setManifestValue(labwareIndex, address, fieldName, value, plateId))
-        dispatch(saveTab())
-      }
-    }
-  })(LabwareContentInputComponent)
 
 class LabwareContentCellComponent extends React.Component {
   /*shouldComponentUpdate(nextProps, nextState) {
@@ -213,9 +77,7 @@ const LabwareContentCell = connect(mapStateToPropsLabwareContentCell)(LabwareCon
 
 const LabwareContentAddressComponent = (props) => {
   logName('LabwareContentAddressComponent')
-  return(
-    <tr
-      data-psd-component-class='TaxonomyIdControl'
+      /*data-psd-component-class='TaxonomyIdControl'
       data-psd-component-parameters={
         JSON.stringify({
           taxonomyServiceUrl: props.taxonomyServiceUrl,
@@ -223,7 +85,10 @@ const LabwareContentAddressComponent = (props) => {
           relativeCssSelectorTaxId: 'td[data-psd-schema-validation-name=taxon_id] input',
           cachedTaxonomies: {}
         })
-      }
+      }*/
+
+  return(
+    <tr
       data-labware-index={ props.labwareIndex } data-address={ props.address }>
       <td>{ props.address }</td>
 
@@ -355,7 +220,6 @@ const ManifestContainersComponent = (props) => {
 }
 
 const ManifestContainers = connect((state) => {
-  console.log(state)
   return { manifestId: state.manifest.manifest_id }
 })(ManifestContainersComponent)
 

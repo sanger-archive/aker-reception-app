@@ -4,9 +4,11 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
   def validate
     unless (state_access.key?(:valid))
       state_access[:valid] = (required_unmatched_fields.length == 0)
-      state_access[:hasUnmatched] = (shown_unmatched_fields.length != 0)
+      state_access[:hasUnmatched] = ((shown_unmatched_fields.length != 0) && (observed_keys.length !=0))
       state_access[:shown] = state_access[:hasUnmatched]
-      state_access[:rebuild] = state_access.key?(:rebuild) ? state_access[:rebuild] : state_access[:shown]
+      #state_access[:rebuild] = state_access.key?(:rebuild) ? state_access[:rebuild] : state_access[:shown]
+      #state_access[:rebuild] = state_access.key?(:rebuild) ? state_access[:rebuild] : state_access[:shown]
+      #debugger if state_access[:hasUnmatched]
     end
   end
 
@@ -72,7 +74,7 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
   end
 
   def matched_expected_fields
-    return [] unless state_access && state_access[:matched]
+    return [] unless state_access && state_access[:matched] && (state_access[:matched].length > 0)
     state_access[:matched].map{|m| m[:expected]}
   end
 

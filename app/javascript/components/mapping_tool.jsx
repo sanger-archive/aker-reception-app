@@ -234,7 +234,6 @@ class MappingToolComponent extends React.Component {
 
   render () {
     if (this.props.shown) {
-    // <div id="myModal" ref={modal=> this.modal = modal} className="modal fade" tabIndex="-1" role="dialog" data-show="true">
       return(
 
           <div className="modal-dialog modal-lg" role="document">
@@ -248,7 +247,6 @@ class MappingToolComponent extends React.Component {
       )
     }
     return null
-    //</div>
   }
 }
 

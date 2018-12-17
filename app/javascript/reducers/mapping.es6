@@ -12,7 +12,7 @@ export default (state = {}, action) => {
       mp.observed=mp.observed.filter((elem) => {return elem != action.observed})
       mp.expected=mp.expected.filter((elem) => {return elem != action.expected})
 
-      return Object.assign({}, state, mp, {selectedObserved: null, selectedExpected: null})
+      return Object.assign({rebuild: true}, state, mp, {selectedObserved: null, selectedExpected: null})
     case C.UNMATCH:
       let mapping = Object.assign({}, state)
       mapping.matched = mapping.matched.filter((elem) => {
@@ -20,13 +20,13 @@ export default (state = {}, action) => {
       })
       mapping.observed.push(action.observed)
       mapping.expected.push(action.expected)
-      return Object.assign({}, state, mapping)
+      return Object.assign({rebuild: true}, state, mapping)
     case C.SELECT_OBSERVED_OPTION:
       return Object.assign({}, state, {selectedObserved: action.value})
     case C.SELECT_EXPECTED_OPTION:
       return Object.assign({}, state, {selectedExpected: action.value})
     case C.TOGGLE_MAPPING:
-      return Object.assign({}, state, {shown: action.toggle})
+      return Object.assign({rebuild: true}, state, {shown: action.toggle})
     default:
       return state
   }

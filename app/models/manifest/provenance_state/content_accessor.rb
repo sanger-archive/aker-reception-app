@@ -6,7 +6,19 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   delegate :manifest_model, to: :provenance_state
 
   def rebuild?
-    (super || !state_access.key?(:structured) || state_access[:structured].nil? || @state[:mapping][:shown])
+    (super || !present_structured? || (present_raw? && @state[:mapping][:rebuild]))
+  end
+
+  def present_mapping?
+    (@state[:mapping] && @state[:mapping][:shown])
+  end
+
+  def present_raw?
+    (state_access.key?(:raw) && !state_access[:raw].nil?)
+  end
+
+  def present_structured?
+    (state_access.key?(:structured) && !state_access[:structured].nil?)
   end
 
   class PositionNotFound < StandardError ; end
@@ -16,7 +28,7 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
 
 
   def present?
-    super && state_access.key?(:structured)
+    super && present_structured?
   end
 
   def build

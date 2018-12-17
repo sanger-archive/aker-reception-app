@@ -7,6 +7,10 @@ module SchemaValidators
         property_name == 'taxon_id'
       end
 
+      def is_integer(val)
+        Integer(val) rescue false
+      end
+
       def find_by_taxon_id(taxon_id)
         if taxonomies_memoized.nil?
           @taxonomies_memoized = {}
@@ -21,9 +25,16 @@ module SchemaValidators
         return true if field_data(bio_data).nil?
 
         taxon_id = field_data_for_property('taxon_id', bio_data)
+        unless is_integer(taxon_id)
+          add_error(labware_index, address, property_name, "The taxon id provided is not a number")
+          return false
+        end
         scientific_name = field_data_for_property('scientific_name', bio_data)
         begin
           obtained_value = find_by_taxon_id(taxon_id).scientificName
+        rescue TaxonomyClient::Errors::BadRequest => e
+          add_error(labware_index, address, property_name, "The request to the EBI Taxonomy service is not valid")
+          return false
         rescue TaxonomyClient::Errors::NotFound => e
           add_error(labware_index, address, property_name, "The Taxon Id provided (#{taxon_id}) was not found in the EBI Taxonomy service")
           return false
