@@ -1,6 +1,6 @@
 # This file provides the information needed to generate the schema needed to validate a specific manifest
 # by combining this information with the Biomaterial schema. For more information refer to app/models/manifest/schema.rb
-field_labware_name: plate_id
+field_labware_name: supplier_plate_name
 field_position: position
 default_labware_name_value: default
 default_position_value: default
@@ -34,7 +34,7 @@ property_updates:
   hmdmc:
     show_on_form: true
     field_name_regex: ^hmdmc(?:[-_ ]+no\.?)?$
-  plate_id:
+  supplier_plate_name:
     field_name_regex: ^plate
     friendly_name: "Plate ID"
     show_on_form: true

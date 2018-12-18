@@ -123,14 +123,17 @@ export const toggleMapping = (toggle) => {
   return { type: C.TOGGLE_MAPPING, toggle }
 }
 
-export const restoreTab = (labwareId) => {
-  return {
-    type: C.RESTORE_TAB, labwareId
-  }
-}
 
 export const changeTab = (position) => {
   return {
     type: C.CHANGE_TAB, position
+  }
+}
+
+export const saveAndLeave = (url) => {
+  return (dispatch, getState) => {
+    dispatch(saveTab()).then(() => {
+      dispatch({ type: C.SAVE_AND_LEAVE, url})
+    })
   }
 }

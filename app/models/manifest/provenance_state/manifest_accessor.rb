@@ -8,7 +8,8 @@ class Manifest::ProvenanceState::ManifestAccessor < Manifest::ProvenanceState::A
     {
       manifest_id: manifest_model.id,
       selectedTabPosition: 0,
-      labwares: labwares
+      labwares: labwares,
+      show_hmdmc_warning: Rails.configuration.show_hmdmc_warning
     }
   end
 

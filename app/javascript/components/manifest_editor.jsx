@@ -1,11 +1,14 @@
 import React from "react"
 import PropTypes from "prop-types"
+import {Fragment} from "react"
 import store from 'store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
-import { loadManifest, selectExpectedOption, selectObservedOption, displayMessage} from '../actions'
+import { loadManifest, selectExpectedOption, selectObservedOption, displayMessage, saveAndLeave} from '../actions'
 import StateSelectors from '../selectors'
+
+import Reception from '../routes'
 
 const logName = (name) => { }
 const MessageDisplay = (props) => {
@@ -71,13 +74,92 @@ const MessagesDisplay = connect((state, ownProps) => {
 })(MessagesDisplayComponent)
 
 
+const InformationDisplayComponent = (props) => {
+  const {manifestId, showHmdmcWarning} = props
+  let hmdmcWarning = null
+  if (showHmdmcWarning) {
+    hmdmcWarning = (
+      <Fragment>
+        <br />
+        <span style={{"color":"red"}}>&#9888; All HMDMC numbers will be saved, but not
+            validated with eHMDMC.</span>
+      </Fragment>
+    )
+  }
+
+  return (
+    <div style={{"marginTop": "10px"}} className={"well csv-upload-box"}>
+      <div className="row">
+        <div className="venter col-md-10">
+          Please drop a Manifest for the current labware onto this box, or the table.
+          Alternatively, you can manually enter material provenance for the current
+          labware in the table below. Use the tabs above this message to switch
+          labware. If necessary, the table can be scrolled horizontally to view all of the fields.
+          { hmdmcWarning }
+        </div>
+        <div className="vcenter col-md-2">
+          <label style={{"float": "right"}} className="btn btn-primary">
+              Browse for Manifest <input data-psd-component-class="ManifestUploader"
+              data-psd-component-parameters={{"manifest_id": manifestId}}
+              id="manifest_upload" type="file" className="upload-button" accept=".csv,.xlsm,.xlsx"
+              style={{"display": "none"}} />
+          </label>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
+const InformationDisplay = connect((state)=>{
+  return {
+    manifestId: state.manifest.manifest_id,
+    showHmdmcWarning: state.manifest.show_hmdmc_warning
+  }
+})(InformationDisplayComponent)
+
+const ManifestButtonsComponent = (props) => {
+  const {manifestId} = props
+  return (
+    <div className="row">
+      <div className="col-md-12">
+        <div style={{"margin": "10px 0"}}>
+          <a className="btn btn-primary save pull-right" onClick={
+            () => { props.goTo(Reception.manifest_build_path(manifestId, 'ethics')) }
+          }>Next</a>
+          <a className="btn btn-primary pull-left"
+          data-confirm="Are you sure you wish to go back? You will lose unsaved progress on the curent step"
+          style={{"marginRight": "10px"}} href={Reception.manifest_build_path(manifestId, 'labware')}>Previous</a>
+          <a className="btn btn-danger pull-left" data-confirm="Are you sure you wish to cancel this manifest?"
+          rel="nofollow" data-method="delete" href={Reception.manifest_path(manifestId)}>Cancel Manifest</a>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const ManifestButtons = connect((state) => {
+  return {
+    manifestId: state.manifest.manifest_id
+  }
+}, (dispatch)=> {
+  return {
+    goTo: (url) => {
+      dispatch(saveAndLeave(url))
+    }
+  }
+})(ManifestButtonsComponent)
+
 export const ManifestEditorComponent = (props) => {
   logName('ManifestEditorComponent')
   return(
     <div>
+      <ManifestButtons />
+      <InformationDisplay />
       <MappingTool />
       <MessagesDisplay />
       <ManifestContainers />
+      <ManifestButtons />
     </div>
   )
 }

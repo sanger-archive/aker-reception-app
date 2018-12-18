@@ -10,27 +10,6 @@
 
     <!-- %= render 'buttons', manifest: manifest, f: f % -->
 
-    <div style="margin-top: 10px" class="well csv-upload-box">
-      <div class="row">
-        <div class="venter col-md-10">
-          Please drop a Manifest for the current labware onto this box, or the table.
-          Alternatively, you can manually enter material provenance for the current
-          labware in the table below. Use the tabs above this message to switch
-          labware. If necessary, the table can be scrolled horizontally to view all of the fields.
-          <% if Rails.configuration.show_hmdmc_warning %>
-            <br><span style="color:red">&#9888; All HMDMC numbers will be saved, but not validated with eHMDMC.</span>
-          <% end %>
-        </div>
-        <div class="vcenter col-md-2">
-          <label style="float: right" class="btn btn-primary">
-              Browse for Manifest <input data-psd-component-class="ManifestUploader"
-              data-psd-component-parameters="<%= { manifest_id: manifest.id }.to_json %>"
-              id="manifest_upload" type="file" class="upload-button" accept=".csv,.xlsm,.xlsx" style="display: none;">
-          </label>
-        </div>
-      </div>
-    </div>
-
     <%= react_component("ManifestEditor", state_for_manifest(manifest, current_user)) %>
 
     <!-- %= render 'buttons', manifest: manifest, f: f % -->

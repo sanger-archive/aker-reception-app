@@ -30,10 +30,26 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
   end
 
   def update(updates)
-    if updates && !updates.empty?
-      provenance = ProvenanceService.new(manifest_schema)
-      success, messages = provenance.set_biomaterial_data(manifest_model, updates, user)
-      apply_messages(messages)
+    ActiveRecord::Base.transaction do
+      if updates && !updates.empty?
+        provenance = ProvenanceService.new(manifest_schema)
+        success, messages = provenance.set_biomaterial_data(manifest_model, updates, user)
+        apply_messages(messages)
+
+        if success #&& !params["manifest"]["change_tab"]
+          success = manifest_model.update_attributes(
+            status: (manifest_model&.any_human_material_no_hmdmc? ? 'ethics' : 'dispatch')
+          )
+        end
+
+        if (!success &&
+            (manifest_model.status == 'dispatch' || manifest_model.status == 'ethics'))
+          # If the given provenance is incomplete or wrong, make sure they're not in a later step
+          #   (because they could have gone back and incorrected the material data).
+          manifest_model.update_attributes(status: :provenance)
+        end
+        state_access[:update_successful] = success
+      end
     end
   end
 

@@ -84,6 +84,11 @@ export default (state = {}, action) => {
         return Object.assign({}, state, {raw: null})
       }
       return state
+    case C.SAVE_AND_LEAVE:
+      if (state.update_successful === true) {
+        window.location.href=action.url
+      }
+      return state
     case C.LOAD_MANIFEST:
       return resetPreviousValues(state, Object.assign({}, action.manifest.content))
     case C.DISPLAY_MESSAGE:
