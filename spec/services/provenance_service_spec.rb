@@ -43,11 +43,11 @@ RSpec.describe :provenance_service do
     context "when missing required fields" do
       before do
         data = {
-          "1" => properties,
-          "2" => {
+          "0" => properties,
+          "1" => {
             'OPTIONAL' => "bananas",
           },
-          "3" => properties,
+          "2" => properties,
         }
         @results = @service.validate(labware_index, data)
       end
@@ -56,7 +56,7 @@ RSpec.describe :provenance_service do
         expect(@results.length).to eq 1
         result = @results.first
         expect(result[:labwareIndex]).to eq labware_index
-        expect(result[:address]).to eq "2"
+        expect(result[:address]).to eq "1"
         errors = result[:errors]
         expect(errors.length).to eq 2
         expect(errors[:REQUIRED_FREE]).not_to be_nil
@@ -67,12 +67,12 @@ RSpec.describe :provenance_service do
     context "when enum field has wrong value" do
       before do
         data = {
-          "1" => properties,
-          "2" => {
+          "0" => properties,
+          "1" => {
             'REQUIRED_FREE' => "xyz",
             'REQUIRED_ENUM' => "bananas",
           },
-          "3" => properties,
+          "2" => properties,
         }
         @results = @service.validate(labware_index, data)
       end
@@ -81,7 +81,7 @@ RSpec.describe :provenance_service do
         expect(@results.length).to eq 1
         result = @results.first
         expect(result[:labwareIndex]).to eq labware_index
-        expect(result[:address]).to eq "2"
+        expect(result[:address]).to eq "1"
         errors = result[:errors]
         expect(errors.length).to eq 1
         expect(errors[:REQUIRED_ENUM]).to include('"ALPHA", "BETA", "GAMMA"')
@@ -91,12 +91,12 @@ RSpec.describe :provenance_service do
     context "when data contains wrong capitalisation" do
       before do
         @data = {
-          "1" => properties,
-          "2" => {
+          "0" => properties,
+          "1" => {
             'REQUIRED_FREE' => "xyz",
             'REQUIRED_ENUM' => "Alpha",
           },
-          "3" => properties,
+          "2" => properties,
         }
         @results = @service.validate(labware_index, @data)
       end
@@ -106,14 +106,14 @@ RSpec.describe :provenance_service do
       end
 
       it "should correct the capitalisation" do
-        expect(@data["2"]['REQUIRED_ENUM']).to eq "ALPHA"
+        expect(@data["1"]['REQUIRED_ENUM']).to eq "ALPHA"
       end
     end
 
     context "when data extra fields" do
       before do
         @data = {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => "xyz",
             'REQUIRED_ENUM' => "ALPHA",
             'some_extra_field' => "bananas",
@@ -144,11 +144,11 @@ RSpec.describe :provenance_service do
     let(:good_labware_data_long) do
       {
         "contents" => {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'alpha',
           },
-          "2" => {
+          "1" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'BETA',
             'OPTIONAL' => 'bananas',
@@ -160,12 +160,12 @@ RSpec.describe :provenance_service do
     let(:good_labware_data_short) do
       {
         "contents" => {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'Beta',
             'OPTIONAL' => '',
           },
-          "2" => {}
+          "1" => {}
         }
       }
     end
@@ -173,7 +173,7 @@ RSpec.describe :provenance_service do
     let(:missing_field_labware_data) do
       {
         "contents" => {
-          "1" => {
+          "0" => {
             'REQUIRED_ENUM' => 'beta',
           }
         }
@@ -183,7 +183,7 @@ RSpec.describe :provenance_service do
     let(:enum_field_wrong_labware_data) do
       {
         "contents" => {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'Alabama',
           }
@@ -195,7 +195,7 @@ RSpec.describe :provenance_service do
       before do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
-        @data = { "1" => good_labware_data_long, "2" => good_labware_data_short }
+        @data = { "0" => good_labware_data_long, "1" => good_labware_data_short }
         @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
@@ -209,11 +209,11 @@ RSpec.describe :provenance_service do
 
       it "should have updated the labware with filtered contents" do
         expect(@labwares[0]).to have_received(:update_attributes).with(contents: {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'ALPHA',
           },
-          "2" => {
+          "1" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'BETA',
             'OPTIONAL' => 'bananas',
@@ -221,7 +221,7 @@ RSpec.describe :provenance_service do
         },
         supplier_plate_name: "")
         expect(@labwares[1]).to have_received(:update_attributes).with(contents: {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'BETA',
           },
@@ -233,7 +233,7 @@ RSpec.describe :provenance_service do
       before do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
-        @data = { "1" => missing_field_labware_data, "2" => enum_field_wrong_labware_data }
+        @data = { "0" => missing_field_labware_data, "1" => enum_field_wrong_labware_data }
         @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
@@ -247,12 +247,12 @@ RSpec.describe :provenance_service do
 
       it "should nevertheless have updated the labware with filtered contents" do
         expect(@labwares[0]).to have_received(:update_attributes).with(contents: {
-          "1" => {
+          "0" => {
             'REQUIRED_ENUM' => 'BETA',
           },
         }, supplier_plate_name: "")
         expect(@labwares[1]).to have_received(:update_attributes).with(contents: {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'Alabama',
           },
@@ -264,7 +264,7 @@ RSpec.describe :provenance_service do
       before do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
-        @data = { "1" => good_labware_data_short }
+        @data = { "0" => good_labware_data_short }
         @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
@@ -282,7 +282,7 @@ RSpec.describe :provenance_service do
 
       it "should nevertheless have updated the labware with filtered contents" do
         expect(@labwares[0]).to have_received(:update_attributes).with(contents: {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'BETA',
           },
@@ -295,7 +295,7 @@ RSpec.describe :provenance_service do
       before do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
-        @data = { "1" => good_labware_data_short, "2" => { "contents" => { "1" => { 'REQUIRED_FREE' => '' } } } }
+        @data = { "0" => good_labware_data_short, "1" => { "contents" => { "0" => { 'REQUIRED_FREE' => '' } } } }
         @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
@@ -313,7 +313,7 @@ RSpec.describe :provenance_service do
 
       it "should nevertheless have updated the labware with filtered contents" do
         expect(@labwares[0]).to have_received(:update_attributes).with(contents: {
-          "1" => {
+          "0" => {
             'REQUIRED_FREE' => 'xyz',
             'REQUIRED_ENUM' => 'BETA',
           },
