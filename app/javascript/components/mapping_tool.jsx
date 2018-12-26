@@ -2,6 +2,9 @@ import React, {Fragment} from "react"
 import PropTypes from "prop-types"
 import { connect } from 'react-redux'
 
+import { Modal } from 'react-bootstrap';
+
+
 import {matchSelection, unmatch, selectExpectedOption, selectObservedOption, toggleMapping, saveTab } from '../actions'
 
 let matchedFields = {}
@@ -79,13 +82,13 @@ function removeFieldsFromSelects(formField, csvField) {
 
 const MappingHeaderComponent = (props) => {
   return (
-    <div className="modal-header">
+    <Modal.Header>
       <button type="button" className="close" onClick={props.onClickClose}
         data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
       </button>
-      <h4 className="modal-title">Select CSV mappings</h4>
-    </div>
+      <Modal.Title>Select CSV mappings</Modal.Title>
+    </Modal.Header>
     )
 }
 
@@ -101,12 +104,12 @@ const MappingHeader = connect((status) => {return {}}, (dispatch) => {
 
 const MappingFooterComponent = (props) => {
  return(
-  <div className="modal-footer">
+  <Modal.Footer>
     <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
     <button id="complete-csv-matching" type="button" className="btn btn-primary"
       onClick={ () => { props.onAccept() } }
       disabled={!props.valid}  >Accept</button>
-  </div>
+  </Modal.Footer>
   )
 }
 
@@ -198,7 +201,7 @@ const MappedFieldsList = (props) => {
 
 const MappingBody = (props) => {
   return (
-    <div className="modal-body">
+    <Modal.Body>
       <div id="modal-alert-required" className="alert alert-error" role="alert" style={{ display: 'none' }}>
         All the required fields must be mapped to a CSV field.
       </div>
@@ -212,7 +215,7 @@ const MappingBody = (props) => {
 
       <MappingInterface {...props }/>
       <MappedFieldsList {...props } />
-    </div>
+    </Modal.Body>
     )
 }
 
@@ -235,15 +238,11 @@ class MappingToolComponent extends React.Component {
   render () {
     if (this.props.shown) {
       return(
-
-          <div className="modal-dialog modal-lg" role="document">
-            <div className="modal-content">
-              <MappingHeader />
-              <MappingBody {...this.props} />
-              <MappingFooter {...this.props} />
-            </div>
-          </div>
-
+          <Modal.Dialog backdrop={"true"}>
+            <MappingHeader />
+            <MappingBody {...this.props} />
+            <MappingFooter {...this.props} />
+          </Modal.Dialog>
       )
     }
     return null

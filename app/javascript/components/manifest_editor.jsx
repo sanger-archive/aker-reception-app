@@ -5,10 +5,14 @@ import store from 'store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
-import { loadManifest, selectExpectedOption, selectObservedOption, displayMessage, saveAndLeave} from '../actions'
+import { loadManifest, selectExpectedOption, selectObservedOption, displayMessage, saveAndLeave } from '../actions'
 import StateSelectors from '../selectors'
 
-import Reception from '../routes'
+import Reception from '../routes.js.erb'
+
+/*if (typeof Reception === 'undefined') {
+  Reception = {}
+}*/
 
 const logName = (name) => { }
 const MessageDisplay = (props) => {
@@ -125,13 +129,13 @@ const ManifestButtonsComponent = (props) => {
       <div className="col-md-12">
         <div style={{"margin": "10px 0"}}>
           <a className="btn btn-primary save pull-right" onClick={
-            () => { props.goTo(Reception.manifest_build_path(manifestId, 'ethics')) }
+            () => { props.goTo(props.paths.next) }
           }>Next</a>
           <a className="btn btn-primary pull-left"
           data-confirm="Are you sure you wish to go back? You will lose unsaved progress on the curent step"
-          style={{"marginRight": "10px"}} href={Reception.manifest_build_path(manifestId, 'labware')}>Previous</a>
+          style={{"marginRight": "10px"}} href={props.paths.previous}>Previous</a>
           <a className="btn btn-danger pull-left" data-confirm="Are you sure you wish to cancel this manifest?"
-          rel="nofollow" data-method="delete" href={Reception.manifest_path(manifestId)}>Cancel Manifest</a>
+          rel="nofollow" data-method="delete" href={props.paths.cancel}>Cancel Manifest</a>
         </div>
       </div>
     </div>
@@ -139,8 +143,25 @@ const ManifestButtonsComponent = (props) => {
 }
 
 const ManifestButtons = connect((state) => {
+  const manifestId = state.manifest.manifest_id
+
+  let paths
+  let previousPath, cancelPath, nextPath
+  if (typeof Reception === 'undefined') {
+    paths = {
+      previous: '', cancel: '', next: ''
+    }
+  } else {
+    paths = {
+      previous: Reception.manifest_build_path(manifestId, 'labware'),
+      cancel: Reception.manifest_path(manifestId),
+      next: Reception.manifest_build_path(manifestId, 'ethics')
+    }
+  }
+
   return {
-    manifestId: state.manifest.manifest_id
+    manifestId,
+    paths
   }
 }, (dispatch)=> {
   return {

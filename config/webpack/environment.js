@@ -2,6 +2,8 @@ const { environment } = require('@rails/webpacker')
 const erb =  require('./loaders/erb')
 const webpack = require('webpack')
 
+//const Reception = require('./routes.js.erb')
+
 // [PJ] add jQuery and papaparse here so that it remains available to all JS files
 environment.plugins.prepend(
   'Provide',
