@@ -6,7 +6,7 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   delegate :manifest_model, to: :provenance_state
 
   def rebuild?
-    (super || !present_structured? || (present_raw? && @state[:mapping][:rebuild]))
+    (super || !present_structured? || (present_raw? && !!@state[:mapping][:rebuild]))
   end
 
   def present_mapping?
@@ -72,7 +72,7 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
 
   def read_from_raw
     idx = 0
-    labware_id_schema_field =  manifest_schema_field(:labware_id)
+    labware_id_schema_field =  manifest_schema_field(:labware_id).to_sym
     state_access[:raw].reduce({}) do |memo, row|
       mapped = mapped_row(row)
 

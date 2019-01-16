@@ -13,6 +13,7 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
   end
 
   def updates_for(obj)
+    return [] if obj.nil?
     obj.keys.reduce({}) do |memo_labware, labware_key|
       if obj[labware_key][:addresses]
         memo_labware[labware_key.to_s] = {

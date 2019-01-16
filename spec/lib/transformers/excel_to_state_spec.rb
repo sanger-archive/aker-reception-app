@@ -15,6 +15,7 @@ RSpec.describe Transformers::ExcelToState do
     }
 
     before do
+      mock_taxonomy_client
       allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
     end
     context 'when file is parsed' do

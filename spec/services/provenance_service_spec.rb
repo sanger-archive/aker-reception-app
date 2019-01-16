@@ -196,6 +196,7 @@ RSpec.describe :provenance_service do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
         @data = { "0" => good_labware_data_long, "1" => good_labware_data_short }
+
         @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
@@ -265,6 +266,7 @@ RSpec.describe :provenance_service do
         @labwares = make_labwares(2)
         @submission = make_submission(@labwares)
         @data = { "0" => good_labware_data_short }
+
         @success, @errors = @service.set_biomaterial_data(@submission, @data, :user)
       end
 
@@ -275,7 +277,7 @@ RSpec.describe :provenance_service do
       it "should return the error" do
         expect(@errors.length).to eq 1
         error = @errors.first
-        expect(error[:labwareIndex]).to eq 2
+        expect(error[:labwareIndex]).to eq 1
         expect(error[:errors].length).to eq 1
         expect(error[:errors].values.first).to eq "At least one material must be specified for each item of labware"
       end
@@ -306,7 +308,7 @@ RSpec.describe :provenance_service do
       it "should return the error" do
         expect(@errors.length).to eq 1
         error = @errors.first
-        expect(error[:labwareIndex]).to eq 2
+        expect(error[:labwareIndex]).to eq 1
         expect(error[:errors].length).to eq 1
         expect(error[:errors].values.first).to eq "At least one material must be specified for each item of labware"
       end

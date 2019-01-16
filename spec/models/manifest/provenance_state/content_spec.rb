@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Manifest::ProvenanceState::Content' do
+RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
 
   let(:schema) {
     {
@@ -58,7 +58,12 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
   let(:content_accessor) { provenance_state.content }
 
 
-  let(:manifest) { create :manifest }
+  let(:manifest) {
+    manifest = create :manifest
+    manifest.update_attributes(no_of_labwares_required: 1)
+    manifest
+
+  }
   context '#apply error checks' do
     context 'with a manifest with a labware that contains the same position twice' do
       let(:manifest_content) {
@@ -72,17 +77,22 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
         {
           expected: [],
           observed: [], matched: [
-            { expected: 'plate_id', observed: 'plate_id'},
+            { expected: 'supplier_plate_name', observed: 'plate_id'},
             { expected: 'supplier_name', observed: 'supplier_name'},
             { expected: 'position', observed: 'position'}
           ]
         }
       }
 
+      before do
+        allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(true)
+        allow(content_accessor).to receive(:manifest_schema_field_required?).with("supplier_plate_name").and_return(true)
+      end
+
       it 'raises PositionDuplicated' do
         expect{
           content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
-        }.to raise_error(Manifest::ProvenanceState::Content::PositionDuplicated)
+        }.to raise_error(Manifest::ProvenanceState::ContentAccessor::PositionDuplicated)
       end
     end
 
@@ -99,7 +109,7 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
           {
             expected: [],
             observed: [], matched: [
-              { expected: 'plate_id', observed: 'plate_id'},
+              { expected: 'supplier_plate_name', observed: 'plate_id'},
               { expected: 'supplier_name', observed: 'supplier_name'},
               { expected: 'position', observed: 'position'}
             ]
@@ -110,13 +120,13 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
 
           before do
             allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(true)
-            allow(content_accessor).to receive(:manifest_schema_field_required?).with("plate_id").and_return(true)
+            allow(content_accessor).to receive(:manifest_schema_field_required?).with("supplier_plate_name").and_return(true)
           end
 
           it 'raises LabwareNotFound error' do
             expect{
               content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
-            }.to raise_error(Manifest::ProvenanceState::Content::LabwareNotFound)
+            }.to raise_error(Manifest::ProvenanceState::ContentAccessor::LabwareNotFound)
           end
         end
 
@@ -136,7 +146,7 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
           {
             expected: [],
             observed: [], matched: [
-              { expected: 'plate_id', observed: 'plate_id'},
+              { expected: 'supplier_plate_name', observed: 'plate_id'},
               { expected: 'supplier_name', observed: 'supplier_name'},
               { expected: 'position', observed: 'position'}
             ]
@@ -147,13 +157,13 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
 
           before do
             allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(true)
-            allow(content_accessor).to receive(:manifest_schema_field_required?).with("plate_id").and_return(true)
+            allow(content_accessor).to receive(:manifest_schema_field_required?).with("supplier_plate_name").and_return(true)
           end
 
           it 'raises PositionNotFound error' do
             expect{
               content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
-            }.to raise_error(Manifest::ProvenanceState::Content::PositionNotFound)
+            }.to raise_error(Manifest::ProvenanceState::ContentAccessor::PositionNotFound)
           end
         end
 
@@ -162,6 +172,8 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
   end
   context '#apply' do
     before do
+      allow(content_accessor).to receive(:manifest_schema_field_required?).with("supplier_plate_name").and_return(false)
+      allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(false)
       content_accessor.apply({schema: schema, mapping: mapping, content: {raw: manifest_content}})
     end
     context 'with an empty manifest' do
@@ -188,14 +200,20 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
       }
       let(:manifest_content) {
         [
-          "plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"
+          {"supplier_plate_name" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"},
+          {"supplier_plate_name" => "Labware 1", "position" => "B:1", "supplier_name" => "InGen"}
         ]
       }
 
+
       it 'does generate content setting plate id for the plate as DEFAULT_LABWARE_NAME_VALUE' do
         expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          "#{default_labware_name_value}" => { addresses: {
-          "A:1"=>  { fields: {"position" => {value: "A:1"}, "supplier_name" => {value: "InGen"}}}
+          0 => {
+            position: 0,
+            supplier_plate_name: "#{default_labware_name_value}",
+            addresses: {
+          "A:1"=>  { fields: {"position" => {value: "A:1"}, "supplier_name" => {value: "InGen"}}},
+          "B:1"=>  { fields: {"position" => {value: "B:1"}, "supplier_name" => {value: "InGen"}}}
           } } } } )
       end
 
@@ -216,9 +234,11 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
         ]
       }
       context 'when the position is not required' do
-        it 'does generate content setting position for the plate as DEFAULT_POSITION_VALUE' do
+        it 'does generate content setting position for the plate' do
           expect(content_accessor.state[:content]).to include(structured: { labwares: {
-            "Labware 1" => { addresses: {
+            0 => {
+              :position=>0, :supplier_plate_name=>"default",
+              addresses: {
             "#{default_position_value}"=>  { fields: {"plate_id" => {value: "Labware 1"}, "supplier_name" => {value: "InGen"}}}
             } } } } )
         end
@@ -243,7 +263,9 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
 
       it 'does generate content setting position and plate_id as default' do
         expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          "#{default_labware_name_value}" => { addresses: {
+          0 => {
+            :position=>0, :supplier_plate_name=>"default",
+            addresses: {
           "#{default_position_value}"=>  { fields: {"supplier_name" => {value: "InGen"}}}
           } } } } )
       end
@@ -255,7 +277,7 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
         {
           expected: [],
           observed: [], matched: [
-            { expected: 'plate_id', observed: 'supplier_name'},
+            { expected: 'supplier_plate_name', observed: 'supplier_name'},
             { expected: 'position', observed: 'position'},
             { expected: 'supplier_name', observed: 'plate_id'}
           ]
@@ -270,9 +292,11 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
 
       it 'does recognise the right plate id attribute to perform the translation' do
         expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          "InGen" => { addresses: {
-          "A:1"=>  { fields: {"position"=>{value: "A:1"}, "plate_id" => {value: "InGen"}, "supplier_name" => {value: "Labware 1"}}},
-          "B:1"=>  { fields: {"position"=>{value: "B:1"}, "plate_id" => {value: "InGen"}, "supplier_name" => {value: "Labware 2"}}}
+          0 => {
+            :position=>0, :supplier_plate_name=>"InGen",
+            addresses: {
+          "A:1"=>  { fields: {"position"=>{value: "A:1"}, "supplier_plate_name" => {value: "InGen"}, "supplier_name" => {value: "Labware 1"}}},
+          "B:1"=>  { fields: {"position"=>{value: "B:1"}, "supplier_plate_name" => {value: "InGen"}, "supplier_name" => {value: "Labware 2"}}}
           } } } } )
       end
     end
@@ -283,7 +307,7 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
         {
           expected: [],
           observed: [], matched: [
-            { expected: 'position', observed: 'position'},{expected: 'plate_id', observed: 'plate_id'},
+            { expected: 'position', observed: 'position'},{expected: 'supplier_plate_name', observed: 'plate_id'},
             { expected: 'is_tumour', observed: 'is_tumour' }, { expected: 'scientific_name', observed: 'scientific_name' },
             { expected: 'taxon_id', observed: 'taxon_id' }, { expected: 'supplier_name', observed: 'supplier_name' },
             { expected: 'gender', observed: 'gender' }
@@ -298,9 +322,11 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
       }
       it 'does generate the content' do
         expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          "Labware 1" => { addresses: {
+          0 => {
+            :position=>0, :supplier_plate_name=>"Labware 1",
+            addresses: {
           "A:1"=>  { fields: {
-            "position" => {value: "A:1"}, "plate_id" => {value: "Labware 1"},
+            "position" => {value: "A:1"}, "supplier_plate_name" => {value: "Labware 1"},
             "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
           "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup"}, "gender" => {value: "male"}}}
           } } } } )
@@ -312,7 +338,7 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
           expected: ["taxon_id", "supplier_name", "gender"],
           observed: ["unknown_value"],
           matched: [
-            { expected: 'position', observed: 'position'},{expected: 'plate_id', observed: 'plate_id'},
+            { expected: 'position', observed: 'position'},{expected: 'supplier_plate_name', observed: 'plate_id'},
             { expected: 'is_tumour', observed: 'is_tumour' },
             { expected: 'scientific_name', observed: 'scientific_name' }
           ]
@@ -325,9 +351,11 @@ RSpec.describe 'Manifest::ProvenanceState::Content' do
       }
       it 'returns only the list of matched fields' do
         expect(content_accessor.state[:content]).to include(structured: {
-          labwares: { "Labware 1" => { addresses: {
+          labwares: { 0 => {
+            :position=>0, :supplier_plate_name=>"Labware 1",
+            addresses: {
           "A:1"=>  { fields: {
-            "position" => {value: "A:1"}, "plate_id" => { value: "Labware 1"},
+            "position" => {value: "A:1"}, "supplier_plate_name" => { value: "Labware 1"},
             "is_tumour" => {value: ""}, "scientific_name" => {value: ""}}}
           } } } } )
       end

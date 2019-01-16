@@ -11,10 +11,10 @@ class ProvenanceService
 
   # Checks the given labware data against the schema to see if it looks OK.
   # Returns an array of errors. If the list is empty, the data seems to be OK.
-  def validate(labware_index, labware_data, completed=nil)
+  def validate(labware_index, labware_data)
     schema_validator.error_messages = []
 
-    if completed && labware_data.empty? && !schema_validator.default_field.nil?
+    if labware_data.empty? && !schema_validator.default_field.nil?
       schema_validator.error_messages = [{
         errors: { schema_validator.default_field => "At least one material must be specified for each item of labware" },
         labwareIndex: labware_index,
@@ -22,7 +22,7 @@ class ProvenanceService
         update_successful: false,
       }]
     else
-      return [] if labware_data.empty?
+      #return [] if labware_data.empty?
 
       labware_data.each do |address, bio_data|
         schema_validator.validate(labware_index, address, bio_data)
@@ -38,7 +38,7 @@ class ProvenanceService
   # - [true, []] - nothing went wrong
   # - [false, [error1, error2, ...]] - some stuff went wrong; here is the information
   # - [false, []] - something unexpected went wrong
-  def set_biomaterial_data(manifest, labware_params, current_user, completed=nil)
+  def set_biomaterial_data(manifest, labware_params, current_user)
     all_errors = []
 
     success = true
@@ -46,7 +46,7 @@ class ProvenanceService
     # remove null or empty data from the params
     manifest.labwares.each_with_index do |labware, position|
       #position = labware.position
-      labware_data = labware_params[position.to_s]
+      labware_data = labware_params[(position).to_s]
       filtered_data = {}
       supplier_plate_name = ''
 
@@ -64,8 +64,7 @@ class ProvenanceService
           end
         end
       end
-
-      error_messages = validate(position, filtered_data, completed)
+      error_messages = validate(position, filtered_data)
       filtered_data = nil if filtered_data.empty?
 
       success &= labware.update_attributes(supplier_plate_name: supplier_plate_name, contents: filtered_data)

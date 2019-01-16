@@ -25,10 +25,14 @@ RSpec.describe 'Manifest::ProvenanceState::ManifestAccessor' do
     }
 
     context 'when the manifest does not have any labware defined' do
+      before do
+        manifest_accessor.apply(state)
+      end
       it 'does generate an empty labwares list' do
-        expect(manifest_accessor.apply(state)).to include({
+        expect(manifest_accessor.state).to include({
           manifest: {
             manifest_id: manifest.id,
+            selectedTabPosition: 0, show_hmdmc_warning: false, valid: true,
             labwares: [
             ]
           }
@@ -40,15 +44,18 @@ RSpec.describe 'Manifest::ProvenanceState::ManifestAccessor' do
       before do
         manifest.update_attributes(labware_type: tube_type)
         manifest.update_attributes(labwares: 2.times.map { create :labware })
+        manifest_accessor.apply(state)
       end
 
       it 'generates labware with one position' do
-        expect(manifest_accessor.apply(state)).to include({
+
+        expect(manifest_accessor.state).to include({
           manifest: {
             manifest_id: manifest.id,
+            selectedTabPosition: 0, show_hmdmc_warning: false, valid: true,
             labwares: [
-              { labware_index: "1", positions: ["1"]},
-              { labware_index: "2", positions: ["1"]}
+              { labware_index: "1", positions: ["1"], supplier_plate_name: "Labware 1"},
+              { labware_index: "2", positions: ["1"], supplier_plate_name: "Labware 2"}
             ]
           }
         })
@@ -59,16 +66,19 @@ RSpec.describe 'Manifest::ProvenanceState::ManifestAccessor' do
       before do
         manifest.update_attributes(labware_type: plate_type)
         manifest.update_attributes(labwares: 2.times.map { create :labware })
+        manifest_accessor.apply(state)
       end
 
 
       it 'generates labware with several positions' do
-        expect(manifest_accessor.apply(state)).to include({
+
+        expect(manifest_accessor.state).to include({
           manifest: {
             manifest_id: manifest.id,
+            selectedTabPosition: 0, show_hmdmc_warning: false, valid: true,
             labwares: [
-              { labware_index: "1", positions: ["A:1", "A:2"]},
-              { labware_index: "2", positions: ["A:1", "A:2"]}
+              { labware_index: "1", positions: ["A:1", "A:2"], supplier_plate_name: "Labware 1"},
+              { labware_index: "2", positions: ["A:1", "A:2"], supplier_plate_name: "Labware 2"}
             ]
           }
         })
@@ -82,12 +92,14 @@ RSpec.describe 'Manifest::ProvenanceState::ManifestAccessor' do
           create :labware, supplier_plate_name: "plate #{idx+1}"
         end
         manifest.update_attributes(labwares: labwares)
+        manifest_accessor.apply(state)
       end
 
       it 'generates supplier plate name ' do
-        expect(manifest_accessor.apply(state)).to include({
+        expect(manifest_accessor.state).to include({
           manifest: {
             manifest_id: manifest.id,
+            selectedTabPosition: 0, show_hmdmc_warning: false, valid: true,
             labwares: [
               { labware_index: "1", supplier_plate_name: "plate 1", positions: ["A:1", "A:2"]},
               { labware_index: "2", supplier_plate_name: "plate 2", positions: ["A:1", "A:2"]}

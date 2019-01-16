@@ -7,8 +7,6 @@ class Manifest::ProvenanceState
   delegate :manifest_schema, to: :schema
   delegate :labwares, to: :manifest
 
-  class WrongNumberLabwares < StandardError ; end
-
   def initialize(manifest, user)
     @state = {}
     @user = user

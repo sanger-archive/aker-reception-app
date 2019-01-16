@@ -104,7 +104,7 @@ const InformationDisplayComponent = (props) => {
         <div className="vcenter col-md-2">
           <label style={{"float": "right"}} className="btn btn-primary">
               Browse for Manifest <input data-psd-component-class="ManifestUploader"
-              data-psd-component-parameters={{"manifest_id": manifestId}}
+              data-psd-component-parameters={JSON.stringify({"manifest_id": manifestId})}
               id="manifest_upload" type="file" className="upload-button" accept=".csv,.xlsm,.xlsx"
               style={{"display": "none"}} />
           </label>

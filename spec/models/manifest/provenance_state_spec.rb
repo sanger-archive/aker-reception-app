@@ -33,9 +33,9 @@ RSpec.describe 'Manifest::ProvenanceState' do
       it 'generates a right state' do
         expect(provenance_state.apply({})[:manifest]).to include({
           :manifest_id=>manifest.id, :labwares=>[
-            {:labware_index=>"1", :positions=>["1"]},
-            {:labware_index=>"2", :positions=>["1"]},
-            {:labware_index=>"3", :positions=>["1"]}]
+            {:labware_index=>"1", :positions=>["1"], :supplier_plate_name => "Labware 1"},
+            {:labware_index=>"2", :positions=>["1"], :supplier_plate_name => "Labware 2"},
+            {:labware_index=>"3", :positions=>["1"], :supplier_plate_name => "Labware 3"}]
           })
       end
     end
@@ -98,11 +98,13 @@ RSpec.describe 'Manifest::ProvenanceState' do
         }
       }
       before do
+        allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
         manifest.update_attributes(labwares: 1.times.map { create :labware })
       end
 
       it 'defines manifest_id' do
-        expect(provenance_state.apply(state)[:manifest][:manifest_id]).to eq(manifest.id)
+        provenance_state.apply(state)
+        expect(provenance_state.state[:manifest][:manifest_id]).to eq(manifest.id)
       end
 
       context 'when the state does not have updates' do
@@ -141,7 +143,7 @@ RSpec.describe 'Manifest::ProvenanceState' do
           } } }
         }
         it 'raises an error' do
-          expect{provenance_state.apply(state)}.to raise_error(Manifest::ProvenanceState::WrongNumberLabwares)
+          expect{provenance_state.apply(state)}.to raise_error(Manifest::ProvenanceState::ContentAccessor::WrongNumberLabwares)
         end
 
       end
@@ -170,7 +172,7 @@ RSpec.describe 'Manifest::ProvenanceState' do
           } } }
         }
         it 'raises an error' do
-          expect{provenance_state.apply(state)}.to raise_error(Manifest::ProvenanceState::WrongNumberLabwares)
+          expect{provenance_state.apply(state)}.to raise_error(Manifest::ProvenanceState::ContentAccessor::WrongNumberLabwares)
         end
 
       end

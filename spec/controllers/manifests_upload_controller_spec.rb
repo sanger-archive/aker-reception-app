@@ -62,6 +62,7 @@ RSpec.describe Manifests::UploadController, type: :controller  do
 
   describe 'POST #create' do
     before do
+      mock_taxonomy_client
       @user = OpenStruct.new(email: 'other@sanger.ac.uk', groups: %w[world team252])
       allow(controller).to receive(:check_credentials)
       allow(controller).to receive(:current_user).and_return(@user)

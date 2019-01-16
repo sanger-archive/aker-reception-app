@@ -21,19 +21,25 @@ RSpec.describe 'Manifest::ProvenanceState::Schema' do
   }
   before do
     allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
-    schema_accessor.apply(state)
   end
   context '#material_schema' do
+    before do
+      schema_accessor.apply(state)
+    end
     it 'returns the material schema object' do
       expect(schema_accessor.material_schema).to eq(material_schema)
     end
   end
   context '#manifest_schema' do
     it 'does not return the same object as the material schema' do
+      schema_accessor.apply(state)
       expect(schema_accessor.state[:schema]).not_to eq(material_schema)
     end
 
     context 'when generating the manifest schema using the material schema' do
+      before do
+        schema_accessor.apply(state)
+      end
       context 'with the list of properties defined as property_updates' do
         context 'when the properties are not present in the material schema' do
           it 'adds them to the manifest schema' do
@@ -62,6 +68,18 @@ RSpec.describe 'Manifest::ProvenanceState::Schema' do
       context 'taking decisions about the contents of the manifest' do
         context 'when the manifest refers to several labware' do
           before do
+            allow(schema_accessor).to receive(:labwares).and_return([
+              {
+                labware_index: 0,
+                positions: ["1"],
+                supplier_plate_name: "Labware 1"
+              },
+              {
+                labware_index: 1,
+                positions: ["1"],
+                supplier_plate_name: "Labware 2"
+              }
+            ])
             schema_accessor.apply({manifest: {labwares: [{}, {}]}})
           end
           it 'sets the labware name as required' do
@@ -70,6 +88,14 @@ RSpec.describe 'Manifest::ProvenanceState::Schema' do
         end
         context 'when the manifest model refers to just one labware' do
           before do
+            allow(schema_accessor).to receive(:labwares).and_return([
+              {
+                labware_index: 0,
+                positions: ["1"],
+                supplier_plate_name: "Labware 1"
+              }
+            ])
+
             schema_accessor.apply({manifest: {labwares: [{}]}})
           end
           it 'sets the labware name as not required' do
@@ -78,6 +104,14 @@ RSpec.describe 'Manifest::ProvenanceState::Schema' do
         end
         context 'when the manifest model refers has several positions' do
           before do
+            allow(schema_accessor).to receive(:labwares).and_return([
+              {
+                labware_index: 0,
+                positions: ["1","2"],
+                supplier_plate_name: "Labware 1"
+              }
+            ])
+
             schema_accessor.apply({manifest: {labwares: [{positions: ["1", "2"]}, {positions: ["1", "2"]}]}})
           end
           it 'sets the position as required' do
@@ -86,6 +120,14 @@ RSpec.describe 'Manifest::ProvenanceState::Schema' do
         end
         context 'when the manifest model refers has just one position' do
           before do
+            allow(schema_accessor).to receive(:labwares).and_return([
+              {
+                labware_index: 0,
+                positions: ["1"],
+                supplier_plate_name: "Labware 1"
+              }
+            ])
+
             schema_accessor.apply({manifest: {labwares: [{positions: ["1"]}, {positions: ["1"]}]}})
           end
           it 'sets the position as not required' do
