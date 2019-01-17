@@ -93,16 +93,22 @@ RSpec.feature "Upload Manifests", type: :feature, js: true do
 
   context 'when uploading a valid Manifest with no Plate ID column' do
     let(:manifest_file) { 'simple_manifest.csv' }
-
-    it 'populates the current tab' do
-      expect(page.find('div.tab-content table')).to have_selector("input[value='78placebo-501']")
-      expect(page.find('div.tab-content table')).to have_selector("input[value='78placebo-502']")
-      expect(page.find('div.tab-content table')).to have_selector("input[value='78placebo-503']")
-      expect(page.find('div.tab-content table')).to have_selector("input[value='6']")
+    context 'when there is only one container' do
+      let(:number_of_containers_required) { 1 }
+      it 'populates the current tab' do
+        expect(page.find('div.tab-content table')).to have_selector("input[value='78placebo-501']")
+        expect(page.find('div.tab-content table')).to have_selector("input[value='78placebo-502']")
+        expect(page.find('div.tab-content table')).to have_selector("input[value='78placebo-503']")
+        expect(page.find('div.tab-content table')).to have_selector("input[value='6']")
+      end
+    end
+    context 'when there is more than one container' do
+      include_examples 'displays an error', 'This manifest does not have a valid labware id field for the labware'
     end
   end
 
   context 'when uploading a manifest that misses or misspells some of the required columns' do
+    let(:number_of_containers_required) { 1 }
     let(:manifest_file) {'incomplete_manifest.csv'}
     it 'shows the mapping tool to fix the problem' do
       expect(page).to have_content('Select CSV mappings', wait: 10)
