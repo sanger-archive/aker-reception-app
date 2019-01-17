@@ -1,4 +1,5 @@
 import C from './constants'
+import Reception from './routes.js.erb'
 
 export const matchSelection = (expected, observed) => {
   return {
@@ -137,3 +138,54 @@ export const saveAndLeave = (url) => {
     })
   }
 }
+
+export const uploadManifest = (manifest, manifest_id) => {
+  return (dispatch, getState) => {
+    let formData = new FormData()
+    formData.append('manifest', manifest)
+    formData.append('manifest_id', manifest_id)
+    $(document).trigger('showLoadingOverlay')
+
+
+    const ajaxRequest = {
+      url: Reception.manifests_upload_index_path(),
+      type: 'POST',
+      method: 'POST',
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false,
+    }
+
+    return $.ajax(ajaxRequest)
+    .then(
+      $.proxy(function(response, event) {
+        const manifest = response.contents
+
+        dispatch(loadManifest(manifest))
+        //dispatch(loadManifestMapping(manifest.mapping))
+
+        if (!getState().mapping.valid) {
+          dispatch(selectExpectedOption(null))
+          dispatch(selectObservedOption(null))
+
+          $('#myModal').modal('show')
+        } else {
+          //dispatch(loadManifestContent(manifest.content))
+        }
+      }, this),
+      (xhr) => {
+        dispatch(displayMessage({
+          labwareIndex: null, address: null, level: 'FATAL', display: 'alert',
+          text: xhr.responseJSON.errors.join("\n")
+        }))
+      }
+    )
+    .always(() => {
+      $(document).trigger('hideLoadingOverlay');
+    })
+  }
+
+  //$(document.body).trigger('uploadManifest', ajaxRequest)
+}
+

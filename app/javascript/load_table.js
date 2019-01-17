@@ -1,6 +1,7 @@
-import { uploadManifest } from 'csv_field_checker';
+//import { uploadManifest } from 'csv_field_checker';
 
 (function($,undefined) {
+
 
   function LoadTable(node, params) {
     this.node = $(node)

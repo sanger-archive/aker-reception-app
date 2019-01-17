@@ -1,4 +1,3 @@
-import { uploadManifest } from 'csv_field_checker';
 
 class ManifestUploader {
   constructor(node, params) {
@@ -24,5 +23,7 @@ class ManifestUploader {
 $(document).ready(function() {
   $(document).trigger('registerComponent.builder', { 'ManifestUploader': ManifestUploader });
 });
+
+
 
 export default ManifestUploader;

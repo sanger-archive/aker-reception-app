@@ -5,14 +5,10 @@ import store from 'store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
-import { loadManifest, selectExpectedOption, selectObservedOption, displayMessage, saveAndLeave } from '../actions'
+import { uploadManifest, loadManifest, selectExpectedOption, selectObservedOption, displayMessage, saveAndLeave } from '../actions'
 import StateSelectors from '../selectors'
 
 import Reception from '../routes.js.erb'
-
-/*if (typeof Reception === 'undefined') {
-  Reception = {}
-}*/
 
 const logName = (name) => { }
 const MessageDisplay = (props) => {
@@ -77,6 +73,31 @@ const MessagesDisplay = connect((state, ownProps) => {
   }
 })(MessagesDisplayComponent)
 
+class ManifestUploaderComponent extends React.Component {
+  constructor(props) {
+    super(props)
+    this.fileInput = React.createRef()
+  }
+  render() {
+    return (
+      <input
+        ref={this.fileInput}
+        onChange={() => { this.props.onChange(this.props.manifestId, this.fileInput.current.files[0]) }}
+        id="manifest_upload" type="file" className="upload-button" accept=".csv,.xlsm,.xlsx"
+        style={{"display": "none"}} />
+    )
+  }
+}
+
+const ManifestUploader = connect((state) => {
+  return {}
+}, (dispatch, ownProps) => {
+  return {
+    onChange: (manifestId, file)=> {
+      dispatch(uploadManifest(file, manifestId))
+    }
+  }
+})(ManifestUploaderComponent)
 
 const InformationDisplayComponent = (props) => {
   const {manifestId, showHmdmcWarning} = props
@@ -103,10 +124,7 @@ const InformationDisplayComponent = (props) => {
         </div>
         <div className="vcenter col-md-2">
           <label style={{"float": "right"}} className="btn btn-primary">
-              Browse for Manifest <input data-psd-component-class="ManifestUploader"
-              data-psd-component-parameters={JSON.stringify({"manifest_id": manifestId})}
-              id="manifest_upload" type="file" className="upload-button" accept=".csv,.xlsm,.xlsx"
-              style={{"display": "none"}} />
+              Browse for Manifest <ManifestUploader manifestId={manifestId} />
           </label>
         </div>
       </div>
