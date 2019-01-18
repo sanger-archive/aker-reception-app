@@ -24,18 +24,14 @@ import 'src/application.scss';
 import ManifestEditor from 'components/manifest_editor';
 
 require('select2')
-require('csv_field_checker')
 require('component_builder')
 require('data_table_initialization')
 require('data_table_schema_validation')
-require('taxonomy_id_control')
-require('materials_table/materials_table')
 require('barcode_reader')
 require('load_table')
 require('manifest_csv_warnings')
 require('loading_icon')
 require('show_previous_in_datatable')
-require('manifest_uploader')
 require('loading_overlay')
 
 import WebpackerReact from 'webpacker-react'

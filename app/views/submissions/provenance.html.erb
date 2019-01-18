@@ -1,18 +1,2 @@
 <%= render partial: 'submission_header' %>
-
-
-
-<div data-psd-component-class="SingleTableManager"
-     data-psd-component-parameters="<%= (manifest.labwares).to_json %>">
-
-  <div>
-    <% labwares = manifest.labwares.sort { |a,b| a.labware_index <=> b.labware_index } %>
-
-    <!-- %= render 'buttons', manifest: manifest, f: f % -->
-
-    <%= react_component("ManifestEditor", state_for_manifest(manifest, current_user)) %>
-
-    <!-- %= render 'buttons', manifest: manifest, f: f % -->
-
-  </div>
-</div>
+<%= react_component("ManifestEditor", state_for_manifest(manifest, current_user)) %>
