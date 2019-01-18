@@ -1,10 +1,10 @@
 import C from '../constants'
 import { combineReducers } from 'redux'
-import content from 'reducers/content'
-import mapping from 'reducers/mapping'
-import schema from 'reducers/schema'
-import manifest from 'reducers/manifest'
-import services from 'reducers/services'
+import content from './content'
+import mapping from './mapping'
+import schema from './schema'
+import manifest from './manifest'
+import services from './services'
 
 import { isThereAnyRequiredUnmatchedField } from '../helpers'
 

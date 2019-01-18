@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai'
-import ContentSelector from "../../../app/javascript/selectors/content"
+import ContentSelector from "../../../../app/javascript/react/selectors/content"
 
 describe('ContentSelector', () => {
 

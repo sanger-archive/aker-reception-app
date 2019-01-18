@@ -21,7 +21,7 @@ import dt from 'datatables.net';
 import 'datatables.net-bs/js/dataTables.bootstrap.js';
 import 'src/application.scss';
 
-import ManifestEditor from 'components/manifest_editor';
+import ManifestEditor from 'react/components/manifest_editor';
 
 require('select2')
 require('component_builder')

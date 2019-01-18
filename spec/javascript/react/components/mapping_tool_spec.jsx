@@ -5,7 +5,7 @@ import { expect } from 'chai'
 import { shallow, mount } from 'enzyme';
 import { createMockStore } from 'redux-test-utils';
 
-import MappingTool from "../../../app/javascript/components/mapping_tool.jsx"
+import MappingTool from "../../../../app/javascript/react/components/mapping_tool.jsx"
 
 const getContext = (status) => {
   let context = { store: createMockStore(status) };

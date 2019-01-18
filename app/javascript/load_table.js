@@ -1,5 +1,5 @@
-import { uploadManifest } from 'actions';
-import store from 'store'
+import { uploadManifest } from 'react/actions';
+import store from 'react/store'
 
 (function($,undefined) {
 

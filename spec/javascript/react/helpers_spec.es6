@@ -4,7 +4,7 @@ import {
   allMatchedFields,
   allRequiredUnmatchedFields,
   isThereAnyRequiredUnmatchedField
-} from "helpers"
+} from "../../../app/javascript/react/helpers"
 
 describe('with helper functions', () => {
   let providedProps = {

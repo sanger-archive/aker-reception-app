@@ -3,8 +3,8 @@ import EnzymeHelper from '../enzyme_helper'
 import React, { Fragment } from 'react';
 import { expect } from 'chai'
 import { shallow, mount } from 'enzyme';
-import ManifestEditor from "../../../app/javascript/components/manifest_editor.jsx"
-import { ManifestEditorComponent } from "../../../app/javascript/components/manifest_editor.jsx"
+import ManifestEditor from "../../../../app/javascript/react/components/manifest_editor.jsx"
+import { ManifestEditorComponent } from "../../../../app/javascript/react/components/manifest_editor.jsx"
 
 import { createMockStore } from 'redux-test-utils';
 

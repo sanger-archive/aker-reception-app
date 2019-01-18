@@ -1,5 +1,5 @@
 import C from './constants'
-import Reception from './routes.js.erb'
+import Reception from '../routes.js.erb'
 
 export const matchSelection = (expected, observed) => {
   return {

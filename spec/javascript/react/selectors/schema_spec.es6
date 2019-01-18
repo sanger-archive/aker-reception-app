@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai'
-import SchemaSelector from "../../../app/javascript/selectors/schema"
+import SchemaSelector from "../../../../app/javascript/react/selectors/schema"
 
 describe('SchemaSelector', () => {
   let state = {

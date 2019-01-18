@@ -6,7 +6,7 @@ import { shallow, mount } from 'enzyme';
 import { createMockStore } from 'redux-test-utils';
 import { Provider, connect } from 'react-redux'
 
-import ManifestContainersConnected from "../../../app/javascript/components/manifest_containers.jsx"
+import ManifestContainersConnected from "../../../../app/javascript/react/components/manifest_containers.jsx"
 
 const getContext = (status) => {
   let context = { store: createMockStore(status) };

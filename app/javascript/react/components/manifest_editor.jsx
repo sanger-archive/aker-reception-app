@@ -1,14 +1,14 @@
 import React from "react"
 import PropTypes from "prop-types"
 import {Fragment} from "react"
-import store from 'store'
+import store from '../store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
 import { uploadManifest, loadManifest, selectExpectedOption, selectObservedOption, displayMessage, saveAndLeave } from '../actions'
 import StateSelectors from '../selectors'
 
-import Reception from '../routes.js.erb'
+import Reception from '../../routes.js.erb'
 
 const logName = (name) => { }
 const MessageDisplay = (props) => {

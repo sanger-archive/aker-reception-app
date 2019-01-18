@@ -1,7 +1,7 @@
 import sinon from 'sinon';
 import { expect } from 'chai'
-import C from "../../../app/javascript/constants"
-import contentReducer from "../../../app/javascript/reducers/content"
+import C from "../../../../app/javascript/react/constants"
+import contentReducer from "../../../../app/javascript/react/reducers/content"
 
 
 describe('ContentReducer', () => {

@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import { expect } from 'chai'
-import ManifestSelector from "../../../app/javascript/selectors/manifest"
+import ManifestSelector from "../../../../app/javascript/react/selectors/manifest"
 
 describe('ManifestSelector', () => {
   let state = {
