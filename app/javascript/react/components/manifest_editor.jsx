@@ -209,34 +209,6 @@ const ManifestEditor = (props) => {
     store.dispatch(loadManifest(props))
   }
 
-  $(document.body).on('uploadManifest', (event, request) => {
-    return $.ajax(request)
-    .then(
-      $.proxy(function(response, event) {
-        const manifest = response.contents
-
-        store.dispatch(loadManifest(manifest))
-        //store.dispatch(loadManifestMapping(manifest.mapping))
-        logName(store.getState())
-        if (!store.getState().mapping.valid) {
-          store.dispatch(selectExpectedOption(null))
-          store.dispatch(selectObservedOption(null))
-
-          $('#myModal').modal('show')
-        } else {
-          //store.dispatch(loadManifestContent(manifest.content))
-        }
-      }, this),
-      (xhr) => {
-        store.dispatch(displayMessage({labwareIndex: null, address: null, level: 'FATAL', display: 'alert', text: xhr.responseJSON.errors.join("\n") }))
-      }
-    )
-    .always(() => {
-      $(document).trigger('hideLoadingOverlay');
-    })
-  })
-  //$(document.body).on('uploadedmanifest', )
-
   return(
     <Provider store={store}>
       <ManifestEditorComponent />

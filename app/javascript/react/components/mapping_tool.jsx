@@ -1,19 +1,8 @@
 import React, {Fragment} from "react"
 import PropTypes from "prop-types"
 import { connect } from 'react-redux'
-
 import { Modal } from 'react-bootstrap';
-
-
 import {matchSelection, unmatch, selectExpectedOption, selectObservedOption, toggleMapping, saveTab } from '../actions'
-
-let matchedFields = {}
-
-const MODAL_ID = 'myModal'
-const FORM_FIELD_SELECT_ID = 'form-fields'
-const CSV_SELECT_ID = 'fields-from-csv'
-const MAPPING_TABLE_ID = 'matched-fields-table'
-const DATA_TABLES = 'div.tab-pane table.dataTable';
 
 
 const MappingHeaderComponent = (props) => {
@@ -82,8 +71,8 @@ const MappingInterface = (props) => {
       </div>
       <div className="col-md-5">
         <div className="form-group">
-          <label htmlFor="fields-from-csv">Fields from CSV</label>
-          <select id="fields-from-csv" className="form-control" name="fields-from-csv" size="8" defaultValue={props.selectedObserved||""}>
+          <label htmlFor="fields-from-file">Fields from File</label>
+          <select id="fields-from-file" className="form-control" name="fields-from-file" size="8" defaultValue={props.selectedObserved||""}>
             <ObservedMappingOptions {...props} />
           </select>
         </div>
@@ -155,34 +144,23 @@ const MappingBody = (props) => {
     )
 }
 
-class MappingToolComponent extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-    }
-  }
-  componentDidUpdate(){
-    if (this.props && this.props.valid) {
-      if (this.props.content &&  this.props.schema && this.props.schema.properties) {
-        //CSVFieldChecker.fillInTableFromFile(buildContentFromStructured(this.props.content.structured), buildMatchedFields(this.props.matched), $(DATA_TABLES), this.props.schema.properties)
-      }
-    }
 
-    //$(this.modal).on('hidden.bs.modal', this.props.handleHideModal);
+const MappingToolComponent = (props) => {
+  if (props.shown) {
+    return(
+        <Modal.Dialog backdrop={"true"} >
+          <MappingHeader />
+          <MappingBody {...props} style={
+          {
+            height: '700px',
+            overflow: 'scroll'
+          }
+        } />
+          <MappingFooter {...props} />
+        </Modal.Dialog>
+    )
   }
-
-  render () {
-    if (this.props.shown) {
-      return(
-          <Modal.Dialog backdrop={"true"}>
-            <MappingHeader />
-            <MappingBody {...this.props} />
-            <MappingFooter {...this.props} />
-          </Modal.Dialog>
-      )
-    }
-    return null
-  }
+  return null
 }
 
 const mapStateToProps = (state) => {
@@ -236,12 +214,10 @@ const mapDispatchToProps = (dispatch, { match, location }) => {
     onMatchFields: (expected, observed) => {
       dispatch(matchSelection(expected, observed))
       dispatch(saveTab())
-      //dispatch(updateState())
     },
     onUnmatch: (expected, observed) => {
       dispatch(unmatch(expected, observed))
       dispatch(saveTab())
-      //dispatch(updateState())
     }
   }
 }

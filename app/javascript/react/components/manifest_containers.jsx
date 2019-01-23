@@ -28,34 +28,26 @@ const LabwareContentHeader = connect((state, ownProps) => {
 })(LabwareContentHeaderComponent)
 
 
-class LabwareContentCellComponent extends React.Component {
-  /*shouldComponentUpdate(nextProps, nextState) {
-    const val = StateSelectors.content.selectedValueAtCell(this.state, this.props.labwareIndex, this.props.address, this.props.fieldName)
-    const nextVal = StateSelectors.content.selectedValueAtCell(nextState, nextProps.labwareIndex, nextProps.address, nextProps.fieldName)
-    return (val !== nextVal)
-  }*/
-  render() {
-    logName('LabwareContentCellComponent')
-    const props = this.props
-    return (
-      <td data-psd-schema-validation-name={props.fieldName}>
-        <div className={ classNames({
-                'form-group': true,
-                'has-error': props.displayError,
-                'has-warning': props.displayWarning
-              }
-            )
-          }
-          style={{position: "relative"}}>
+const LabwareContentCellComponent = (props) => {
+  logName('LabwareContentCellComponent')
+  return (
+    <td data-psd-schema-validation-name={props.fieldName}>
+      <div className={ classNames({
+              'form-group': true,
+              'has-error': props.displayError,
+              'has-warning': props.displayWarning
+            }
+          )
+        }
+        style={{position: "relative"}}>
 
-          <LabwareContentInput
-            labwareIndex={props.labwareIndex}
-            address={props.address}
-            fieldName={props.fieldName} />
-        </div>
-      </td>
-    )
-  }
+        <LabwareContentInput
+          labwareIndex={props.labwareIndex}
+          address={props.address}
+          fieldName={props.fieldName} />
+      </div>
+    </td>
+  )
 }
 
 const mapStateToPropsLabwareContentCell = ((hasInputMessages, hasInputErrors) => {
@@ -77,16 +69,6 @@ const LabwareContentCell = connect(mapStateToPropsLabwareContentCell)(LabwareCon
 
 const LabwareContentAddressComponent = (props) => {
   logName('LabwareContentAddressComponent')
-      /*data-psd-component-class='TaxonomyIdControl'
-      data-psd-component-parameters={
-        JSON.stringify({
-          taxonomyServiceUrl: props.taxonomyServiceUrl,
-          relativeCssSelectorSciName: 'td[data-psd-schema-validation-name=scientific_name] input',
-          relativeCssSelectorTaxId: 'td[data-psd-schema-validation-name=taxon_id] input',
-          cachedTaxonomies: {}
-        })
-      }*/
-
   return(
     <tr
       data-labware-index={ props.labwareIndex } data-address={ props.address }>

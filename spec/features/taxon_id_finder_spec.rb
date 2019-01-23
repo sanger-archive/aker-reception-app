@@ -82,8 +82,6 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           it 'uses the taxonomy service and searches for the id provided', js: true do
             fill_in('labware[0]address[A:1]fieldName[taxon_id]', with: '3')
             expect(page).to have_selector("input[value='Some specie name']")
-
-            #expect(page.find('labware[0]address[A:1]fieldName[scientific_name]')).not_to have_selector('.has-error')
           end
         end
 
@@ -104,8 +102,6 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
               fill_in("labware[0]address[B:#{i + 1}]fieldName[phenotype]", with: '4')
 
               first('a.save').click
-              #click_on('Next')
-              #within(first('form > .row > .col-md-12')) { click_on('Next') }
               expect(page).not_to have_selector('.has-error')
             end
           end

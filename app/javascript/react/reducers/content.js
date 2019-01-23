@@ -22,7 +22,7 @@ export const removeEmptyRows = (newState, labwareId, address) => {
 
   /* If the other inputs do not have any value, remove the address from the state */
   let fieldsWithValue = Object.keys(fields).filter((k) => {
-    if ((k=='plate_id') || (k=='position')) {
+    if ((k=='supplier_plate_name') || (k=='position')) {
       return false
     }
     return (fields[k].value && (fields[k].value.length > 0))
@@ -101,7 +101,7 @@ export default (state = {}, action) => {
     case C.SET_MANIFEST_VALUE:
       newState = Object.assign({}, state)
 
-      setManifestValue(newState, action.labwareId, action.address, "plate_id", action.labwareId)
+      setManifestValue(newState, action.labwareId, action.address, "supplier_plate_name", action.labwareId)
       setManifestValue(newState, action.labwareId, action.address, "position", action.address)
       setManifestValue(newState, action.labwareId, action.address, action.fieldName, action.value)
       removeEmptyRows(newState, action.labwareId, action.address)
