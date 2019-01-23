@@ -1,8 +1,7 @@
 import C from '../constants'
 
 export default (state = {}, action) => {
-
-  switch(action.type) {
+  switch (action.type) {
     case C.LOAD_MANIFEST:
       return Object.assign({}, state, action.manifest.schema)
 
@@ -12,4 +11,3 @@ export default (state = {}, action) => {
       return state
   }
 }
-

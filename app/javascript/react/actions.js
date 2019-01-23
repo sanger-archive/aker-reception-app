@@ -1,17 +1,20 @@
 import C from './constants'
 import Reception from '../routes.js.erb'
+import $ from 'jquery'
 
 export const matchSelection = (expected, observed) => {
   return {
     type: C.MATCH_SELECTION,
-    observed, expected
+    observed,
+    expected
   }
 }
 
-export const unmatch = (expected, observed) =>  {
+export const unmatch = (expected, observed) => {
   return {
     type: C.UNMATCH,
-    observed, expected
+    observed,
+    expected
   }
 }
 
@@ -36,20 +39,13 @@ export const selectObservedOption = (val) => {
 export const setManifestValue = (labwareId, address, fieldName, value, plateId) => {
   return {
     type: C.SET_MANIFEST_VALUE, labwareId, address, fieldName, value, plateId
-    //,
-    /*meta: {
-      debounce: {
-        time: 1000,
-        key: 'SET_MANIFEST_INPUT_DEBOUNCED'
-      }
-    }*/
   }
 }
 
 export const filteredState = (state) => {
   let dupState = Object.assign({}, state)
 
-  if (Object.keys(dupState.mapping).length == 0) {
+  if (Object.keys(dupState.mapping).length === 0) {
     delete dupState.mapping
   }
 }
@@ -66,8 +62,8 @@ export const cacheTaxonomy = (taxId, data) => {
 
 export const updateScientificName = (labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl) => {
   return (dispatch, getState) => {
-    if (taxId.length == 0) {
-      dispatch(setManifestValue(labwareId, address, fieldName, "", plateId))
+    if (taxId.length === 0) {
+      dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
       return
     }
     const cache = getState().services.cachedTaxonomies
@@ -78,7 +74,7 @@ export const updateScientificName = (labwareId, address, fieldName, taxId, plate
         return
       }
     }
-    return $.ajax(taxonomyServiceUrl+'/'+taxId, {
+    return $.ajax(taxonomyServiceUrl + '/' + taxId, {
       method: 'GET',
       contentType: 'application/json',
       dataType: 'json'
@@ -86,13 +82,17 @@ export const updateScientificName = (labwareId, address, fieldName, taxId, plate
       dispatch(cacheTaxonomy(taxId, data))
       dispatch(setManifestValue(labwareId, address, fieldName, data.scientificName, plateId))
     }).fail((e) => {
-      if (e.status==404) {
-        dispatch(setManifestValue(labwareId, address, fieldName, "", plateId))
-        dispatch(displayMessage({level: 'FATAL',
-          display: 'alert', text: "There is no scientific name for the taxon id provided" , labware_index: labwareId, address, field: fieldName
+      if (e.status === 404) {
+        dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
+        dispatch(displayMessage({ level: 'FATAL',
+          display: 'alert',
+          text: 'There is no scientific name for the taxon id provided',
+          labware_index: labwareId,
+          address,
+          field: fieldName
         }))
       } else {
-        dispatch(displayMessage({level: 'FATAL', display: 'alert', text: "There was an error while connecting to the EBI taxonomy service" }))
+        dispatch(displayMessage({ level: 'FATAL', display: 'alert', text: 'There was an error while connecting to the EBI taxonomy service' }))
       }
     })
   }
@@ -103,7 +103,7 @@ export const saveTab = (form) => {
     const state = getState()
     const manifestId = state.manifest.manifest_id
 
-    return $.ajax("/manifests/state/"+manifestId, {
+    return $.ajax('/manifests/state/' + manifestId, {
       method: 'PUT',
       contentType: 'application/json',
       dataType: 'json',
@@ -111,7 +111,7 @@ export const saveTab = (form) => {
     }).then((data) => {
       dispatch(loadManifest(data.contents))
     }).fail((e) => {
-      dispatch(displayMessage({level: 'FATAL', display: 'alert', text: "There is no connection with the service" }))
+      dispatch(displayMessage({ level: 'FATAL', display: 'alert', text: 'There is no connection with the service' }))
     })
   }
 }
@@ -124,7 +124,6 @@ export const toggleMapping = (toggle) => {
   return { type: C.TOGGLE_MAPPING, toggle }
 }
 
-
 export const changeTab = (position) => {
   return {
     type: C.CHANGE_TAB, position
@@ -134,18 +133,17 @@ export const changeTab = (position) => {
 export const saveAndLeave = (url) => {
   return (dispatch, getState) => {
     dispatch(saveTab()).then(() => {
-      dispatch({ type: C.SAVE_AND_LEAVE, url})
+      dispatch({ type: C.SAVE_AND_LEAVE, url })
     })
   }
 }
 
-export const uploadManifest = (manifest, manifest_id) => {
+export const uploadManifest = (manifest, manifestId) => {
   return (dispatch, getState) => {
-    let formData = new FormData()
+    let formData = new window.FormData()
     formData.append('manifest', manifest)
-    formData.append('manifest_id', manifest_id)
+    formData.append('manifest_id', manifestId)
     $(document).trigger('showLoadingOverlay')
-
 
     const ajaxRequest = {
       url: Reception.manifests_upload_index_path(),
@@ -154,38 +152,35 @@ export const uploadManifest = (manifest, manifest_id) => {
       data: formData,
       cache: false,
       contentType: false,
-      processData: false,
+      processData: false
     }
 
     return $.ajax(ajaxRequest)
-    .then(
-      $.proxy(function(response, event) {
-        const manifest = response.contents
+      .then(
+        $.proxy(function (response, event) {
+          const manifest = response.contents
 
-        dispatch(loadManifest(manifest))
-        //dispatch(loadManifestMapping(manifest.mapping))
+          dispatch(loadManifest(manifest))
 
-        if (!getState().mapping.valid) {
-          dispatch(selectExpectedOption(null))
-          dispatch(selectObservedOption(null))
+          if (!getState().mapping.valid) {
+            dispatch(selectExpectedOption(null))
+            dispatch(selectObservedOption(null))
 
-          $('#myModal').modal('show')
-        } else {
-          //dispatch(loadManifestContent(manifest.content))
+            $('#myModal').modal('show')
+          }
+        }, this),
+        (xhr) => {
+          dispatch(displayMessage({
+            labwareIndex: null,
+            address: null,
+            level: 'FATAL',
+            display: 'alert',
+            text: xhr.responseJSON.errors.join('\n')
+          }))
         }
-      }, this),
-      (xhr) => {
-        dispatch(displayMessage({
-          labwareIndex: null, address: null, level: 'FATAL', display: 'alert',
-          text: xhr.responseJSON.errors.join("\n")
-        }))
-      }
-    )
-    .always(() => {
-      $(document).trigger('hideLoadingOverlay');
-    })
+      )
+      .always(() => {
+        $(document).trigger('hideLoadingOverlay')
+      })
   }
-
-  //$(document.body).trigger('uploadManifest', ajaxRequest)
 }
-
