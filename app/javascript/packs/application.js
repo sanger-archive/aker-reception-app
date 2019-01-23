@@ -11,17 +11,19 @@
 import $ from 'jquery'
 import {} from 'jquery-ujs'
 
+// [PJ] need to import datatables in this way to get it working
+import dt from 'datatables.net'
+import 'datatables.net-bs/js/dataTables.bootstrap.js'
+import 'src/application.scss'
+
+import ManifestEditor from 'react/components/manifest_editor'
+
+import WebpackerReact from 'webpacker-react'
+
 // we need to include bootstrap's JS for things like the modal: https://getbootstrap.com/docs/3.3/javascript/
-require( 'bootstrap/dist/js/bootstrap');
+require('bootstrap/dist/js/bootstrap')
 
 const moment = require('moment')
-
-// [PJ] need to import datatables in this way to get it working
-import dt from 'datatables.net';
-import 'datatables.net-bs/js/dataTables.bootstrap.js';
-import 'src/application.scss';
-
-import ManifestEditor from 'react/components/manifest_editor';
 
 require('select2')
 require('component_builder')
@@ -33,12 +35,10 @@ require('manifest_csv_warnings')
 require('loading_icon')
 require('show_previous_in_datatable')
 require('loading_overlay')
+WebpackerReact.setup({ ManifestEditor })
 
-import WebpackerReact from 'webpacker-react'
-WebpackerReact.setup({ManifestEditor})
-
-$(document).on("turbolinks:load", function() {
+$(document).on('turbolinks:load', function () {
   $('.has-popover').popover({
     trigger: 'hover'
-  });
-});
+  })
+})

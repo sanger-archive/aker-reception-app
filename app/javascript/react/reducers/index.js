@@ -8,7 +8,6 @@ import services from './services'
 
 import { isThereAnyRequiredUnmatchedField } from '../helpers'
 
-
 const isValidMapping = (state) => {
   return !isThereAnyRequiredUnmatchedField(state)
 }
@@ -22,7 +21,7 @@ const reducers = combineReducers({
 })
 
 export default (state, action) => {
-  switch(action.type) {
+  switch (action.type) {
     case C.LOAD_MANIFEST:
       let obj = Object.assign({}, action.manifest, reducers(state, action))
       return obj
@@ -30,4 +29,3 @@ export default (state, action) => {
       return reducers(state, action)
   }
 }
-

@@ -1,56 +1,53 @@
-import { uploadManifest } from 'react/actions';
+import { uploadManifest } from 'react/actions'
 import store from 'react/store'
 
-(function($,undefined) {
-
-
-  function LoadTable(node, params) {
+(function ($, undefined) {
+  function LoadTable (node, params) {
     this.node = $(node)
-    this.params = params;
+    this.params = params
 
-    this.attachHandlers();
+    this.attachHandlers()
   }
 
-  var proto = LoadTable.prototype;
+  var proto = LoadTable.prototype
 
-  proto.attachHandlers = function() {
+  proto.attachHandlers = function () {
     this.dataTable = this.node.DataTable({
       paging: false,
       searching: false,
       ordering: false
     })
-    .on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    })
-    .on('dragover dragenter', function() {
-      $(this).addClass('is-dragover bg-info').removeClass('table-striped')
-    })
-    .on('dragleave dragend drop', function() {
-      $(this).removeClass('is-dragover bg-info').addClass('table-striped')
-    })
-    .on('drop', $.proxy(function(e) {
-      store.dispatch(uploadManifest(e.originalEvent.dataTransfer.files[0], this.params.manifest_id))
-    }, this));
+      .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      })
+      .on('dragover dragenter', function () {
+        $(this).addClass('is-dragover bg-info').removeClass('table-striped')
+      })
+      .on('dragleave dragend drop', function () {
+        $(this).removeClass('is-dragover bg-info').addClass('table-striped')
+      })
+      .on('drop', $.proxy(function (e) {
+        store.dispatch(uploadManifest(e.originalEvent.dataTransfer.files[0], this.params.manifest_id))
+      }, this))
 
     var csvBox = $('.csv-upload-box')
-      .on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+      .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
+        e.preventDefault()
+        e.stopPropagation()
       })
-      .on('dragover dragenter', function() {
+      .on('dragover dragenter', function () {
         $(this).addClass('is-dragover bg-info')
       })
-      .on('dragleave dragend drop', function() {
+      .on('dragleave dragend drop', function () {
         $(this).removeClass('is-dragover bg-info')
       })
-      .on('drop', $.proxy(function(e) {
+      .on('drop', $.proxy(function (e) {
         store.dispatch(uploadManifest(e.originalEvent.dataTransfer.files[0], this.params.manifest_id))
-      }, this));
+      }, this))
   }
 
-  $(document).ready(function() {
-    $(document).trigger('registerComponent.builder', {'LoadTable': LoadTable});
-  });
-
-})(jQuery);
+  $(document).ready(function () {
+    $(document).trigger('registerComponent.builder', { 'LoadTable': LoadTable })
+  })
+})(jQuery)

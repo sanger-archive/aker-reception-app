@@ -1,23 +1,23 @@
 // enable/disable the decapper option on the labware page
 
-function isDecappableSelected() {
-  return $(".labwaretype:checked").hasClass("decappable");
+function isDecappableSelected () {
+  return $('.labwaretype:checked').hasClass('decappable')
 }
 
-function isSupplyLabwareSelected() {
-  return ($(".supplylabware").val()=="true");
+function isSupplyLabwareSelected () {
+  return ($('.supplylabware').val() == 'true')
 }
 
-function enableDecapper() {
+function enableDecapper () {
   if (isDecappableSelected() && isSupplyLabwareSelected()) {
-    $(".supplydecapper").parent().show();
+    $('.supplydecapper').parent().show()
   } else {
-    $(".supplydecapper").parent().hide();
+    $('.supplydecapper').parent().hide()
   }
 }
 
-$(document).on("turbolinks:load", function() {
-  $(".labwaretype").change(enableDecapper);
-  $(".supplylabware").change(enableDecapper);
-  enableDecapper();
-});
+$(document).on('turbolinks:load', function () {
+  $('.labwaretype').change(enableDecapper)
+  $('.supplylabware').change(enableDecapper)
+  enableDecapper()
+})
