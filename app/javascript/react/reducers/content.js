@@ -22,12 +22,12 @@ export const removeEmptyRows = (newState, labwareId, address) => {
 
   /* If the other inputs do not have any value, remove the address from the state */
   let fieldsWithValue = Object.keys(fields).filter((k) => {
-    if ((k == 'supplier_plate_name') || (k == 'position')) {
+    if ((k === 'supplier_plate_name') || (k === 'position')) {
       return false
     }
     return (fields[k].value && (fields[k].value.length > 0))
   })
-  if (fieldsWithValue.length == 0) {
+  if (fieldsWithValue.length === 0) {
     delete newState.structured.labwares[labwareId].addresses[address]
     return newState
   }

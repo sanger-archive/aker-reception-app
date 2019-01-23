@@ -1,4 +1,6 @@
-(function ($, undefined) {
+import $ from 'jquery'
+
+(function () {
   function DataTableSchemaValidation (node, params) {
     this._node = $(node)
     this.params = params
@@ -65,10 +67,10 @@
       } })
   }
 
-  Array.prototype.indexOfCaseInsensitive = function (item) {
+  function indexOfCaseInsensitive (list, item) {
     item = item.toUpperCase()
-    for (var index = 0; index < this.length; ++index) {
-      if (item === this[index].toUpperCase()) {
+    for (var index = 0; index < list.length; ++index) {
+      if (item === list[index].toUpperCase()) {
         return index
       }
     }
@@ -136,7 +138,7 @@
         return false
       }
       // True (fail) if the value is given but unmatched
-      return (schema.enum.indexOfCaseInsensitive(v) < 0)
+      return (indexOfCaseInsensitive(schema.enum, v) < 0)
     }
   }
 
@@ -182,7 +184,7 @@
   proto.hmdmcCheck = function (fieldProperties, hmdmcField) {
     // Only validate the HMDMC number if there is one
     if (hmdmcField.value) {
-      var hmdmcPattern = new RegExp('^[0-9]{2}\/[0-9]{3,4}$')
+      var hmdmcPattern = new RegExp('^[0-9]{2}/[0-9]{3,4}$')
 
       // First validate that the HMDMC field is in the correct format
       if (hmdmcPattern.test(hmdmcField.value)) {
@@ -236,7 +238,7 @@
 
       failed = (
         // HMDMC is not required but needs to validated if present
-        (htmlField.name == 'hmdmc' && this.hmdmcCheck(fieldProperties, htmlField)) ||
+        (htmlField.name === 'hmdmc' && this.hmdmcCheck(fieldProperties, htmlField)) ||
         // Check for required fields
         this.failSchemaCheck(fieldProperties,
           htmlField,
@@ -296,4 +298,4 @@
   $(document).ready(function () {
     $(document).trigger('registerComponent.builder', { 'DataTableSchemaValidation': DataTableSchemaValidation })
   })
-}(jQuery))
+}())

@@ -1,6 +1,7 @@
+import $ from 'jquery'
 import moment from 'moment'
 
-(function ($, undefined) {
+(function () {
   /**
   * This component works with 3 elements:
   * 1. An input to read a barcode with the following behaviour:
@@ -26,7 +27,7 @@ import moment from 'moment'
   var proto = BarcodeReader.prototype
 
   proto.readInput = function (e) {
-    if ((e.keyCode === 9) || (e.keyCode == 13)) {
+    if ((e.keyCode === 9) || (e.keyCode === 13)) {
       e.preventDefault()
       this.inputReader[1].value = this.inputReader[1].value.trim()
       $(this.form).submit()
@@ -83,4 +84,4 @@ import moment from 'moment'
   $(document).ready(function () {
     $(document).trigger('registerComponent.builder', { 'BarcodeReader': BarcodeReader })
   })
-}(jQuery))
+}())

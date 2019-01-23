@@ -1,4 +1,6 @@
-(function ($, undefined) {
+import $ from 'jquery'
+
+(function () {
   function DataTableInitialization (node, params) {
     this.node = $(node)
     this.initDataTable(params)
@@ -24,4 +26,4 @@
   $(document).ready(function () {
     $(document).trigger('registerComponent.builder', { 'DataTableInitialization': DataTableInitialization })
   })
-}(jQuery))
+}())

@@ -1,7 +1,8 @@
+import $ from 'jquery'
 import { uploadManifest } from 'react/actions'
 import store from 'react/store'
 
-(function ($, undefined) {
+(function () {
   function LoadTable (node, params) {
     this.node = $(node)
     this.params = params
@@ -31,7 +32,7 @@ import store from 'react/store'
         store.dispatch(uploadManifest(e.originalEvent.dataTransfer.files[0], this.params.manifest_id))
       }, this))
 
-    var csvBox = $('.csv-upload-box')
+    $('.csv-upload-box')
       .on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
         e.preventDefault()
         e.stopPropagation()
@@ -50,4 +51,4 @@ import store from 'react/store'
   $(document).ready(function () {
     $(document).trigger('registerComponent.builder', { 'LoadTable': LoadTable })
   })
-})(jQuery)
+})()

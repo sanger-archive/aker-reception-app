@@ -1,4 +1,6 @@
-(function ($, undefined) {
+import $ from 'jquery'
+
+(function () {
   function ComponentBuilder () {
     this.instances = []
     this.components = {}
@@ -77,4 +79,4 @@
   var componentBuilder = new ComponentBuilder()
   componentBuilder.listenPageLoad()
   componentBuilder.listenComponentRegistration()
-}(jQuery))
+}())

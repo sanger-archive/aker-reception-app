@@ -1,4 +1,6 @@
-(function ($, undefined) {
+import $ from 'jquery'
+
+(function () {
   function LoadingIcon (node, params) {
     this.node = $(node)
 
@@ -52,4 +54,4 @@
   $(document).ready(function () {
     $(document).trigger('registerComponent.builder', { 'LoadingIcon': LoadingIcon })
   })
-}(jQuery))
+}())

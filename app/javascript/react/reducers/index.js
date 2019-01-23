@@ -6,12 +6,6 @@ import schema from './schema'
 import manifest from './manifest'
 import services from './services'
 
-import { isThereAnyRequiredUnmatchedField } from '../helpers'
-
-const isValidMapping = (state) => {
-  return !isThereAnyRequiredUnmatchedField(state)
-}
-
 const reducers = combineReducers({
   content,
   mapping,

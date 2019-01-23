@@ -1,5 +1,6 @@
 import C from './constants'
 import Reception from '../routes.js.erb'
+import $ from 'jquery'
 
 export const matchSelection = (expected, observed) => {
   return {
@@ -38,20 +39,13 @@ export const selectObservedOption = (val) => {
 export const setManifestValue = (labwareId, address, fieldName, value, plateId) => {
   return {
     type: C.SET_MANIFEST_VALUE, labwareId, address, fieldName, value, plateId
-    //,
-    /* meta: {
-      debounce: {
-        time: 1000,
-        key: 'SET_MANIFEST_INPUT_DEBOUNCED'
-      }
-    } */
   }
 }
 
 export const filteredState = (state) => {
   let dupState = Object.assign({}, state)
 
-  if (Object.keys(dupState.mapping).length == 0) {
+  if (Object.keys(dupState.mapping).length === 0) {
     delete dupState.mapping
   }
 }
@@ -68,7 +62,7 @@ export const cacheTaxonomy = (taxId, data) => {
 
 export const updateScientificName = (labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl) => {
   return (dispatch, getState) => {
-    if (taxId.length == 0) {
+    if (taxId.length === 0) {
       dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
       return
     }
@@ -88,7 +82,7 @@ export const updateScientificName = (labwareId, address, fieldName, taxId, plate
       dispatch(cacheTaxonomy(taxId, data))
       dispatch(setManifestValue(labwareId, address, fieldName, data.scientificName, plateId))
     }).fail((e) => {
-      if (e.status == 404) {
+      if (e.status === 404) {
         dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
         dispatch(displayMessage({ level: 'FATAL',
           display: 'alert',
@@ -144,11 +138,11 @@ export const saveAndLeave = (url) => {
   }
 }
 
-export const uploadManifest = (manifest, manifest_id) => {
+export const uploadManifest = (manifest, manifestId) => {
   return (dispatch, getState) => {
-    let formData = new FormData()
+    let formData = new window.FormData()
     formData.append('manifest', manifest)
-    formData.append('manifest_id', manifest_id)
+    formData.append('manifest_id', manifestId)
     $(document).trigger('showLoadingOverlay')
 
     const ajaxRequest = {
@@ -167,15 +161,12 @@ export const uploadManifest = (manifest, manifest_id) => {
           const manifest = response.contents
 
           dispatch(loadManifest(manifest))
-          // dispatch(loadManifestMapping(manifest.mapping))
 
           if (!getState().mapping.valid) {
             dispatch(selectExpectedOption(null))
             dispatch(selectObservedOption(null))
 
             $('#myModal').modal('show')
-          } else {
-          // dispatch(loadManifestContent(manifest.content))
           }
         }, this),
         (xhr) => {
@@ -192,6 +183,4 @@ export const uploadManifest = (manifest, manifest_id) => {
         $(document).trigger('hideLoadingOverlay')
       })
   }
-
-  // $(document.body).trigger('uploadManifest', ajaxRequest)
 }

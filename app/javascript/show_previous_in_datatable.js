@@ -1,4 +1,7 @@
+import $ from 'jquery'
+
 import Reception from './routes'
+
 
 function attachCollapseEvent ($node, path) {
   $node.one('show.bs.collapse', function () {

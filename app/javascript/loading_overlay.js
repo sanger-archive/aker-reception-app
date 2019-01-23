@@ -1,3 +1,5 @@
+import $ from 'jquery'
+
 import 'gasparesganga-jquery-loading-overlay/dist/loadingoverlay.js'
 
 // Class that uses a jQuery Loading Overlay plugin on a single node.
@@ -5,7 +7,7 @@ import 'gasparesganga-jquery-loading-overlay/dist/loadingoverlay.js'
 class LoadingOverlay {
   constructor (node, params) {
     this.$node = $(node)
-    this.params = (typeof params === 'undefined') ? {} : params
+    this.params = params || {}
 
     // Event Handlers
     this.show = this.show.bind(this)
