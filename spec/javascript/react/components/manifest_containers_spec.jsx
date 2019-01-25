@@ -17,7 +17,8 @@ describe('<ManifestContainers />', () => {
 
   let status = {
     "services": {
-      "materials_schema_url": ""
+      "materials_schema_url": "",
+      "taxonomy_service_url": ""
     },
     "manifest": {
       "manifest_id": "1234",

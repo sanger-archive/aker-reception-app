@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/**/*_spec.js spec/javascript/**/*_spec.jsx"
+    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/react/**/*.*"
   },
   "dependencies": {
     "@babel/core": "^7.0.0",

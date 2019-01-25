@@ -140,7 +140,7 @@ LabwareContentInputComponent.propTypes = {
   title: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  labwareIndex: PropTypes.string.isRequired,
+  labwareIndex: PropTypes.number.isRequired,
   address: PropTypes.string.isRequired,
   plateId: PropTypes.string.isRequired,
   taxonomyServiceUrl: PropTypes.string.isRequired,
