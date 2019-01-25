@@ -70,9 +70,22 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
     {:labwares => returned_list}
   end
 
+  def _find_or_allocate_labware_from_raw(memo, labware_id)
+    memo[:labwares]={} unless memo[:labwares]
+    labware_found = memo[:labwares].keys.select{|l| memo[:labwares][l][labware_id_schema_field]==labware_id }[0]
+    unless labware_found
+      labware_found = memo[:labwares].keys.length
+      memo[:labwares][labware_found] = {}
+    end
+    labware_found
+  end
+
+  def labware_id_schema_field
+    manifest_schema_field(:labware_id).to_sym
+  end
+
   def read_from_raw
     idx = 0
-    labware_id_schema_field =  manifest_schema_field(:labware_id).to_sym
     state_access[:raw].reduce({}) do |memo, row|
       mapped = mapped_row(row)
 
@@ -80,13 +93,7 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
 
 
       labware_id = labware_id(mapped)
-
-      memo[:labwares]={} unless memo[:labwares]
-      labware_found = memo[:labwares].keys.select{|l| memo[:labwares][l][labware_id_schema_field]==labware_id }[0]
-      unless labware_found
-        labware_found = memo[:labwares].keys.length
-        memo[:labwares][labware_found] = {}
-      end
+      labware_found = _find_or_allocate_labware_from_raw(memo, labware_id)
 
       validate_position_existence(mapped, idx)
 

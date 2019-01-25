@@ -32,19 +32,27 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
     }
   end
 
+  def field_requires_mapping?(expected_properties)
+    ((expected_properties['required']) || (expected_properties['show_on_form'] && expected_properties['field_name_regex']))
+  end
+
+  def map_field(memo, expected_key, expected_properties, observed_keys)
+    found = observed_keys.detect do |observed_key|
+      observed_key.strip.match(expected_properties['field_name_regex'])
+    end
+    if found
+      memo[:matched].push({expected: expected_key, observed: found})
+      memo[:observed].reject! { |observed_key| (observed_key == found) }
+    else
+      memo[:expected].push(expected_key)
+    end
+  end
+
   def perform_mapping
     expected_keys_and_properties.reduce(initial_mapping) do |memo, expected_key_and_properties|
       expected_key, expected_properties = expected_key_and_properties
-      if ((expected_properties['required']) || (expected_properties['show_on_form'] && expected_properties['field_name_regex']))
-        found = observed_keys.detect do |observed_key|
-          observed_key.strip.match(expected_properties['field_name_regex'])
-        end
-        if found
-          memo[:matched].push({expected: expected_key, observed: found})
-          memo[:observed].reject! { |observed_key| (observed_key == found) }
-        else
-          memo[:expected].push(expected_key)
-        end
+      if field_requires_mapping?(expected_properties)
+        map_field(memo, expected_key, expected_properties, observed_keys)
       end
       memo
     end

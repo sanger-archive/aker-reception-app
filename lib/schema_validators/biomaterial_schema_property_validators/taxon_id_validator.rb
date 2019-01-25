@@ -21,6 +21,30 @@ module SchemaValidators
         taxonomies_memoized[taxon_id]
       end
 
+      def validate_scientific_name(taxon_id, scientific_name, labware_index, address, property_name)
+        begin
+          obtained_value = find_by_taxon_id(taxon_id).scientificName
+        rescue TaxonomyClient::Errors::BadRequest => e
+          add_error(labware_index, address, property_name,
+            "The request to the EBI Taxonomy service is not valid")
+          return false
+        rescue TaxonomyClient::Errors::NotFound => e
+          add_error(labware_index, address, property_name,
+            "The Taxon Id provided (#{taxon_id}) was not found in the EBI Taxonomy service")
+          return false
+        end
+
+        if scientific_name
+          unless scientific_name == obtained_value
+            add_error(labware_index, address, property_name,
+              "The Taxon Id provided (#{taxon_id}) does not match the scientific name provided '#{scientific_name}'.
+              The taxonomy service indicates it should be '#{obtained_value}.")
+            return false
+          end
+        end
+        true
+      end
+
       def validate(labware_index, address, bio_data)
         return true if field_data(bio_data).nil?
 
@@ -30,23 +54,8 @@ module SchemaValidators
           return false
         end
         scientific_name = field_data_for_property('scientific_name', bio_data)
-        begin
-          obtained_value = find_by_taxon_id(taxon_id).scientificName
-        rescue TaxonomyClient::Errors::BadRequest => e
-          add_error(labware_index, address, property_name, "The request to the EBI Taxonomy service is not valid")
-          return false
-        rescue TaxonomyClient::Errors::NotFound => e
-          add_error(labware_index, address, property_name, "The Taxon Id provided (#{taxon_id}) was not found in the EBI Taxonomy service")
-          return false
-        end
 
-        if scientific_name
-          unless scientific_name == obtained_value
-            add_error(labware_index, address, property_name, "The Taxon Id provided (#{taxon_id}) does not match the scientific name provided '#{scientific_name}'. The taxonomy service indicates it should be '#{obtained_value}.")
-            return false
-          end
-        end
-        true
+        validate_scientific_name(taxon_id, scientific_name, labware_index, address, property_name)
       end
     end
   end

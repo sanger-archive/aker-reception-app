@@ -25,9 +25,7 @@ class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Acc
   end
 
   def manifest_schema
-    return @manifest_schema if @manifest_schema
-    config = Rails.application.config.manifest_schema_config
-    @manifest_schema = material_schema.dup.tap do |schema|
+    @manifest_schema ||= material_schema.dup.tap do |schema|
 
       # Merges properties from the biomaterial schema and the manifest schema config to create a new schema object
       # The resulting schema will have all the information from the material schema but any fields defined in the manifest
@@ -47,17 +45,19 @@ class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Acc
       # 'position' is required when there are several positions to choose inside the same labware to put the sample in
       schema["properties"][manifest_schema_field(:position)]["required"] = false
       schema["properties"][manifest_schema_field(:position)]["show_on_form"] = false
-      if (labwares.length > 0)
-        if labwares[0][:positions]
-          schema["properties"][manifest_schema_field(:position)]["required"] = (labwares[0][:positions].length > 1)
-          schema["properties"][manifest_schema_field(:position)]["show_on_form"] = (labwares[0][:positions].length > 1)
-        end
+      if (labwares.length > 0) && (labwares[0][:positions])
+        schema["properties"][manifest_schema_field(:position)]["required"] = (labwares[0][:positions].length > 1)
+        schema["properties"][manifest_schema_field(:position)]["show_on_form"] = (labwares[0][:positions].length > 1)
       end
     end
     @manifest_schema
   end
 
   private
+
+  def config
+    Rails.application.config.manifest_schema_config
+  end
 
   def _build_show_on_form(schema)
     unless schema["show_on_form"]
