@@ -36,28 +36,25 @@ const WarningDisplay = (props) => {
   )
 }
 
+const showMessages = (props, messages, Renderer) => {
+  return messages.map((msg, pos) => {
+    if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {
+      return
+    }
+    return <Renderer {...msg}
+      supplierPlateNames={props.supplierPlateNames}
+      selectedTabPosition={props.selectedTabPosition}
+      key={pos} />
+  })
+}
+
+
 const MessagesDisplayComponent = (props) => {
   logName('MessagesDisplayComponent')
   return (
     <div>
-      { props.warnings.map((msg, pos) => {
-        if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {
-          return
-        }
-        return <WarningDisplay {...msg}
-          supplierPlateNames={props.supplierPlateNames}
-          selectedTabPosition={props.selectedTabPosition}
-          key={pos} />
-      }) }
-      { props.errors.map((msg, pos) => {
-        if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {
-          return
-        }
-        return <ErrorDisplay {...msg}
-          supplierPlateNames={props.supplierPlateNames}
-          selectedTabPosition={props.selectedTabPosition}
-          key={pos} />
-      }) }
+      {showMessages(props, props.warnings, WarningDisplay)}
+      {showMessages(props, props.errors, ErrorDisplay)}
     </div>
   )
 }
