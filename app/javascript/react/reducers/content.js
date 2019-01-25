@@ -59,24 +59,7 @@ const resetPreviousValues = (prevState, newState) => {
   return newState
 }
 
-// const resetPreviousValues = (prevState, newState) => {
-//   for (let labwareId of Object.keys(prevState.structured.labwares)) {
-//     let labware = prevStructure.labwares[labwareId]
-//     for (let addressId of Object.keys(labware.addresses)) {
-//       let address = labware.addresses[addressId]
-//       for (let fieldName of Object.keys(address[addressId].fields)) {
-//         let field = address.fields[fieldName]
-//         if (!found(newState, labwareId, addressId, fieldName)) {
-//           setManifestValue(newState, labwareId, address, fieldName, "")
-//         }
-//       }
-//     }
-//   }
-//   return newState
-// }
-
 export default (state = {}, action) => {
-  let newState
   switch (action.type) {
     case C.TOGGLE_MAPPING:
       if (!action.toggle) {
@@ -91,14 +74,11 @@ export default (state = {}, action) => {
     case C.LOAD_MANIFEST:
       return resetPreviousValues(state, Object.assign({}, action.manifest.content))
     case C.DISPLAY_MESSAGE:
-      let displayObj = Object.assign({}, state)
-      if (!displayObj.structured) {
-        displayObj.structured = {}
-      }
+      let displayObj = Object.assign({ structured: {} }, state)
       Object.assign(displayObj.structured, { messages: [action.data] })
       return displayObj
     case C.SET_MANIFEST_VALUE:
-      newState = Object.assign({}, state)
+      let newState = Object.assign({}, state)
 
       setManifestValue(newState, action.labwareId, action.address, 'supplier_plate_name', action.labwareId)
       setManifestValue(newState, action.labwareId, action.address, 'position', action.address)
