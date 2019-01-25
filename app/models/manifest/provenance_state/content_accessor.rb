@@ -31,10 +31,14 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
     super && present_structured?
   end
 
+  def state_access_raw
+    state_access && state_access[:raw]
+  end
+
   def build
     {
-      raw: state_access && state_access[:raw],
-      structured: (state_access && state_access[:raw] && @state[:mapping]) ? read_from_raw : read_from_database
+      raw: state_access_raw,
+      structured: (state_access_raw && @state[:mapping]) ? read_from_raw : read_from_database
     }
   end
 
@@ -117,16 +121,18 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
 
 
   def labware_id(mapped)
-    if mapped[manifest_schema_field(:labware_id)]
-      mapped[manifest_schema_field(:labware_id)][:value]
+    key = manifest_schema_field(:labware_id)
+    if mapped[key]
+      mapped[key][:value]
     else
       Rails.configuration.manifest_schema_config['default_labware_name_value']
     end
   end
 
   def position(mapped)
-    if mapped[manifest_schema_field(:position)]
-      mapped[manifest_schema_field(:position)][:value]
+    key = manifest_schema_field(:position)
+    if mapped[key]
+      mapped[key][:value]
     else
       Rails.configuration.manifest_schema_config['default_position_value']
     end
