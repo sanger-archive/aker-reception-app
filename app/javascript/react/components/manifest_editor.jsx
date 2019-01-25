@@ -1,11 +1,9 @@
-import React from "react"
-import PropTypes from "prop-types"
-import {Fragment} from "react"
+import React, { Fragment } from 'react'
 import store from '../store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
-import { uploadManifest, loadManifest, selectExpectedOption, selectObservedOption, displayMessage, saveAndLeave } from '../actions'
+import { uploadManifest, loadManifest, saveAndLeave } from '../actions'
 import StateSelectors from '../selectors'
 
 import Reception from '../../routes.js.erb'
@@ -13,7 +11,7 @@ import Reception from '../../routes.js.erb'
 const logName = (name) => { }
 const MessageDisplay = (props) => {
   logName('MessageDisplay')
-  return(
+  return (
     <span>At ({props.supplierPlateNames[props.labware_index]} - {props.address} {props.field}): {props.text}</span>
   )
 }
@@ -25,7 +23,7 @@ const ErrorDisplay = (props) => {
       <button type="button" className="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       <p className='alert-msg'>&nbsp;<MessageDisplay {...props} /></p>
     </div>
-    )
+  )
 }
 
 const WarningDisplay = (props) => {
@@ -38,27 +36,25 @@ const WarningDisplay = (props) => {
   )
 }
 
+const showMessages = (props, messages, Renderer) => {
+  return messages.map((msg, pos) => {
+    if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {
+      return
+    }
+    return <Renderer {...msg}
+      supplierPlateNames={props.supplierPlateNames}
+      selectedTabPosition={props.selectedTabPosition}
+      key={pos} />
+  })
+}
+
+
 const MessagesDisplayComponent = (props) => {
   logName('MessagesDisplayComponent')
   return (
     <div>
-      { props.warnings.map((msg, pos) => {
-        if (msg.labware_index && (props.selectedTabPosition!=msg.labware_index)) {
-          return
-        }
-        return <WarningsDisplay {...msg}
-          supplierPlateNames={props.supplierPlateNames}
-          selectedTabPosition={props.selectedTabPosition}
-          key={pos} />
-      }) }
-      { props.errors.map((msg, pos) => {
-        if (msg.labware_index && (props.selectedTabPosition!=msg.labware_index)) {
-          return
-        }
-        return <ErrorDisplay {...msg}
-          supplierPlateNames={props.supplierPlateNames}
-          selectedTabPosition={props.selectedTabPosition}
-          key={pos} /> }) }
+      {showMessages(props, props.warnings, WarningDisplay)}
+      {showMessages(props, props.errors, ErrorDisplay)}
     </div>
   )
 }
@@ -74,17 +70,17 @@ const MessagesDisplay = connect((state, ownProps) => {
 })(MessagesDisplayComponent)
 
 class ManifestUploaderComponent extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.fileInput = React.createRef()
   }
-  render() {
+  render () {
     return (
       <input
         ref={this.fileInput}
         onChange={() => { this.props.onChange(this.props.manifestId, this.fileInput.current.files[0]) }}
         id="manifest_upload" type="file" className="upload-button" accept=".csv,.xlsm,.xlsx"
-        style={{"display": "none"}} />
+        style={{ 'display': 'none' }} />
     )
   }
 }
@@ -93,37 +89,39 @@ const ManifestUploader = connect((state) => {
   return {}
 }, (dispatch, ownProps) => {
   return {
-    onChange: (manifestId, file)=> {
+    onChange: (manifestId, file) => {
       dispatch(uploadManifest(file, manifestId))
     }
   }
 })(ManifestUploaderComponent)
 
-const InformationDisplayComponent = (props) => {
-  const {manifestId, showHmdmcWarning} = props
-  let hmdmcWarning = null
+const hmdmcWarning = (showHmdmcWarning) => {
   if (showHmdmcWarning) {
-    hmdmcWarning = (
+    return (
       <Fragment>
         <br />
-        <span style={{"color":"red"}}>&#9888; All HMDMC numbers will be saved, but not
+        <span style={{ 'color': 'red' }}>&#9888; All HMDMC numbers will be saved, but not
             validated with eHMDMC.</span>
       </Fragment>
     )
   }
+  return null
+}
 
+const InformationDisplayComponent = (props) => {
+  const { manifestId, showHmdmcWarning } = props
   return (
-    <div style={{"marginTop": "10px"}} className={"well csv-upload-box"}>
+    <div style={{ 'marginTop': '10px' }} className={'well csv-upload-box'}>
       <div className="row">
         <div className="venter col-md-10">
           Please drop a Manifest for the current labware onto this box, or the table.
           Alternatively, you can manually enter material provenance for the current
           labware in the table below. Use the tabs above this message to switch
           labware. If necessary, the table can be scrolled horizontally to view all of the fields.
-          { hmdmcWarning }
+          { hmdmcWarning(showHmdmcWarning) }
         </div>
         <div className="vcenter col-md-2">
-          <label style={{"float": "right"}} className="btn btn-primary">
+          <label style={{ 'float': 'right' }} className="btn btn-primary">
               Browse for Manifest <ManifestUploader manifestId={manifestId} />
           </label>
         </div>
@@ -132,8 +130,7 @@ const InformationDisplayComponent = (props) => {
   )
 }
 
-
-const InformationDisplay = connect((state)=>{
+const InformationDisplay = connect((state) => {
   return {
     manifestId: state.manifest.manifest_id,
     showHmdmcWarning: state.manifest.show_hmdmc_warning
@@ -141,19 +138,18 @@ const InformationDisplay = connect((state)=>{
 })(InformationDisplayComponent)
 
 const ManifestButtonsComponent = (props) => {
-  const {manifestId} = props
   return (
     <div className="row">
       <div className="col-md-12">
-        <div style={{"margin": "10px 0"}}>
+        <div style={{ 'margin': '10px 0' }}>
           <a className="btn btn-primary save pull-right" onClick={
             () => { props.goTo(props.paths.next) }
           }>Next</a>
           <a className="btn btn-primary pull-left"
-          data-confirm="Are you sure you wish to go back? You will lose unsaved progress on the curent step"
-          style={{"marginRight": "10px"}} href={props.paths.previous}>Previous</a>
+            data-confirm="Are you sure you wish to go back? You will lose unsaved progress on the curent step"
+            style={{ 'marginRight': '10px' }} href={props.paths.previous}>Previous</a>
           <a className="btn btn-danger pull-left" data-confirm="Are you sure you wish to cancel this manifest?"
-          rel="nofollow" data-method="delete" href={props.paths.cancel}>Cancel Manifest</a>
+            rel="nofollow" data-method="delete" href={props.paths.cancel}>Cancel Manifest</a>
         </div>
       </div>
     </div>
@@ -164,7 +160,6 @@ const ManifestButtons = connect((state) => {
   const manifestId = state.manifest.manifest_id
 
   let paths
-  let previousPath, cancelPath, nextPath
   if (typeof Reception === 'undefined') {
     paths = {
       previous: '', cancel: '', next: ''
@@ -181,7 +176,7 @@ const ManifestButtons = connect((state) => {
     manifestId,
     paths
   }
-}, (dispatch)=> {
+}, (dispatch) => {
   return {
     goTo: (url) => {
       dispatch(saveAndLeave(url))
@@ -191,7 +186,7 @@ const ManifestButtons = connect((state) => {
 
 export const ManifestEditorComponent = (props) => {
   logName('ManifestEditorComponent')
-  return(
+  return (
     <div>
       <ManifestButtons />
       <InformationDisplay />
@@ -209,7 +204,7 @@ const ManifestEditor = (props) => {
     store.dispatch(loadManifest(props))
   }
 
-  return(
+  return (
     <Provider store={store}>
       <ManifestEditorComponent />
     </Provider>

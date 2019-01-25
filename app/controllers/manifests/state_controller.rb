@@ -1,3 +1,5 @@
+# Given a state from the manifest editor, it performs the actions required from server
+# and returns a new updated version of the state for the client to update its display
 class Manifests::StateController < ApplicationController
 
   # PUT /manifests/state

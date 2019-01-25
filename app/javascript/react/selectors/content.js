@@ -28,6 +28,10 @@ export const buildCheckInputErrors = () => {
   )
 }
 
+const equalityIndex = (a,b) => {
+  return ((typeof a !== 'undefined') && (typeof b !== 'undefined') && (a.toString()===b.toString()))
+}
+
 export const ContentSelector = {
   buildCheckTabMessages,
   hasTabMessages: buildCheckTabMessages(),
@@ -52,13 +56,13 @@ export const ContentSelector = {
   ),
   tabMessages: (state, tabIndex) => {
     return (state?.content?.structured?.messages?.filter((m) => {
-      return (m.labware_index === tabIndex) || (m.labware_index === null) || (m.labware_index === undefined)
+      return ((m.labware_index === null) || (m.labware_index === undefined) || equalityIndex(m.labware_index, tabIndex))
     }) || [])
   },
 
   inputMessages: (state, props) => {
     return ContentSelector.tabMessages(state, props.labwareIndex).filter((m) => {
-      return ((m.labware_index === props.labwareIndex) && (m.address === props.address) && (m.field === props.fieldName))
+      return (equalityIndex(m.labware_index, props.labwareIndex) && (m.address === props.address) && (m.field === props.fieldName))
     })
   },
 

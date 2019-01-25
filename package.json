@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/**/*_spec.js spec/javascript/**/*_spec.jsx"
+    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/react/**/*.*"
   },
   "dependencies": {
     "@babel/core": "^7.0.0",
@@ -37,9 +37,11 @@
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-optional-chaining": "^7.0.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.1.0",
+    "@babel/types": "^7.3.0",
     "babel-eslint": "^10.0.1",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "chai": "^4.1.2",
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.6.0",
@@ -48,6 +50,7 @@
     "eslint-plugin-import": "^2.15.0",
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-standard": "^4.0.0",
     "jsdom": "^12.0.0",
     "jsdom-global": "^3.0.2",

@@ -60,41 +60,41 @@ export const cacheTaxonomy = (taxId, data) => {
   }
 }
 
+const updateScientificNameFromService = (dispatch, labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl) => {
+  return $.ajax(taxonomyServiceUrl + '/' + taxId, {
+    method: 'GET',
+    contentType: 'application/json',
+    dataType: 'json'
+  }).then((data) => {
+    dispatch(cacheTaxonomy(taxId, data))
+    dispatch(setManifestValue(labwareId, address, fieldName, data.scientificName, plateId))
+  }).fail((e) => {
+    if (e.status === 404) {
+      dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
+      dispatch(displayMessage({ level: 'FATAL',
+        display: 'alert',
+        text: 'There is no scientific name for the taxon id provided',
+        labware_index: labwareId,
+        address,
+        field: fieldName
+      }))
+    } else {
+      dispatch(displayMessage({ level: 'FATAL', display: 'alert', text: 'There was an error while connecting to the EBI taxonomy service' }))
+    }
+  })
+}
+
 export const updateScientificName = (labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl) => {
   return (dispatch, getState) => {
     if (taxId.length === 0) {
-      dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
-      return
+      return dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
     }
     const cache = getState().services.cachedTaxonomies
-    if (cache) {
-      const val = cache[taxId]
-      if (val) {
-        dispatch(setManifestValue(labwareId, address, fieldName, val.scientificName, plateId))
-        return
-      }
+    if (cache && cache[taxId]) {
+      return dispatch(setManifestValue(labwareId, address, fieldName, cache[taxId].scientificName, plateId))
     }
-    return $.ajax(taxonomyServiceUrl + '/' + taxId, {
-      method: 'GET',
-      contentType: 'application/json',
-      dataType: 'json'
-    }).then((data) => {
-      dispatch(cacheTaxonomy(taxId, data))
-      dispatch(setManifestValue(labwareId, address, fieldName, data.scientificName, plateId))
-    }).fail((e) => {
-      if (e.status === 404) {
-        dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
-        dispatch(displayMessage({ level: 'FATAL',
-          display: 'alert',
-          text: 'There is no scientific name for the taxon id provided',
-          labware_index: labwareId,
-          address,
-          field: fieldName
-        }))
-      } else {
-        dispatch(displayMessage({ level: 'FATAL', display: 'alert', text: 'There was an error while connecting to the EBI taxonomy service' }))
-      }
-    })
+
+    return updateScientificNameFromService(dispatch, labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl)
   }
 }
 
@@ -138,6 +138,31 @@ export const saveAndLeave = (url) => {
   }
 }
 
+const uploadManifestToService = (dispatch, getState, ajaxRequest, manifest, manifestId) => {
+  return $.ajax(ajaxRequest).then($.proxy(function (response, event) {
+    const manifest = response.contents
+    dispatch(loadManifest(manifest))
+    if (!getState().mapping.valid) {
+      dispatch(selectExpectedOption(null))
+      dispatch(selectObservedOption(null))
+      $('#myModal').modal('show')
+    }
+  }, this),
+  (xhr) => {
+    dispatch(displayMessage({
+      labwareIndex: null,
+      address: null,
+      level: 'FATAL',
+      display: 'alert',
+      text: xhr.responseJSON.errors.join('\n')
+    }))
+  }
+  )
+    .always(() => {
+      $(document).trigger('hideLoadingOverlay')
+    })
+}
+
 export const uploadManifest = (manifest, manifestId) => {
   return (dispatch, getState) => {
     let formData = new window.FormData()
@@ -155,32 +180,6 @@ export const uploadManifest = (manifest, manifestId) => {
       processData: false
     }
 
-    return $.ajax(ajaxRequest)
-      .then(
-        $.proxy(function (response, event) {
-          const manifest = response.contents
-
-          dispatch(loadManifest(manifest))
-
-          if (!getState().mapping.valid) {
-            dispatch(selectExpectedOption(null))
-            dispatch(selectObservedOption(null))
-
-            $('#myModal').modal('show')
-          }
-        }, this),
-        (xhr) => {
-          dispatch(displayMessage({
-            labwareIndex: null,
-            address: null,
-            level: 'FATAL',
-            display: 'alert',
-            text: xhr.responseJSON.errors.join('\n')
-          }))
-        }
-      )
-      .always(() => {
-        $(document).trigger('hideLoadingOverlay')
-      })
+    return uploadManifestToService(dispatch, getState, ajaxRequest, manifest, manifestId)
   }
 }

@@ -1,5 +1,4 @@
-import React from "react"
-import {Fragment} from "react"
+import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 import classNames from 'classnames'
 
@@ -7,14 +6,13 @@ import StateSelectors from '../selectors'
 import LabwareTabs from './labware_tabs'
 import { LabwareContentInput } from './labware_content_input'
 
-
-const logName = (name) => {  }
+const logName = (name) => { }
 
 const LabwareContentHeaderComponent = (props) => {
-  const requiredMark = props.isRequiredField ? (<span style={{color: "red"}}>*</span>) : null
+  const requiredMark = props.isRequiredField ? (<span style={{ color: 'red' }}>*</span>) : null
 
-  return(
-    <th style={{whiteSpace: "nowrap"}}>
+  return (
+    <th style={{ whiteSpace: 'nowrap' }}>
       { props.friendlyName }{ requiredMark }
     </th>
   )
@@ -27,19 +25,18 @@ const LabwareContentHeader = connect((state, ownProps) => {
   }
 })(LabwareContentHeaderComponent)
 
-
 const LabwareContentCellComponent = (props) => {
   logName('LabwareContentCellComponent')
   return (
     <td data-psd-schema-validation-name={props.fieldName}>
       <div className={ classNames({
-              'form-group': true,
-              'has-error': props.displayError,
-              'has-warning': props.displayWarning
-            }
-          )
-        }
-        style={{position: "relative"}}>
+        'form-group': true,
+        'has-error': props.displayError,
+        'has-warning': props.displayWarning
+      }
+      )
+      }
+      style={{ position: 'relative' }}>
 
         <LabwareContentInput
           labwareIndex={props.labwareIndex}
@@ -69,7 +66,7 @@ const LabwareContentCell = connect(mapStateToPropsLabwareContentCell)(LabwareCon
 
 const LabwareContentAddressComponent = (props) => {
   logName('LabwareContentAddressComponent')
-  return(
+  return (
     <tr
       data-labware-index={ props.labwareIndex } data-address={ props.address }>
       <td>{ props.address }</td>
@@ -78,7 +75,7 @@ const LabwareContentAddressComponent = (props) => {
         return <LabwareContentCell
           labwareIndex={props.labwareIndex}
           address={props.address} fieldName={fieldName}
-                key={fieldName} />
+          key={fieldName} />
       })}
     </tr>
   )
@@ -90,23 +87,23 @@ const LabwareContentAddress = connect((state, ownProps) => {
     address: ownProps.address,
 
     fieldsToShow: StateSelectors.schema.fieldsToShow(state),
-    taxonomyServiceUrl: state.services.taxonomy_service_url,
+    taxonomyServiceUrl: state.services.taxonomy_service_url
   }
 })(LabwareContentAddressComponent)
 
 class LabwareContentAddresses extends React.Component {
-  shouldComponentUpdate(nextProps, nextState) {
-    const update = (nextProps.selectedTabPosition == this.props.position)
+  shouldComponentUpdate (nextProps, nextState) {
+    const update = (nextProps.selectedTabPosition === this.props.position)
     return update
   }
-  render() {
+  render () {
     logName('LabwareContentAddresses')
     const props = this.props
     return props.positionsForLabware.map((address, posAddress) => {
       return (
         <LabwareContentAddress key={address}
           labwareIndex={props.position}
-          address={address}  />
+          address={address} />
       )
     })
   }
@@ -114,37 +111,20 @@ class LabwareContentAddresses extends React.Component {
 
 const LabwareContentComponent = (props) => {
   logName('LabwareContentComponent')
-  return(
-    <div role="tabpanel"
-      className={classNames({"tab-pane": true, "active": (props.selectedTabPosition === props.position)})}
-      id={"Labware"+ props.labwareIndex}>
-
-      <div style={{overflow: "scroll"}} className="material-data-table">
-
-        <table className="table table-condensed table-striped"
-               data-psd-component-class={
-                JSON.stringify(["LoadTable", "DataTableSchemaValidation"])
-              }
-               data-psd-component-parameters={JSON.stringify([{
-                manifest_id: props.manifestId
-                }, {
-                  schemaJson: props.schema,
-                  material_schema_url: props.materialSchemaUrl
-                }
-                ])}>
+  return (
+    <div role="tabpanel" className={classNames({ 'tab-pane': true, 'active': (props.selectedTabPosition === props.position) })}
+      id={'Labware' + props.labwareIndex}>
+      <div style={{ overflow: 'scroll' }} className="material-data-table">
+        <table className="table table-condensed table-striped" data-psd-component-class="LoadTable"
+          data-psd-component-parameters={JSON.stringify([{ manifest_id: props.manifestId }])}>
           <thead>
             <tr>
               <th></th>
-              { props.fieldsToShow.map((name, pos) => {
-                return (
-                  <LabwareContentHeader fieldName={name} key={name} />
-              )})}
+              { props.fieldsToShow.map((name, pos) => <LabwareContentHeader fieldName={name} key={name} />)}
             </tr>
           </thead>
-
           <tbody>
-            <LabwareContentAddresses
-              positionsForLabware={props.positionsForLabware}
+            <LabwareContentAddresses positionsForLabware={props.positionsForLabware}
               selectedTabPosition={props.selectedTabPosition} position={props.position} />
           </tbody>
         </table>
@@ -176,7 +156,7 @@ const LabwareContentsComponent = (props) => {
         )
       })}
     </div>
-    )
+  )
 }
 
 const LabwareContents = connect((state) => {
@@ -189,7 +169,7 @@ const LabwareContents = connect((state) => {
 const ManifestContainersComponent = (props) => {
   logName('ManifestContainersComponent')
   if (props.manifestId) {
-    return(
+    return (
       <Fragment>
         <input type="hidden" value={ props.manifestId } name="manifest_id" />
         <LabwareTabs />

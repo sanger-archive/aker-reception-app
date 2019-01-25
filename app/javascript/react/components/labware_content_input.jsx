@@ -1,18 +1,19 @@
-import React from "react"
+import React from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import StateSelectors from '../selectors'
 import { setManifestValue, saveTab, updateScientificName } from '../actions'
-import { debounce, throttle } from 'throttle-debounce'
+import { debounce } from 'throttle-debounce'
 
-const logName = (name) => {  }
+const logName = (name) => { }
 
-const DEBOUNCED_TIMING=500
+const DEBOUNCED_TIMING = 500
 
 export const LabwareContentSelectComponent = (props) => {
   logName('LabwareContentSelectComponent')
-  const {fieldName,title,name,id,selectedOptionValue,onChange} = props
+  const { title, name, id, selectedOptionValue, onChange } = props
 
-  return(
+  return (
     <select onChange={onChange} className="form-control" title={title} name={name} id={id} value={selectedOptionValue}>
       <option value=""></option>
       { props.optionsForSelect.map((val, pos) => {
@@ -20,6 +21,15 @@ export const LabwareContentSelectComponent = (props) => {
       }) }
     </select>
   )
+}
+
+LabwareContentSelectComponent.propTypes = {
+  title: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  selectedOptionValue: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  optionsForSelect: PropTypes.array.isRequired
 }
 
 export const LabwareContentSelect = connect((state, ownProps) => {
@@ -31,16 +41,24 @@ export const LabwareContentSelect = connect((state, ownProps) => {
 
 export const LabwareContentText = (props) => {
   logName('LabwareContentText')
-  const {onChange,selectedValue,title,name,id} = props
-  return(
+  const { onChange, selectedValue, title, name, id } = props
+  return (
     <input onChange={onChange}
       className="form-control" title={title} name={name} id={id}
       value={selectedValue} />
   )
 }
 
+LabwareContentText.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  selectedValue: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired
+}
+
 class LabwareContentInputComponent extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       value: props.selectedValue,
@@ -49,17 +67,16 @@ class LabwareContentInputComponent extends React.Component {
     this.onChangeProcessThrottelledCall = this.buildThrottelledCall()
   }
 
-  setStateValueSelected(str) {
-    console.log('set value to '+str)
-    this.setState({stateValueSelected: str})
+  setStateValueSelected (str) {
+    this.setState({ stateValueSelected: str })
   }
 
-  onChangeProcess(receivedChanges) {
+  onChangeProcess (receivedChanges) {
     receivedChanges.reduceRight((memo, receivedChange) => {
-      const found = (memo.filter((actualChange)=> {
-        return ((actualChange[0]==receivedChange[0]) && (actualChange[1]==receivedChange[1]) && (actualChange[2]==receivedChange[2]))
+      const found = (memo.filter((actualChange) => {
+        return ((actualChange[0] === receivedChange[0]) && (actualChange[1] === receivedChange[1]) && (actualChange[2] === receivedChange[2]))
       }))
-      if (found.length == 0) {
+      if (found.length === 0) {
         memo.push(receivedChange)
       }
       return memo
@@ -67,54 +84,68 @@ class LabwareContentInputComponent extends React.Component {
       this.props.onChangeManifestInput.apply(this, receivedChange)
     })
 
-    //this.setStateValueSelected('redux')
-    this.setState({stateValueSelected: 'redux', value: this.props.selectedValue})
-    this.receivedChanges=[]
+    // this.setStateValueSelected('redux')
+    this.setState({ stateValueSelected: 'redux', value: this.props.selectedValue })
+    this.receivedChanges = []
   }
 
-  buildThrottelledCall() {
+  buildThrottelledCall () {
     let receivedChanges = []
 
-    const debouncedCall = debounce(DEBOUNCED_TIMING, () => { this.onChangeProcess(receivedChanges)} )
+    const debouncedCall = debounce(DEBOUNCED_TIMING, () => { this.onChangeProcess(receivedChanges) })
 
     return (labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl) => {
-      this.setState({stateValueSelected: 'react'})
-      //this.setStateValueSelected('react')
+      this.setState({ stateValueSelected: 'react' })
+      // this.setStateValueSelected('react')
       receivedChanges.push([labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl])
       debouncedCall()
     }
   }
 
-  buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId, taxonomyServiceUrl) {
+  buildOnChangeManifestInput (labwareIndex, address, fieldName, plateId, taxonomyServiceUrl) {
     if (!this.onChange) {
       this.onChange = (e) => {
         const value = e.target.value
-        this.setState({value: value})
+        this.setState({ value: value })
         this.onChangeProcessThrottelledCall(labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl)
       }
     }
     return this.onChange
   }
 
-  commonPropsForInput() {
+  commonPropsForInput () {
     // If we are in React mode, we'll get the value from the state of this component. If we are working in Redux mode
     /// we'll get it from Redux state
-    const selectedValue = (this.state.stateValueSelected =='react') ? this.state.value : this.props.selectedValue
+    const selectedValue = (this.state.stateValueSelected === 'react') ? this.state.value : this.props.selectedValue
 
     const { title, name, id, labwareIndex, address, fieldName, plateId, taxonomyServiceUrl } = this.props
     const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId, taxonomyServiceUrl)
     return { selectedValue, title, name, id, onChange }
   }
 
-  render() {
+  render () {
     logName('LabwareContentInputComponent')
-    const {isSelect, fieldName} = this.props
+    const { isSelect, fieldName } = this.props
     if (isSelect) {
       return <LabwareContentSelect {...this.commonPropsForInput()} fieldName={fieldName} />
     } else {
       return <LabwareContentText {...this.commonPropsForInput()} />
     }
   }
+}
+
+LabwareContentInputComponent.propTypes = {
+  selectedValue: PropTypes.string.isRequired,
+  onChangeManifestInput: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  labwareIndex: PropTypes.number.isRequired,
+  address: PropTypes.string.isRequired,
+  plateId: PropTypes.string.isRequired,
+  taxonomyServiceUrl: PropTypes.string.isRequired,
+  isSelect: PropTypes.bool.isRequired,
+  fieldName: PropTypes.string.isRequired
 }
 
 export const LabwareContentInput = connect(
@@ -139,17 +170,15 @@ export const LabwareContentInput = connect(
     return {
       onChangeManifestInput: (labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl) => {
         dispatch(setManifestValue(labwareIndex, address, fieldName, value, plateId))
-        if (fieldName=='taxon_id') {
+        if (fieldName === 'taxon_id') {
           let promise = dispatch(updateScientificName(labwareIndex, address, 'scientific_name', value, plateId, taxonomyServiceUrl))
           if (promise) {
-            promise.then(()=>{
-              console.log('saving inside a promise')
+            promise.then(() => {
               dispatch(saveTab())
             })
             return
           }
         }
-        console.log('saving outside promise')
         dispatch(saveTab())
       }
     }
