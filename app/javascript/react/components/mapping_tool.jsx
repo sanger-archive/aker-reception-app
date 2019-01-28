@@ -126,7 +126,7 @@ const MappedFieldsList = (props) => {
 
 const MappingBody = (props) => {
   return (
-    <Modal.Body>
+    <Modal.Body className="mapping-modal">
       <div id="modal-alert-required" className="alert alert-error" role="alert" style={{ display: 'none' }}>
         All the required fields must be mapped to a CSV field.
       </div>

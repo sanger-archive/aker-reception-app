@@ -116,7 +116,7 @@ const LabwareContentComponent = (props) => {
       id={'Labware' + props.labwareIndex}>
       <div style={{ overflow: 'scroll' }} className="material-data-table">
         <table className="table table-condensed table-striped" data-psd-component-class="LoadTable"
-          data-psd-component-parameters={JSON.stringify([{ manifest_id: props.manifestId }])}>
+          data-psd-component-parameters={JSON.stringify({ manifest_id: props.manifestId })}>
           <thead>
             <tr>
               <th></th>
