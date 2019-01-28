@@ -4,7 +4,7 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
   delegate :manifest_model, to: :provenance_state
 
   def rebuild?
-    true
+    state_access && state_access[:structured] && state_access[:structured][:labwares]
   end
 
   def build

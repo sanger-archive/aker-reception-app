@@ -4,12 +4,13 @@ RSpec.describe Transformers::StateToState do
 
   let(:manifest) { create :manifest }
   let(:user) { create :user }
-  let(:transformer) {
-
-    Transformers::StateToState.new(
+  let(:opts) {
     {manifest_model: manifest, current_user: user, state:
     {schema: material_schema, content: {structured: {}}, mapping: {}}}
-    ) }
+  }
+  let(:transformer) {
+    Transformers::StateToState.new(opts)
+  }
 
   context '#transform' do
     let(:material_schema) {
@@ -20,8 +21,9 @@ RSpec.describe Transformers::StateToState do
       allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
     end
     context 'when file is parsed' do
-      it 'returns a valid state' do
-        expect(transformer.transform[:content][:structured].nil?).to eq(false)
+      it 'generates a valid state' do
+        transformer.transform
+        expect(opts[:state][:content][:structured].nil?).to eq(false)
       end
     end
   end

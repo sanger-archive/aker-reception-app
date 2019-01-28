@@ -75,6 +75,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
 
       let(:mapping) {
         {
+          valid: true,
           expected: [],
           observed: [], matched: [
             { expected: 'supplier_plate_name', observed: 'plate_id'},
@@ -91,7 +92,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
 
       it 'raises PositionDuplicated' do
         expect{
-          content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
+          content_accessor.apply({mapping: mapping, content: {rebuild: true, raw: manifest_content}})
         }.to raise_error(Manifest::ProvenanceState::ContentAccessor::PositionDuplicated)
       end
     end
@@ -107,6 +108,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
       context 'with a manifest that contains a plate_id match' do
         let(:mapping) {
           {
+            valid: true,
             expected: [],
             observed: [], matched: [
               { expected: 'supplier_plate_name', observed: 'plate_id'},
@@ -125,7 +127,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
 
           it 'raises LabwareNotFound error' do
             expect{
-              content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
+              content_accessor.apply({mapping: mapping, content: {rebuild: true, raw: manifest_content}})
             }.to raise_error(Manifest::ProvenanceState::ContentAccessor::LabwareNotFound)
           end
         end
@@ -144,6 +146,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
       context 'with a manifest that contains a position match' do
         let(:mapping) {
           {
+            valid: true,
             expected: [],
             observed: [], matched: [
               { expected: 'supplier_plate_name', observed: 'plate_id'},
@@ -162,7 +165,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
 
           it 'raises PositionNotFound error' do
             expect{
-              content_accessor.apply({mapping: mapping, content: {raw: manifest_content}})
+              content_accessor.apply({mapping: mapping, content: {rebuild: true, raw: manifest_content}})
             }.to raise_error(Manifest::ProvenanceState::ContentAccessor::PositionNotFound)
           end
         end
@@ -174,11 +177,12 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     before do
       allow(content_accessor).to receive(:manifest_schema_field_required?).with("supplier_plate_name").and_return(false)
       allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(false)
-      content_accessor.apply({schema: schema, mapping: mapping, content: {raw: manifest_content}})
+      content_accessor.apply({schema: schema, mapping: mapping, content: {rebuild: true, raw: manifest_content}})
     end
     context 'with an empty manifest' do
       let(:mapping) {
         {
+          valid: true,
           expected: ["is_tumour", "scientific_name", "taxon_id", "supplier_name", "gender"],
           observed: [], matched: []
         }
@@ -191,6 +195,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     context 'with a manifest that does not contain plate id match' do
       let(:mapping) {
         {
+          valid: true,
           expected: [],
           observed: [], matched: [
             { expected: 'position', observed: 'position'},
@@ -221,6 +226,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     context 'with a manifest that does not contain position match' do
       let(:mapping) {
         {
+          valid: true,
           expected: [],
           observed: [], matched: [
             { expected: 'plate_id', observed: 'plate_id'},
@@ -249,6 +255,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     context 'with a manifest that does not contain either plate_id or position match' do
       let(:mapping) {
         {
+          valid: true,
           expected: [],
           observed: [], matched: [
             { expected: 'supplier_name', observed: 'supplier_name'}
@@ -275,6 +282,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     context 'with a matching of plate id using a different attribute than plate_id' do
       let(:mapping) {
         {
+          valid: true,
           expected: [],
           observed: [], matched: [
             { expected: 'supplier_plate_name', observed: 'supplier_name'},
@@ -305,6 +313,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     context 'with a manifest that contains all the fields' do
       let(:mapping) {
         {
+          valid: true,
           expected: [],
           observed: [], matched: [
             { expected: 'position', observed: 'position'},{expected: 'supplier_plate_name', observed: 'plate_id'},
@@ -335,6 +344,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     context 'with a manifest that contains some fields' do
       let(:mapping) {
         {
+          valid: true,
           expected: ["taxon_id", "supplier_name", "gender"],
           observed: ["unknown_value"],
           matched: [

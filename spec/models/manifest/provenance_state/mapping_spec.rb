@@ -51,7 +51,7 @@ RSpec.describe 'Manifest::ProvenanceState::Mapping' do
   context '#apply' do
     before do
       allow(provenance_state.schema).to receive(:manifest_schema).and_return(schema)
-      mapping_accessor.apply({content: {raw: manifest_content}})
+      mapping_accessor.apply({mapping: { rebuild: true } , content: {raw: manifest_content}})
 
     end
 
@@ -286,7 +286,7 @@ RSpec.describe 'Manifest::ProvenanceState::Mapping' do
       }
       it 'matches plate id and position' do
         allow(provenance_state.schema).to receive(:manifest_schema).and_return(schema_with_plate_id_and_pos)
-        mapping_accessor.apply({content: {raw: manifest_content}})
+        mapping_accessor.apply({mapping: { rebuild: true}, content: {raw: manifest_content}})
         expect((mapping_accessor.state[:mapping][:matched].select do |e|
           ((((e[:expected] == 'plate_id') && (e[:observed] == 'plate_id'))) ||
           (((e[:expected]=='position') && (e[:observed] == 'well_position'))))

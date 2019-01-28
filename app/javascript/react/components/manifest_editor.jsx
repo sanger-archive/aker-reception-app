@@ -59,7 +59,7 @@ const MessagesDisplayComponent = (props) => {
   )
 }
 
-const MessagesDisplay = connect((state, ownProps) => {
+export const MessagesDisplay = connect((state, ownProps) => {
   const selectedTabPosition = StateSelectors.manifest.selectedTabPosition(state)
   return {
     warnings: StateSelectors.content.warningTabMessages(state, selectedTabPosition),

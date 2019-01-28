@@ -18,7 +18,11 @@ module Transformers
     def build_state(raw_content)
       {
         content: {
-          raw: raw_content
+          raw: raw_content,
+          rebuild: true
+        },
+        mapping: {
+          rebuild: true
         }
       }
     end

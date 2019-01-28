@@ -98,6 +98,16 @@ export const updateScientificName = (labwareId, address, fieldName, taxId, plate
   }
 }
 
+export const showManifestUploadError = (dispatch, xhr) => {
+  dispatch(displayMessage({
+    labwareIndex: null,
+    address: null,
+    level: 'FATAL',
+    display: 'alert',
+    text: xhr.responseJSON.errors.join('\n')
+  }))
+}
+
 export const saveTab = (form) => {
   return (dispatch, getState) => {
     const state = getState()
@@ -110,9 +120,7 @@ export const saveTab = (form) => {
       data: JSON.stringify(getState())
     }).then((data) => {
       dispatch(loadManifest(data.contents))
-    }).fail((e) => {
-      dispatch(displayMessage({ level: 'FATAL', display: 'alert', text: 'There is no connection with the service' }))
-    })
+    }).fail($.proxy(showManifestUploadError, this, dispatch))
   }
 }
 
@@ -147,17 +155,7 @@ const uploadManifestToService = (dispatch, getState, ajaxRequest, manifest, mani
       dispatch(selectObservedOption(null))
       $('#myModal').modal('show')
     }
-  }, this),
-  (xhr) => {
-    dispatch(displayMessage({
-      labwareIndex: null,
-      address: null,
-      level: 'FATAL',
-      display: 'alert',
-      text: xhr.responseJSON.errors.join('\n')
-    }))
-  }
-  )
+  }, this), $.proxy(showManifestUploadError, this, dispatch))
     .always(() => {
       $(document).trigger('hideLoadingOverlay')
     })

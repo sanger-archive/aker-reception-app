@@ -63,7 +63,8 @@ export default (state = {}, action) => {
   switch (action.type) {
     case C.TOGGLE_MAPPING:
       if (!action.toggle) {
-        return Object.assign({}, state, { raw: null })
+        /** When closing the mapping tool, rebuild the content **/
+        return Object.assign({}, state, { rebuild: true })
       }
       return state
     case C.SAVE_AND_LEAVE:

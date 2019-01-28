@@ -2,14 +2,9 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
   delegate :manifest_schema, to: :provenance_state
 
   def validate
-    unless (state_access.key?(:valid))
-      state_access[:valid] = (required_unmatched_fields.length == 0)
-      state_access[:hasUnmatched] = ((shown_unmatched_fields.length != 0) && (observed_keys.length !=0))
-      state_access[:shown] = state_access[:hasUnmatched]
-      #state_access[:rebuild] = state_access.key?(:rebuild) ? state_access[:rebuild] : state_access[:shown]
-      #state_access[:rebuild] = state_access.key?(:rebuild) ? state_access[:rebuild] : state_access[:shown]
-      #debugger if state_access[:hasUnmatched]
-    end
+    state_access[:valid] = (required_unmatched_fields.length == 0)
+    state_access[:hasUnmatched] = ((shown_unmatched_fields.length != 0) && (observed_keys.length !=0))
+    state_access[:shown] = (state_access.key?(:shown) ? state_access[:shown] : state_access[:hasUnmatched])
   end
 
   def valid?
@@ -17,7 +12,8 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
   end
 
   def rebuild?
-    (super && @state[:content] && !@state[:content][:structured] && @state[:content][:raw])
+    (state_access && state_access[:rebuild] == true)
+    #(super && @state[:content] && !@state[:content][:structured] && @state[:content][:raw])
   end
 
   def build
@@ -49,6 +45,7 @@ class Manifest::ProvenanceState::MappingAccessor < Manifest::ProvenanceState::Ac
   end
 
   def perform_mapping
+    state_access[:rebuild] = false
     expected_keys_and_properties.reduce(initial_mapping) do |memo, expected_key_and_properties|
       expected_key, expected_properties = expected_key_and_properties
       if field_requires_mapping?(expected_properties)

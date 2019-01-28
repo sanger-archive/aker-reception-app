@@ -14,7 +14,7 @@ const MappingHeaderComponent = (props) => {
       </button>
       <Modal.Title>Select CSV mappings</Modal.Title>
     </Modal.Header>
-    )
+  )
 }
 
 const MappingHeader = connect((status) => {return {}}, (dispatch) => {
@@ -24,7 +24,6 @@ const MappingHeader = connect((status) => {return {}}, (dispatch) => {
     }
   }
 })(MappingHeaderComponent)
-
 
 
 const MappingFooterComponent = (props) => {
