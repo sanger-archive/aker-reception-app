@@ -38,5 +38,5 @@ en:
     attributes:
       manifest:
         id: 'Manifest Identifier'
-        email: 'Sample Guardian email'
-        contact: 'Internal Contact'
+        email: 'Owner'
+        contact: 'Sample Guardian email'
