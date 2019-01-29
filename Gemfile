@@ -76,7 +76,6 @@ group :development do
   gem 'spring' # Spring speeds up development by keeping your application running in the background
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console' # Access an IRB console on exception pages or by using <%= console %> anywhere
-  gem 'pry'
 end
 
 group :test do
