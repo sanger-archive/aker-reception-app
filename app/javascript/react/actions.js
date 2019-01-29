@@ -112,8 +112,8 @@ export const saveTab = (form) => {
   return (dispatch, getState) => {
     const state = getState()
     const manifestId = state.manifest.manifest_id
-
-    return $.ajax('/manifests/state/' + manifestId, {
+    const path = Reception.manifests_state_path(manifestId)
+    return $.ajax(path, {
       method: 'PUT',
       contentType: 'application/json',
       dataType: 'json',
