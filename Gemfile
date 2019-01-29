@@ -26,7 +26,6 @@ gem 'logstash-event'
 gem 'logstash-logger'
 gem 'net-ldap' # Pure Ruby LDAP library. Read more: https://github.com/ruby-ldap/ruby-net-ldap
 gem 'pg', '~> 0.18' # pg version 1.0.0 is not compatible with Rails 5.1.4
-gem 'pry'
 gem 'puma', '~> 3.0' # Use Puma as the app server
 gem 'rails', '~> 5.2.0'
 gem 'request_store'
@@ -77,6 +76,7 @@ group :development do
   gem 'spring' # Spring speeds up development by keeping your application running in the background
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console' # Access an IRB console on exception pages or by using <%= console %> anywhere
+  gem 'pry'
 end
 
 group :test do
