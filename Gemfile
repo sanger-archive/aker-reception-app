@@ -70,8 +70,6 @@ end
 
 group :development do
   gem 'listen', '~> 3.0.5'
-  gem 'pry'
-  gem 'pry-rails', '~> 0.3.6' # An IRB alternative and runtime developer console
   gem 'rubocop', '~> 0.51.0', require: false # A Ruby static code analyzer
   gem 'rubocop-rspec'
   gem 'spring' # Spring speeds up development by keeping your application running in the background
