@@ -7,7 +7,7 @@ git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
   "https://github.com/#{repo_name}.git"
 end
-
+gem 'pry'
 # All the gems not in a group will always be installed:
 #   http://bundler.io/v1.6/groups.html#grouping-your-dependencies
 gem 'activeresource', '~> 5.0' # Wrap your RESTful web app with Ruby classes
