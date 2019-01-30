@@ -6,7 +6,7 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   delegate :manifest_model, to: :provenance_state
 
   def rebuild?
-    (state_access && (state_access[:rebuild] == true) && (valid_mapping?))
+    (state_access && (state_access[:rebuild] == true))
   end
 
   def present_mapping?
@@ -46,8 +46,16 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   def build
     {
       raw: state_access_raw,
-      structured: (state_access_raw && @state[:mapping]) ? read_from_raw : read_from_database
+      structured: build_structured
     }
+  end
+
+  def build_structured
+    if (state_access_raw && valid_mapping?)
+      read_from_raw
+    else
+      read_from_database
+    end
   end
 
   def validate

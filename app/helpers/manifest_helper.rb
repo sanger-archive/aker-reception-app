@@ -53,7 +53,7 @@ module ManifestHelper
   end
 
   def state_for_manifest(manifest, user)
-    Manifest::ProvenanceState.new(manifest, user).apply({})
+    Manifest::ProvenanceState.new(manifest, user).apply({content: {rebuild: true}})
     # {
     #   manifest: {
     #     manifest_id: manifest.id,
