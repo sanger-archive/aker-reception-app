@@ -29,16 +29,19 @@ const MappingHeader = connect((status) => {return {}}, (dispatch) => {
 const MappingFooterComponent = (props) => {
  return(
   <Modal.Footer>
-    <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
+    <button type="button" className="btn btn-default" data-dismiss="modal" onClick={ props.onCancel }>Close</button>
     <button id="complete-csv-matching" type="button" className="btn btn-primary"
-      onClick={ () => { props.onAccept() } }
+      onClick={ props.onAccept }
       disabled={!props.valid}  >Accept</button>
   </Modal.Footer>
   )
 }
 
 const MappingFooter = connect((state) => { return{} }, (dispatch) => {
-  return {onAccept: () => { dispatch(toggleMapping(false))} }
+  return {
+    onAccept: () => { dispatch(toggleMapping(false))},
+    onCancel: () => { dispatch(toggleMapping(false)) }
+  }
 })(MappingFooterComponent)
 
 const mappingOption = (text, value, pos, required, onClick) => {

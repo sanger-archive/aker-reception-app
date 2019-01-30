@@ -173,6 +173,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
       end
     end
   end
+
   context '#apply' do
     context 'when building structured content from scratch' do
       let (:raw_manifest) { 'a manifest in raw' }

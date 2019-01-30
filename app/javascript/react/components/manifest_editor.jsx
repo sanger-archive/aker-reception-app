@@ -3,7 +3,7 @@ import store from '../store'
 import { Provider, connect } from 'react-redux'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
-import { uploadManifest, loadManifest, saveAndLeave } from '../actions'
+import { uploadManifest, loadManifest, saveAndLeave, toggleMapping } from '../actions'
 import StateSelectors from '../selectors'
 
 import Reception from '../../routes.js.erb'
@@ -108,6 +108,20 @@ const hmdmcWarning = (showHmdmcWarning) => {
   return null
 }
 
+const MappingButton = (props) => {
+  if (!props.showMappingButton) {
+    return null
+  }
+  return (
+    <Fragment>
+      <div className="row">&nbsp;</div>
+      <div className="row">
+        <button className="btn btn-primary" onClick={props.onShowMapping}>Show mapping</button>
+      </div>
+    </Fragment>
+  )
+}
+
 const InformationDisplayComponent = (props) => {
   const { manifestId, showHmdmcWarning } = props
   return (
@@ -121,9 +135,12 @@ const InformationDisplayComponent = (props) => {
           { hmdmcWarning(showHmdmcWarning) }
         </div>
         <div className="vcenter col-md-2">
-          <label style={{ 'float': 'right' }} className="btn btn-primary">
-              Browse for Manifest <ManifestUploader manifestId={manifestId} />
-          </label>
+          <div className="row">
+            <label className="btn btn-primary">
+                Browse for Manifest <ManifestUploader manifestId={manifestId} />
+            </label>
+          </div>
+          <MappingButton {...props} />
         </div>
       </div>
     </div>
@@ -133,7 +150,12 @@ const InformationDisplayComponent = (props) => {
 const InformationDisplay = connect((state) => {
   return {
     manifestId: state.manifest.manifest_id,
-    showHmdmcWarning: state.manifest.show_hmdmc_warning
+    showHmdmcWarning: state.manifest.show_hmdmc_warning,
+    showMappingButton: !!state.content.raw
+  }
+}, (dispatch, state) => {
+  return {
+    onShowMapping: () => { dispatch(toggleMapping(true)) }
   }
 })(InformationDisplayComponent)
 
