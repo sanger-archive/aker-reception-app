@@ -174,200 +174,247 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     end
   end
   context '#apply' do
-    before do
-      allow(content_accessor).to receive(:manifest_schema_field_required?).with("supplier_plate_name").and_return(false)
-      allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(false)
-      content_accessor.apply({schema: schema, mapping: mapping, content: {rebuild: true, raw: manifest_content}})
-    end
-    context 'with an empty manifest' do
-      let(:mapping) {
-        {
-          valid: true,
-          expected: ["is_tumour", "scientific_name", "taxon_id", "supplier_name", "gender"],
-          observed: [], matched: []
-        }
-      }
-      let(:manifest_content) { [] }
-      it 'does not generate any content' do
-        expect(content_accessor.state[:content]).to include(raw: [], structured: {})
-      end
-    end
-    context 'with a manifest that does not contain plate id match' do
-      let(:mapping) {
-        {
-          valid: true,
-          expected: [],
-          observed: [], matched: [
-            { expected: 'position', observed: 'position'},
-            { expected: 'supplier_name', observed: 'supplier_name' }
-          ]
-        }
-      }
-      let(:manifest_content) {
-        [
-          {"supplier_plate_name" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"},
-          {"supplier_plate_name" => "Labware 1", "position" => "B:1", "supplier_name" => "InGen"}
-        ]
-      }
-
-
-      it 'does generate content setting plate id for the plate as DEFAULT_LABWARE_NAME_VALUE' do
-        expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          0 => {
-            position: 0,
-            supplier_plate_name: "#{default_labware_name_value}",
-            addresses: {
-          "A:1"=>  { fields: {"position" => {value: "A:1"}, "supplier_name" => {value: "InGen"}}},
-          "B:1"=>  { fields: {"position" => {value: "B:1"}, "supplier_name" => {value: "InGen"}}}
-          } } } } )
+    context 'when building structured content from scratch' do
+      let (:raw_manifest) { 'a manifest in raw' }
+      let (:database_content) { 'some database data' }
+      let (:raw_content) { 'some data from raw and mapping' }
+      let (:invalid_mapping) { { valid: false } }
+      let (:valid_mapping) { { valid: true } }
+      before do
+        allow(content_accessor).to receive(:validate).and_return(true)
+        allow(content_accessor).to receive(:read_from_database).and_return(database_content)
+        allow(content_accessor).to receive(:read_from_raw).and_return(raw_content)
       end
 
+      context 'when receiving some structured content' do
+        it 'ignores the received structured content' do
+          content_accessor.apply({content: {rebuild: true, structured: 'some stuff'}})
+          expect(content_accessor.state[:content]).to include(structured: database_content)
+        end
+      end
+      context 'when we do not have raw manifest content in the state' do
+        it 'obtains the structured content from the database' do
+          content_accessor.apply({content: {rebuild: true}})
+          expect(content_accessor.state[:content]).to include(structured: database_content)
+        end
+      end
+      context 'when we do have some raw content' do
+        context 'when we do not have a mapping' do
+          it 'obtains the structured content from the database' do
+            content_accessor.apply({content: {rebuild: true, raw: raw_manifest }})
+            expect(content_accessor.state[:content]).to include(structured: database_content)
+          end
+        end
+        context 'when we do not have a valid mapping' do
+          it 'obtains the structured content from the database' do
+            content_accessor.apply({content: {rebuild: true, raw: raw_manifest }, mapping: invalid_mapping })
+            expect(content_accessor.state[:content]).to include(structured: database_content)
+          end
+        end
+        context 'when we have a valid mapping' do
+          it 'ignores the database and generates the structured content using both mapping and raw' do
+            content_accessor.apply({content: {rebuild: true, raw: raw_manifest }, mapping: valid_mapping })
+            expect(content_accessor.state[:content]).to include(structured: raw_content)
+          end
+        end
+      end
     end
-    context 'with a manifest that does not contain position match' do
-      let(:mapping) {
-        {
-          valid: true,
-          expected: [],
-          observed: [], matched: [
-            { expected: 'plate_id', observed: 'plate_id'},
-            { expected: 'supplier_name', observed: 'supplier_name'}
+    context 'when applying a mapping to generate structured content' do
+      before do
+        allow(content_accessor).to receive(:manifest_schema_field_required?).with("supplier_plate_name").and_return(false)
+        allow(content_accessor).to receive(:manifest_schema_field_required?).with("position").and_return(false)
+        content_accessor.apply({schema: schema, mapping: mapping, content: {rebuild: true, raw: manifest_content}})
+      end
+      context 'with an empty manifest' do
+        let(:mapping) {
+          {
+            valid: true,
+            expected: ["is_tumour", "scientific_name", "taxon_id", "supplier_name", "gender"],
+            observed: [], matched: []
+          }
+        }
+        let(:manifest_content) { [] }
+        it 'does not generate any content' do
+          expect(content_accessor.state[:content]).to include(raw: [], structured: {})
+        end
+      end
+      context 'with a manifest that does not contain plate id match' do
+        let(:mapping) {
+          {
+            valid: true,
+            expected: [],
+            observed: [], matched: [
+              { expected: 'position', observed: 'position'},
+              { expected: 'supplier_name', observed: 'supplier_name' }
+            ]
+          }
+        }
+        let(:manifest_content) {
+          [
+            {"supplier_plate_name" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"},
+            {"supplier_plate_name" => "Labware 1", "position" => "B:1", "supplier_name" => "InGen"}
           ]
         }
-      }
-      let(:manifest_content) {
-        [
-          "plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"
-        ]
-      }
-      context 'when the position is not required' do
-        it 'does generate content setting position for the plate' do
+
+
+        it 'does generate content setting plate id for the plate as DEFAULT_LABWARE_NAME_VALUE' do
+          expect(content_accessor.state[:content]).to include(structured: { labwares: {
+            0 => {
+              position: 0,
+              supplier_plate_name: "#{default_labware_name_value}",
+              addresses: {
+            "A:1"=>  { fields: {"position" => {value: "A:1"}, "supplier_name" => {value: "InGen"}}},
+            "B:1"=>  { fields: {"position" => {value: "B:1"}, "supplier_name" => {value: "InGen"}}}
+            } } } } )
+        end
+
+      end
+      context 'with a manifest that does not contain position match' do
+        let(:mapping) {
+          {
+            valid: true,
+            expected: [],
+            observed: [], matched: [
+              { expected: 'plate_id', observed: 'plate_id'},
+              { expected: 'supplier_name', observed: 'supplier_name'}
+            ]
+          }
+        }
+        let(:manifest_content) {
+          [
+            "plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"
+          ]
+        }
+        context 'when the position is not required' do
+          it 'does generate content setting position for the plate' do
+            expect(content_accessor.state[:content]).to include(structured: { labwares: {
+              0 => {
+                :position=>0, :supplier_plate_name=>"default",
+                addresses: {
+              "#{default_position_value}"=>  { fields: {"plate_id" => {value: "Labware 1"}, "supplier_name" => {value: "InGen"}}}
+              } } } } )
+          end
+        end
+      end
+
+
+      context 'with a manifest that does not contain either plate_id or position match' do
+        let(:mapping) {
+          {
+            valid: true,
+            expected: [],
+            observed: [], matched: [
+              { expected: 'supplier_name', observed: 'supplier_name'}
+            ]
+          }
+        }
+        let(:manifest_content) {
+          [
+            "plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"
+          ]
+        }
+
+        it 'does generate content setting position and plate_id as default' do
           expect(content_accessor.state[:content]).to include(structured: { labwares: {
             0 => {
               :position=>0, :supplier_plate_name=>"default",
               addresses: {
-            "#{default_position_value}"=>  { fields: {"plate_id" => {value: "Labware 1"}, "supplier_name" => {value: "InGen"}}}
+            "#{default_position_value}"=>  { fields: {"supplier_name" => {value: "InGen"}}}
             } } } } )
         end
       end
-    end
 
 
-    context 'with a manifest that does not contain either plate_id or position match' do
-      let(:mapping) {
-        {
-          valid: true,
-          expected: [],
-          observed: [], matched: [
-            { expected: 'supplier_name', observed: 'supplier_name'}
+      context 'with a matching of plate id using a different attribute than plate_id' do
+        let(:mapping) {
+          {
+            valid: true,
+            expected: [],
+            observed: [], matched: [
+              { expected: 'supplier_plate_name', observed: 'supplier_name'},
+              { expected: 'position', observed: 'position'},
+              { expected: 'supplier_name', observed: 'plate_id'}
+            ]
+          }
+        }
+        let(:manifest_content) {
+          [
+            {"plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"},
+            {"plate_id" => "Labware 2", "position" => "B:1", "supplier_name" => "InGen"}
           ]
         }
-      }
-      let(:manifest_content) {
-        [
-          "plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"
-        ]
-      }
 
-      it 'does generate content setting position and plate_id as default' do
-        expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          0 => {
-            :position=>0, :supplier_plate_name=>"default",
-            addresses: {
-          "#{default_position_value}"=>  { fields: {"supplier_name" => {value: "InGen"}}}
-          } } } } )
+        it 'does recognise the right plate id attribute to perform the translation' do
+          expect(content_accessor.state[:content]).to include(structured: { labwares: {
+            0 => {
+              :position=>0, :supplier_plate_name=>"InGen",
+              addresses: {
+            "A:1"=>  { fields: {"position"=>{value: "A:1"}, "supplier_plate_name" => {value: "InGen"}, "supplier_name" => {value: "Labware 1"}}},
+            "B:1"=>  { fields: {"position"=>{value: "B:1"}, "supplier_plate_name" => {value: "InGen"}, "supplier_name" => {value: "Labware 2"}}}
+            } } } } )
+        end
       end
-    end
 
 
-    context 'with a matching of plate id using a different attribute than plate_id' do
-      let(:mapping) {
-        {
-          valid: true,
-          expected: [],
-          observed: [], matched: [
-            { expected: 'supplier_plate_name', observed: 'supplier_name'},
-            { expected: 'position', observed: 'position'},
-            { expected: 'supplier_name', observed: 'plate_id'}
+      context 'with a manifest that contains all the fields' do
+        let(:mapping) {
+          {
+            valid: true,
+            expected: [],
+            observed: [], matched: [
+              { expected: 'position', observed: 'position'},{expected: 'supplier_plate_name', observed: 'plate_id'},
+              { expected: 'is_tumour', observed: 'is_tumour' }, { expected: 'scientific_name', observed: 'scientific_name' },
+              { expected: 'taxon_id', observed: 'taxon_id' }, { expected: 'supplier_name', observed: 'supplier_name' },
+              { expected: 'gender', observed: 'gender' }
+            ]
+          }
+        }
+        let(:manifest_content) {
+          [
+            "plate_id" => "Labware 1", "position" => "A:1", "is_tumour" => "tum", "scientific_name" => "sci",
+            "taxon_id" => "123", "supplier_name" => "sup", "gender" => "male"
           ]
         }
-      }
-      let(:manifest_content) {
-        [
-          {"plate_id" => "Labware 1", "position" => "A:1", "supplier_name" => "InGen"},
-          {"plate_id" => "Labware 2", "position" => "B:1", "supplier_name" => "InGen"}
-        ]
-      }
-
-      it 'does recognise the right plate id attribute to perform the translation' do
-        expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          0 => {
-            :position=>0, :supplier_plate_name=>"InGen",
-            addresses: {
-          "A:1"=>  { fields: {"position"=>{value: "A:1"}, "supplier_plate_name" => {value: "InGen"}, "supplier_name" => {value: "Labware 1"}}},
-          "B:1"=>  { fields: {"position"=>{value: "B:1"}, "supplier_plate_name" => {value: "InGen"}, "supplier_name" => {value: "Labware 2"}}}
-          } } } } )
+        it 'does generate the content' do
+          expect(content_accessor.state[:content]).to include(structured: { labwares: {
+            0 => {
+              :position=>0, :supplier_plate_name=>"Labware 1",
+              addresses: {
+            "A:1"=>  { fields: {
+              "position" => {value: "A:1"}, "supplier_plate_name" => {value: "Labware 1"},
+              "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
+            "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup"}, "gender" => {value: "male"}}}
+            } } } } )
+        end
       end
-    end
-
-
-    context 'with a manifest that contains all the fields' do
-      let(:mapping) {
-        {
-          valid: true,
-          expected: [],
-          observed: [], matched: [
-            { expected: 'position', observed: 'position'},{expected: 'supplier_plate_name', observed: 'plate_id'},
-            { expected: 'is_tumour', observed: 'is_tumour' }, { expected: 'scientific_name', observed: 'scientific_name' },
-            { expected: 'taxon_id', observed: 'taxon_id' }, { expected: 'supplier_name', observed: 'supplier_name' },
-            { expected: 'gender', observed: 'gender' }
+      context 'with a manifest that contains some fields' do
+        let(:mapping) {
+          {
+            valid: true,
+            expected: ["taxon_id", "supplier_name", "gender"],
+            observed: ["unknown_value"],
+            matched: [
+              { expected: 'position', observed: 'position'},{expected: 'supplier_plate_name', observed: 'plate_id'},
+              { expected: 'is_tumour', observed: 'is_tumour' },
+              { expected: 'scientific_name', observed: 'scientific_name' }
+            ]
+          }
+        }
+        let(:manifest_content) {
+          [
+            "plate_id" => "Labware 1", "position" => "A:1", "is_tumour" => "", "scientific_name" => "", "unknown_value" => ""
           ]
         }
-      }
-      let(:manifest_content) {
-        [
-          "plate_id" => "Labware 1", "position" => "A:1", "is_tumour" => "tum", "scientific_name" => "sci",
-          "taxon_id" => "123", "supplier_name" => "sup", "gender" => "male"
-        ]
-      }
-      it 'does generate the content' do
-        expect(content_accessor.state[:content]).to include(structured: { labwares: {
-          0 => {
-            :position=>0, :supplier_plate_name=>"Labware 1",
-            addresses: {
-          "A:1"=>  { fields: {
-            "position" => {value: "A:1"}, "supplier_plate_name" => {value: "Labware 1"},
-            "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
-          "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup"}, "gender" => {value: "male"}}}
-          } } } } )
-      end
-    end
-    context 'with a manifest that contains some fields' do
-      let(:mapping) {
-        {
-          valid: true,
-          expected: ["taxon_id", "supplier_name", "gender"],
-          observed: ["unknown_value"],
-          matched: [
-            { expected: 'position', observed: 'position'},{expected: 'supplier_plate_name', observed: 'plate_id'},
-            { expected: 'is_tumour', observed: 'is_tumour' },
-            { expected: 'scientific_name', observed: 'scientific_name' }
-          ]
-        }
-      }
-      let(:manifest_content) {
-        [
-          "plate_id" => "Labware 1", "position" => "A:1", "is_tumour" => "", "scientific_name" => "", "unknown_value" => ""
-        ]
-      }
-      it 'returns only the list of matched fields' do
-        expect(content_accessor.state[:content]).to include(structured: {
-          labwares: { 0 => {
-            :position=>0, :supplier_plate_name=>"Labware 1",
-            addresses: {
-          "A:1"=>  { fields: {
-            "position" => {value: "A:1"}, "supplier_plate_name" => { value: "Labware 1"},
-            "is_tumour" => {value: ""}, "scientific_name" => {value: ""}}}
-          } } } } )
+        it 'returns only the list of matched fields' do
+          expect(content_accessor.state[:content]).to include(structured: {
+            labwares: { 0 => {
+              :position=>0, :supplier_plate_name=>"Labware 1",
+              addresses: {
+            "A:1"=>  { fields: {
+              "position" => {value: "A:1"}, "supplier_plate_name" => { value: "Labware 1"},
+              "is_tumour" => {value: ""}, "scientific_name" => {value: ""}}}
+            } } } } )
+        end
       end
     end
   end

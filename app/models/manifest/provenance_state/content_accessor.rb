@@ -59,7 +59,7 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   end
 
   def validate
-    if state_access[:structured][:labwares]
+    if state_access[:structured] && state_access[:structured][:labwares]
       num_labwares_file = state_access[:structured][:labwares].keys.length
       num_labwares_manifest = manifest_model.labwares.count
       if (num_labwares_file > num_labwares_manifest)

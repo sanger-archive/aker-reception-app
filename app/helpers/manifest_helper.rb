@@ -54,14 +54,6 @@ module ManifestHelper
 
   def state_for_manifest(manifest, user)
     Manifest::ProvenanceState.new(manifest, user).apply({content: {rebuild: true}})
-    # {
-    #   manifest: {
-    #     manifest_id: manifest.id,
-    #     labwares: labwares.map{|l| }
-    #   },
-    #   content: content_for_manifest(manifest),
-    #   schema: manifest.schema
-    # }
   end
 
   def content_for_manifest(manifest)
