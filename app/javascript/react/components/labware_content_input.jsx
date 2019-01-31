@@ -11,10 +11,10 @@ const DEBOUNCED_TIMING = 500
 
 export const LabwareContentSelectComponent = (props) => {
   logName('LabwareContentSelectComponent')
-  const { title, name, id, selectedOptionValue, onChange } = props
+  const { title, name, id, selectedOptionValue, onChange, readOnly } = props
 
   return (
-    <select onChange={onChange} className="form-control" title={title} name={name} id={id} value={selectedOptionValue}>
+    <select readOnly={readOnly} onChange={onChange} className="form-control" title={title} name={name} id={id} value={selectedOptionValue}>
       <option value=""></option>
       { props.optionsForSelect.map((val, pos) => {
         return (<option key={pos} value={val}>{val}</option>)
@@ -44,6 +44,8 @@ export const LabwareContentText = (props) => {
   const { onChange, selectedValue, title, name, id } = props
   return (
     <input onChange={onChange}
+      readOnly={props.readOnly}
+      tabIndex={props.readOnly ? "-1" : ""}
       className="form-control" title={title} name={name} id={id}
       value={selectedValue} />
   )
@@ -118,9 +120,9 @@ class LabwareContentInputComponent extends React.Component {
     /// we'll get it from Redux state
     const selectedValue = (this.state.stateValueSelected === 'react') ? this.state.value : this.props.selectedValue
 
-    const { title, name, id, labwareIndex, address, fieldName, plateId, taxonomyServiceUrl } = this.props
+    const { title, name, id, labwareIndex, address, fieldName, plateId, taxonomyServiceUrl, readOnly } = this.props
     const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId, taxonomyServiceUrl)
-    return { selectedValue, title, name, id, onChange }
+    return { selectedValue, title, name, id, onChange, readOnly }
   }
 
   render () {
@@ -161,6 +163,7 @@ export const LabwareContentInput = connect(
 
       selectedValue: StateSelectors.content.selectedValueAtCell(state, ownProps.labwareIndex, ownProps.address, ownProps.fieldName),
       isSelect: StateSelectors.schema.isSelectFieldName(state, ownProps.fieldName),
+      readOnly: !StateSelectors.schema.isEditableField(state, ownProps.fieldName),
       title: StateSelectors.schema.friendlyNameFor(state, ownProps.fieldName),
       name: `manifest[labware][${ownProps.labwareIndex}][contents][${ownProps.address}][${ownProps.fieldName}]`,
       id: `labware[${ownProps.labwareIndex}]address[${ownProps.address}]fieldName[${ownProps.fieldName}]`

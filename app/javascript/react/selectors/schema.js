@@ -16,7 +16,11 @@ export const SchemaSelector = {
   ),
   isRequiredField: createSelector(
     (state, fieldName) => SchemaSelector.propertyForFieldName(state, fieldName),
-    (property) => property['required']
+    (property) => { return property.hasOwnProperty('required') ? property['required'] : false }
+  ),
+  isEditableField: createSelector(
+    (state, fieldName) => SchemaSelector.propertyForFieldName(state, fieldName),
+    (property) => { return property.hasOwnProperty('editable') ? property['editable'] : true }
   ),
   fieldTypeFor: createSelector(
     (state, fieldName) => SchemaSelector.propertyForFieldName(state, fieldName),

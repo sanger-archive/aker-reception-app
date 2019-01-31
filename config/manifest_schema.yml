@@ -25,7 +25,8 @@ property_updates:
     show_on_form: true
     field_name_regex: '^taxon(?:[-_ ]*id)?$'
   scientific_name:
-    required: false
+    editable: false
+    required: true
     show_on_form: true
     field_name_regex: '^scientific(?:[-_ ]*name)?$'
   phenotype:
