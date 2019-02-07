@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/react/**/*.*"
+    "test": "NODE_ENV=test RAILS_ENV=test mocha-webpack --opts mocha-webpack.opts spec/javascript/react/*_spec.* spec/javascript/react/**/*.*"
   },
   "dependencies": {
     "@babel/core": "^7.2.2",
@@ -57,6 +57,8 @@
     "jsdom-global": "^3.0.2",
     "mocha": "^5.2.0",
     "mocha-webpack": "^1.1.0",
+    "nock": "^10.0.6",
+    "redux-mock-store": "^1.5.3",
     "redux-test-utils": "^0.3.0",
     "scheduler": "^0.11.3",
     "sinon": "^6.1.5",

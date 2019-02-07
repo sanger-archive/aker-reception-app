@@ -21,6 +21,7 @@ const MappingHeader = connect((status) => {return {}}, (dispatch) => {
   return {
     onClickClose: () => {
       dispatch(toggleMapping(false))
+      dispatch(saveTab())
     }
   }
 })(MappingHeaderComponent)
@@ -39,8 +40,13 @@ const MappingFooterComponent = (props) => {
 
 const MappingFooter = connect((state) => { return{} }, (dispatch) => {
   return {
-    onAccept: () => { dispatch(toggleMapping(false))},
-    onCancel: () => { dispatch(toggleMapping(false)) }
+    onAccept: () => {
+      dispatch(toggleMapping(false))
+      dispatch(saveTab())
+    },
+    onCancel: () => {
+      dispatch(toggleMapping(false))
+    }
   }
 })(MappingFooterComponent)
 
@@ -94,8 +100,7 @@ const MappingInterface = (props) => {
 const MappedPair = (pairInfo, schema, onUnmatch, number) => {
   return(
     <tr key={number.toString()}>
-      <td>{ schema.properties[pairInfo.expected].friendly_name }</td>
-      <td>{ pairInfo.expected }</td>
+      <td title={ schema.properties[pairInfo.expected].friendly_name }>{ pairInfo.expected }</td>
       <td>{ pairInfo.observed }</td>
       <td><button className='btn btn-danger' onClick={() => {onUnmatch(pairInfo.expected, pairInfo.observed)}}>x</button></td>
     </tr>)
@@ -112,7 +117,6 @@ const MappedFieldsList = (props) => {
       <table id="matched-fields-table" className="table">
         <thead>
           <tr>
-            <th></th>
             <th>Available field</th>
             <th>Field from CSV</th>
             <th></th>

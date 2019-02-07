@@ -5,16 +5,16 @@ import StateSelectors from '../selectors'
 import { setManifestValue, saveTab, updateScientificName } from '../actions'
 import { debounce } from 'throttle-debounce'
 
-const logName = (name) => { }
+const logName = (name) => {  }
 
 const DEBOUNCED_TIMING = 500
 
 export const LabwareContentSelectComponent = (props) => {
   logName('LabwareContentSelectComponent')
-  const { title, name, id, selectedOptionValue, onChange, readOnly } = props
+  const { title, name, id, selectedOptionValue, onBlur, onChange, readOnly } = props
 
   return (
-    <select readOnly={readOnly} onChange={onChange} className="form-control" title={title} name={name} id={id} value={selectedOptionValue}>
+    <select readOnly={readOnly} onBlur={onBlur} onChange={onChange} className="form-control" title={title} name={name} id={id} defaultValue={selectedOptionValue}>
       <option value=""></option>
       { props.optionsForSelect.map((val, pos) => {
         return (<option key={pos} value={val}>{val}</option>)
@@ -24,11 +24,12 @@ export const LabwareContentSelectComponent = (props) => {
 }
 
 LabwareContentSelectComponent.propTypes = {
+  onBlur: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   selectedOptionValue: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
   optionsForSelect: PropTypes.array.isRequired
 }
 
@@ -39,106 +40,94 @@ export const LabwareContentSelect = connect((state, ownProps) => {
   }
 })(LabwareContentSelectComponent)
 
-export const LabwareContentText = (props) => {
-  logName('LabwareContentText')
-  const { onChange, selectedValue, title, name, id } = props
-  return (
-    <input onChange={onChange}
-      readOnly={props.readOnly}
-      tabIndex={props.readOnly ? "-1" : ""}
-      className="form-control" title={title} name={name} id={id}
-      value={selectedValue} />
-  )
+export class LabwareContentText extends React.Component {
+  constructor(props) {
+    super(props)
+    this.input = React.createRef();
+  }
+  render() {
+    logName('LabwareContentText')
+    // Because we dont want to send a request in every keystroke, we dont use the onChange handler
+    const { onBlur, selectedValue, title, name, id, readOnly } = this.props
+
+    if (this.input.current) {
+      // By doing this we overwrite the contents of the input when we update the redux state without
+      // rerendering the full DOM tree on every keystroke
+      this.input.current.value=selectedValue
+    }
+    return (
+      <input
+        ref={this.input}
+        defaultValue={selectedValue}
+        onBlur={onBlur}
+        readOnly={readOnly}
+        tabIndex={readOnly ? "-1" : ""}
+        className="form-control" title={title} name={name} id={id} />
+    )
+  }
 }
 
 LabwareContentText.propTypes = {
-  onChange: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   selectedValue: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired
 }
 
+
 class LabwareContentInputComponent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      value: props.selectedValue,
-      stateValueSelected: 'redux'
+      value: props.selectedValue
     }
-    this.onChangeProcessThrottelledCall = this.buildThrottelledCall()
-  }
-
-  setStateValueSelected (str) {
-    this.setState({ stateValueSelected: str })
-  }
-
-  onChangeProcess (receivedChanges) {
-    receivedChanges.reduceRight((memo, receivedChange) => {
-      const found = (memo.filter((actualChange) => {
-        return ((actualChange[0] === receivedChange[0]) && (actualChange[1] === receivedChange[1]) && (actualChange[2] === receivedChange[2]))
-      }))
-      if (found.length === 0) {
-        memo.push(receivedChange)
-      }
-      return memo
-    }, []).reverse().forEach((receivedChange, pos) => {
-      this.props.onChangeManifestInput.apply(this, receivedChange)
+    this.debouncedUpdateInput = debounce(DEBOUNCED_TIMING, () => {
+      this.props.updateInput.apply(this, this.dataForUpdate)
     })
-
-    // this.setStateValueSelected('redux')
-    this.setState({ stateValueSelected: 'redux', value: this.props.selectedValue })
-    this.receivedChanges = []
   }
 
-  buildThrottelledCall () {
-    let receivedChanges = []
-
-    const debouncedCall = debounce(DEBOUNCED_TIMING, () => { this.onChangeProcess(receivedChanges) })
-
-    return (labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl) => {
-      this.setState({ stateValueSelected: 'react' })
-      // this.setStateValueSelected('react')
-      receivedChanges.push([labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl])
-      debouncedCall()
+  buildDirectUpdateInputHandler (labwareIndex, address, fieldName, plateId, taxonomyServiceUrl) {
+    return (e) => {
+      const value = e.target.value
+      this.props.updateInput(labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl)
     }
   }
 
-  buildOnChangeManifestInput (labwareIndex, address, fieldName, plateId, taxonomyServiceUrl) {
-    if (!this.onChange) {
-      this.onChange = (e) => {
-        const value = e.target.value
-        this.setState({ value: value })
-        this.onChangeProcessThrottelledCall(labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl)
-      }
+  buildDebouncedUpdateInputHandler (labwareIndex, address, fieldName, plateId, taxonomyServiceUrl) {
+    return (e) => {
+      const value = e.target.value
+      this.dataForUpdate = [labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl]
+
+      this.debouncedUpdateInput()
     }
-    return this.onChange
   }
 
   commonPropsForInput () {
-    // If we are in React mode, we'll get the value from the state of this component. If we are working in Redux mode
-    /// we'll get it from Redux state
-    const selectedValue = (this.state.stateValueSelected === 'react') ? this.state.value : this.props.selectedValue
-
+    let selectedValue = this.props.selectedValue
     const { title, name, id, labwareIndex, address, fieldName, plateId, taxonomyServiceUrl, readOnly } = this.props
-    const onChange = this.buildOnChangeManifestInput(labwareIndex, address, fieldName, plateId, taxonomyServiceUrl)
-    return { selectedValue, title, name, id, onChange, readOnly }
+
+    const onBlur = this.buildDirectUpdateInputHandler(labwareIndex, address, fieldName, plateId, taxonomyServiceUrl)
+    const onChange = this.buildDebouncedUpdateInputHandler(labwareIndex, address, fieldName, plateId, taxonomyServiceUrl)
+
+    return { selectedValue, title, name, id, onBlur, onChange, readOnly }
   }
 
   render () {
     logName('LabwareContentInputComponent')
-    const { isSelect, fieldName } = this.props
+    const { isSelect, fieldName, selectedValue, readOnly } = this.props
     if (isSelect) {
-      return <LabwareContentSelect {...this.commonPropsForInput()} fieldName={fieldName} />
+      return <fieldset disabled={readOnly}><LabwareContentSelect {...this.commonPropsForInput()} fieldName={fieldName} /></fieldset>
     } else {
-      return <LabwareContentText {...this.commonPropsForInput()} />
+      return <fieldset disabled={readOnly}><LabwareContentText {...this.commonPropsForInput()} /></fieldset>
     }
   }
 }
 
 LabwareContentInputComponent.propTypes = {
   selectedValue: PropTypes.string.isRequired,
-  onChangeManifestInput: PropTypes.func.isRequired,
+  //onBlur: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
@@ -171,7 +160,7 @@ export const LabwareContentInput = connect(
   },
   (dispatch, { match, location }) => {
     return {
-      onChangeManifestInput: (labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl) => {
+      updateInput: (labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl) => {
         dispatch(setManifestValue(labwareIndex, address, fieldName, value, plateId))
         if (fieldName === 'taxon_id') {
           let promise = dispatch(updateScientificName(labwareIndex, address, 'scientific_name', value, plateId, taxonomyServiceUrl))

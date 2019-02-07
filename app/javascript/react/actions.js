@@ -60,26 +60,40 @@ export const cacheTaxonomy = (taxId, data) => {
   }
 }
 
-const updateScientificNameFromService = (dispatch, labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl) => {
+
+export const setTaxonomyNumCalls = (numCalls) => {
+  return {
+    type: C.SET_TAXONOMY_NUM_CALLS,
+    value: numCalls
+  }
+}
+
+const updateScientificNameFromService = (dispatch, getState, labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl) => {
+  const taxonomyNumCalls = getState().services.taxonomyNumCalls ? getState().services.taxonomyNumCalls + 1 : 1
+  dispatch(setTaxonomyNumCalls(taxonomyNumCalls))
   return $.ajax(taxonomyServiceUrl + '/' + taxId, {
     method: 'GET',
     contentType: 'application/json',
     dataType: 'json'
   }).then((data) => {
     dispatch(cacheTaxonomy(taxId, data))
-    dispatch(setManifestValue(labwareId, address, fieldName, data.scientificName, plateId))
+    if (taxonomyNumCalls === getState().services.taxonomyNumCalls) {
+      dispatch(setManifestValue(labwareId, address, fieldName, data.scientificName, plateId))
+    }
   }).fail((e) => {
-    if (e.status === 404) {
-      dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
-      dispatch(displayMessage({ level: 'FATAL',
-        display: 'alert',
-        text: 'There is no scientific name for the taxon id provided',
-        labware_index: labwareId,
-        address,
-        field: fieldName
-      }))
-    } else {
-      dispatch(displayMessage({ level: 'FATAL', display: 'alert', text: 'There was an error while connecting to the EBI taxonomy service' }))
+    if (taxonomyNumCalls === getState().services.taxonomyNumCalls) {
+      if (e.status === 404) {
+        dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
+        dispatch(displayMessage({ level: 'FATAL',
+          display: 'alert',
+          text: 'There is no scientific name for the taxon id provided',
+          labware_index: labwareId,
+          address,
+          field: fieldName
+        }))
+      } else {
+        dispatch(displayMessage({ level: 'FATAL', display: 'alert', text: 'There was an error while connecting to the EBI taxonomy service' }))
+      }
     }
   })
 }
@@ -87,14 +101,16 @@ const updateScientificNameFromService = (dispatch, labwareId, address, fieldName
 export const updateScientificName = (labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl) => {
   return (dispatch, getState) => {
     if (taxId.length === 0) {
-      return dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
+      dispatch(setManifestValue(labwareId, address, fieldName, '', plateId))
+      return Promise.resolve()
     }
     const cache = getState().services.cachedTaxonomies
     if (cache && cache[taxId]) {
-      return dispatch(setManifestValue(labwareId, address, fieldName, cache[taxId].scientificName, plateId))
+      dispatch(setManifestValue(labwareId, address, fieldName, cache[taxId].scientificName, plateId))
+      return Promise.resolve()
     }
 
-    return updateScientificNameFromService(dispatch, labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl)
+    return updateScientificNameFromService(dispatch, getState, labwareId, address, fieldName, taxId, plateId, taxonomyServiceUrl)
   }
 }
 
@@ -120,7 +136,7 @@ export const saveTab = (form) => {
       data: JSON.stringify(getState())
     }).then((data) => {
       dispatch(loadManifest(data.contents))
-    }).fail($.proxy(showManifestUploadError, this, dispatch))
+    }, $.proxy(showManifestUploadError, this, dispatch))
   }
 }
 

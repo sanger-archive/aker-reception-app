@@ -10,7 +10,7 @@ export const createKeys = (state, keys) => {
 }
 
 export const setManifestValue = (state, labwareId, address, fieldName, value) => {
-  Object.assign(createKeys(state,
+  return Object.assign(createKeys(state,
     [
       'structured', 'labwares', labwareId, 'addresses', address,
       'fields', fieldName
@@ -37,6 +37,10 @@ export const found = (state, labwareId, addressId, fieldName, value) => {
   return state?.structured?.labwares?.[labwareId]?.addresses?.[addressId]?.fields?.[fieldName]
 }
 
+export const value = (state, labwareId, addressId, fieldName) => {
+  return state?.structured?.labwares?.[labwareId]?.addresses?.[addressId]?.fields?.[fieldName]?.value
+}
+
 const applyForAddresses = (state, handler) => {
   const labwares = state?.structured?.labwares
   for (let labwareId in labwares) {
@@ -54,6 +58,12 @@ const resetPreviousValues = (prevState, newState) => {
   applyForAddresses(prevState, (labwareId, addressId, fieldName) => {
     if (!found(newState, labwareId, addressId, fieldName)) {
       setManifestValue(newState, labwareId, addressId, fieldName, '')
+    } else {
+      const newValue = value(newState, labwareId, addressId, fieldName)
+      if (value(prevState, labwareId, addressId, fieldName) !== newValue) {
+        setManifestValue(newState, labwareId, addressId, fieldName, newValue)
+      }
+
     }
   })
   return newState
@@ -62,11 +72,7 @@ const resetPreviousValues = (prevState, newState) => {
 export default (state = {}, action) => {
   switch (action.type) {
     case C.TOGGLE_MAPPING:
-      if (!action.toggle) {
-        /** When closing the mapping tool, rebuild the content **/
-        return Object.assign({}, state, { rebuild: true })
-      }
-      return state
+      return Object.assign({}, state, {rebuild: true})
     case C.SAVE_AND_LEAVE:
       if (state.update_successful === true) {
         window.location.href = action.url
