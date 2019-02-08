@@ -23,6 +23,9 @@ RSpec.describe :provenance_service do
         'REQUIRED_ENUM' => {
           'required' => true,
           'allowed' => ['ALPHA', 'BETA', 'GAMMA'],
+        },
+        'UNIQUE_VALUES' => {
+          'unique_value' => true
         }
       },
     }
@@ -53,8 +56,8 @@ RSpec.describe :provenance_service do
       end
 
       it "should produce appropriate errors" do
-        expect(@results.length).to eq 1
-        result = @results.first
+        expect(@results.length).to eq 2
+        result = @results.first.first
         expect(result[:labwareIndex]).to eq labware_index
         expect(result[:address]).to eq "1"
         errors = result[:errors]
@@ -78,8 +81,8 @@ RSpec.describe :provenance_service do
       end
 
       it "should produce appropriate errors" do
-        expect(@results.length).to eq 1
-        result = @results.first
+        expect(@results.length).to eq 2
+        result = @results.first.first
         expect(result[:labwareIndex]).to eq labware_index
         expect(result[:address]).to eq "1"
         errors = result[:errors]
@@ -102,7 +105,7 @@ RSpec.describe :provenance_service do
       end
 
       it "should accept the data" do
-        expect(@results).to be_empty
+        expect(@results.first).to be_empty
       end
 
       it "should correct the capitalisation" do
@@ -123,8 +126,48 @@ RSpec.describe :provenance_service do
       end
 
       it "should accept the data" do
-        expect(@results).to be_empty
+        expect(@results.first).to be_empty
       end
+    end
+
+    context 'with unique values checks' do
+      context 'when there are duplicate values' do
+        before do
+          @data = {
+            "0" => {
+              'UNIQUE_VALUES' => "xyz",
+            },
+            "1" => {
+              'UNIQUE_VALUES' => "xyz",
+            }
+          }
+          @results = @service.validate(labware_index, @data)
+        end
+
+        it 'should generate warnings if there is a duplicate value in the column' do
+          errors, warnings = @results
+          expect(warnings.length>0).to eq(true)
+        end
+      end
+      context 'when there are no duplicate values' do
+        before do
+          @data = {
+            "0" => {
+              'UNIQUE_VALUES' => "xyz",
+            },
+            "1" => {
+              'UNIQUE_VALUES' => "xyz2",
+            }
+          }
+          @results = @service.validate(labware_index, @data)
+        end
+
+        it 'should not warnings if there is no duplicate value in the column' do
+          errors, warnings = @results
+          expect(warnings.length).to eq(0)
+        end
+      end
+
     end
   end
 

@@ -79,8 +79,10 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           visit manifest_build_path(manifest_id: matsub.id, id: 'provenance')
         end
         context 'when writing a taxonomy id in a single input' do
-          it 'uses the taxonomy service and searches for the id provided', js: true do
+          it 'uses the taxonomy service and searches for the id provided on blur event', js: true do
             fill_in('labware[0]address[A:1]fieldName[taxon_id]', with: '3')
+            page.find("body").click
+
             expect(page).to have_selector("input[value='Some specie name']")
           end
         end

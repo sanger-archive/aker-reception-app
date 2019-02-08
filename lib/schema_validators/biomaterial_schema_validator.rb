@@ -22,6 +22,7 @@ module SchemaValidators
     def initialize(schema)
       @schema = schema
       @error_messages = []
+      @warning_messages = []
       build_validators(@schema)
     end
 

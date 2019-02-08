@@ -39,6 +39,7 @@ class ProvenanceService
   # - [false, [error1, error2, ...]] - some stuff went wrong; here is the information
   # - [false, []] - something unexpected went wrong
   def set_biomaterial_data(manifest, labware_params, current_user)
+
     all_errors = []
     all_warnings = []
 
@@ -65,6 +66,7 @@ class ProvenanceService
           end
         end
       end
+
       error_messages, warning_messages = validate(position, filtered_data)
       filtered_data = nil if filtered_data.empty?
 

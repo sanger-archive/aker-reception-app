@@ -26,7 +26,7 @@ const MessagesList = (props, messages, Renderer) => {
 
   return (
     <div className={`card alert alert-${props.type}`} role="alert">
-      <p className="card-header" data-toggle="collapse" data-target={"#"+cardId}>
+      <p className="card-header" data-toggle="collapse" data-target={"#"+cardId} style={{cursor: 'pointer'}}>
         {props.messages.length} {pluralize(((props.type=='danger') ? 'error' : props.type), props.messages.length)}:
       </p>
       <ul id={cardId} className="card-body collapse show">

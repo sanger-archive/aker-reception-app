@@ -5,7 +5,7 @@ require 'webmock/rspec'
 RSpec.shared_examples "displays an error" do |errorMessage|
 
   it 'displays an error' do
-    expect(page.find('#page-error-alert')).to have_text(errorMessage)
+    expect(page.find('.alert-danger')).to have_text(errorMessage)
   end
 
 end
