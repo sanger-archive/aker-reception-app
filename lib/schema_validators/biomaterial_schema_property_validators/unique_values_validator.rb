@@ -13,8 +13,8 @@ module SchemaValidators
         value = field_data(bio_data)
         prepare_memoized_values(labware_index, property_name)
         if is_duplicated?(labware_index, property_name, value)
-          add_error(labware_index, address, property_name, "The field #{property_name} has a duplicate value #{value} at #{address}")
-          success = false
+          add_warning(labware_index, address, property_name, "The field #{property_name} has a duplicate value #{value} at #{address}")
+          success = true
         else
           add_memoized_value(labware_index, property_name, value)
         end
@@ -25,7 +25,7 @@ module SchemaValidators
       private
       def prepare_memoized_values(labware_index, property_name)
         @memoized_values = {} if @memoized_values.nil?
-        @memoized_values[property_name] = [] unless @memoized_values[property_name]        
+        @memoized_values[property_name] = [] unless @memoized_values[property_name]
       end
 
       def add_memoized_value(labware_index, property_name, value)

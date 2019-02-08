@@ -7,6 +7,7 @@ default_position_value: default
 
 property_updates:
   supplier_name:
+    unique_value: true
     show_on_form: true
     field_name_regex: ^supplier[-_ ]*name$
   is_tumour:
@@ -16,6 +17,7 @@ property_updates:
     show_on_form: true
     field_name_regex: ^tissue[-_ ]*type$
   donor_id:
+    unique_value: true
     show_on_form: true
     field_name_regex: '^donor(?:[-_ ]*id)?$'
   gender:
