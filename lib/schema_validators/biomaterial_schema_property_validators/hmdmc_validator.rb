@@ -10,7 +10,7 @@ module SchemaValidators
 
       def is_human?(bio_data)
         species = field_data_for_property('scientific_name', bio_data)
-        (species.present? && species.strip.downcase == 'homo sapiens')
+        (species.present? && species.strip.downcase == 'homo sapiens') || (field_data_for_property('taxon_id', bio_data).to_s=="9606")
       end
 
       # Performs some checks based on the presence of HMDMC

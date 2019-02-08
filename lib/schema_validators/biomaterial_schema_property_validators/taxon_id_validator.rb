@@ -21,7 +21,7 @@ module SchemaValidators
         taxonomies_memoized[taxon_id]
       end
 
-      def validate_scientific_name(taxon_id, scientific_name, labware_index, address, property_name)
+      def validate_scientific_name(taxon_id, scientific_name, labware_index, address, property_name, bio_data)
         begin
           obtained_value = find_by_taxon_id(taxon_id).scientificName
         rescue TaxonomyClient::Errors::BadRequest => e
@@ -34,14 +34,15 @@ module SchemaValidators
           return false
         end
 
-        if scientific_name
-          unless scientific_name == obtained_value
-            add_error(labware_index, address, property_name,
+        unless scientific_name == obtained_value
+          if scientific_name
+            add_warning(labware_index, address, property_name,
               "The Taxon Id provided (#{taxon_id}) does not match the scientific name provided '#{scientific_name}'.
-              The taxonomy service indicates it should be '#{obtained_value}.")
-            return false
+              The taxonomy service indicates it should be '#{obtained_value} so the value provided will be ignored.")
           end
+          set_field_data_for_property('scientific_name', bio_data, obtained_value)
         end
+
         true
       end
 
@@ -55,7 +56,7 @@ module SchemaValidators
         end
         scientific_name = field_data_for_property('scientific_name', bio_data)
 
-        validate_scientific_name(taxon_id, scientific_name, labware_index, address, property_name)
+        validate_scientific_name(taxon_id, scientific_name, labware_index, address, property_name, bio_data)
       end
     end
   end

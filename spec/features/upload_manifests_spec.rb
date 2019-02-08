@@ -10,6 +10,14 @@ RSpec.shared_examples "displays an error" do |errorMessage|
 
 end
 
+RSpec.shared_examples "shows the mapping tool" do |errorMessage|
+
+  it 'shows the mapping tool' do
+    expect(page).to have_content('Select CSV mappings', wait: 10)
+  end
+
+end
+
 RSpec.feature "Upload Manifests", type: :feature, js: true do
 
   include StubHelper
@@ -39,7 +47,16 @@ RSpec.feature "Upload Manifests", type: :feature, js: true do
 
   context 'when uploading a Manifest with duplicate Plate IDs' do
     let(:manifest_file) { 'duplicate_plate_ids.xlsx' }
-    include_examples "displays an error", 'Duplicate entry found'
+    context 'when the number of labwares is 1' do
+      context 'plate id is not required so it is ignored' do
+        let(:number_of_containers_required) { 1 }
+        include_examples "shows the mapping tool"
+      end
+    end
+    context 'when the number of labwares is more than 1 then plate id is required' do
+      let(:number_of_containers_required) { 3 }
+      include_examples "displays an error", 'Duplicate entry found'
+    end
   end
 
   context 'when uploading a Manifest with fewer plates than Labwares required' do

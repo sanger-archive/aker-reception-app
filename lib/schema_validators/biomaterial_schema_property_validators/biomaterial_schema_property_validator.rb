@@ -66,6 +66,10 @@ module SchemaValidators
         field_data
       end
 
+      def set_field_data_for_property(property_name, bio_data, value)
+        bio_data[property_name]=value
+      end
+
     end
   end
 end

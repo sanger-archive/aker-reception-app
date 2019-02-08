@@ -13,7 +13,7 @@ module SchemaValidators
 
       def add_warning_for_duplication(ref1, ref2, dups)
         add_warning(ref1[:labware_index], ref1[:address], ref1[:property_name],
-          "The field #{ref1[:property_name]} at #{ref1[:address]} has #{dups.length} duplicates for #{ref1[:value]} (eg: "+
+          "The field #{ref1[:property_name]} at #{ref1[:address]} has #{dups.length} duplications of value #{ref1[:value]} (eg: "+
             location_display(ref2)+")")
       end
 
