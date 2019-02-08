@@ -14,6 +14,7 @@ module SchemaValidators
 
     attr_reader :schema
     attr_accessor :error_messages
+    attr_accessor :warning_messages
     attr_accessor :validators
 
 

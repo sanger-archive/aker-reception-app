@@ -45,7 +45,7 @@ export const ContentSelector = {
   buildCheckInputErrors,
   hasInputErrors: buildCheckInputErrors(),
 
-  isWarning: (m) => { return (m.level === 'WARN') },
+  isWarning: (m) => { return (m.level === 'WARNING') },
   warningTabMessages: createSelector(
     (state, labwareIndex) => ContentSelector.tabMessages(state, labwareIndex),
     (messages) => messages.filter((m) => ContentSelector.isWarning(m))

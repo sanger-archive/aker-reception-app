@@ -8,13 +8,17 @@ module SchemaValidators
         property_name == 'hmdmc'
       end
 
+      def is_human?(bio_data)
+        species = field_data_for_property('scientific_name', bio_data)
+        (species.present? && species.strip.downcase == 'homo sapiens')
+      end
+
       # Performs some checks based on the presence of HMDMC
       def check_hmdmc(hmdmc_number, bio_data)
         return nil if field_data(bio_data).nil?
         # Only allow human material/samples to have HMDMC numbers
         # TODO: Change to taxon_id
-        species = field_data_for_property('scientific_name', bio_data)
-        unless species.present? && species.strip.downcase == 'homo sapiens'
+        unless is_human?(bio_data)
           return 'Only human material are to have HMDMC numbers associated.'
         end
         # Check format validity
@@ -30,6 +34,12 @@ module SchemaValidators
 
 
       def validate(labware_index, address, bio_data)
+        if (is_human?(bio_data) && field_data(bio_data).nil?)
+          add_warning(labware_index, address, property_name,
+            "You have added human material without an HMDMC number. "+
+            "If you intended to do this, please confirm during the next step.")
+        end
+
         # Check HMDMC server-side
         hmdmc_error = check_hmdmc(field_data(bio_data), bio_data)
         unless hmdmc_error.blank?

@@ -34,9 +34,8 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
     ActiveRecord::Base.transaction do
       if updates && !updates.empty?
         provenance = ProvenanceService.new(manifest_schema)
-        success, messages = provenance.set_biomaterial_data(manifest_model, updates, user)
-        apply_messages(messages)
-
+        success, errors, warnings = provenance.set_biomaterial_data(manifest_model, updates, user)
+        apply_messages(errors, warnings)
         if success #&& !params["manifest"]["change_tab"]
           success = manifest_model.update_attributes(
             status: (manifest_model&.any_human_material_no_hmdmc? ? 'ethics' : 'dispatch')
@@ -54,39 +53,33 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
     end
   end
 
-  def add_message(labware_index, address, field, text)
+  def add_message(level, labware_index, address, field, text)
     state_access[:structured][:messages] = [] unless state_access[:structured][:messages]
-    state_access[:structured][:messages].push({level: "ERROR",
+    state_access[:structured][:messages].push({level: level,
       text: text, labware_index: labware_index, address: address, field: field
       })
-    #if labware_index && address && field
-    #  build_keys(@state, [:content, :structured, :labwares, labware_index, :addresses, address, :fields, field, :messages])
-    #  state_access[:structured][:labwares][labware_index][:addresses][address][:fields][field][:messages] = [text]
-    #end
   end
 
-  def clean_errors
+  def clean_messages
     if state_access[:structured]
       state_access[:structured][:messages] = []
-      # state_access[:structured][:labwares].keys.each do |l_key|
-      #   if state_access[:structured][:labwares][l_key][:addresses]
-      #     state_access[:structured][:labwares][l_key][:addresses].keys.each do |a_key|
-      #       state_access[:structured][:labwares][l_key][:addresses][a_key][:fields].keys.each do |f_key|
-      #         state_access[:structured][:labwares][l_key][:addresses][a_key][:fields][f_key][:messages] = []
-      #       end
-      #     end
-      #   end
-      # end
     end
   end
 
-  def apply_messages(messages)
-    clean_errors
-    messages.each do |message|
+  def apply_messages(errors, warnings)
+    clean_messages
+    errors.each do |message|
       message[:errors].keys.each do |field|
-        add_message(message[:labwareIndex].to_s, message[:address], field, message[:errors][field])
+        add_message("ERROR", message[:labwareIndex].to_s, message[:address], field, message[:errors][field])
       end
     end
+    warnings.each do |message|
+      message[:warnings].keys.each do |field|
+        add_message("WARNING", message[:labwareIndex].to_s, message[:address], field, message[:warnings][field])
+      end
+    end
+
   end
+
 
 end

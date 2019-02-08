@@ -16,6 +16,10 @@ module SchemaValidators
         schema_validator.error_messages
       end
 
+      def warning_messages
+        schema_validator.warning_messages
+      end
+
       def field_data(bio_data)
         field_data_for_property(property_name, bio_data)
       end
@@ -37,11 +41,29 @@ module SchemaValidators
         error_message[:errors][field.to_sym] = msg
       end
 
+      # Adds a validation error to the given warning_messages.
+      def add_warning(labware_index, address, field, msg)
+        i = warning_messages.index { |x| x[:labwareIndex]==labware_index && x[:address]==address }
+        if i.nil?
+          warning_message = {
+            warnings: {},
+            labwareIndex: labware_index,
+            address: address,
+            update_successful: true,
+          }
+          warning_messages.push(warning_message)
+        else
+          warning_message = warning_messages[i]
+        end
+        warning_message[:warnings][field.to_sym] = msg
+      end
+
+
       def field_data_for_property(property_name, bio_data)
         field_data = bio_data[property_name]
         field_data = field_data.strip if field_data
-        field_data = nil if field_data and field_data.empty?    
-        field_data  
+        field_data = nil if field_data and field_data.empty?
+        field_data
       end
 
     end

@@ -13,6 +13,7 @@ class ProvenanceService
   # Returns an array of errors. If the list is empty, the data seems to be OK.
   def validate(labware_index, labware_data)
     schema_validator.error_messages = []
+    schema_validator.warning_messages = []
 
     if labware_data.empty? && !schema_validator.default_field.nil?
       schema_validator.error_messages = [{
@@ -27,9 +28,8 @@ class ProvenanceService
       labware_data.each do |address, bio_data|
         schema_validator.validate(labware_index, address, bio_data)
       end
-
-      schema_validator.error_messages
     end
+    return schema_validator.error_messages, schema_validator.warning_messages
   end
 
   # Process request to set the json data for labware in a given manifest.
@@ -40,6 +40,7 @@ class ProvenanceService
   # - [false, []] - something unexpected went wrong
   def set_biomaterial_data(manifest, labware_params, current_user)
     all_errors = []
+    all_warnings = []
 
     success = true
 
@@ -64,14 +65,15 @@ class ProvenanceService
           end
         end
       end
-      error_messages = validate(position, filtered_data)
+      error_messages, warning_messages = validate(position, filtered_data)
       filtered_data = nil if filtered_data.empty?
 
       success &= labware.update_attributes(supplier_plate_name: supplier_plate_name, contents: filtered_data)
       all_errors += error_messages unless error_messages.empty?
+      all_warnings += warning_messages unless warning_messages.empty?
     end
     success &= all_errors.empty?
-    return success, all_errors
+    return success, all_errors, all_warnings
   end
 
 end
