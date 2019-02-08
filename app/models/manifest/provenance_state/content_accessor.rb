@@ -107,6 +107,7 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   def read_from_raw
     idx = 0
     state_access[:raw].reduce({}) do |memo, row|
+
       mapped = mapped_row(row)
 
       validate_labware_existence(mapped, idx)
@@ -123,8 +124,6 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
       memo[:labwares][labware_found][:position] = labware_found
       build_keys(memo, [:labwares, labware_found, labware_id_schema_field])
       memo[:labwares][labware_found][labware_id_schema_field]=labware_id
-
-      validate_position_duplication(memo, labware_found, position)
 
       build_keys(memo, [:labwares, labware_found, :addresses, position, :fields])
 

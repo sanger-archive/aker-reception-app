@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 import store from '../store'
 import { Provider, connect } from 'react-redux'
+import pluralize from 'pluralize'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
 import { uploadManifest, loadManifest, saveAndLeave, toggleMapping } from '../actions'
@@ -16,46 +17,49 @@ const MessageDisplay = (props) => {
   )
 }
 
-const ErrorDisplay = (props) => {
-  logName('ErrorDisplay')
+const MessagesList = (props, messages, Renderer) => {
+  logName('MessagesList')
+  if (props.messages.length === 0) {
+    return null
+  }
+  const cardId = `card-${props.type}`
+
   return (
-    <div id="page-error-alert" className="alert alert-danger" role="alert">
-      <button type="button" className="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      <p className='alert-msg'>&nbsp;<MessageDisplay {...props} /></p>
+    <div className={`card alert alert-${props.type}`} role="alert">
+      <p className="card-header" data-toggle="collapse" data-target={"#"+cardId}>
+        {props.messages.length} {pluralize(((props.type=='danger') ? 'error' : props.type), props.messages.length)}:
+      </p>
+      <ul id={cardId} className="card-body collapse show">
+        {
+          props.messages.map((msg, pos) => {
+            if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {
+              return
+            }
+            return (
+              <li key={pos}>
+                <p className='alert-msg'>&nbsp;
+                  <MessageDisplay {...msg}
+                    supplierPlateNames={props.supplierPlateNames}
+                    selectedTabPosition={props.selectedTabPosition}
+                    key={pos} />
+                </p>
+              </li>
+            )
+          })
+        }
+      </ul>
     </div>
   )
-}
-
-const WarningDisplay = (props) => {
-  logName('WarningDisplay')
-  return (
-    <div id="page-warning-alert" className="alert alert-warning" role="alert">
-      <strong className='alert-title'>Warning!</strong>
-      <p className='alert-msg'>&nbsp;<MessageDisplay {...props} /></p>
-    </div>
-  )
-}
-
-const showMessages = (props, messages, Renderer) => {
-  return messages.map((msg, pos) => {
-    if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {
-      return
-    }
-    return <Renderer {...msg}
-      supplierPlateNames={props.supplierPlateNames}
-      selectedTabPosition={props.selectedTabPosition}
-      key={pos} />
-  })
 }
 
 
 const MessagesDisplayComponent = (props) => {
   logName('MessagesDisplayComponent')
   return (
-    <div>
-      {showMessages(props, props.warnings, WarningDisplay)}
-      {showMessages(props, props.errors, ErrorDisplay)}
-    </div>
+    <React.Fragment>
+      <MessagesList {...props} messages={props.warnings} type="warning" />
+      <MessagesList {...props} messages={props.errors} type="danger" />
+    </React.Fragment>
   )
 }
 
