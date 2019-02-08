@@ -26,4 +26,8 @@ class Manifest::ProvenanceState::ManifestAccessor < Manifest::ProvenanceState::A
     end
   end
 
+  def supplier_plate_name(labware_index)
+    state_access.select{|obj| obj[:labware_index] == labware_index}.first[:supplier_plate_name]
+  end
+
 end
