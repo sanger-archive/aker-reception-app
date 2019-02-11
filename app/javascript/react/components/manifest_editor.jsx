@@ -20,6 +20,24 @@ const MessageDisplay = (props) => {
   )
 }
 
+const MessagesListElements = (props) => {
+  return props.messages.map((msg, pos) => {
+    if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {
+      return
+    }
+    return (
+      <li key={pos}>
+        <p className='alert-msg'>&nbsp;
+          <MessageDisplay {...msg}
+            supplierPlateNames={props.supplierPlateNames}
+            selectedTabPosition={props.selectedTabPosition}
+            key={pos} />
+        </p>
+      </li>
+    )
+  })
+}
+
 const MessagesList = (props, messages, Renderer) => {
   logName('MessagesList')
   if (props.messages.length === 0) {
@@ -36,23 +54,7 @@ const MessagesList = (props, messages, Renderer) => {
         "card-body collapse": true,
         "show": (props.messages.length < MAX_UNCOLLAPSED_MESSAGES_TO_DISPLAY)
         })}>
-        {
-          props.messages.map((msg, pos) => {
-            if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {
-              return
-            }
-            return (
-              <li key={pos}>
-                <p className='alert-msg'>&nbsp;
-                  <MessageDisplay {...msg}
-                    supplierPlateNames={props.supplierPlateNames}
-                    selectedTabPosition={props.selectedTabPosition}
-                    key={pos} />
-                </p>
-              </li>
-            )
-          })
-        }
+        <MessagesListElements {...props} />
       </ul>
     </div>
   )

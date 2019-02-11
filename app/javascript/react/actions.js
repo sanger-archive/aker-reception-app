@@ -87,10 +87,7 @@ const updateScientificNameFromService = (dispatch, getState, labwareId, address,
         dispatch(displayMessage({ level: 'FATAL',
           display: 'alert',
           text: 'There is no scientific name for the taxon id provided',
-          labware_index: labwareId,
-          address,
-          field: fieldName
-        }))
+          labware_index: labwareId, address, field: fieldName }))
       } else {
         dispatch(displayMessage({ level: 'FATAL', display: 'alert', text: 'There was an error while connecting to the EBI taxonomy service' }))
       }
