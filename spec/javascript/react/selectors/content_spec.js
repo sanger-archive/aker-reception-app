@@ -6,7 +6,7 @@ describe('ContentSelector', () => {
 
   const warningMessage = {
     "labware_index": 0,
-    "level": "WARN",
+    "level": "WARNING",
     "address": "A:1",
     "field": "taxonId",
     "display": "alert",
