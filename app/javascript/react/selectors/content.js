@@ -29,7 +29,8 @@ export const buildCheckInputErrors = () => {
 }
 
 const equalityIndex = (a,b) => {
-  return ((typeof a !== 'undefined') && (typeof b !== 'undefined') && (a.toString()===b.toString()))
+  return (((a==null) && (b==null)) ||
+    ((typeof a !== 'undefined') && (typeof b !== 'undefined') && ((a!==null) && (b!==null)) && (a.toString()===b.toString())))
 }
 
 export const ContentSelector = {

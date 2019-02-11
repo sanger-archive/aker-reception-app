@@ -50,12 +50,14 @@ RSpec.feature "Upload Manifests", type: :feature, js: true do
     context 'when the number of labwares is 1' do
       context 'plate id is not required so it is ignored' do
         let(:number_of_containers_required) { 1 }
-        include_examples "shows the mapping tool"
+        include_examples "displays an error", 'Duplicate entry found'
       end
     end
-    context 'when the number of labwares is more than 1 then plate id is required' do
-      let(:number_of_containers_required) { 3 }
-      include_examples "displays an error", 'Duplicate entry found'
+    context 'when the number of labwares is more than 1' do
+      let(:number_of_containers_required) { 2 }
+      context 'plate id is required' do
+        include_examples "displays an error", 'Duplicate entry found'
+      end
     end
   end
 

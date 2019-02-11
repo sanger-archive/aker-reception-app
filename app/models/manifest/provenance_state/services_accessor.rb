@@ -7,4 +7,9 @@ class Manifest::ProvenanceState::ServicesAccessor < Manifest::ProvenanceState::A
     }
   end
 
+  def validate
+    @state[@key][:valid] = true
+  end
+
+
 end

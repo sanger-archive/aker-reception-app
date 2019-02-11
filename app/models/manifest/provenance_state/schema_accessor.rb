@@ -53,6 +53,10 @@ class Manifest::ProvenanceState::SchemaAccessor < Manifest::ProvenanceState::Acc
     @manifest_schema
   end
 
+  def validate
+    @state[@key][:valid] = true
+  end
+
   private
 
   def config

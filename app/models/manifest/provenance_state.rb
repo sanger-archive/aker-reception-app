@@ -22,12 +22,18 @@ class Manifest::ProvenanceState
 
   def apply(state)
     @state = (state.dup || build_state)
-    @services.apply(@state)
-    @manifest.apply(@state)
-    @schema.apply(@state)
-    @mapping.apply(@state)
-    @content.apply(@state)
-    @store.apply(@state)
+    begin
+      @services.apply(@state)
+      @manifest.apply(@state)
+      @schema.apply(@state)
+      @mapping.apply(@state)
+      @content.apply(@state)
+      @store.apply(@state)
+    rescue Manifest::ProvenanceState::ContentAccessor::ContentError => e
+      @content.clean_messages
+      @content.add_message("ERROR", nil, nil, nil, e.message)
+      @content.state_access[:valid] = false
+    end
     @state
   end
 

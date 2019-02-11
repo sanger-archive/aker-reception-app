@@ -119,63 +119,6 @@ RSpec.describe 'Manifest::ProvenanceState' do
           expect(provenance_state.state).to include(state)
         end
       end
-      context 'when file defines more labwares than the manifest created' do
-        before do
-          allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
-          manifest.update_attributes(labwares: 1.times.map { create :labware })
-
-        end
-
-        let(:content) {
-          {
-            raw: [
-                {"plate_id" => "Labware 1", "position" => "A:1", "is_tumour" => "", "scientific_name" => "", "taxon_id" => "", "supplier_name" => "", "gender" => ""},
-                {"plate_id" => "Labware 2", "position" => "A:1", "is_tumour" => "", "scientific_name" => "", "taxon_id" => "", "supplier_name" => "", "gender" => ""}
-            ],
-            structured: { labwares: {
-              "Labware 1" => { addresses: { "A:1"=>  { fields:
-              {"is_tumour" => {value: ""}, "scientific_name" => {value: ""}, "taxon_id" => {value: ""},
-              "supplier_name" => {value: ""}, "gender" => {value: ""}}}}},
-              "Labware 2" => { addresses: { "A:1"=>  { fields:
-              {"is_tumour" => {value: ""}, "scientific_name" => {value: ""}, "taxon_id" => {value: ""},
-              "supplier_name" => {value: ""}, "gender" => {value: ""}}}}}
-
-          } } }
-        }
-        it 'raises an error' do
-          expect{provenance_state.apply(state)}.to raise_error(Manifest::ProvenanceState::ContentAccessor::WrongNumberLabwares)
-        end
-
-      end
-
-      context 'when file defines less labwares than the manifest created' do
-        before do
-          allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
-          manifest.update_attributes(labwares: 3.times.map { create :labware })
-
-        end
-
-        let(:content) {
-          {
-            raw: [
-                {"plate_id" => "Labware 1", "position" => "A:1", "is_tumour" => "", "scientific_name" => "", "taxon_id" => "", "supplier_name" => "", "gender" => ""},
-                {"plate_id" => "Labware 2", "position" => "A:1", "is_tumour" => "", "scientific_name" => "", "taxon_id" => "", "supplier_name" => "", "gender" => ""}
-            ],
-            structured: { labwares: {
-              "Labware 1" => { addresses: { "A:1"=>  { fields:
-              {"is_tumour" => {value: ""}, "scientific_name" => {value: ""}, "taxon_id" => {value: ""},
-              "supplier_name" => {value: ""}, "gender" => {value: ""}}}}},
-              "Labware 2" => { addresses: { "A:1"=>  { fields:
-              {"is_tumour" => {value: ""}, "scientific_name" => {value: ""}, "taxon_id" => {value: ""},
-              "supplier_name" => {value: ""}, "gender" => {value: ""}}}}}
-
-          } } }
-        }
-        it 'raises an error' do
-          expect{provenance_state.apply(state)}.to raise_error(Manifest::ProvenanceState::ContentAccessor::WrongNumberLabwares)
-        end
-
-      end
     end
   end
 end

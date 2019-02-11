@@ -29,10 +29,11 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
     (state_access && state_access.key?(:structured) && !state_access[:structured].nil?)
   end
 
-  class PositionNotFound < StandardError ; end
-  class LabwareNotFound < StandardError ; end
-  class PositionDuplicated < StandardError ; end
-  class WrongNumberLabwares < StandardError ; end
+  class ContentError < StandardError ; end
+  class PositionNotFound < ContentError ; end
+  class LabwareNotFound < ContentError ; end
+  class PositionDuplicated < ContentError ; end
+  class WrongNumberLabwares < ContentError ; end
 
 
   def present?
@@ -58,16 +59,20 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
     end
   end
 
+  def num_labwares_manifest
+    manifest_model.labwares.count
+  end
+
   def validate
     if state_access[:structured] && state_access[:structured][:labwares]
       num_labwares_file = state_access[:structured][:labwares].keys.length
-      num_labwares_manifest = manifest_model.labwares.count
       if (num_labwares_file > num_labwares_manifest)
         raise WrongNumberLabwares.new("Expected #{num_labwares_manifest} labwares in Manifest but found #{num_labwares_file}.")
       elsif (num_labwares_file < num_labwares_manifest)
         raise WrongNumberLabwares.new("Expected #{num_labwares_manifest} labwares in Manifest but could only find #{num_labwares_file}.")
       end
     end
+    state_access[:valid]=true
   end
 
 
@@ -119,12 +124,14 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
       validate_position_existence(mapped, idx)
 
       position = position(mapped)
+
       build_keys(memo, [:labwares, labware_found, :addresses])
       build_keys(memo, [:labwares, labware_found, :position])
       memo[:labwares][labware_found][:position] = labware_found
       build_keys(memo, [:labwares, labware_found, labware_id_schema_field])
       memo[:labwares][labware_found][labware_id_schema_field]=labware_id
 
+      validate_position_duplication(memo, labware_found, position)
       build_keys(memo, [:labwares, labware_found, :addresses, position, :fields])
 
 
@@ -153,16 +160,20 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
     end
   end
 
+  def mandatory_field_value_present(mapped, field)
+    return true unless manifest_schema_field_required?(manifest_schema_field(field))
+    (mapped[manifest_schema_field(field)] && !mapped[manifest_schema_field(field)][:value].blank?)
+  end
 
   def validate_labware_existence(mapped, idx)
-    if (manifest_schema_field_required?(manifest_schema_field(:labware_id)) && !mapped[manifest_schema_field(:labware_id)])
-      raise LabwareNotFound.new("This manifest does not have a valid labware id field for the labware at row: #{idx}")
+    unless mandatory_field_value_present(mapped, :labware_id)
+      raise LabwareNotFound.new("This manifest file does not have a valid labware id field for the labware at line: #{idx+1}")
     end
   end
 
   def validate_position_existence(mapped, idx)
-    if (manifest_schema_field_required?(manifest_schema_field(:position)) && !mapped[manifest_schema_field(:position)])
-      raise PositionNotFound.new("This manifest does not have a valid position field for the wells of row: #{idx}")
+    unless mandatory_field_value_present(mapped, :position)
+      raise PositionNotFound.new("This manifest file does not have a valid position field for the wells of line: #{idx+1}")
     end
   end
 

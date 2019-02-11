@@ -17,48 +17,23 @@ RSpec.describe Transformers::ExcelToState do
     before do
       mock_taxonomy_client
       allow(MatconClient::Material).to receive(:schema).and_return(material_schema)
+      manifest.update_attributes(labwares: 3.times.map { create :labware })
     end
     context 'when file is parsed' do
-      context 'when the manifest has only 1 labware' do
-        before do
-          manifest.update_attributes(labwares: 1.times.map { create :labware })
+      context 'when there is some errors on parsing' do
+        let(:path) { 'spec/fixtures/files/corrupted_simple_manifest.xlsx' }
+        it 'fails transforming to state' do
+          expect(transformer.transform).to be_falsy
         end
-        context 'the schema is not going to declare plate id as required' do
-          context 'therefore it will try to put all the contents in the same position on same plate' do
-            it 'fails transforming to state' do
-              expect(transformer.transform).to be_falsy
-            end
-            it 'gives an error' do
-              expect(transformer.errors).to be_truthy
-            end
-          end
-        end
-      end
-      context 'when the manifest is declared for 2 labwares' do
-        before do
-          manifest.update_attributes(labwares: 2.times.map { create :labware })
-        end
-        context 'the schema will declare plate id as required' do
-          context 'but the number of labwares is different between state and manifest' do
-            it 'gives an error' do
-              expect(transformer.errors).to be_truthy
-            end
-            it 'fails transforming to state' do
-              expect(transformer.transform).to be_falsy
-            end
-          end
+        it 'gives an error' do
+          expect(transformer.errors).to be_truthy
         end
       end
 
-      context 'when the manifest is declared for 3 labwares' do
-        before do
-          manifest.update_attributes(labwares: 3.times.map { create :labware })
-        end
-        context 'the schema will declare plate id as required' do
-          it 'will perform a right conversion to state' do
-            expect(transformer.transform).to be_truthy
-            expect(transformer.contents[:content][:structured][:labwares].keys.count).to eq(3)
-          end
+      context 'when there is no errors' do
+        it 'will perform a right conversion to state' do
+          expect(transformer.transform).to be_truthy
+          expect(transformer.contents[:content][:structured][:labwares].keys.count).to eq(3)
         end
       end
     end

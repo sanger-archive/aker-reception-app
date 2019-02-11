@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react'
 import store from '../store'
 import { Provider, connect } from 'react-redux'
+import classNames from 'classnames'
 import pluralize from 'pluralize'
 import MappingTool from './mapping_tool'
 import ManifestContainers from './manifest_containers'
@@ -8,6 +9,8 @@ import { uploadManifest, loadManifest, saveAndLeave, toggleMapping } from '../ac
 import StateSelectors from '../selectors'
 
 import Reception from '../../routes.js.erb'
+
+const MAX_UNCOLLAPSED_MESSAGES_TO_DISPLAY = 5
 
 const logName = (name) => { }
 const MessageDisplay = (props) => {
@@ -29,7 +32,10 @@ const MessagesList = (props, messages, Renderer) => {
       <p className="card-header" data-toggle="collapse" data-target={"#"+cardId} style={{cursor: 'pointer'}}>
         {props.messages.length} {pluralize(((props.type=='danger') ? 'error' : props.type), props.messages.length)}:
       </p>
-      <ul id={cardId} className="card-body collapse show">
+      <ul id={cardId} className={classNames({
+        "card-body collapse": true,
+        "show": (props.messages.length < MAX_UNCOLLAPSED_MESSAGES_TO_DISPLAY)
+        })}>
         {
           props.messages.map((msg, pos) => {
             if (msg.labware_index && (props.selectedTabPosition != msg.labware_index)) {

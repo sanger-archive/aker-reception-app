@@ -13,6 +13,10 @@ class Manifest::ProvenanceState::ManifestAccessor < Manifest::ProvenanceState::A
     }
   end
 
+  def validate
+    @state[@key][:valid] = true
+  end
+
   def labwares
     manifest_model.labwares.each_with_index.map do |labware, idx|
       labware_index = idx+1

@@ -57,12 +57,12 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
   let(:provenance_state) { Manifest::ProvenanceState.new(manifest, user) }
   let(:content_accessor) { provenance_state.content }
 
+  let(:no_of_labwares_required) { 1 }
 
   let(:manifest) {
     manifest = create :manifest
-    manifest.update_attributes(no_of_labwares_required: 1)
+    manifest.update_attributes(no_of_labwares_required: no_of_labwares_required)
     manifest
-
   }
   context '#apply error checks' do
     context 'with a manifest with a labware that contains the same position twice' do
@@ -98,6 +98,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     end
 
     context 'when the labware is not defined in some entries of the manifest' do
+      let(:no_of_labwares_required) { 2 }
       let(:manifest_content) {
         [
           {"plate_id" => "Labware 1", "supplier_name" => "InGen", "position" => "A:1"},
@@ -174,6 +175,53 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
     end
   end
 
+  context '#validate' do
+    let(:content) {
+      {
+        raw: [
+            {"plate_id" => "Labware 1", "position" => "A:1", "is_tumour" => "", "scientific_name" => "", "taxon_id" => "", "supplier_name" => "", "gender" => ""},
+            {"plate_id" => "Labware 2", "position" => "A:1", "is_tumour" => "", "scientific_name" => "", "taxon_id" => "", "supplier_name" => "", "gender" => ""}
+        ],
+        structured: { labwares: {
+          "Labware 1" => { addresses: { "A:1"=>  { fields:
+          {"is_tumour" => {value: ""}, "scientific_name" => {value: ""}, "taxon_id" => {value: ""},
+          "supplier_name" => {value: ""}, "gender" => {value: ""}}}}},
+          "Labware 2" => { addresses: { "A:1"=>  { fields:
+          {"is_tumour" => {value: ""}, "scientific_name" => {value: ""}, "taxon_id" => {value: ""},
+          "supplier_name" => {value: ""}, "gender" => {value: ""}}}}}
+
+      } } }
+    }
+
+    context 'when the number of labwares in the manifest is less than the number of labwares provided' do
+      before do
+        allow(MatconClient::Material).to receive(:schema).and_return(schema)
+        manifest.update_attributes(labwares: 2.times.map { create :labware })
+      end
+      it 'not raise an error' do
+        expect{content_accessor.apply(content: content)}.not_to raise_error
+      end
+    end
+    context 'when the number of labwares in the manifest is greater than the number of labwares provided' do
+      before do
+        allow(MatconClient::Material).to receive(:schema).and_return(schema)
+        manifest.update_attributes(labwares: 3.times.map { create :labware })
+      end
+      it 'raises an error' do
+        expect{content_accessor.apply(content: content)}.to raise_error(Manifest::ProvenanceState::ContentAccessor::WrongNumberLabwares)
+      end
+    end
+    context 'when the number of labwares in the manifest is equal to the number of labwares provided' do
+      before do
+        allow(MatconClient::Material).to receive(:schema).and_return(schema)
+        manifest.update_attributes(labwares: 1.times.map { create :labware })
+      end
+      it 'raises an error' do
+        expect{content_accessor.apply(content: content)}.to raise_error(Manifest::ProvenanceState::ContentAccessor::WrongNumberLabwares)
+      end
+    end
+  end
+
   context '#apply' do
     context 'when building structured content from scratch' do
       let (:raw_manifest) { 'a manifest in raw' }
@@ -239,6 +287,7 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
           expect(content_accessor.state[:content]).to include(raw: [], structured: {})
         end
       end
+
       context 'with a manifest that does not contain plate id match' do
         let(:mapping) {
           {

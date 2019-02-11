@@ -53,33 +53,4 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
     end
   end
 
-  def add_message(level, labware_index, address, field, text)
-    state_access[:structured][:messages] = [] unless state_access[:structured][:messages]
-    state_access[:structured][:messages].push({level: level,
-      text: text, labware_index: labware_index, address: address, field: field
-      })
-  end
-
-  def clean_messages
-    if state_access[:structured]
-      state_access[:structured][:messages] = []
-    end
-  end
-
-  def apply_messages(errors, warnings)
-    clean_messages
-    errors.each do |message|
-      message[:errors].keys.each do |field|
-        add_message("ERROR", message[:labwareIndex].to_s, message[:address], field, message[:errors][field])
-      end
-    end
-    warnings.each do |message|
-      message[:warnings].keys.each do |field|
-        add_message("WARNING", message[:labwareIndex].to_s, message[:address], field, message[:warnings][field])
-      end
-    end
-
-  end
-
-
 end
