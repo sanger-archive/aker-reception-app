@@ -9,12 +9,27 @@ const logName = (name) => {  }
 
 const DEBOUNCED_TIMING = 500
 
+class LabwareContentInputDefaultValue extends React.Component {
+  constructor(props) {
+    super(props)
+    this.input = React.createRef();
+  }
+  setupInputValue(selectedValue) {
+    if (this.input.current) {
+      // By doing this we overwrite the contents of the input when we update the redux state without
+      // rerendering the full DOM tree on every keystroke
+      this.input.current.value=selectedValue
+    }
+  }
+}
+
+
 export class LabwareContentSelectComponent extends LabwareContentInputDefaultValue {
   render() {
     const props = this.props
     logName('LabwareContentSelectComponent')
 
-    setupInputValue(selectedOptionValue)
+    this.setupInputValue(selectedOptionValue)
 
     const { title, name, id, selectedOptionValue, onBlur, onChange, readOnly } = props
 
@@ -47,23 +62,9 @@ export const LabwareContentSelect = connect((state, ownProps) => {
   }
 })(LabwareContentSelectComponent)
 
-class LabwareContentInputDefaultValue extends React.Component {
-  constructor(props) {
-    super(props)
-    this.input = React.createRef();
-  }
-  setupInputValue(selectedValue) {
-    if (this.input.current) {
-      // By doing this we overwrite the contents of the input when we update the redux state without
-      // rerendering the full DOM tree on every keystroke
-      this.input.current.value=selectedValue
-    }
-  }
-}
-
 export class LabwareContentText extends LabwareContentInputDefaultValue {
   render() {
-    setupInputValue(selectedValue)
+    this.setupInputValue(selectedValue)
 
     logName('LabwareContentText')
     // Because we dont want to send a request in every keystroke, we dont use the onChange handler
