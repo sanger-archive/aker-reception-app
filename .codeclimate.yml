@@ -12,3 +12,10 @@ plugins:
   eslint:
     enabled: true
     channel: "eslint-5"
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        javascript:
+          mass_threshold: 55
