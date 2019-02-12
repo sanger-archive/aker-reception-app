@@ -37,7 +37,7 @@ class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Acce
         provenance = ProvenanceService.new(manifest_schema)
         success, errors, warnings = provenance.set_biomaterial_data(manifest_model, updates, user)
         apply_messages(errors, warnings)
-        if success #&& !params["manifest"]["change_tab"]
+        if success
           success = manifest_model.update_attributes(
             status: (manifest_model&.any_human_material_no_hmdmc? ? 'ethics' : 'dispatch')
           )

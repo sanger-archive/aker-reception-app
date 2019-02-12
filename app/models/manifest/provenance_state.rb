@@ -31,7 +31,7 @@ class Manifest::ProvenanceState
       @mapping.apply(@state)
       @content.apply(@state)
       @store.apply(@state)
-    rescue Manifest::ProvenanceState::ContentAccessor::ContentError => e
+    rescue Manifest::ProvenanceState::ContentAccessor::ContentBuilder::ContentError => e
       @content.clean_messages
       @content.add_message(Manifest::ProvenanceState::ContentAccessor::ContentMessage.new(level: "ERROR", text: e.message))
     end
