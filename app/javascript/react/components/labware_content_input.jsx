@@ -29,9 +29,8 @@ export class LabwareContentSelectComponent extends LabwareContentInputDefaultVal
     const props = this.props
     logName('LabwareContentSelectComponent')
 
-    this.setupInputValue(selectedOptionValue)
-
     const { title, name, id, selectedOptionValue, onBlur, onChange, readOnly } = props
+    this.setupInputValue(selectedOptionValue)
 
     return (
       <select readOnly={readOnly} onBlur={onBlur} onChange={onChange}
@@ -64,11 +63,12 @@ export const LabwareContentSelect = connect((state, ownProps) => {
 
 export class LabwareContentText extends LabwareContentInputDefaultValue {
   render() {
-    this.setupInputValue(selectedValue)
+
 
     logName('LabwareContentText')
     // Because we dont want to send a request in every keystroke, we dont use the onChange handler
     const { onBlur, selectedValue, title, name, id, readOnly } = this.props
+    this.setupInputValue(selectedValue)
 
     return (
       <input
