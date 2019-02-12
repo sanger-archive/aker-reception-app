@@ -19,9 +19,9 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
   end
 
 
-  def validate_position_duplication(obj, labware_id, position)
+  def validate_position_duplication(obj, labware_id, position, idx)
     if obj[:labwares][labware_id][:addresses].key?(position)
-      raise PositionDuplicated.new("Duplicate entry found for #{labware_id}: Position #{position}")
+      raise PositionDuplicated.new("Duplicate entry found for Labware #{labware_id+1}: Position #{position}, line: #{idx+1}")
     end
   end
 
@@ -67,7 +67,7 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
       build_keys(memo, [:labwares, labware_found, labware_id_schema_field])
       memo[:labwares][labware_found][labware_id_schema_field]=labware_id
 
-      validate_position_duplication(memo, labware_found, position)
+      validate_position_duplication(memo, labware_found, position, idx)
       build_keys(memo, [:labwares, labware_found, :addresses, position, :fields])
 
 
@@ -120,12 +120,21 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
     @state[:mapping][:matched].select{|match| match[:observed] == key }.map{|m| m[:expected]}.first
   end
 
+  # Allocates memory for the list of keys provided inside the hash obj
+  def build_keys(obj, list, value=nil)
+    obj = list.reduce(obj) do |memo, key|
+      (memo[key] || (memo[key] = {}))
+    end
+    obj = value if value
+    obj
+  end
+
   def _find_or_allocate_labware_from_raw(memo, labware_id)
-    memo[:labwares]={} unless memo[:labwares]
-    labware_found = memo[:labwares].keys.select{|l| memo[:labwares][l][labware_id_schema_field]==labware_id }[0]
+    memo_labwares = memo[:labwares] ||= {}
+    labware_found = memo_labwares.keys.select{|l| memo_labwares[l][labware_id_schema_field]==labware_id }[0]
     unless labware_found
-      labware_found = memo[:labwares].keys.length
-      memo[:labwares][labware_found] = {}
+      labware_found = memo_labwares.keys.length
+      memo_labwares[labware_found] = {}
     end
     labware_found
   end

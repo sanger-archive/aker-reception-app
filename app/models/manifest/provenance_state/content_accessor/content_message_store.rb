@@ -1,7 +1,7 @@
 module Manifest::ProvenanceState::ContentAccessor::ContentMessageStore
   def add_message(message)
-    state_access[:structured] = { messages: [] } if state_access[:structured].nil?
-    state_access[:structured][:messages] = [] unless state_access[:structured][:messages]
+    state_access[:structured] ||= {}
+    state_access[:structured][:messages] ||= []
     if message.validate
       state_access[:structured][:messages].push(message.serialize)
       state_access[:valid] = false if (message.level=='ERROR')

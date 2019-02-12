@@ -35,15 +35,5 @@ class Manifest::ProvenanceState::Accessor
   def validate
   end
 
-  # Allocates memory for the list of keys provided inside the hash obj
-  def build_keys(obj, list, value=nil)
-    obj = list.reduce(obj) do |memo, key|
-      (memo[key] || (memo[key] = {}))
-    end
-    obj = value if value
-    obj
-  end
-
-
   attr_reader :provenance_state, :state
 end
