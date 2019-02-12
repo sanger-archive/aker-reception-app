@@ -33,7 +33,8 @@ export class LabwareContentSelectComponent extends LabwareContentInputDefaultVal
     this.setupInputValue(selectedOptionValue)
 
     return (
-      <select readOnly={readOnly} onBlur={onBlur} onChange={onChange}
+      <select ref={this.input}
+        readOnly={readOnly} onBlur={onBlur} onChange={onChange}
         className="form-control" title={title} name={name} id={id} defaultValue={selectedOptionValue}>
         <option value=""></option>
         { props.optionsForSelect.map((val, pos) => {
