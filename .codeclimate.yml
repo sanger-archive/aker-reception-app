@@ -12,7 +12,6 @@ plugins:
   eslint:
     enabled: true
     channel: "eslint-5"
-engines:
   duplication:
     enabled: true
     config:
