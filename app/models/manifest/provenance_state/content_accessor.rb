@@ -35,6 +35,7 @@ class Manifest::ProvenanceState::ContentAccessor < Manifest::ProvenanceState::Ac
   class PositionDuplicated < ContentError ; end
   class WrongNumberLabwares < ContentError ; end
 
+  include ContentMessageStore
 
   def present?
     super && present_structured?

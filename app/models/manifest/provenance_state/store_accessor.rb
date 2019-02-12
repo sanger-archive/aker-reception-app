@@ -1,5 +1,6 @@
 class Manifest::ProvenanceState::StoreAccessor < Manifest::ProvenanceState::Accessor
   delegate :manifest_schema, to: :provenance_state
+  delegate :apply_messages, to: :provenance_state
   delegate :user, to: :provenance_state
   delegate :manifest_model, to: :provenance_state
 
