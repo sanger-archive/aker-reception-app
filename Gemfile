@@ -7,7 +7,7 @@ git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
   "https://github.com/#{repo_name}.git"
 end
-
+gem 'pry'
 # All the gems not in a group will always be installed:
 #   http://bundler.io/v1.6/groups.html#grouping-your-dependencies
 gem 'activeresource', '~> 5.0' # Wrap your RESTful web app with Ruby classes
@@ -26,7 +26,6 @@ gem 'logstash-event'
 gem 'logstash-logger'
 gem 'net-ldap' # Pure Ruby LDAP library. Read more: https://github.com/ruby-ldap/ruby-net-ldap
 gem 'pg', '~> 0.18' # pg version 1.0.0 is not compatible with Rails 5.1.4
-gem 'pry'
 gem 'puma', '~> 3.0' # Use Puma as the app server
 gem 'rails', '~> 5.2.0'
 gem 'request_store'
@@ -38,6 +37,8 @@ gem 'turbolinks', '~> 5' # Turbolinks makes navigating your web application fast
 gem 'uglifier', '~> 3.2' # Use Uglifier as compressor for JavaScript assets
 gem 'uuid'
 gem 'webpacker', '~> 3.5', '>= 3.5.3'
+gem 'webpacker-react'
+gem 'react-rails'
 gem 'wicked'
 
 ###
@@ -69,8 +70,8 @@ end
 
 group :development do
   gem 'listen', '~> 3.0.5'
-  gem 'pry-rails', '~> 0.3.6' # An IRB alternative and runtime developer console
   gem 'rubocop', '~> 0.51.0', require: false # A Ruby static code analyzer
+  gem 'rubocop-rspec'
   gem 'spring' # Spring speeds up development by keeping your application running in the background
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'web-console' # Access an IRB console on exception pages or by using <%= console %> anywhere

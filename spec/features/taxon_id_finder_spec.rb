@@ -63,8 +63,8 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
       end
       context 'when writing the provenance information' do
         before do
-          tax_info = double('taxonomy_info', taxId: '3', scientificName: 'One specie')
-          tax_info2 = double('taxonomy_info', taxId: '4', scientificName: 'Another different one')
+          tax_info = double('taxonomy_info', taxId: '3', scientificName: 'Some specie name')
+          tax_info2 = double('taxonomy_info', taxId: '4', scientificName: 'Some specie name')
           cached_taxonomies = [tax_info, tax_info2].each_with_object({}) do |elem, memo|
             memo[elem.taxId] = { taxId: elem.taxId, scientificName: elem.scientificName }
             memo
@@ -79,11 +79,11 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           visit manifest_build_path(manifest_id: matsub.id, id: 'provenance')
         end
         context 'when writing a taxonomy id in a single input' do
-          it 'uses the taxonomy service and searches for the id provided', js: true do
-            fill_in('labware[1]address[A:1]fieldName[taxon_id]', with: '3')
-            expect(page).to have_selector('.has-success')
-            expect(!find_by_id('labware[1]address[A:1]fieldName[scientific_name]').value.empty?)
-              .to eq(true)
+          it 'uses the taxonomy service and searches for the id provided on blur event', js: true do
+            fill_in('labware[0]address[A:1]fieldName[taxon_id]', with: '3')
+            page.find("body").click
+
+            expect(page).to have_selector("input[value='Some specie name']")
           end
         end
 
@@ -91,20 +91,19 @@ RSpec.feature 'TaxonIdFinder', type: :feature, js: true do
           context 'when writing a taxonomy id in different inputs' do
             it 'uses the taxonomy service and searches for the id provided', js: true do
               i = 0
-              fill_in("labware[1]address[A:#{i + 1}]fieldName[taxon_id]", with: '3')
-              fill_in("labware[1]address[A:#{i + 1}]fieldName[supplier_name]", with: '3')
-              fill_in("labware[1]address[A:#{i + 1}]fieldName[donor_id]", with: '3')
-              fill_in("labware[1]address[A:#{i + 1}]fieldName[gender]", with: 'male')
-              fill_in("labware[1]address[A:#{i + 1}]fieldName[phenotype]", with: '3')
+              fill_in("labware[0]address[A:#{i + 1}]fieldName[taxon_id]", with: '3')
+              fill_in("labware[0]address[A:#{i + 1}]fieldName[supplier_name]", with: '3')
+              fill_in("labware[0]address[A:#{i + 1}]fieldName[donor_id]", with: '3')
+              fill_in("labware[0]address[A:#{i + 1}]fieldName[gender]", with: 'male')
+              fill_in("labware[0]address[A:#{i + 1}]fieldName[phenotype]", with: '3')
 
-              fill_in("labware[1]address[B:#{i + 1}]fieldName[taxon_id]", with: '4')
-              fill_in("labware[1]address[B:#{i + 1}]fieldName[supplier_name]", with: '4')
-              fill_in("labware[1]address[B:#{i + 1}]fieldName[donor_id]", with: '4')
-              fill_in("labware[1]address[B:#{i + 1}]fieldName[gender]", with: 'female')
-              fill_in("labware[1]address[B:#{i + 1}]fieldName[phenotype]", with: '4')
+              fill_in("labware[0]address[B:#{i + 1}]fieldName[taxon_id]", with: '4')
+              fill_in("labware[0]address[B:#{i + 1}]fieldName[supplier_name]", with: '4')
+              fill_in("labware[0]address[B:#{i + 1}]fieldName[donor_id]", with: '4')
+              fill_in("labware[0]address[B:#{i + 1}]fieldName[gender]", with: 'female')
+              fill_in("labware[0]address[B:#{i + 1}]fieldName[phenotype]", with: '4')
 
-              within(first('form > .row > .col-md-12')) { click_on('Next') }
-
+              first('a.save').click
               expect(page).not_to have_selector('.has-error')
             end
           end

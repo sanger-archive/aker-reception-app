@@ -6,6 +6,7 @@ module SchemaValidators
       SchemaValidators::BiomaterialSchemaPropertyValidators::AllowedValuesValidator,
       SchemaValidators::BiomaterialSchemaPropertyValidators::TaxonIdValidator,
       SchemaValidators::BiomaterialSchemaPropertyValidators::HmdmcValidator,
+      SchemaValidators::BiomaterialSchemaPropertyValidators::UniqueValuesValidator,
     ]
 
     def self.VALIDATION_CLASSES
@@ -14,12 +15,14 @@ module SchemaValidators
 
     attr_reader :schema
     attr_accessor :error_messages
+    attr_accessor :warning_messages
     attr_accessor :validators
 
 
     def initialize(schema)
       @schema = schema
       @error_messages = []
+      @warning_messages = []
       build_validators(@schema)
     end
 
@@ -52,8 +55,8 @@ module SchemaValidators
     private
 
     def build_validators(schema)
-      @validators = schema['properties'].reduce({}) do |memo, prop|
-        property_name, property_data = prop
+      @validators = schema['properties'].keys.reduce({}) do |memo, property_name|
+        property_data = schema['properties'][property_name]
 
         memo[property_name] = self.class.VALIDATION_CLASSES.select do |klass|
           klass.is_applicable?(property_name, property_data)

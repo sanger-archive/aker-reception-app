@@ -1,0 +1,48 @@
+# This file provides the information needed to generate the schema needed to validate a specific manifest
+# by combining this information with the Biomaterial schema. For more information refer to app/models/manifest/schema.rb
+field_labware_name: supplier_plate_name
+field_position: position
+default_labware_name_value: default
+default_position_value: default
+
+property_updates:
+  supplier_name:
+    unique_value: true
+    show_on_form: true
+    field_name_regex: ^supplier[-_ ]*name$
+  is_tumour:
+    show_on_form: true
+    field_name_regex: ^(?:is[-_ ]+)?tumou?r\??$
+  tissue_type:
+    show_on_form: true
+    field_name_regex: ^tissue[-_ ]*type$
+  donor_id:
+    unique_value: true
+    show_on_form: true
+    field_name_regex: '^donor(?:[-_ ]*id)?$'
+  gender:
+    show_on_form: true
+    field_name_regex: '^(?:gender|sex)$'
+  taxon_id:
+    show_on_form: true
+    field_name_regex: '^taxon(?:[-_ ]*id)?$'
+  scientific_name:
+    editable: false
+    required: false
+    show_on_form: true
+    field_name_regex: '^scientific(?:[-_ ]*name)?$'
+  phenotype:
+    show_on_form: true
+    field_name_regex: '^phenotype$'
+  hmdmc:
+    show_on_form: true
+    field_name_regex: ^hmdmc(?:[-_ ]+no\.?)?$
+  supplier_plate_name:
+    field_name_regex: ^plate
+    friendly_name: "Plate ID"
+    show_on_form: false
+  position:
+    field_name_regex: ^(well(\\s*|_*|-*))?position$
+    friendly_name: "Position"
+    show_on_form: false
+

@@ -10,6 +10,16 @@ class MockedTaxonomyServiceController < ActionController::Base
   end
 end
 
+def mock_taxonomy_client
+  allow(TaxonomyClient::Taxonomy).to receive(:find) do |taxon_id|
+    TaxonomyClient::Taxonomy.new({
+      "taxId": taxon_id,
+      "scientificName": "Some specie name"
+    })
+  end
+end
+
+
 def mock_taxonomy_service
   Rails.application.routes.draw do
     Rails.application.reload_routes!

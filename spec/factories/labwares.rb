@@ -2,12 +2,12 @@ FactoryBot.define do
   factory :labware do
     sequence(:labware_index) { |n| n }
     manifest
-    print_count 0
-    barcode nil
-    container_id nil
+    print_count { 0 }
+    barcode { nil }
+    container_id { nil }
 
     trait :printed do
-      print_count 1
+      print_count { 1 }
     end
 
     trait :has_contents do
