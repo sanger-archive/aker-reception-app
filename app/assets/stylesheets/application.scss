@@ -199,3 +199,9 @@ h2 {
   top: 100px !important;
   bottom: auto !important;
 }
+
+.mapping-modal {
+  height: 500px;
+  overflow: scroll;
+  max-height: 100%;
+}

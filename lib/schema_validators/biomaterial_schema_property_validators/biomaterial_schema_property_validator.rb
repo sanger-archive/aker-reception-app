@@ -16,32 +16,52 @@ module SchemaValidators
         schema_validator.error_messages
       end
 
+      def warning_messages
+        schema_validator.warning_messages
+      end
+
       def field_data(bio_data)
         field_data_for_property(property_name, bio_data)
       end
 
-      # Adds a validation error to the given error_messages.
-      def add_error(labware_index, address, field, msg)
-        i = error_messages.index { |x| x[:labwareIndex]==labware_index && x[:address]==address }
+      def _add_message(store, key, message_data)
+        i = store.index do |x|
+          x[:labwareIndex]==message_data[:labware_index] && x[:address]==message_data[:address]
+        end
         if i.nil?
-          error_message = {
-            errors: {},
-            labwareIndex: labware_index,
-            address: address,
+          message = {
+            labwareIndex: message_data[:labware_index],
+            address: message_data[:address],
             update_successful: true,
           }
-          error_messages.push(error_message)
+          message[key]={}
+          store.push(message)
         else
-          error_message = error_messages[i]
+          message = store[i]
         end
-        error_message[:errors][field.to_sym] = msg
+        message[key][message_data[:field].to_sym] = message_data[:text]
       end
+
+      # Adds a validation error to the given error_messages.
+      def add_error(labware_index, address, field, msg)
+        _add_message(error_messages, :errors, {labware_index: labware_index, address: address, field: field, text: msg})
+      end
+
+      # Adds a validation error to the given warning_messages.
+      def add_warning(labware_index, address, field, msg)
+        _add_message(warning_messages, :warnings, {labware_index: labware_index, address: address, field: field, text: msg})
+      end
+
 
       def field_data_for_property(property_name, bio_data)
         field_data = bio_data[property_name]
         field_data = field_data.strip if field_data
-        field_data = nil if field_data and field_data.empty?    
-        field_data  
+        field_data = nil if field_data and field_data.empty?
+        field_data
+      end
+
+      def set_field_data_for_property(property_name, bio_data, value)
+        bio_data[property_name]=value
       end
 
     end

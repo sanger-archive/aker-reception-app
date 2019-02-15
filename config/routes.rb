@@ -16,6 +16,7 @@ Rails.application.routes.draw do
     resources :print, only: [:index, :create]
     resources :dispatch, only: [:index, :create]
     resources :upload, only: [:create]
+    resources :state, only: [:update]
   end
 
   resources :manifests, only: [:index, :new, :destroy, :show] do

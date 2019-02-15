@@ -6,6 +6,20 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+
+def config_all_envs_for(name)
+  yaml = Pathname.new("#{paths["config"].existent.first}/#{name}.yml")
+
+  if yaml.exist?
+    require "erb"
+    (YAML.load(ERB.new(yaml.read).result) || {}) || {}
+  else
+    raise "Could not load configuration. No such file - #{yaml}"
+  end
+rescue Psych::SyntaxError => e
+  raise "YAML syntax error occurred while parsing #{yaml}. "          "Please note that YAML must be consistently indented using spaces. Tabs are not allowed. "          "Error: #{e.message}"
+end
+
 module Submission
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -31,6 +45,7 @@ module Submission
     end
 
     config.ldap = config_for(:ldap)
+    config.manifest_schema_config = config_all_envs_for(:manifest_schema)
 
     config.eager_load_paths << Rails.root.join('lib')
   end

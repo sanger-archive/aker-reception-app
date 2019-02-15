@@ -1,0 +1,17 @@
+{
+    "extends": [
+      "standard",
+      "eslint:recommended",
+      "plugin:react/recommended"
+     ],
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    //"parser": "babel-eslint",
+    "rules": { 
+      "complexity": ["error", 5],
+      "max-lines-per-function": ["error", 25]
+    }
+}
