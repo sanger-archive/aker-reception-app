@@ -7,6 +7,13 @@ module DispatchSteps
       @manifest = manifest
     end
 
+    def valid_bio_data(bio_data)
+      config = Rails.application.config.manifest_schema_config
+      bio_data.reject do |k|
+        (k==config["field_labware_name"]) || (k==config["field_position"]) || (k=='plate_id')
+      end
+    end
+
     # If you're trying to be safe, you need to make sure errors from this method are caught.
     def up
       @manifest.labwares.each do |labware|
@@ -18,7 +25,7 @@ module DispatchSteps
           # while the 'owner_email' refers to the creator of the manifest. Within materials, the
           # 'owner_email' is used as the 'submitter_id' indicating who submitted the materials and
           # the manifest 'contact'/'Sample Guardian' is the 'owner' of the material(s).
-          m = MatconClient::Material.create(bio_data.merge(
+          m = MatconClient::Material.create(valid_bio_data(bio_data).merge(
                                               owner_id: @manifest.contact.email,
                                               submitter_id: @manifest.owner_email
           ))

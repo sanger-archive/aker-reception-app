@@ -52,4 +52,12 @@ module ManifestHelper
     return manifest.labware_type.name
   end
 
+  def state_for_manifest(manifest, user)
+    Manifest::ProvenanceState.new(manifest, user).apply({content: {rebuild: true}})
+  end
+
+  def content_for_manifest(manifest)
+    manifest.labwares
+  end
+
 end
