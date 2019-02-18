@@ -148,13 +148,10 @@ const LabwareContent = connect((state, ownProps) => {
 
 const LabwareContentsComponent = (props) => {
   logName('LabwareContentsComponent')
+  const labwareIndex = props.labwareIndexes[props.selectedTabPosition]
   return (
     <div className="tab-content">
-      { props.labwareIndexes.map((labwareIndex, pos) => {
-        return (
-          <LabwareContent key={labwareIndex} labwareIndex={labwareIndex} position={pos} />
-        )
-      })}
+      <LabwareContent key={labwareIndex} labwareIndex={labwareIndex} position={labwareIndex} />
     </div>
   )
 }
@@ -162,6 +159,7 @@ const LabwareContentsComponent = (props) => {
 const LabwareContents = connect((state) => {
   logName('LabwareContents')
   return {
+    selectedTabPosition: StateSelectors.manifest.selectedTabPosition(state),
     labwareIndexes: StateSelectors.manifest.labwareIndexes(state)
   }
 })(LabwareContentsComponent)
