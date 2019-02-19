@@ -21,6 +21,7 @@ describe('<ManifestContainers />', () => {
       "taxonomy_service_url": ""
     },
     "manifest": {
+      "selectedTabPosition": "0",
       "manifest_id": "1234",
       "labwares": [
         {"supplier_plate_name": "Labware 1","positions": ["A:1","B:1"]},
@@ -120,23 +121,20 @@ describe('<ManifestContainers />', () => {
     })
 
     context('<LabwareContent>', () => {
-      it('displays the 2 labwares', () => {
-        expect(wrapper.find('LabwareContentComponent')).to.have.length(2)
+      it('displays just the labware selected', () => {
+        expect(wrapper.find('LabwareContentComponent')).to.have.length(1)
       })
     })
 
     context('<LabwareContentAddress>', () => {
-      it('displays 2 positions for the first labware', () => {
+      it('displays 2 positions', () => {
         expect(wrapper.find('LabwareContentComponent').first().find('LabwareContentAddressComponent')).to.have.length(2)
       })
-      it('displays 1 positions for the last labware', () => {
-        expect(wrapper.find('LabwareContentComponent').last().find('LabwareContentAddressComponent')).to.have.length(1)
-      })
-
-      it('displays all the addresses of the status', ()=> {
-        ["A:1","B:1","1"].forEach((val) => {
+      it('displays all the addresses', ()=> {
+        (["A:1","B:1"]).forEach((val) => {
           expect(wrapper.find('LabwareContentAddressComponent').filterWhere((n) => n.prop('address')==val)).to.have.length(1)
         })
+
       })
     })
 
