@@ -27,3 +27,13 @@ import $ from 'jquery'
     $(document).trigger('registerComponent.builder', { 'DataTableInitialization': DataTableInitialization })
   })
 }())
+
+$.fn.dataTable.ext.type.detect.unshift(
+    function ( d ) {
+      return ((!!$(d).data('sort-with')) ? 'reception-date' : null)
+    }
+)
+
+$.fn.dataTable.ext.type.order['reception-date-pre'] = function ( d ) {
+  return $(d).data('sort-with')
+}
