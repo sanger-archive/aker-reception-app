@@ -1,4 +1,4 @@
 <tr>
   <td><%= material_reception.barcode_value %></td>
-  <td><%= localize(material_reception.created_at, format: :terse) %></td>
+  <td><span data-sort-with="<%= material_reception.created_at %>"><%= localize(material_reception.created_at, format: :terse) %></span></td>
 </tr>
