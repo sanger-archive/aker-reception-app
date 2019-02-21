@@ -111,7 +111,15 @@ export const updateScientificName = (labwareId, address, fieldName, taxId, plate
   }
 }
 
+const isAbortedRequest = (xhr) => {
+  return ((xhr.status === 0) && (xhr.statusText === 'abort'))
+}
+
 export const showManifestUploadError = (dispatch, xhr) => {
+  if (isAbortedRequest(xhr)) {
+    return
+  }
+
   dispatch(displayMessage({
     labwareIndex: null,
     address: null,
@@ -121,18 +129,29 @@ export const showManifestUploadError = (dispatch, xhr) => {
   }))
 }
 
+export const storeSavingRequest = (savingRequest) => {
+  return {
+    type: C.STORE_SAVING_REQUEST, savingRequest
+  }
+}
+
 export const saveTab = (form) => {
   return (dispatch, getState) => {
     const state = getState()
     const manifestId = state.manifest.manifest_id
     const path = Reception.manifests_state_path(manifestId)
-    return $.ajax(path, {
+
+    const request = $.ajax(path, {
       method: 'PUT',
       contentType: 'application/json',
       dataType: 'json',
       data: JSON.stringify(getState())
-    }).then((data) => {
+    })
+    dispatch(storeSavingRequest(request))
+
+    return request.then((data) => {
       dispatch(loadManifest(data.contents))
+      dispatch(storeSavingRequest(null))
     }, $.proxy(showManifestUploadError, this, dispatch))
   }
 }
