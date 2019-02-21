@@ -107,16 +107,20 @@ class LabwareContentInputComponent extends React.Component {
   buildDirectUpdateInputHandler (labwareIndex, address, fieldName, plateId, taxonomyServiceUrl) {
     return (e) => {
       const value = e.target.value
-      this.props.updateInput(labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl)
+      if (value !== this.props.selectedValue) {
+        this.props.updateInput(labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl)
+      }
     }
   }
 
   buildDebouncedUpdateInputHandler (labwareIndex, address, fieldName, plateId, taxonomyServiceUrl) {
     return (e) => {
       const value = e.target.value
-      this.dataForUpdate = [labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl]
+      if (value !== this.props.selectedValue) {
+        this.dataForUpdate = [labwareIndex, address, fieldName, value, plateId, taxonomyServiceUrl]
 
-      this.debouncedUpdateInput()
+        this.debouncedUpdateInput()
+      }
     }
   }
 
