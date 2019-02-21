@@ -5,6 +5,7 @@ import classNames from 'classnames'
 import StateSelectors from '../selectors'
 import LabwareTabs from './labware_tabs'
 import { LabwareContentInput } from './labware_content_input'
+import StoreManager from './store_manager'
 
 const logName = (name) => { }
 
@@ -119,7 +120,7 @@ const LabwareContentComponent = (props) => {
           data-psd-component-parameters={JSON.stringify({ manifest_id: props.manifestId })}>
           <thead>
             <tr>
-              <th></th>
+              <th><StoreManager /></th>
               { props.fieldsToShow.map((name, pos) => <LabwareContentHeader fieldName={name} key={name} />)}
             </tr>
           </thead>
