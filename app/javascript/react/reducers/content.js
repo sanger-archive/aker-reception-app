@@ -71,6 +71,13 @@ const resetPreviousValues = (prevState, newState) => {
 
 export default (state = {}, action) => {
   switch (action.type) {
+    case C.STORE_SAVING_REQUEST:
+      if (action.savingRequest !== null) {
+        if (state.savingRequest) {
+          state.savingRequest.abort()
+        }
+      }
+      return Object.assign({}, state, { savingRequest: action.savingRequest })
     case C.TOGGLE_MAPPING:
       return Object.assign({}, state, {rebuild: true})
     case C.SAVE_AND_LEAVE:

@@ -3,7 +3,7 @@
 field_labware_name: supplier_plate_name
 field_position: position
 default_labware_name_value: default
-default_position_value: default
+default_position_value: "1"
 
 property_updates:
   supplier_name:
