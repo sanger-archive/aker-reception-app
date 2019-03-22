@@ -19,11 +19,8 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
   end
 
   def validate_position_valid(labware_found, position, idx)
-    if (@state[:manifest] && @state[:manifest][:labwares] && @state[:manifest][:labwares][labware_found]
-      && @state[:manifest][:labwares][labware_found][:positions])
-      unless @state[:manifest][:labwares][labware_found][:positions].include?(position)
-        raise PositionNotFound.new("The text '#{position}'' is not a valid position for the declared labware at line: #{idx+1}")
-      end
+    unless @state[:manifest][:labwares][labware_found][:positions].include?(position)
+      raise PositionNotFound.new("The text '#{position}'' is not a valid position for the declared labware at line: #{idx+1}")
     end
   end
 
