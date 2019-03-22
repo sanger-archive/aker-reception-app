@@ -466,6 +466,90 @@ RSpec.describe 'Manifest::ProvenanceState::ContentAccessor' do
             } } } } )
         end
       end
+
+      context 'with a manifest that contains positions in different formats like A01, A001, etc' do
+        let(:mapping) {
+          {
+            valid: true,
+            expected: [],
+            observed: [], matched: [
+              { expected: 'position', observed: 'position'},{expected: 'supplier_plate_name', observed: 'plate_id'},
+              { expected: 'is_tumour', observed: 'is_tumour' }, { expected: 'scientific_name', observed: 'scientific_name' },
+              { expected: 'taxon_id', observed: 'taxon_id' }, { expected: 'supplier_name', observed: 'supplier_name' },
+              { expected: 'gender', observed: 'gender' }
+            ]
+          }
+        }
+        let(:manifest_content) {
+          [
+            {
+              "plate_id" => "Labware 1", "position" => "A01", "is_tumour" => "tum", "scientific_name" => "sci",
+              "taxon_id" => "123", "supplier_name" => "sup", "gender" => "male"
+            },
+            {
+              "plate_id" => "Labware 1", "position" => "A:2", "is_tumour" => "tum", "scientific_name" => "sci",
+              "taxon_id" => "123", "supplier_name" => "sup1", "gender" => "male"
+            },
+            {
+              "plate_id" => "Labware 1", "position" => "B3", "is_tumour" => "tum", "scientific_name" => "sci",
+              "taxon_id" => "123", "supplier_name" => "sup2", "gender" => "male"
+            },
+            {
+              "plate_id" => "Labware 1", "position" => "C001", "is_tumour" => "tum", "scientific_name" => "sci",
+              "taxon_id" => "123", "supplier_name" => "sup3", "gender" => "male"
+            },
+            {
+              "plate_id" => "Labware 1", "position" => "D01", "is_tumour" => "tum", "scientific_name" => "sci",
+              "taxon_id" => "123", "supplier_name" => "sup5", "gender" => "male"
+            },
+            {
+              "plate_id" => "Labware 1", "position" => "e:1", "is_tumour" => "tum", "scientific_name" => "sci",
+              "taxon_id" => "123", "supplier_name" => "sup6", "gender" => "male"
+            },
+            {
+              "plate_id" => "Labware 1", "position" => "B12", "is_tumour" => "tum", "scientific_name" => "sci",
+              "taxon_id" => "123", "supplier_name" => "sup4", "gender" => "male"
+            }
+          ]
+        }
+        it 'does generate the content' do
+          expect(content_accessor.state[:content]).to include(structured: { labwares: {
+            0 => {
+              :position=>0, :supplier_plate_name=>"Labware 1",
+              addresses: {
+            "A:1"=>  { fields: {
+              "position" => {value: "A01"}, "supplier_plate_name" => {value: "Labware 1"},
+              "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
+            "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup"}, "gender" => {value: "male"}}},
+            "A:2"=>  { fields: {
+              "position" => {value: "A:2"}, "supplier_plate_name" => {value: "Labware 1"},
+              "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
+            "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup1"}, "gender" => {value: "male"}}},
+            "B:3"=>  { fields: {
+              "position" => {value: "B3"}, "supplier_plate_name" => {value: "Labware 1"},
+              "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
+            "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup2"}, "gender" => {value: "male"}}},
+            "C:1"=>  { fields: {
+              "position" => {value: "C001"}, "supplier_plate_name" => {value: "Labware 1"},
+              "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
+            "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup3"}, "gender" => {value: "male"}}},
+            "D:1"=>  { fields: {
+              "position" => {value: "D01"}, "supplier_plate_name" => {value: "Labware 1"},
+              "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
+            "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup5"}, "gender" => {value: "male"}}},
+            "E:1"=>  { fields: {
+              "position" => {value: "e:1"}, "supplier_plate_name" => {value: "Labware 1"},
+              "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
+            "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup6"}, "gender" => {value: "male"}}},
+            "B:12"=>  { fields: {
+              "position" => {value: "B12"}, "supplier_plate_name" => {value: "Labware 1"},
+              "is_tumour" => {value: "tum"}, "scientific_name" => {value: "sci"},
+            "taxon_id" => {value: "123"}, "supplier_name" => {value: "sup4"}, "gender" => {value: "male"}}},
+            }
+            } } } )
+        end
+      end
+
     end
   end
 end
