@@ -29,7 +29,7 @@ export const buildCheckInputErrors = () => {
 }
 
 const sanitizedAddress = (address) => {
-  if (!address.includes(":")) {
+  if (address && address.includes && (!address.includes(":"))) {
     const matches = address.match(/([^\d])(\d*)/)
     if ((matches) && (matches[2])) {
       try {

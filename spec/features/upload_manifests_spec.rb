@@ -110,6 +110,43 @@ RSpec.feature "Upload Manifests", type: :feature, js: true do
 
   end
 
+  context 'when uploading a Manifest with wrong addresses' do
+    let(:manifest_file) { 'wrong_address.csv' }
+    include_examples "displays an error", 'is not a valid position'
+  end
+
+
+  context 'when uploading a Manifest with different valid formats of addresses' do
+    let(:manifest_file) { 'different_formats_address.csv' }
+    it 'fills each table with information from the Manifest' do
+
+      first('.close').click
+
+      expect(page.find('div.tab-content table')).to have_selector("input[value='supplier name 1']")
+      expect(page.find('div.tab-content table')).to have_selector("input[value='donor id 1']")
+      expect(page.find('div.tab-content table')).to have_selector("input[value='Red']")
+
+
+
+      click_link 'Labware 2'
+
+      expect(page.find('div.tab-content table')).to have_selector("input[value='supplier name 2']")
+      expect(page.find('div.tab-content table')).to have_selector("input[value='donor id 2']")
+      expect(page.find('div.tab-content table')).to have_selector("input[value='Green']")
+
+      click_link 'Labware 3'
+
+      expect(page.find('div.tab-content table')).to have_selector("input[value='supplier name 3']")
+      expect(page.find('div.tab-content table')).to have_selector("input[value='donor id 3']")
+      expect(page.find('div.tab-content table')).to have_selector("input[value='Yellow']")
+    end
+
+    it 'does not display any error if the contents are right' do
+      first('.close').click
+      expect(first("ul.nav.nav-tabs")).not_to have_css('.bg-danger')
+    end
+  end
+
   context 'when uploading a valid Manifest with no Plate ID column' do
     let(:manifest_file) { 'simple_manifest.csv' }
     context 'when there is only one container' do

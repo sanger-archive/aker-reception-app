@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Transformers::ExcelToState do
 
-  let(:manifest) { create :manifest }
+  let(:lt) { create :labware_type}
+  let(:manifest) { create :manifest, labware_type: lt}
   let(:user) { create :user }
   let(:transformer) { Transformers::ExcelToState.new(manifest_model: manifest, current_user: user, path: path) }
   let(:path) { 'spec/fixtures/files/good_manifest_with_3_plates.csv' }
@@ -10,7 +11,8 @@ RSpec.describe Transformers::ExcelToState do
   context '#transform' do
     let(:material_schema) {
       { "properties" => {
-        "scientific_name" => { "required" => true }, "concentration" => { "required" => false}
+        "scientific_name" => { "required" => true },
+        "concentration" => { "required" => false}
       } }
     }
 

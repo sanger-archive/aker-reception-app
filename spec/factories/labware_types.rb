@@ -4,7 +4,7 @@ FactoryBot.define do
     num_of_cols { 12 }
     num_of_rows { 8 }
     col_is_alpha { false }
-    row_is_alpha { false }
+    row_is_alpha { true }
     name { generate(:labware_type_names) }
     description { "A piece of labware" }
   end
@@ -17,7 +17,7 @@ FactoryBot.define do
     num_of_cols { 12 }
     num_of_rows { 8 }
     col_is_alpha { false }
-    row_is_alpha { false }
+    row_is_alpha { true }
     name { "Plate" }
     description { "A plate" }
   end
