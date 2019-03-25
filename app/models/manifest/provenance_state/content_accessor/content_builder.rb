@@ -26,7 +26,7 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
   end
 
   def validate_position_valid(mapped, labware_found, position, idx)
-    unless mandatory_field_value_present(mapped, :position)
+    if mandatory_field_value_present(mapped, :position)
       positions_defined = positions_defined(labware_found)
       if positions_defined && !positions_defined.include?(position)
         raise PositionNotFound.new("The text '#{position}'' is not a valid position for the declared labware at line: #{idx+1}. Please review the file uploaded")
