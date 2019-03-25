@@ -25,10 +25,12 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
     end
   end
 
-  def validate_position_valid(labware_found, position, idx)
-    positions_defined = positions_defined(labware_found)
-    if positions_defined && !positions_defined.include?(position)
-      raise PositionNotFound.new("The text '#{position}'' is not a valid position for the declared labware at line: #{idx+1}. Please review the file uploaded")
+  def validate_position_valid(mapped, labware_found, position, idx)
+    unless mandatory_field_value_present(mapped, :position)
+      positions_defined = positions_defined(labware_found)
+      if positions_defined && !positions_defined.include?(position)
+        raise PositionNotFound.new("The text '#{position}'' is not a valid position for the declared labware at line: #{idx+1}. Please review the file uploaded")
+      end
     end
   end
 
@@ -74,7 +76,7 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
       validate_position_existence(mapped, idx)
 
       position = position(mapped)
-      validate_position_valid(labware_found, position, idx)
+      validate_position_valid(mapped, labware_found, position, idx)
 
       build_keys(memo, [:labwares, labware_found, :addresses])
       build_keys(memo, [:labwares, labware_found, :position])
