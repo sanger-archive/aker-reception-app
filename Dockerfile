@@ -13,6 +13,16 @@ RUN apt-get install -y nodejs
 # Using --unsafe-perm because: https://github.com/Medium/phantomjs/issues/707
 RUN npm install -g phantomjs-prebuilt --unsafe-perm
 
+# Install yarn
+RUN npm install -g yarn
+
+# Install node packages
+RUN yarn install
+
+# Install chrome for headless chrome testing
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install
+
 # Create the working directory
 # https://docs.docker.com/engine/reference/builder/#workdir
 WORKDIR /code
@@ -36,5 +46,8 @@ RUN chmod u+x /utils/wait-for-it.sh
 ADD https://raw.githubusercontent.com/pjvv/docker-entrypoint/master/docker-entrypoint.sh /utils/docker-entrypoint.sh
 RUN chmod u+x /utils/docker-entrypoint.sh
 
-# Add all remaining contents to the image
+# Add all remaining contents to the image - used for compose
 ADD . /code
+
+# Used to run the image stand-alone
+# CMD ["rails", "s", "-p", "3000", "-b", "0.0.0.0"]
