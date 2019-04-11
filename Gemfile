@@ -69,12 +69,12 @@ group :development, :test do
 end
 
 group :development do
-  gem 'sqlite3', '~> 1.3.6'
   gem 'listen', '~> 3.0.5'
   gem 'rubocop', '~> 0.51.0', require: false # A Ruby static code analyzer
   gem 'rubocop-rspec'
   gem 'spring' # Spring speeds up development by keeping your application running in the background
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'sqlite3', '~> 1.3.6'
   gem 'web-console' # Access an IRB console on exception pages or by using <%= console %> anywhere
 end
 
