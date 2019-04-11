@@ -7,7 +7,6 @@ git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
   "https://github.com/#{repo_name}.git"
 end
-gem 'pry'
 # All the gems not in a group will always be installed:
 #   http://bundler.io/v1.6/groups.html#grouping-your-dependencies
 gem 'activeresource', '~> 5.0' # Wrap your RESTful web app with Ruby classes
@@ -64,6 +63,7 @@ group :development, :test do
   gem 'database_cleaner' # database_cleaner is not required, but highly recommended
   gem 'factory_bot_rails', '~> 4.8'
   gem 'launchy'
+  gem 'pry'
   gem 'rspec-rails', '~> 3.4'
   gem 'webmock'
 end
@@ -74,6 +74,7 @@ group :development do
   gem 'rubocop-rspec'
   gem 'spring' # Spring speeds up development by keeping your application running in the background
   gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'sqlite3', '~> 1.3.6'
   gem 'web-console' # Access an IRB console on exception pages or by using <%= console %> anywhere
 end
 
