@@ -1,0 +1,9 @@
+coverage
+node_modules
+.byebyg_history
+.codeclimate.yml
+.eslintrc.json
+.gitignore
+.travis
+LICENSE
+README.md
