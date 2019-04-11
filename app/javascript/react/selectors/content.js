@@ -28,6 +28,20 @@ export const buildCheckInputErrors = () => {
   )
 }
 
+const sanitizedAddress = (address) => {
+  if (address && address.includes && (!address.includes(":"))) {
+    const matches = address.match(/([^\d])(\d*)/)
+    if ((matches) && (matches[2])) {
+      try {
+        return (matches[1]+":"+parseInt(matches[2], 10))
+      } catch(e) {
+        console.log("Matched integer regex out of bounds")
+      }
+    }
+  }
+  return address
+}
+
 const equalityIndex = (a,b) => {
   return (((a==null) && (b==null)) ||
     ((typeof a !== 'undefined') && (typeof b !== 'undefined') && ((a!==null) && (b!==null)) && (a.toString()===b.toString())))
@@ -63,7 +77,8 @@ export const ContentSelector = {
 
   inputMessages: (state, props) => {
     return ContentSelector.tabMessages(state, props.labwareIndex).filter((m) => {
-      return (equalityIndex(m.labware_index, props.labwareIndex) && (m.address === props.address) && (m.field === props.fieldName))
+      return (equalityIndex(m.labware_index, props.labwareIndex) &&
+        (sanitizedAddress(m.address) === sanitizedAddress(props.address)) && (m.field === props.fieldName))
     })
   },
 
@@ -78,7 +93,7 @@ export const ContentSelector = {
   ),
 
   selectedValueAtCell: (state, labwareId, address, fieldName) => {
-    const val = state?.content?.structured?.labwares?.[labwareId]?.addresses?.[address]?.fields?.[fieldName]?.value
+    const val = state?.content?.structured?.labwares?.[labwareId]?.addresses?.[sanitizedAddress(address)]?.fields?.[fieldName]?.value
     return (val || '')
   }
 }

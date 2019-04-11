@@ -128,5 +128,11 @@ describe('ContentSelector', () => {
       expect(ContentSelector.selectedValueAtCell(state,"0", "X:1", "taxonId")).to.equal("")
       expect(ContentSelector.selectedValueAtCell(state,"3", "A:1", "taxonId")).to.equal("")
     })
+    it('returns the value of the cell if the format is like A02, D12, etc', () => {
+      expect(ContentSelector.selectedValueAtCell(state, "0", "A1", "taxonId")).to.equal("1234")
+      expect(ContentSelector.selectedValueAtCell(state, "0", "A01", "taxonId")).to.equal("1234")
+      expect(ContentSelector.selectedValueAtCell(state, "0", "A:1", "taxonId")).to.equal("1234")
+      expect(ContentSelector.selectedValueAtCell(state, "0", "A_1", "taxonId")).to.equal("")
+    })
   })
 })

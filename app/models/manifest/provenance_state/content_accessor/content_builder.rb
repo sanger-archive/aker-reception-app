@@ -18,6 +18,22 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
     end
   end
 
+  def positions_defined(labware_found)
+    keys = [:manifest, :labwares, labware_found, :positions]
+    keys.reduce(@state) do |memo, key|
+      memo ? memo[key] : nil
+    end
+  end
+
+  def validate_position_valid(mapped, labware_found, position, idx)
+    if mandatory_field_value_present(mapped, :position)
+      positions_defined = positions_defined(labware_found)
+      if positions_defined && !positions_defined.include?(position)
+        raise PositionNotFound.new("The text '#{position}'' is not a valid position for the declared labware at line: #{idx+1}. Please review the file uploaded")
+      end
+    end
+  end
+
 
   def validate_position_duplication(obj, labware_id, position, idx)
     if obj[:labwares][labware_id][:addresses].key?(position)
@@ -60,6 +76,7 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
       validate_position_existence(mapped, idx)
 
       position = position(mapped)
+      validate_position_valid(mapped, labware_found, position, idx)
 
       build_keys(memo, [:labwares, labware_found, :addresses])
       build_keys(memo, [:labwares, labware_found, :position])
@@ -86,10 +103,18 @@ module Manifest::ProvenanceState::ContentAccessor::ContentBuilder
     end
   end
 
+  def sanitized_position(position)
+    matches = position.match(/^([^\d]):?(\d*)$/)
+    if matches
+      return "#{matches[1].upcase}:#{matches[2].to_i}" if (matches && matches[2])
+    end
+    return position
+  end
+
   def position(mapped)
     key = manifest_schema_field(:position)
     if mapped[key]
-      mapped[key][:value]
+      sanitized_position(mapped[key][:value])
     else
       Rails.configuration.manifest_schema_config['default_position_value']
     end
